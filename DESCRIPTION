@@ -1,0 +1,28 @@
+Package: mpMap2
+Type: Package
+Title: Multi-parent RIL genetic analysis
+Version: 0.0.1
+Date: 2015-03-24
+Author: Emma Huang and Rohan Shah, with contributions from Daniel Ahfock
+Maintainer: Emma Huang <Emma.Huang@csiro.au>
+Description: Tools for constructing linkage maps, reconstructing haplotypes,
+    estimating linkage disequilibrium and QTL mapping in multi-parent RIL
+    designs (e.g. MAGIC)
+License: GPL-2
+LazyLoad: yes
+Depends:
+    qtl,
+    Rcpp,
+    seriation,
+    methods
+Suggests:
+    Rmpi,
+    asreml,
+    happy.hbrem,
+    graph,
+    igraph,
+    RBGL
+Imports:
+    wgaim,
+    ggplot2
+LinkingTo: Rcpp, qtl
