@@ -1,2 +1,3 @@
 import(qtl)
 exportPattern("^[[:alpha:]]+")
+useDynLib(mpMap2)

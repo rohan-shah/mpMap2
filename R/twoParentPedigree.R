@@ -20,6 +20,7 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds,
   entries <- 2L + initialPopulationSize + intercrossingGenerations*initialPopulationSize + nSeeds*selfingGenerations*initialPopulationSize
 
   mother <- father <- rep(NA, entries)
+  observed <- rep(FALSE, entries)
   lineNames <- paste0("L", 1:entries)
   mother[1:2] <- father[1:2] <- 0L
 
@@ -54,6 +55,7 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds,
     for(lineCounter in currentIndex:(currentIndex+initialPopulationSize-1))
     {
       mother[nextFree:(nextFree+nSeeds-1)] <- father[nextFree:(nextFree+nSeeds-1)] <- lineCounter
+      observed[nextFree+nSeeds-1] <- TRUE
       nextFree <- nextFree + nSeeds
     }
   }
@@ -65,9 +67,15 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds,
       for(seedCounter in 1:nSeeds)
       {
         father[nextFree:(nextFree+selfingGenerations-1)] <- mother[nextFree:(nextFree+selfingGenerations-1)] <- c(lineCounter, nextFree:(nextFree+selfingGenerations-2))
+        observed[nextFree+selfingGenerations-1] <- TRUE
         nextFree <- nextFree + selfingGenerations
       }
     }
   }
-  return(new("pedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:2L))
+  #If there's no selfing mark the last set of intercrossing lines as observed
+  else
+  {
+    observed[lastGenerationStart:lastGenerationEnd] <- TRUE
+  }
+  return(new("pedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:2L, observed = observed))
 }
