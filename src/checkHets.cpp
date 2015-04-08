@@ -20,7 +20,7 @@ SEXP checkHets(SEXP hets)
 			errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + " must be a matrix with three columns");
 			continue;
 		}
-		Rcpp::IntegerMatrix currentHetObjectMat = currentHetObject;
+		Rcpp::IntegerMatrix currentHetObjectMat = Rcpp::as<Rcpp::IntegerMatrix>(currentHetObject);
 		int currentHetObjectRows = currentHetObjectDim(0);
 		//Now check symmetry - That is, if we have an encoding for haplotype (a, b), then we must have the same encoding for haplotype (b, a)
 		for(int rowCounter = 0; rowCounter < currentHetObjectRows; rowCounter++)
@@ -36,7 +36,7 @@ SEXP checkHets(SEXP hets)
 			//If we didn't find the symmetric encoding, that's an error. 
 			if(otherRow == currentHetObjectRows) 
 			{
-				errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index])) + ": If haplotype (a, b) has an encoding then haplotype (b, a) must have the same encoding");
+				errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + ": If haplotype (a, b) has an encoding then haplotype (b, a) must have the same encoding");
 				break;
 			}
 

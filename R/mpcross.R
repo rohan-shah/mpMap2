@@ -16,9 +16,9 @@ setMethod(f = "print", signature = "mpcross", definition = function(x)
   cat(sum(proportionMissing>.05), " markers had >5% missing data.\n")
   cat(sum(proportionMissing>.10), " markers had >10% missing data.\n")
   cat(sum(proportionMissing>.20), " markers had >20% missing data.\n")
-  cat("-------------------------------------------------------\n")
-  cat(length(which(segpval<1e-5)), " markers had <1e-5 p-value for segregation distortion\n")
-  cat(length(which(segpval<1e-10)), " markers had <1e-10 p-value for segregation distortion\n")
-  cat(length(which(segpval<1e-15)), " markers had <1e-15 p-value for segregation distortion\n")
-
 })
+
+fromMpMap <- function(mpcross)
+{
+  isMpMapMpcrossArgument(mpcross)
+}

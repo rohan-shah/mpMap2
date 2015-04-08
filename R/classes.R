@@ -1,3 +1,14 @@
+checkMap <- function(map)
+{
+	allNumeric <- unlist(lapply(map, is.numeric))
+	if(!allNumeric) return("A map object must be a list of numeric vectors")
+	return(TRUE)
+}
+.map4 <- setClass("map4", contains = "list", validity = checkMap)
+setOldClass("map", S4Class = "map4")
+removeClass("map4")
+setClassUnion("mapOrNULL", c("map", "NULL"))
+
 checkPedigree <- function(object)
 {
 	nLines <- length(object@lineNames)
@@ -9,23 +20,23 @@ checkPedigree <- function(object)
 
 	if(any(is.na(object@initial)))
 	{
-		errors <- c("errors", "Slot initial contained NA values")
+		errors <- c(errors, "Slot initial contained NA values")
 	}
 	if(any(is.na(object@lineNames)))
 	{
-		errors <- c("errors", "Slot lineNames contained NA values")
+		errors <- c(errors, "Slot lineNames contained NA values")
 	}
 	if(any(is.na(object@mother)))
 	{
-		errors <- c("errors", "Slot mother contained NA values")
+		errors <- c(errors, "Slot mother contained NA values")
 	}
 	if(any(is.na(object@father)))
 	{
-		errors <- c("errors", "Slot father contained NA values")
+		errors <- c(errors, "Slot father contained NA values")
 	}
 	if(any(is.na(object@observed)))
 	{
-		errors <- c("errors", "Slot observed contained NA values")
+		errors <- c(errors, "Slot observed contained NA values")
 	}
 
 	if(length(object@initial) == 0)
@@ -73,6 +84,7 @@ checkPedigree <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+.pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer", initial = "integer", observed = "logical"), validity = checkPedigree)
 checkHets <- function(object)
 {
 	if(is.null(names(object)) || any(names(object) == ""))
@@ -86,7 +98,7 @@ checkHets <- function(object)
 	return(.Call("checkHets", object))
 }
 .hetData <- setClass("hetData", contains = "list", validity = checkHets)
-.pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer", initial = "integer", observed = "logical"), validity = checkPedigree)
+
 checkMpcross <- function(object)
 {
 	errors <- c()
@@ -130,15 +142,61 @@ checkMpcross <- function(object)
 	{
 		errors <- c(errors, "Row names of slot finals were inconsistent with slot observed of pedigree")
 	}
-	alleleDataErrors <- .Call("alleleDataErrors", object, PACKAGE="mpMap2")
+	#This checks the relation between the het data, founder data and final data. It doesn't check that the het data is itself valid
+	alleleDataErrors <- .Call("alleleDataErrors", object, 10, PACKAGE="mpMap2")
 	if(length(alleleDataErrors) > 0)
 	{
-		if(length(alleleDataErrors) > 10)
-		{
-			errors <- c(alleleDataErrors, "Not reporting futher errors related to invalid alleles", errors)
-		}
-		else errors <- c(alleleDataErrors, errors)
+		errors <- c(errors, alleleDataErrors)
 	}
-	return(errors)
+
+	if(!is.null(object@map))
+	{
+		nMapMarkers <- sum(unlist(lapply(object@map, length)))
+		if(nMarkers != nMapMarkers)
+		{
+			errors <- c(errors, "Number of markers in map is different from the number of markers in slot founders")
+		}
+		else
+		{
+			markerNames <- unlist(lapply(object@map, names))
+			if(any(colnames(object@founders) != markerNames))
+			{
+				errors <- c(errors, "Marker names in map disagree with marker names in slot founders")
+			}
+		}
+	}
+	if(length(errors) > 0) return(errors)
+	return(TRUE)
 }
-.mpcross <- setClass("mpcross", slots = list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree"), validity=checkMpcross)
+.mpcross <- setClass("mpcross", slots = list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", map = "mapOrNULL"), validity=checkMpcross)
+
+.compressedMatrix <- setClass("compressedMatrix", slots = list(levels = "numeric", data = "integer"), validity = function(object) .Call("checkCompressedMatrix", object, package="mpMap2"))
+setClassUnion("numericOrNULL", c("numeric", "NULL"))
+.rf <- setClass("rf", slots = list(r = "numeric", theta = "compressedMatrix", lod = "numericOrNULL", lkhd = "numericOrNULL"))
+
+checkMpcrossRF <- function(object)
+{
+	if(!is.null(object@map)) return("An mpcross object with recombination fractions cannot have a map")
+	return(TRUE)
+}
+.mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"), validity=checkMpcrossRF)
+
+checkLG <- function(object)
+{
+	if(!all(object@groups %in% allGroups))
+	{
+		return("Only values in slot allGroups are allowed as values in slot groups")
+	}
+	return(TRUE)
+}
+.lg <- setClass("lg", slots = list(groups = "integer", allGroups = "integer"), validity = checkLG)
+
+checkMpcrossLG <- function(object)
+{
+	if(any(names(lg@groups) != colnames(object@founders)))
+	{
+		return("Marker names implied by names of slots lg@groups and founders were different")
+	}
+	return(TRUE)
+}
+.mpcrossLG <- setClass("mpcrossLG", contains = "mpcrossRF", slots = list(lg = "lg"), validity=checkMpcrossLG)

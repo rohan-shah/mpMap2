@@ -9,7 +9,7 @@ extern "C"
 	{
 		{"checkHets", (DL_FUNC)&checkHets, 1},
 		{"generateGenotypes", (DL_FUNC)&generateGenotypes, 3},
-		{"alleleDataErrors", (DL_FUNC)&alleleDataErrors, 1},
+		{"alleleDataErrors", (DL_FUNC)&alleleDataErrors, 2},
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
 		{NULL, NULL, 0}
 	};

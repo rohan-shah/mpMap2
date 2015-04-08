@@ -21,7 +21,7 @@ sim.mpcross <- function(map, pedigree, mapFunction, seed)
 	{
 		adjacentRecombination <- c(adjacentRecombination, sapply(diff(map[[i]]), mapFunction), 0.5)
 	}
-	nMarkers <- length(adjacentRecombination)+1
+	nMarkers <- length(adjacentRecombination)
 	markerNames <- unlist(lapply(map, names))
 	#Remove last value of 0.5
 	adjacentRecombination <- adjacentRecombination[-length(adjacentRecombination)]
