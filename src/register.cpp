@@ -3,6 +3,7 @@
 #include "checkHets.h"
 #include "generateGenotypes.h"
 #include "alleleDataErrors.h"
+#include "estimateRf.h"
 extern "C"
 {
 	R_CallMethodDef callMethods[] = 
@@ -11,6 +12,7 @@ extern "C"
 		{"generateGenotypes", (DL_FUNC)&generateGenotypes, 3},
 		{"alleleDataErrors", (DL_FUNC)&alleleDataErrors, 2},
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
+		{"estimateRf", (DL_FUNC)&estimateRf, 7},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

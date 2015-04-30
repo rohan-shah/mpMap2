@@ -1,4 +1,4 @@
-#' Simulate data from multi-parent designs
+ #' Simulate data from multi-parent designs
 #' 
 #' Data is simulated according to a pedigree, map and QTL model
 #' @export
@@ -9,7 +9,7 @@
 #' @return Object of class \code{mpcross}. 
 sim.mpcross <- function(map, pedigree, mapFunction, seed)
 {
-	isPedigreeArgument(pedigree)
+	isDetailedPedigreeArgument(pedigree)
 	isMapArgument(map)
 	nonNegativeIntegerArgument(seed)
 
@@ -33,7 +33,10 @@ sim.mpcross <- function(map, pedigree, mapFunction, seed)
 	founders <- genotypes[1:nFounders(pedigree),1:nMarkers]
 	#For the finals we have to combine the two
 	finals <- genotypes[which(pedigree@observed),]
+	finalsRowNames <- rownames(finals)
+	finalsColNames <- colnames(finals)[1:nMarkers]
 	finals <- combineGenotypes(finals, hetData)
-
-	return(new("mpcross", founders = founders, finals = finals, hetData = hetData, pedigree = pedigree))
+	colnames(finals) <- finalsColNames
+	rownames(finals) <- finalsRowNames
+	return(new("mpcross", geneticData = list(new("geneticData", founders = founders, finals = finals, hetData = hetData, pedigree = pedigree))))
 }

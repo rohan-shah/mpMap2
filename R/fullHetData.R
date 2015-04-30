@@ -15,7 +15,7 @@ fullHetData <- function(map, nFounders)
 			{
 				repeatedValue[row, 3] <- repeatedValue[nFounders * repeatedValue[row,1] + repeatedValue[row,2],3]
 			}
-			repeatedValue[row, 3] <- max(repeatedValue[,3])
+			repeatedValue[row, 3] <- max(repeatedValue[,3])+1
 		}
 	}
 	dimnames(repeatedValue) <- NULL

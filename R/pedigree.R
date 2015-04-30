@@ -9,11 +9,11 @@ linesByNames <- function(pedigree, names)
 	}
 	return(cbind(lineName = names, mother = pedigree@lineNames[pedigree@mother[lineIndices]], father = pedigree@lineNames[pedigree@father[lineIndices]]))
 }
-setMethod(f = "length", signature = "pedigree", definition = function(x)
-{
-	return(length(x@lineNames))
-})
 setMethod(f = "print", signature = "pedigree", definition = function(x)
 {
-	cat("This is a pedigree object containing ", length(x), " lines, of which ", nFounders(x), " are founders and ", sum(x@observed), " are observed\n")
+	cat("This is a pedigree object containing ", length(x), " lines\n")
+})
+setMethod(f = "print", signature = "detailedPedigree", definition = function(x)
+{
+	cat("This is a pedigree object containing ", length(x@lineNames), " lines, of which ", nFounders(x), " are founders and ", nFinals(x), " are observed\n")
 })

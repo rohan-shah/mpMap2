@@ -44,9 +44,9 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		{
 			throw std::runtime_error("Input markerNames must be a character vector");
 		}
-		if(Rcpp::as<std::string>(pedigree.attr("class")) != "pedigree")
+		if(Rcpp::as<std::string>(pedigree.attr("class")) != "detailedPedigree")
 		{
-			throw std::runtime_error("Input pedigree class had class " + Rcpp::as<std::string>(pedigree.attr("class")));
+			throw std::runtime_error("Input pedigree had class " + Rcpp::as<std::string>(pedigree.attr("class")) + " instead of detailedPedigree");
 		}
 		Rcpp::CharacterVector lineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
 		Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));

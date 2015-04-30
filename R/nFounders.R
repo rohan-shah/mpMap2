@@ -5,5 +5,9 @@ setMethod(f = "nFounders", signature = "pedigree", definition = function(object)
 })
 setMethod(f = "nFounders", signature = "mpcross", definition = function(object)
 {
-	return(length(object@pedigree@initial))
+	return(unlist(lapply(object@geneticData, nFounders)))
+})
+setMethod(f = "nFounders", signature = "geneticData", definition = function(object)
+{
+	return(nrow(object@founders))
 })

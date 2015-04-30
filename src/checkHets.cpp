@@ -15,7 +15,7 @@ SEXP checkHets(SEXP hets)
 			continue;
 		}
 		Rcpp::IntegerVector currentHetObjectDim = Rcpp::as<Rcpp::IntegerVector>(currentHetObject.attr("dim"));
-		if(currentHetObjectDim.size() != 2 || currentHetObjectDim[0] == 0 || currentHetObjectDim[1] != 3)
+		if(currentHetObjectDim.size() != 2 || currentHetObjectDim[1] != 3)
 		{
 			errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + " must be a matrix with three columns");
 			continue;
