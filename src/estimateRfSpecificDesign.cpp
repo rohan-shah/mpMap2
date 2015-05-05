@@ -378,9 +378,19 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles
 	//We do this to make it easier to identify markers with identical segregation patterns. recodedFounders = column major matrix
 	Rcpp::IntegerMatrix recodedFounders(nFounders, nMarkers), recodedFinals(nFinals, nMarkers);
+	Rcpp::List recodedHetData(nMarkers);
+	recodedHetData.attr("names") = args.hetData.attr("names");
 	recodedFinals.attr("dimnames") = args.finals.attr("dimnames");
-	unsigned int maxAlleles = 0;
-	recodeFoundersFinalsHets(recodedFounders, recodedFinals, args.founders, args.finals, maxAlleles);
+	
+	recodeDataStruct recoded;
+	recoded.recodedFounders = recodedFounders;
+	recoded.recodedFinals = recodedFinals;
+	recoded.founders = args.founders;
+	recoded.finals = args.finals;
+	recoded.hetData = args.hetData;
+	recoded.recodedHetData = recodedHetData;
+	recodeFoundersFinalsHets(recoded);
+	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 8) 
 	{
 		args.error = "Internal error - Cannot have more than eight alleles per marker";
@@ -409,10 +419,10 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	std::vector<bool> allowableMarkerPatternsIRIP(markerPatterns.size() * markerPatterns.size());
 	getAllowableMarkerPatterns(allowableMarkerPatternsStandard, allowableMarkerPatternsIRIP, markerPatterns, nFounders);
 	rfhaps_internal_args internal_args(args.lineWeights);
-	internal_args.founders = args.founders;
-	internal_args.finals = args.finals;
+	internal_args.founders = recodedFounders;
+	internal_args.finals = recodedFinals;
 	internal_args.pedigree = args.pedigree;
-	internal_args.hetData = args.hetData;
+	internal_args.hetData = recodedHetData;
 	internal_args.recombinationFractions = args.recombinationFractions;
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
 	internal_args.markerPatternIDs.swap(markerPatternIDs);
