@@ -44,11 +44,16 @@ checkPedigree <- function(object)
 	{
 		errors <- c(errors, "Mother and father must preceed offspring in the pedigree")
 	}
+	#Entry selfing must be either "auto" of "infinite"
+	if(object@selfing != "auto" && object@selfing != "infinite")
+	{
+		errors <- c(errors, "Slot selfing must be either \"infinite\" or \"auto\"")
+	}
 
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer"), validity = checkPedigree)
+.pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer", selfing = "character"), validity = checkPedigree)
 checkDetailedPedigree <- function(object)
 {
 	nTotalLines <- length(object@lineNames)

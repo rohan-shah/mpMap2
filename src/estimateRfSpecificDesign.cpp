@@ -7,7 +7,6 @@
 #include "recodeFoundersFinalsHets.h"
 #include "markerPatternsToUniqueValues.h"
 #include "funnelsToUniqueValues.h"
-#include "getAllowableMarkerPatterns.h"
 #include <memory>
 struct rfhaps_internal_args
 {
@@ -121,8 +120,9 @@ public:
 	arrayType()
 	{}
 	double values[n][n];
+	bool allowable;
 };
-template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpecificDesign(rfhaps_internal_args& args)
 {
 	typedef std::pair<markerPatternID, markerPatternID> markerPair;
 	struct PerRecombinationFractionData
@@ -155,7 +155,7 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_int
 
 	int nMarkerPatternIDs = args.markerEncodings.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
-	
+
 	//This is basically just a huge lookup table
 	PerMarkerPairData computedContributions;
 #ifdef USE_OPENMP
@@ -215,14 +215,24 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_int
 							}
 						}
 					}
+					//maximum and minimum of the marker probabilities
+					double max = -std::numeric_limits<double>::infinity(), min = std::numeric_limits<double>::infinity();
 					//now take logs of every value in markerProbabilities
 					for(int firstMarkerValue = 0; firstMarkerValue <= nFirstMarkerAlleles; firstMarkerValue++)
 					{
 						for(int secondMarkerValue = 0; secondMarkerValue <= nSecondMarkerAlleles; secondMarkerValue++)
 						{
+							max = std::max(max, markerProbabilities.values[firstMarkerValue][secondMarkerValue]);
+							min = std::min(min, markerProbabilities.values[firstMarkerValue][secondMarkerValue]);
 							markerProbabilities.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilities.values[firstMarkerValue][secondMarkerValue]);
 						}
 					}
+					//If these are too close then mark the combination as not allowable
+					if(fabs(max - min) < 1e-3)
+					{
+						markerProbabilities.allowable = false;
+					}
+					else markerProbabilities.allowable = true;
 				}
 				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
 				{
@@ -256,14 +266,23 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_int
 							}
 						}
 					}
+					//maximum and minimum of the marker probabilities
+					double max = -std::numeric_limits<double>::infinity(), min = std::numeric_limits<double>::infinity();
 					//now take logs of every value in markerProbabilitiesThisFunnel
 					for(int firstMarkerValue = 0; firstMarkerValue <= nFirstMarkerAlleles; firstMarkerValue++)
 					{
 						for(int secondMarkerValue = 0; secondMarkerValue <= nSecondMarkerAlleles; secondMarkerValue++)
 						{
+							max = std::max(max, markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue]);
+							min = std::min(min, markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue]);
 							markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue]);
 						}
 					}
+					if(fabs(max - min) < 1e-3)
+					{
+						markerProbabilitiesThisFunnel.allowable = false;
+					}
+					else markerProbabilitiesThisFunnel.allowable = true;
 				}
 			}
 #ifdef USE_OPENMP
@@ -286,40 +305,37 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_int
 			//For some bits in the lower triangle we have already calculated a corresponding bit in the upper triangle, so don't recalculate these. This means we have some values in args.result which are never set, but later code is aware of this
 			if(markerCounter2 >= maxStart && markerCounter2 < minEnd && markerCounter1 >= maxStart && markerCounter1 < minEnd && markerCounter2 < markerCounter1) continue;
 			int markerPatternID2 = args.markerPatternIDs[markerCounter2];
-			bool allowableStandard = allowableMarkerPatternsStandard[markerPatternID1*nMarkerPatternIDs + markerPatternID2];
-			bool allowableIRIP = allowableMarkerPatternsIRIP[markerPatternID1*nMarkerPatternIDs + markerPatternID2];
-			if(allowableStandard || allowableIRIP)
+
+			typename PerMarkerPairData::iterator patternData = computedContributions.find(markerPair(markerPatternID1, markerPatternID2));
+			if(patternData == computedContributions.end()) throw std::runtime_error("Internal error");
+			PerRecombinationFractionData* markerPairData = (PerRecombinationFractionData*)patternData->second;
+			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
-				typename PerMarkerPairData::iterator patternData = computedContributions.find(markerPair(markerPatternID1, markerPatternID2));
-				if(patternData == computedContributions.end()) throw std::runtime_error("Internal error");
-				PerRecombinationFractionData* markerPairData = (PerRecombinationFractionData*)patternData->second;
-				for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+				PerRecombinationFractionData& perRecombLevelData = markerPairData[recombCounter];
+				
+				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
-					PerRecombinationFractionData& perRecombLevelData = markerPairData[recombCounter];
-					
-					for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+					int marker1Value = args.finals(finalCounter, markerCounter1);
+					int marker2Value = args.finals(finalCounter, markerCounter2);
+					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 					{
-						int marker1Value = args.finals(finalCounter, markerCounter1);
-						int marker2Value = args.finals(finalCounter, markerCounter2);
-						if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
+						double contribution = 0;
+						bool allowable = false;
+						int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+						if(intercrossingGenerations == 0)
 						{
-							double contribution = 0;
-							int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
-							if(intercrossingGenerations == 0 && allowableStandard)
-							{
-								funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
-								arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perFunnelData[currentLineFunnelID];
-								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
-							}
-							else if(intercrossingGenerations > 0 && allowableIRIP)
-							{
-								arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perAIGenerationData[intercrossingGenerations-1];
-								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
-							}
-							//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
-							if(contribution != contribution) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
-							else if(contribution != 0) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
+							funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+							arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perFunnelData[currentLineFunnelID];
+							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 						}
+						else if(intercrossingGenerations > 0)
+						{
+							arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perAIGenerationData[intercrossingGenerations-1];
+							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+						}
+						//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
+						if(contribution != contribution) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
+						else if(contribution != 0 && allowable) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 					}
 				}
 			}
@@ -327,27 +343,36 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesign(rfhaps_int
 	}
 	return true;
 }
+template<int nFounders, int maxAlleles> bool estimateRfSpecificDesignInternal2(rfhaps_internal_args& args)
+{
+		bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
+		if(infiniteSelfing)
+		{
+			return estimateRfSpecificDesign<nFounders, maxAlleles, true>(args);
+		}
+		else return estimateRfSpecificDesign<nFounders, maxAlleles, false>(args);
+}
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
-template<int nFounders> bool estimateRfSpecificDesignInternal(rfhaps_internal_args& args)
+template<int nFounders> bool estimateRfSpecificDesignInternal1(rfhaps_internal_args& args)
 {
 	switch(args.maxAlleles)
 	{
 		case 1:
-			return estimateRfSpecificDesign<nFounders, 1>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 1>(args);
 		case 2:
-			return estimateRfSpecificDesign<nFounders, 2>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 2>(args);
 		case 3:
-			return estimateRfSpecificDesign<nFounders, 3>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 3>(args);
 		case 4:
-			return estimateRfSpecificDesign<nFounders, 4>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 4>(args);
 		case 5:
-			return estimateRfSpecificDesign<nFounders, 5>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 5>(args);
 		case 6:
-			return estimateRfSpecificDesign<nFounders, 6>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 6>(args);
 		case 7:
-			return estimateRfSpecificDesign<nFounders, 7>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 7>(args);
 		case 8:
-			return estimateRfSpecificDesign<nFounders, 8>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 8>(args);
 		default:
 			throw std::runtime_error("Internal error");
 	}
@@ -413,11 +438,6 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	std::vector<funnelEncoding> funnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, funnelIDs, funnelEncodings, allFunnels, nFounders);
 	
-	//Construct boolean matrix where rows and columns represent marker segregation patterns, and the boolean values refer to whether or not that pair of marker segregation patterns can be used to estimate recombination fractions
-	//A pair can be unaccetable as all parameters lead to the same probability model (complete unidentifiability) or there are pairs of parameters that lead to the same probability model (We will be able to estimate the "best pair", but get no further).
-	std::vector<bool> allowableMarkerPatternsStandard(markerPatterns.size() * markerPatterns.size());
-	std::vector<bool> allowableMarkerPatternsIRIP(markerPatterns.size() * markerPatterns.size());
-	getAllowableMarkerPatterns(allowableMarkerPatternsStandard, allowableMarkerPatternsIRIP, markerPatterns, nFounders);
 	rfhaps_internal_args internal_args(args.lineWeights);
 	internal_args.founders = recodedFounders;
 	internal_args.finals = recodedFinals;
@@ -427,8 +447,6 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
 	internal_args.markerPatternIDs.swap(markerPatternIDs);
 	internal_args.markerEncodings.swap(markerEncodings);
-	internal_args.allowableMarkerPatternsStandard.swap(allowableMarkerPatternsStandard);
-	internal_args.allowableMarkerPatternsIRIP.swap(allowableMarkerPatternsIRIP);
 	internal_args.hasAI = hasAIC;
 	internal_args.marker1Start = args.marker1Start;
 	internal_args.marker1End = args.marker1End;
@@ -440,15 +458,15 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	internal_args.funnelEncodings.swap(funnelEncodings);
 	if(nFounders == 2)
 	{
-		return estimateRfSpecificDesignInternal<2>(internal_args);
+		return estimateRfSpecificDesignInternal1<2>(internal_args);
 	}
 	else if(nFounders == 4)
 	{
-		return estimateRfSpecificDesignInternal<4>(internal_args);
+		return estimateRfSpecificDesignInternal1<4>(internal_args);
 	}
 	else if(nFounders == 8)
 	{
-		return estimateRfSpecificDesignInternal<8>(internal_args);
+		return estimateRfSpecificDesignInternal1<8>(internal_args);
 	}
 	else
 	{
