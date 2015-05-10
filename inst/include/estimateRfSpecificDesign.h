@@ -4,14 +4,14 @@
 #include <vector>
 struct estimateRfSpecificDesignArgs
 {
-	estimateRfSpecificDesignArgs(std::vector<double>& lineWeights)
-	: lineWeights(lineWeights)
+	estimateRfSpecificDesignArgs(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
+		: recombinationFractions(recombinationFractions), lineWeights(lineWeights)
 	{}
 	Rcpp::IntegerMatrix founders;
 	Rcpp::IntegerMatrix finals;
 	Rcpp::S4 pedigree;
 	Rcpp::S4 hetData;
-	Rcpp::NumericVector recombinationFractions;
+	std::vector<double>& recombinationFractions;
 	
 	std::vector<double>& lineWeights;
 	int marker1Start, marker1End;

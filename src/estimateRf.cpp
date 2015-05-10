@@ -19,6 +19,8 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
 		int halfIndex = std::distance(recombinationFractions.begin(), halfIterator);
+
+		std::vector<double> recombinationFractionsDouble = Rcpp::as<std::vector<double> >(recombinationFractions);
 		Rcpp::S4 object;
 		try
 		{
@@ -127,7 +129,7 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 			Rcpp::S4 currentGeneticData = geneticData(i);
 			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
 			std::string error;
-			estimateRfSpecificDesignArgs args(lineWeightsThisDesign);
+			estimateRfSpecificDesignArgs args(lineWeightsThisDesign, recombinationFractionsDouble);
 			try
 			{
 				args.founders = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("founders"));
@@ -168,7 +170,6 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 				ss << "hetData slot of design " << i << " was not an S4 object";
 				throw std::runtime_error(ss.str().c_str());
 			}
-			args.recombinationFractions = recombinationFractions;
 			args.marker1Start = marker1Start;
 			args.marker2Start = marker2Start;
 			args.marker1End = marker1End;
