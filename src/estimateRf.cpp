@@ -101,11 +101,11 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		if(marker1Range.size() != 2) throw std::runtime_error("Input marker1Range must have two entries");
 		if(marker2Range.size() != 2) throw std::runtime_error("Input marker2Range must have two entries");
 
-		int marker1Start = marker1Range(0), marker1End = marker1Range(1);
-		int marker2Start = marker2Range(0), marker2End = marker2Range(1);
-		if(marker1Start > marker1End || marker1Start < 0 || marker1End < 0) throw std::runtime_error("Invalid value for input marker1Range");
-		if(marker2Start > marker2End || marker2Start < 0 || marker2End < 0) throw std::runtime_error("Invalid value for input marker2Range");
-		long marker1RangeSize = marker1End - marker1Start, marker2RangeSize = marker2End - marker2Start;
+		int marker1Start = marker1Range(0)-1, marker1End = marker1Range(1);
+		int marker2Start = marker2Range(0)-1, marker2End = marker2Range(1);
+		if(marker1Start >= marker1End || marker1Start < 0 || marker1End < 0) throw std::runtime_error("Invalid value for input marker1Range");
+		if(marker2Start >= marker2End || marker2Start < 0 || marker2End < 0) throw std::runtime_error("Invalid value for input marker2Range");
+		long marker1RangeSize = marker1End - marker1Start, marker2RangeSize = marker2End - marker2Start	;
 
 		//Indexing has form result[markerCounter1 *nRecombLevels*nMarkers + markerCounter2 * nRecombLevels + recombCounter]
 		//This is not an Rcpp::NumericVector because it can quite easily overflow the size of such a vector (signed int)

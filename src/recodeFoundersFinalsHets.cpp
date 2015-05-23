@@ -8,12 +8,12 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 	long nMarkers = inputs.finals.ncol();
 	long nFounders = inputs.founders.nrow(), nFinals = inputs.finals.nrow();
 	
-	std::vector<int> finalAllowedValues;
+	std::vector<int> hetValues;
 	std::map<int, int> founderTranslations, finalTranslations;
 	for(long markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 	{
 		founderTranslations.clear();
-		finalAllowedValues.clear();	
+		hetValues.clear();	
 		finalTranslations.clear();
 		
 		Rcpp::IntegerMatrix currentMarkerHetData = Rcpp::as<Rcpp::IntegerMatrix>(Rcpp::as<Rcpp::List>(inputs.hetData)(markerCounter));
@@ -28,33 +28,36 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 			{
 				inputs.recodedFounders(founderCounter, markerCounter) = founderTranslations.size();
 				founderTranslations.insert(std::make_pair(oldValue, founderTranslations.size()));
+				finalTranslations.insert(std::make_pair(oldValue, founderTranslations.size()));
 			}
 			else
 			{
 				inputs.recodedFounders(founderCounter, markerCounter) = lookup->second;
 			}
 		}
-		inputs.maxAlleles = std::max(inputs.maxAlleles, (unsigned int)founderTranslations.size());
+		unsigned int nFounderAlleles = (unsigned int)founderTranslations.size();
+		inputs.maxAlleles = std::max(inputs.maxAlleles, nFounderAlleles);
 		//now translate hetData to sequential values
 		//Start off by translating the first two columns. Then gather up all the values in the third column that don't correspond to a homozygote. 
-		//But if they DO correspond to a homozygote, translate immediately
+		//But if the first two columns indicate that we're dealing with a het, translate the third column immediately
 		for(int i = 0; i < currentMarkerHetData.nrow(); i++)
 		{
 			for(int j = 0; j < 2; j++)
 			{
 				recodedCurrentMarkerHetData(i, j) = founderTranslations.find(currentMarkerHetData(i, j))->second;
 			}
-			if(currentMarkerHetData(i, 0) != currentMarkerHetData(i, 1)) finalAllowedValues.push_back(currentMarkerHetData(i, 2));
+			if(currentMarkerHetData(i, 0) != currentMarkerHetData(i, 1)) hetValues.push_back(currentMarkerHetData(i, 2));
 			else
 			{
 				recodedCurrentMarkerHetData(i, 2) = recodedCurrentMarkerHetData(i, 0);
 			}
 		}
 		//The homozygotes get translated as-is, the hetrozygotes are given sequential labels afterwards. 
-		finalAllowedValues.erase(std::unique(finalAllowedValues.begin(), finalAllowedValues.end()), finalAllowedValues.end());
-		for(std::size_t allowedValueCounter = 0; allowedValueCounter < finalAllowedValues.size(); allowedValueCounter++)
+		std::sort(hetValues.begin(), hetValues.end());
+		hetValues.erase(std::unique(hetValues.begin(), hetValues.end()), hetValues.end());
+		for(std::size_t allowedValueCounter = 0; allowedValueCounter < hetValues.size(); allowedValueCounter++)
 		{
-			finalTranslations.insert(std::make_pair(finalAllowedValues[allowedValueCounter], (int)allowedValueCounter+nFounders));
+			finalTranslations.insert(std::make_pair(hetValues[allowedValueCounter], (int)allowedValueCounter+nFounderAlleles));
 		}
 		for(int i = 0; i < currentMarkerHetData.nrow(); i++)
 		{
@@ -66,7 +69,7 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 		{
 			if(inputs.finals(finalCounter, markerCounter) != NA_INTEGER)
 			{
-				inputs.recodedFinals(finalCounter, markerCounter) = founderTranslations.find(inputs.finals(finalCounter, markerCounter))->second;
+				inputs.recodedFinals(finalCounter, markerCounter) = finalTranslations.find(inputs.finals(finalCounter, markerCounter))->second;
 			}
 			else inputs.recodedFinals(finalCounter, markerCounter) = NA_INTEGER;
 		}
