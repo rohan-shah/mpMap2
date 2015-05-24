@@ -26,9 +26,10 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 			lookup = founderTranslations.find(oldValue);
 			if(lookup == founderTranslations.end()) 
 			{
-				inputs.recodedFounders(founderCounter, markerCounter) = founderTranslations.size();
-				founderTranslations.insert(std::make_pair(oldValue, founderTranslations.size()));
-				finalTranslations.insert(std::make_pair(oldValue, founderTranslations.size()));
+				int newValue = founderTranslations.size();
+				inputs.recodedFounders(founderCounter, markerCounter) = newValue;
+				founderTranslations.insert(std::make_pair(oldValue, newValue));
+				finalTranslations.insert(std::make_pair(oldValue, newValue));
 			}
 			else
 			{

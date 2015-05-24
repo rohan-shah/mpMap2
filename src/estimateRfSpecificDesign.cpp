@@ -8,6 +8,7 @@
 #include "markerPatternsToUniqueValues.h"
 #include "funnelsToUniqueValues.h"
 #include <memory>
+#include "constructLookupTable.hpp"
 struct rfhaps_internal_args
 {
 	rfhaps_internal_args(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
@@ -20,6 +21,7 @@ struct rfhaps_internal_args
 	std::vector<double>& recombinationFractions;
 	
 	std::vector<int> intercrossingGenerations;
+	std::vector<int> selfingGenerations;
 	//A vector where entry i contains the markerPatternID identifying the segregation pattern of marker number i. Contains one entry per marker. 
 	std::vector<markerPatternID> markerPatternIDs;
 	std::vector<double>& lineWeights;
@@ -35,410 +37,6 @@ struct rfhaps_internal_args
 	std::vector<funnelID> funnelIDs;
 	std::vector<funnelEncoding> funnelEncodings;
 };
-template<int n> struct arrayType
-{
-public:
-	arrayType()
-	{}
-	double values[n][n];
-};
-//Note that if we change the mask[8][8] values of 2 to 1 we get mask4 in the first 4x4 block. 
-//const int mask4[4][4] = {{0, 1, 1, 1}, {1, 0, 1, 1}, {1, 1, 0, 1}, {1, 1, 1, 0}};
-const int mask[8][8] =
-	{
-			{0, 1, 2, 2, 2, 2, 2, 2},
-			{1, 0, 2, 2, 2, 2, 2, 2},
-			{2, 2, 0, 1, 2, 2, 2, 2},
-			{2, 2, 1, 0, 2, 2, 2, 2},
-			{2, 2, 2, 2, 0, 1, 2, 2},
-			{2, 2, 2, 2, 1, 0, 2, 2},
-			{2, 2, 2, 2, 2, 2, 0, 1},
-			{2, 2, 2, 2, 2, 2, 1, 0}
-	};
-/*See Karl Bromans paper on intermediate generations. In terms of indices, 
-Zero = homozygote, One = other homozygote, Two = hetrozygote
-In terms of values, see Table one of the paper. Zero = first equation of table, one = second equation, etc. Note that
-we combine equations 4 and 5 into a single state. 
-*/
-const int rilIntermediateMask[3][3] = 
-	{
-		{0, 1, 2},
-		{1, 0, 2},
-		{2, 2, 3}
-	};
-//Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
-template<int nFounders> void genotypeProbabilitiesNoIntercross(double (&prob)[3], double recombinationFraction);
-template<int nFounders> void genotypeProbabilitiesWithIntercross(double (&prob)[3], int nAIGenarations, double recombinationFraction);
-//There are only really two probability values for the 4-way design, but if we put in three values we can use the same mask as for the 8-way case
-template<> void genotypeProbabilitiesNoIntercross<4>(double (&prob)[3], double r)
-{
-	prob[0] = (1-r)/(4+8*r);
-	prob[1] = prob[2] = r/(4+8*r);
-}
-template<> void genotypeProbabilitiesNoIntercross<8>(double (&prob)[3], double r)
-{
-	prob[0] = (1-r)*(1-r)/(8+16*r);
-	prob[1] = r*(1-r)/(8+16*r);
-	prob[2] = r/(16+32*r);
-}
-template<> void genotypeProbabilitiesNoIntercross<2>(double (&prob)[3], double r)
-{
-	prob[0] = 1/(2*(1 + 2*r));
-	prob[1] = r/(1 + 2 * r);
-}
-template<> void genotypeProbabilitiesWithIntercross<2>(double (&prob)[3], int nAIGenerations, double r)
-{
-	double tmp = pow(1-r, nAIGenerations - 1);
-	//calculated by taking the 4-way case and setting both pairs of founders to be identical
-	prob[0] = (1/(1 + 2 * r)) * ((1-r)*tmp/2 + (2*r + 1 - tmp) /4);
-	prob[1] = (1 - prob[0]*2)/2;
-}
-template<> void genotypeProbabilitiesWithIntercross<4>(double (&prob)[3], int nAIGenerations, double r)
-{
-	double tmp = pow(1-r, nAIGenerations-1);
-	//prob[0] = (pow(1-r, 1+nAIGenerations)/4+(2*r+1-pow(1-r, nAIGenerations-1))/16)/(1+2*r); 
-	prob[0] = (tmp *(1-r)*(1-r)/4 + (2*r + 1 - tmp)/16)/(1 + 2*r);
-	prob[1] = prob[2] = (1 - 4 * prob[0]) / 12;
-}
-template<> void genotypeProbabilitiesWithIntercross<8>(double (&prob)[3], int nAIGenerations, double r)
-{
-	double tmp = pow(1-r, nAIGenerations-1);
-	prob[0] = (tmp *(1-r)*(1-r)*(1-r)/8 + (2*r + 1 - tmp)/64)/(1 + 2*r);
-	prob[1] = prob[2] = (1 - 8 * prob[0]) / 56;
-}
-template<int nFounders> void genotypeProbabilitiesNoIntercross(arrayType<nFounders>& expandedProbabilities, double r)
-{
-	double probabilities[3];
-	genotypeProbabilitiesNoIntercross<nFounders>(probabilities, r);
-	for(int i = 0; i < nFounders; i++)
-	{
-		for(int j = 0; j < nFounders; j++)
-		{
-			expandedProbabilities.values[i][j] = probabilities[mask[i][j]];
-		}
-	}
-}
-template<int nFounders> void genotypeProbabilitiesWithIntercross(arrayType<nFounders>& expandedProbabilities, int nAIGenerations, double r)
-{
-	double probabilities[3];
-	genotypeProbabilitiesWithIntercross<nFounders>(probabilities, nAIGenerations, r);
-	for(int i = 0; i < nFounders; i++)
-	{
-		for(int j = 0; j < nFounders; j++)
-		{
-			expandedProbabilities.values[i][j] = probabilities[mask[i][j]];
-		}
-	}
-}
-template<int maxAlleles> struct perRecombinationFractionData
-{
-	std::vector<arrayType<maxAlleles> > perFunnelData;
-	std::vector<arrayType<maxAlleles> > perAIGenerationData;
-};
-template<int maxAlleles> struct singleMarkerPairData
-{
-public:
-	singleMarkerPairData(int nRecombLevels, int nDifferentFunnels, int nDifferentAIGenerations)
-		: perRecombData(nRecombLevels), allowableFunnel(nDifferentFunnels), allowableAI(nDifferentAIGenerations)
-	{}
-	std::vector<perRecombinationFractionData<maxAlleles> > perRecombData;
-	std::vector<bool> allowableFunnel;
-	std::vector<bool> allowableAI;
-};
-typedef std::pair<markerPatternID, markerPatternID> markerPair;
-template<int maxAlleles> class allMarkerPairData : public std::map<markerPair, singleMarkerPairData<maxAlleles> >
-{
-public:
-	typedef typename std::map<markerPair, singleMarkerPairData<maxAlleles> > parent;
-	void swapInsert(markerPair& pair, singleMarkerPairData<maxAlleles>& inputData)
-	{
-		singleMarkerPairData<maxAlleles> empty(0, 0, 0);
-		std::pair<typename parent::iterator, bool> location = parent::insert(make_pair(pair, empty));
-		if(!location.second)
-		{
-			throw std::runtime_error("Internal error");
-		}
-		location.first->second.perRecombData.swap(inputData.perRecombData);
-		location.first->second.allowableFunnel.swap(inputData.allowableFunnel);
-		location.first->second.allowableAI.swap(inputData.allowableAI);
-	}
-};
-template<int maxAlleles> struct constructLookupTableArgs
-{
-public:
-	constructLookupTableArgs(allMarkerPairData<maxAlleles>& computedContributions)
-		: computedContributions(computedContributions)
-	{}
-	allMarkerPairData<maxAlleles>& computedContributions;
-	std::vector<markerEncoding>* markerEncodings;
-	std::vector<funnelEncoding>* funnelEncodings;
-	std::vector<double>* recombinationFractions;
-	std::vector<int>* intercrossingGenerations;
-};
-template<int maxAlleles> bool isValid(std::vector<arrayType<maxAlleles> >& markerProbabilities, int nFirstMarkerAlleles, int nSecondMarkerAlleles)
-{
-	int nPoints = markerProbabilities.size();
-	for(int recombCounter1 = 0; recombCounter1 < nPoints; recombCounter1++)
-	{
-		for(int recombCounter2 = recombCounter1 + 10; recombCounter2 < nPoints; recombCounter2++)
-		{
-			double sum = 0;
-			for(int i = 0; i < nFirstMarkerAlleles; i++)
-			{
-				for(int j = 0; j < nSecondMarkerAlleles; j++)
-				{
-					sum += fabs(markerProbabilities[recombCounter1].values[i][j] - markerProbabilities[recombCounter2].values[i][j]);
-				}
-			}
-			//If two different recombination fractions give similar models then this pair of markers is not good
-			if(sum < 0.005)
-			{
-				return false;
-			} 
-		}
-	}
-	return true;
-}
-template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles>& args)
-{
-	int nMarkerPatternIDs = args.markerEncodings->size();
-	int nRecombLevels = args.recombinationFractions->size();
-	int nDifferentFunnels = args.funnelEncodings->size();
-	int maxAIGenerations = *std::max_element(args.intercrossingGenerations->begin(), args.intercrossingGenerations->end());
-
-	//Only compute the haplotype probabilities once
-	std::vector<arrayType<nFounders> > funnelHaplotypeProbabilities(nRecombLevels);
-	for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
-	{
-		genotypeProbabilitiesNoIntercross<nFounders>(funnelHaplotypeProbabilities[recombCounter], (*args.recombinationFractions)[recombCounter]);
-	}
-	//Similarly for the intercrossing generation haplotype probabilities
-	std::vector<std::vector<arrayType<nFounders> > > intercrossingHaplotypeProbabilities(nRecombLevels);
-	for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
-	{
-		intercrossingHaplotypeProbabilities[recombCounter].resize(maxAIGenerations);
-		for(int aiCounter = 1; aiCounter <= maxAIGenerations; aiCounter++)
-		{
-			genotypeProbabilitiesWithIntercross<nFounders>(intercrossingHaplotypeProbabilities[recombCounter][aiCounter-1], aiCounter, (*args.recombinationFractions)[recombCounter]);
-		}
-	}
-
-
-	//In order to determine if a marker combination is informative, we use a much finer numerical grid.
-	const int nFinerPoints = 101;
-	//These values only need to be computed once. They're recombined in different ways depending on the funnel. 
-	std::vector<arrayType<nFounders> > finerFunnelHaplotypeProbabilities(nFinerPoints);
-	for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
-	{
-		genotypeProbabilitiesNoIntercross<nFounders>(finerFunnelHaplotypeProbabilities[recombCounter], 0.5 * ((double)recombCounter) / ((double)nFinerPoints - 1.0));
-	}
-	std::vector< std::vector<arrayType<nFounders> > > finerIntercrossingHaplotypeProbabilities(nFinerPoints);
-	for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
-	{
-		finerIntercrossingHaplotypeProbabilities[recombCounter].resize(maxAIGenerations);
-		for(int aiCounter = 1; aiCounter <= maxAIGenerations; aiCounter++)
-		{
-			genotypeProbabilitiesWithIntercross<nFounders>(finerIntercrossingHaplotypeProbabilities[recombCounter][aiCounter-1], aiCounter, 0.5 * ((double)recombCounter) / ((double)nFinerPoints - 1.0));
-		}
-	}
-#ifdef USE_OPENMP
-	#pragma omp parallel 
-#endif
-	{
-		//This is a temporary that's reused with in one of the later loops
-		std::vector<arrayType<maxAlleles> > finerMarkerProbabilities(nFinerPoints);
-		//This next loop is a big chunk of code, but does NOT grow with problem size (number of markers, number of lines). Well, it grows but to some fixed limit, because there are only so many marker patterns. 
-#ifdef USE_OPENMP
-		#pragma omp for schedule(dynamic, 1)
-#endif
-		for(int firstPattern = 0; firstPattern < nMarkerPatternIDs; firstPattern++)
-		{
-			int firstMarkerEncoding = (*args.markerEncodings)[firstPattern];
-			int firstMarkerPattern[nFounders];
-			for(int i = 0; i < nFounders; i++)
-			{
-				firstMarkerPattern[i] = ((firstMarkerEncoding & (7 << (3*i))) >> (3*i));
-			}
-			//marker alleles have been encoded so they're of the form [0, nAlleles), so can just look for max value
-			int nFirstMarkerAlleles = *std::max_element(firstMarkerPattern, firstMarkerPattern+nFounders)+1;
-			for(int secondPattern = 0; secondPattern < nMarkerPatternIDs; secondPattern++)
-			{
-				int secondMarkerEncoding = (*args.markerEncodings)[secondPattern];
-				int secondMarkerPattern[nFounders];
-				for(int i = 0; i < nFounders; i++)
-				{
-					secondMarkerPattern[i] = ((secondMarkerEncoding & (7 << (3*i))) >> (3*i));
-				}
-				int nSecondMarkerAlleles = *std::max_element(secondMarkerPattern, secondMarkerPattern+nFounders)+1;
-				
-				markerPair currentPair(firstPattern, secondPattern);
-				//The data for this pair of markers
-				singleMarkerPairData<maxAlleles> thisMarkerPairData(nRecombLevels, nDifferentFunnels, maxAIGenerations);
-				//Compute marker probabilities for a finer grid. If me seem to see a repeated probability model (numerically, up to a tolerance), then in that particular situtation this pair of markers is no good
-				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
-				{
-					for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
-					{
-						arrayType<maxAlleles>& finerMarkerProbabilitiesThisRecomb = finerMarkerProbabilities[recombCounter];
-						arrayType<nFounders>& finerFunnelHaplotypeProbabilitiesThisRecomb = finerFunnelHaplotypeProbabilities[recombCounter];
-						memset(&finerMarkerProbabilitiesThisRecomb, 0, sizeof(arrayType<maxAlleles>));
-						funnelEncoding enc = (*args.funnelEncodings)[funnelCounter];
-						int funnel[8];
-						for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-						{
-							funnel[founderCounter] = ((enc & (7 << (3*founderCounter))) >> (3*founderCounter));
-						}
-						for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-						{
-							//firstFounder is the index of the founder within the current funnel
-							for(int firstFounder = 0; firstFounder < nFounders; firstFounder++)
-							{
-								if(firstMarkerPattern[funnel[firstFounder]] == firstMarkerValue)
-								{
-									for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-									{
-										for(int secondFounder = 0; secondFounder < nFounders; secondFounder++)
-										{
-											 if(secondMarkerPattern[funnel[secondFounder]] == secondMarkerValue)
-											 {
-												finerMarkerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] += finerFunnelHaplotypeProbabilitiesThisRecomb.values[firstFounder][secondFounder];
-											 }
-										 }
-									}
-								}
-							}
-						}
-					}
-					thisMarkerPairData.allowableFunnel[funnelCounter] = isValid<maxAlleles>(finerMarkerProbabilities, nFirstMarkerAlleles, nSecondMarkerAlleles);
-				}
-				for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
-				{
-					for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
-					{
-						arrayType<nFounders>& finerHaplotypeProbabilities = finerIntercrossingHaplotypeProbabilities[recombCounter][intercrossingGeneration-1];
-						arrayType<maxAlleles>& finerMarkerProbabilitiesThisRecomb = finerMarkerProbabilities[recombCounter];
-						memset(&finerMarkerProbabilitiesThisRecomb, 0, sizeof(arrayType<maxAlleles>));
-						for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-						{
-							for(int firstFounder = 0; firstFounder < nFounders; firstFounder++)
-							{
-								if(firstMarkerPattern[firstFounder] == firstMarkerValue)
-								{
-									for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-									{
-										for(int secondFounder = 0; secondFounder < nFounders; secondFounder++)
-										{
-											 if(secondMarkerPattern[secondFounder] == secondMarkerValue)
-											 {
-												finerMarkerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] += finerHaplotypeProbabilities.values[firstFounder][secondFounder];
-											 }
-										 }
-									}
-								}
-							}
-						}
-					}
-					thisMarkerPairData.allowableAI[intercrossingGeneration-1] = isValid<maxAlleles>(finerMarkerProbabilities, nFirstMarkerAlleles, nSecondMarkerAlleles);
-				}
-
-				for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
-				{
-					double recombFraction = (*args.recombinationFractions)[recombCounter];
-					perRecombinationFractionData<maxAlleles>& currentRecomb = thisMarkerPairData.perRecombData[recombCounter];
-					currentRecomb.perFunnelData.resize(nDifferentFunnels);
-					currentRecomb.perAIGenerationData.resize(maxAIGenerations);
-
-					for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
-					{
-						if(thisMarkerPairData.allowableAI[intercrossingGeneration-1])
-						{
-							arrayType<nFounders>& haplotypeProbabilities = intercrossingHaplotypeProbabilities[recombCounter][intercrossingGeneration-1];
-							arrayType<maxAlleles>& markerProbabilities = currentRecomb.perAIGenerationData[intercrossingGeneration-1];
-							memset(&markerProbabilities, 0, sizeof(arrayType<maxAlleles>));
-							for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-							{
-								for(int firstFounder = 0; firstFounder < nFounders; firstFounder++)
-								{
-									if(firstMarkerPattern[firstFounder] == firstMarkerValue)
-									{
-										for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-										{
-											for(int secondFounder = 0; secondFounder < nFounders; secondFounder++)
-											{
-												 if(secondMarkerPattern[secondFounder] == secondMarkerValue)
-												 {
-													markerProbabilities.values[firstMarkerValue][secondMarkerValue] += haplotypeProbabilities.values[firstFounder][secondFounder];
-												 }
-											 }
-										}
-									}
-								}
-							}
-							//now take logs of every value in markerProbabilities
-							for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-							{
-								for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-								{
-									markerProbabilities.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilities.values[firstMarkerValue][secondMarkerValue]);
-								}
-							}
-						}
-					}
-					arrayType<nFounders>& funnelHaplotypeProbabilitiesThisRecomb = funnelHaplotypeProbabilities[recombCounter];
-					for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
-					{
-						if(thisMarkerPairData.allowableFunnel[funnelCounter])
-						{
-							arrayType<maxAlleles>& markerProbabilitiesThisFunnel = currentRecomb.perFunnelData[funnelCounter];
-							memset(&markerProbabilitiesThisFunnel, 0, sizeof(arrayType<maxAlleles>));
-							funnelEncoding enc = (*args.funnelEncodings)[funnelCounter];
-							int funnel[8];
-							for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-							{
-								funnel[founderCounter] = ((enc & (7 << (3*founderCounter))) >> (3*founderCounter));
-							}
-							for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-							{
-								//firstFounder is the index of the founder within the current funnel
-								for(int firstFounder = 0; firstFounder < nFounders; firstFounder++)
-								{
-									if(firstMarkerPattern[funnel[firstFounder]] == firstMarkerValue)
-									{
-										for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-										{
-											for(int secondFounder = 0; secondFounder < nFounders; secondFounder++)
-											{
-												 if(secondMarkerPattern[funnel[secondFounder]] == secondMarkerValue)
-												 {
-													markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue] += funnelHaplotypeProbabilitiesThisRecomb.values[firstFounder][secondFounder];
-												 }
-											 }
-										}
-									}
-								}
-							}
-							//now take logs of every value in markerProbabilitiesThisFunnel
-							for(int firstMarkerValue = 0; firstMarkerValue < nFirstMarkerAlleles; firstMarkerValue++)
-							{
-								for(int secondMarkerValue = 0; secondMarkerValue < nSecondMarkerAlleles; secondMarkerValue++)
-								{
-									markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisFunnel.values[firstMarkerValue][secondMarkerValue]);
-								}
-							}
-						}
-					}
-				}
-				//Now we see if these markers are informative with either 0 AIC generations or some non-zero number
-	#ifdef USE_OPENMP
-				#pragma omp critical
-	#endif
-				{
-					args.computedContributions.swapInsert(currentPair, thisMarkerPairData);
-				}
-			}
-		}
-	}
-}
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpecificDesign(rfhaps_internal_args& args)
 {
 	int nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -451,6 +49,8 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 
 	int nMarkerPatternIDs = args.markerEncodings.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
+	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
+	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions;
@@ -460,6 +60,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.funnelEncodings = &args.funnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
+	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
 #ifdef USE_OPENMP
@@ -480,7 +81,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 			singleMarkerPairData<maxAlleles> markerPairData = patternData->second;
 			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
-				perRecombinationFractionData<maxAlleles>& perRecombLevelData = markerPairData.perRecombData[recombCounter];
 				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
 					int marker1Value = args.finals(finalCounter, markerCounter1);
@@ -490,22 +90,23 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 						double contribution = 0;
 						bool allowable = false;
 						int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+						int selfingGenerations = args.selfingGenerations[finalCounter];
 						if(intercrossingGenerations == 0)
 						{
 							funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
-							allowable = markerPairData.allowableFunnel[currentLineFunnelID];
+							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perFunnelData[currentLineFunnelID];
+								arrayType<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
 						else if(intercrossingGenerations > 0)
 						{
-							allowable = markerPairData.allowableAI[intercrossingGenerations-1];
+							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								arrayType<maxAlleles>& perMarkerGenotypeValues = perRecombLevelData.perAIGenerationData[intercrossingGenerations-1];
+								arrayType<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -524,6 +125,7 @@ template<int nFounders, int maxAlleles> bool estimateRfSpecificDesignInternal2(r
 		bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
 		if(infiniteSelfing)
 		{
+			std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
 			return estimateRfSpecificDesign<nFounders, maxAlleles, true>(args);
 		}
 		else return estimateRfSpecificDesign<nFounders, maxAlleles, false>(args);
@@ -620,6 +222,7 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	internal_args.pedigree = args.pedigree;
 	internal_args.hetData = recodedHetData;
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
+	internal_args.selfingGenerations.swap(selfingGenerations);
 	internal_args.markerPatternIDs.swap(markerPatternIDs);
 	internal_args.markerEncodings.swap(markerEncodings);
 	internal_args.hasAI = hasAIC;
