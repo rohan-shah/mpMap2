@@ -1,22 +1,40 @@
 #include "markerPatternsToUniqueValues.h"
-void markerPatternsToUniqueValues(std::map<markerEncoding, markerPatternID>& markerPatterns, std::vector<markerPatternID>& markerPatternIDs, std::vector<markerEncoding>&markerEncodings, int nFounders, int nMarkers, Rcpp::IntegerMatrix& recodedFounders)
+void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 {
-	for(long markerCounter = 0; markerCounter < nMarkers; markerCounter++)
+	for(long markerCounter = 0; markerCounter < args.nMarkers; markerCounter++)
 	{
-		int encodedMarkerPattern = 0;
-		for(long founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		Rcpp::IntegerMatrix currentMarkerHetData = args.recodedHetData(markerCounter);
+		//Set up struct containing data about this marker
+		markerData currentPattern(currentMarkerHetData.nrow(), currentMarkerHetData.ncol(), args.nFounders);
+		for(long founderCounter = 0; founderCounter < args.nFounders; founderCounter++)
 		{
-			encodedMarkerPattern += (recodedFounders(founderCounter, markerCounter) << 3*founderCounter);
+			currentPattern.founderAlleles[founderCounter] = args.recodedFounders(founderCounter, markerCounter);
 		}
-		if(markerPatterns.find(encodedMarkerPattern) == markerPatterns.end())
+		for(int i = 0; i < currentMarkerHetData.nrow(); i++)
 		{
-			markerPatternIDs.push_back(markerPatterns.size());
-			markerPatterns.insert(std::make_pair(encodedMarkerPattern, markerPatterns.size()));
-			markerEncodings.push_back(encodedMarkerPattern);
+			for(int j = 0; j < currentMarkerHetData.ncol(); j++)
+			{
+				currentPattern.hetData(i, j) = currentMarkerHetData(i, j);
+			}
+		}
+		currentPattern.nObservedValues = *std::max_element(&(currentPattern.founderAlleles[0]), &(currentPattern.founderAlleles[args.nFounders]));
+		currentPattern.nObservedValues = std::max(currentPattern.nObservedValues, *std::max_element(&(currentPattern.hetData(0,0)), &(currentPattern.hetData(0,0))+currentPattern.hetData.getNRows() * currentPattern.hetData.getNColumns()));
+		currentPattern.nObservedValues++;
+
+		currentPattern.computeHash();
+		//Have we already seen a marker like this?
+		std::map<markerData, markerPatternID>::iterator existingPattern = args.markerPatterns.find(currentPattern);
+		//If not, add it to the list of all possible marker patterns, and give it a new ID
+		if(existingPattern == args.markerPatterns.end())
+		{
+			args.markerPatternIDs.push_back(args.markerPatterns.size());
+			args.markerPatterns.insert(std::make_pair(currentPattern, args.markerPatterns.size()));
+			args.allMarkerPatterns.push_back(currentPattern);
 		}
 		else
 		{
-			markerPatternIDs.push_back(markerPatterns.find(encodedMarkerPattern)->second);
+			//If we have, mark this marker as having pattern given by the existing ID
+			args.markerPatternIDs.push_back(existingPattern->second);
 		}
 	}
 }

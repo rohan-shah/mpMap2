@@ -6,6 +6,7 @@
 #include "estimateRf.h"
 extern "C"
 {
+	char* package_name = "mpMap2";
 	R_CallMethodDef callMethods[] = 
 	{
 		{"checkHets", (DL_FUNC)&checkHets, 1},

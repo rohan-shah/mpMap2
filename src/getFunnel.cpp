@@ -3,7 +3,6 @@ void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& fath
 {
 	int currentLine = line;
 	while(father(currentLine) == mother(currentLine))
-
 	{
 		currentLine = father(currentLine)-1;
 	}

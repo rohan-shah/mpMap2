@@ -12,10 +12,6 @@ template <typename T, typename V> struct Unique
 	}
 };
 
-//The marker encoding struct represents a marker segregation pattern, encoded as a bitfield.
-struct markerEncoding_imp;
-typedef Unique<markerEncoding_imp, int> markerEncoding;
-
 //The marker pattern ID struct represents a unique identifier, assigned to a particular marker encoding.
 struct markerPatternID_imp;
 typedef Unique<markerPatternID_imp, int> markerPatternID;

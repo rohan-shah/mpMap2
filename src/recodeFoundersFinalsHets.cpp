@@ -37,7 +37,6 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 			}
 		}
 		unsigned int nFounderAlleles = (unsigned int)founderTranslations.size();
-		inputs.maxAlleles = std::max(inputs.maxAlleles, nFounderAlleles);
 		//now translate hetData to sequential values
 		//Start off by translating the first two columns. Then gather up all the values in the third column that don't correspond to a homozygote. 
 		//But if the first two columns indicate that we're dealing with a het, translate the third column immediately
@@ -56,6 +55,7 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 		//The homozygotes get translated as-is, the hetrozygotes are given sequential labels afterwards. 
 		std::sort(hetValues.begin(), hetValues.end());
 		hetValues.erase(std::unique(hetValues.begin(), hetValues.end()), hetValues.end());
+		inputs.maxAlleles = std::max(inputs.maxAlleles, (unsigned int)(nFounderAlleles + hetValues.size()));
 		for(std::size_t allowedValueCounter = 0; allowedValueCounter < hetValues.size(); allowedValueCounter++)
 		{
 			finalTranslations.insert(std::make_pair(hetValues[allowedValueCounter], (int)allowedValueCounter+nFounderAlleles));

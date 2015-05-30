@@ -14,19 +14,14 @@ struct rfhaps_internal_args
 	rfhaps_internal_args(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
 	: recombinationFractions(recombinationFractions), lineWeights(lineWeights)
 	{}
-	Rcpp::IntegerMatrix founders;
 	Rcpp::IntegerMatrix finals;
 	Rcpp::S4 pedigree;
-	Rcpp::List hetData;
 	std::vector<double>& recombinationFractions;
 	
 	std::vector<int> intercrossingGenerations;
 	std::vector<int> selfingGenerations;
-	//A vector where entry i contains the markerPatternID identifying the segregation pattern of marker number i. Contains one entry per marker. 
-	std::vector<markerPatternID> markerPatternIDs;
 	std::vector<double>& lineWeights;
-	//vector with entry i containing an encoding of the marker segregation pattern for a marker with markerPatternID i
-	std::vector<markerEncoding> markerEncodings;
+	markerPatternsToUniqueValuesArgs markerPatternData;
 	bool hasAI;
 	int marker1Start, marker1End;
 	int marker2Start, marker2End;
@@ -47,16 +42,15 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
 
-	int nMarkerPatternIDs = args.markerEncodings.size();
+	int nMarkerPatternIDs = args.markerPatternData.allMarkerPatterns.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
 	//This is basically just a huge lookup table
-	allMarkerPairData<maxAlleles> computedContributions;
+	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions);
-	lookupArgs.markerEncodings = &args.markerEncodings;
+	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.funnelEncodings = &args.funnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -69,16 +63,14 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 	//This set of loops DOES grow with problem size. 
 	for(int markerCounter1 = args.marker1Start; markerCounter1 < args.marker1End; markerCounter1++)
 	{
-		int markerPatternID1 = args.markerPatternIDs[markerCounter1];
+		int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounter1];
 		for(int markerCounter2 = args.marker2Start; markerCounter2 < args.marker2End; markerCounter2++)
 		{
 			//For some bits in the lower triangle we have already calculated a corresponding bit in the upper triangle, so don't recalculate these. This means we have some values in args.result which are never set, but later code is aware of this
 			if(markerCounter2 >= maxStart && markerCounter2 < minEnd && markerCounter1 >= maxStart && markerCounter1 < minEnd && markerCounter2 < markerCounter1) continue;
-			int markerPatternID2 = args.markerPatternIDs[markerCounter2];
+			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounter2];
 
-			typename allMarkerPairData<maxAlleles>::iterator patternData = computedContributions.find(markerPair(markerPatternID1, markerPatternID2));
-			if(patternData == computedContributions.end()) throw std::runtime_error("Internal error");
-			singleMarkerPairData<maxAlleles> markerPairData = patternData->second;
+			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
 			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
 				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
@@ -141,7 +133,7 @@ template<int nFounders> bool estimateRfSpecificDesignInternal1(rfhaps_internal_a
 			return estimateRfSpecificDesignInternal2<nFounders, 2>(args);
 		case 3:
 			return estimateRfSpecificDesignInternal2<nFounders, 3>(args);
-		case 4:
+/*		case 4:
 			return estimateRfSpecificDesignInternal2<nFounders, 4>(args);
 		case 5:
 			return estimateRfSpecificDesignInternal2<nFounders, 5>(args);
@@ -150,7 +142,7 @@ template<int nFounders> bool estimateRfSpecificDesignInternal1(rfhaps_internal_a
 		case 7:
 			return estimateRfSpecificDesignInternal2<nFounders, 7>(args);
 		case 8:
-			return estimateRfSpecificDesignInternal2<nFounders, 8>(args);
+			return estimateRfSpecificDesignInternal2<nFounders, 8>(args);*/
 		default:
 			throw std::runtime_error("Internal error");
 	}
@@ -161,15 +153,22 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
 	std::vector<int> intercrossingGenerations, selfingGenerations;
 	getIntercrossingAndSelfingGenerations(args.pedigree, args.finals, nFounders, intercrossingGenerations, selfingGenerations);
-	bool hasAIC = *std::max(intercrossingGenerations.begin(), intercrossingGenerations.end()) > 0;
+	bool hasAIC = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end()) > 0;
 
 	//Check that everything has a unique funnel - For the case of the lines which are just selfing, we just check that one funnel. For AIC lines, we check the funnels of all the parent lines
 	std::vector<funnelType> allFunnels;
 	{
 		std::vector<std::string> funnelWarnings, funnelErrors;
 		estimateRfCheckFunnels(args.finals, args.founders, args.pedigree, intercrossingGenerations, funnelWarnings, funnelErrors, allFunnels);
-		std::size_t warningIndex = 0;
-		for(;warningIndex < funnelWarnings.size() && warningIndex < 6;warningIndex++)
+		for(std::size_t errorIndex = 0; errorIndex < funnelErrors.size() && errorIndex < 6; errorIndex++)
+		{
+			Rprintf(funnelErrors[errorIndex].c_str());
+		}
+		if(funnelErrors.size() > 0)
+		{
+			return false;
+		}
+		for(std::size_t warningIndex = 0; warningIndex < funnelWarnings.size() && warningIndex < 6; warningIndex++)
 		{
 			Rprintf(funnelWarnings[warningIndex].c_str());
 		}
@@ -199,14 +198,15 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 		args.error = "Internal error - Cannot have more than eight alleles per marker";
 		return false;
 	}
-	//map containing encodings of all the marker segregation patterns, and an associated marker ID (we can't use the encoding as an index because they'll jump around a lot and could be quite big values sometimes I think). Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
-	//Note that markerEncoding and markerPatternID are defined in unitTypes.hpp. They're just integers (and automatically convertible to integers), but they're represented by different types - This stops us from confusing or accidentally interchanging them.
-	std::map<markerEncoding, markerPatternID> markerPatterns;
-	//A vector where entry i contains the markerPatternID identifying the segregation pattern of marker number i. Contains one entry per marker - but the same value will appear multiple times because many markers will have the same segregation pattern - which is the whole point of this set-up
-	std::vector<markerPatternID> markerPatternIDs;
-	//vector with entry i containing an encoding of the marker segregation pattern for a marker with markerPatternID i. Note that this vector has a *different* number of entries to the markerPatternIDs vector.
-	std::vector<markerEncoding> markerEncodings;
-	markerPatternsToUniqueValues(markerPatterns, markerPatternIDs, markerEncodings, nFounders, nMarkers, recodedFounders);
+	//We need to assign a unique ID to each marker pattern - Where by pattern we mean the combination of hetData and founder alleles. Note that this is possible because we just recoded everything to a standardised format.
+	//Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
+	//Note that markerPatternID is defined in unitTypes.hpp. It's just an integer (and automatically convertible to an integer), but it's represented by a unique type - This stops us from confusing it with an ordinary integer.
+	markerPatternsToUniqueValuesArgs markerPatternConversionArgs;
+	markerPatternConversionArgs.nFounders = nFounders;
+	markerPatternConversionArgs.nMarkers = nMarkers;
+	markerPatternConversionArgs.recodedFounders = recodedFounders;
+	markerPatternConversionArgs.recodedHetData = recodedHetData;
+	markerPatternsToUniqueValues(markerPatternConversionArgs);
 	
 	//map containing encodings of the funnels involved in the experiment (as key), and an associated unique index (again, using the encoded values directly is no good because they'll be all over the place). Unique indices are contiguous again.
 	std::map<funnelEncoding, funnelID> funnelTranslation;
@@ -217,14 +217,11 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	funnelsToUniqueValues(funnelTranslation, funnelIDs, funnelEncodings, allFunnels, nFounders);
 	
 	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
-	internal_args.founders = recodedFounders;
 	internal_args.finals = recodedFinals;
 	internal_args.pedigree = args.pedigree;
-	internal_args.hetData = recodedHetData;
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
 	internal_args.selfingGenerations.swap(selfingGenerations);
-	internal_args.markerPatternIDs.swap(markerPatternIDs);
-	internal_args.markerEncodings.swap(markerEncodings);
+	internal_args.markerPatternData.swap(markerPatternConversionArgs);
 	internal_args.hasAI = hasAIC;
 	internal_args.marker1Start = args.marker1Start;
 	internal_args.marker1End = args.marker1End;

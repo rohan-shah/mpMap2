@@ -76,7 +76,7 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			{
 				std::stringstream ss;
 				ss << "Attempting to trace pedigree for line " << finalNames[finalCounter] << ": Unable to get funnel for line " << pedigreeLineNames[*i];
-				warnings.push_back(ss.str());
+				errors.push_back(ss.str());
 				continue;
 			}
 			//insert these founders into the vector containing all the represented founders
@@ -117,6 +117,7 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 
 			for(std::vector<int>::iterator founderIterator = representedFounders.begin(); founderIterator != representedFounders.end(); founderIterator++)
 			{
+				//Note that founderIterator comes from representedFounders, which comes from getFunnel - Which returns values starting at 1, not 0. So we have to subtract one. 
 				if(finals(finalCounter, markerCounter) == founders((*founderIterator)-1, markerCounter))
 				{
 					okMarker = true;

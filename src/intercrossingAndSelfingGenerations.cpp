@@ -34,7 +34,6 @@ bool getIntercrossingAndSelfingGenerations(Rcpp::S4 pedigree, Rcpp::IntegerMatri
 		{
 			currentPedRow = mother(currentPedRow)-1;
 			if(currentPedRow < 0 || currentPedRow > nPedigreeRows) return false;
-
 			nAIC++;
 		}
 		//But we've counted the initial log2(nFounders) generations, so subtract that
