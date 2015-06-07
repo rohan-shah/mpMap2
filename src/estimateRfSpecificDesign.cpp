@@ -9,6 +9,7 @@
 #include "funnelsToUniqueValues.h"
 #include <memory>
 #include "constructLookupTable.hpp"
+#include "probabilities2.hpp"
 struct rfhaps_internal_args
 {
 	rfhaps_internal_args(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
@@ -34,15 +35,15 @@ struct rfhaps_internal_args
 };
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpecificDesign(rfhaps_internal_args& args)
 {
-	int nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
-	int nDifferentFunnels = args.funnelEncodings.size();
+	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
+	std::size_t nDifferentFunnels = args.funnelEncodings.size();
 	int marker2RangeSize = args.marker2End - args.marker2Start;
 	int maxStart = std::max(args.marker1Start, args.marker2Start), minEnd = std::min(args.marker1End, args.marker2End);
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
 
-	int nMarkerPatternIDs = args.markerPatternData.allMarkerPatterns.size();
+	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
@@ -50,7 +51,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData);
+	constructLookupTableArgs<maxAlleles, nFounders> lookupArgs(computedContributions, args.markerPatternData);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.funnelEncodings = &args.funnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -89,7 +90,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								arrayType<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -98,7 +99,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								arrayType<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -159,7 +160,7 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	std::vector<funnelType> allFunnels;
 	{
 		std::vector<std::string> funnelWarnings, funnelErrors;
-		estimateRfCheckFunnels(args.finals, args.founders, args.pedigree, intercrossingGenerations, funnelWarnings, funnelErrors, allFunnels);
+		estimateRfCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, funnelWarnings, funnelErrors, allFunnels);
 		for(std::size_t errorIndex = 0; errorIndex < funnelErrors.size() && errorIndex < 6; errorIndex++)
 		{
 			Rprintf(funnelErrors[errorIndex].c_str());
@@ -192,12 +193,14 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	recoded.hetData = args.hetData;
 	recoded.recodedHetData = recodedHetData;
 	recodeFoundersFinalsHets(recoded);
+
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 8) 
 	{
 		args.error = "Internal error - Cannot have more than eight alleles per marker";
 		return false;
 	}
+
 	//We need to assign a unique ID to each marker pattern - Where by pattern we mean the combination of hetData and founder alleles. Note that this is possible because we just recoded everything to a standardised format.
 	//Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
 	//Note that markerPatternID is defined in unitTypes.hpp. It's just an integer (and automatically convertible to an integer), but it's represented by a unique type - This stops us from confusing it with an ordinary integer.
@@ -235,14 +238,14 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	{
 		return estimateRfSpecificDesignInternal1<2>(internal_args);
 	}
-	else if(nFounders == 4)
+	/*else if(nFounders == 4)
 	{
 		return estimateRfSpecificDesignInternal1<4>(internal_args);
 	}
 	else if(nFounders == 8)
 	{
 		return estimateRfSpecificDesignInternal1<8>(internal_args);
-	}
+	}*/
 	else
 	{
 		Rprintf("Number of founders must be 2, 4 or 8\n");

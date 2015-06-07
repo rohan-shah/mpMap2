@@ -7,6 +7,7 @@
 extern "C"
 {
 	char* package_name = "mpMap2";
+	void R_init_Rcpp(DllInfo *info);
 	R_CallMethodDef callMethods[] = 
 	{
 		{"checkHets", (DL_FUNC)&checkHets, 1},
@@ -19,5 +20,6 @@ extern "C"
 	RcppExport void R_init_mpMap2(DllInfo *info)
 	{
 		R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+		R_init_Rcpp(info);
 	}
 }

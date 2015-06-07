@@ -5,20 +5,23 @@ void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 	{
 		Rcpp::IntegerMatrix currentMarkerHetData = args.recodedHetData(markerCounter);
 		//Set up struct containing data about this marker
-		markerData currentPattern(currentMarkerHetData.nrow(), currentMarkerHetData.ncol(), args.nFounders);
-		for(long founderCounter = 0; founderCounter < args.nFounders; founderCounter++)
+		markerData currentPattern(args.nFounders);
+		for(int founderCounter1 = 0; founderCounter1 < args.nFounders; founderCounter1++)
 		{
-			currentPattern.founderAlleles[founderCounter] = args.recodedFounders(founderCounter, markerCounter);
-		}
-		for(int i = 0; i < currentMarkerHetData.nrow(); i++)
-		{
-			for(int j = 0; j < currentMarkerHetData.ncol(); j++)
+			for(int founderCounter2 = 0; founderCounter2 < args.nFounders; founderCounter2++)
 			{
-				currentPattern.hetData(i, j) = currentMarkerHetData(i, j);
+				int markerAllele1 = args.recodedFounders(founderCounter1, markerCounter);
+				int markerAllele2 = args.recodedFounders(founderCounter2, markerCounter);
+				for(int hetDataRowCounter = 0; hetDataRowCounter < currentMarkerHetData.nrow(); hetDataRowCounter++)
+				{
+					if(currentMarkerHetData(hetDataRowCounter, 0) == markerAllele1 && currentMarkerHetData(hetDataRowCounter, 1) == markerAllele2)
+					{
+						currentPattern.hetData(founderCounter1, founderCounter2) = currentMarkerHetData(hetDataRowCounter, 2);
+					}
+				}
 			}
 		}
-		currentPattern.nObservedValues = *std::max_element(&(currentPattern.founderAlleles[0]), &(currentPattern.founderAlleles[args.nFounders]));
-		currentPattern.nObservedValues = std::max(currentPattern.nObservedValues, *std::max_element(&(currentPattern.hetData(0,0)), &(currentPattern.hetData(0,0))+currentPattern.hetData.getNRows() * currentPattern.hetData.getNColumns()));
+		currentPattern.nObservedValues = *std::max_element(&(currentPattern.hetData(0,0)), &(currentPattern.hetData(0,0))+currentPattern.hetData.getNRows() * currentPattern.hetData.getNColumns());
 		currentPattern.nObservedValues++;
 
 		currentPattern.computeHash();

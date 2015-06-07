@@ -30,7 +30,7 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 		individualsToCheckFunnels.swap(nextGenerationToCheck);
 	}
 }
-void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
+void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
 	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));
@@ -110,6 +110,7 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 		//Not having all the founders in the input funnels is more serious if it causes the observed marker data to be impossible. So check for this.
 		for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 		{
+			Rcpp::IntegerMatrix currentMarkerHetData = hetData(markerCounter);
 			bool okMarker = false;
 			//If observed value is an NA then than's ok, continue
 			int value = finals(finalCounter, markerCounter);

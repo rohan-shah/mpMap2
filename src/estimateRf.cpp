@@ -18,7 +18,7 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		int nRecombLevels = recombinationFractions.size();
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
-		int halfIndex = std::distance(recombinationFractions.begin(), halfIterator);
+		int halfIndex = (int)std::distance(recombinationFractions.begin(), halfIterator);
 
 		std::vector<double> recombinationFractionsDouble = Rcpp::as<std::vector<double> >(recombinationFractions);
 		Rcpp::S4 object;
@@ -224,7 +224,7 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 				}
 				else
 				{
-					currentTheta = recombinationFractions(maxPtr - start);
+					currentTheta = recombinationFractions((int)(maxPtr - start));
 					currentLod = max - resultPtr[(long)sourceIndex1*(long)nRecombLevels*(long)marker2RangeSize + (long)sourceIndex2 * (long)nRecombLevels + halfIndex];
 				}
 				theta(destIndex1, destIndex2) = currentTheta;

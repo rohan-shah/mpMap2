@@ -9,10 +9,9 @@
 struct markerData
 {
 public:
-	markerData(int nHetDataRows, int nHetDataColumns, int nFounders)
-		: hetData(nHetDataRows, nHetDataColumns), nFounders(nFounders), hashed(false), hash(0)
+	markerData(int nFounders)
+		: hetData(nFounders, nFounders, -1), hashed(false), hash(0)
 	{}
-	int founderAlleles[16];
 	rowMajorMatrix<int> hetData;
 	bool operator<(const markerData& other) const
 	{
@@ -20,11 +19,6 @@ public:
 		if(!other.hashed) other.computeHash();
 		if(this->hash < other.hash) return true;
 		if(this->hash > other.hash) return false;
-		for(int i = 0; i < nFounders; i++)
-		{
-			if(this->founderAlleles[i] < other.founderAlleles[i]) return true;
-			if(this->founderAlleles[i] > other.founderAlleles[i]) return false;
-		}
 		for(int i = 0; i < hetData.getNRows(); i++)
 		{
 			for(int j = 0; j < hetData.getNColumns(); j++)
@@ -39,14 +33,12 @@ public:
 	{
 		if(!hashed)
 		{
-			hash = crc32(&founderAlleles, sizeof(int) * nFounders, 0);
 			hash = crc32(&(hetData(0,0)), sizeof(int)*hetData.getNRows() * hetData.getNColumns(), hash);
 			hashed = true;
 		}
 	}
 	int nObservedValues;
 private:
-	int nFounders;
 	mutable bool hashed;
 	mutable int hash;
 };

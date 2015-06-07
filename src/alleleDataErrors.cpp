@@ -130,9 +130,9 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 				}
 			}
 		}
-		Rcpp::IntegerMatrix founderErrors(founderErrorRow.size(), 3), finalErrors(finalErrorRow.size(), 2);
+		Rcpp::IntegerMatrix founderErrors((int)founderErrorRow.size(), 3), finalErrors((int)finalErrorRow.size(), 2);
 		Rcpp::IntegerVector nullErrors = Rcpp::wrap(nullErrorMarkers);
-		for(std::size_t founderErrorCounter = 0; founderErrorCounter < founderErrorRow.size(); founderErrorCounter++)
+		for(int founderErrorCounter = 0; founderErrorCounter < (int)founderErrorRow.size(); founderErrorCounter++)
 		{
 			founderErrors(founderErrorCounter, 0) = founderErrorMarker[founderErrorCounter];
 			founderErrors(founderErrorCounter, 1) = founderErrorRow[founderErrorCounter];
@@ -140,7 +140,7 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 		}
 		founderErrors.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::CharacterVector::create("Marker", "Row", "Column"));
 
-		for(std::size_t i = 0; i < finalErrorRow.size(); i++)
+		for(int i = 0; i < (int)finalErrorRow.size(); i++)
 		{
 			finalErrors(i, 0) = finalErrorRow[i];
 			finalErrors(i, 1) = finalErrorMarker[i];

@@ -11,8 +11,8 @@ void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation
 		}
 		if(funnelTranslation.find(encoded) == funnelTranslation.end())
 		{
-			funnelIDs.push_back(funnelTranslation.size());
-			funnelTranslation.insert(std::make_pair(encoded, funnelTranslation.size()));
+			funnelIDs.push_back((int)funnelTranslation.size());
+			funnelTranslation.insert(std::make_pair(encoded, (int)funnelTranslation.size()));
 			funnelEncodings.push_back(encoded);
 		}
 		else

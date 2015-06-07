@@ -4,7 +4,7 @@ SEXP checkHets(SEXP hets)
 	std::vector<std::string> errors;
 	Rcpp::List hetObject = hets;
 	Rcpp::CharacterVector hetObjectNames = hetObject.names();
-	std::size_t index = 0;
+	int index = 0;
 	for(Rcpp::List::iterator i = hetObject.begin(); i != hetObject.end(); i++,index++)
 	{
 		if(errors.size() > 10) break;
