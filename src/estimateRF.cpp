@@ -1,9 +1,9 @@
-#include "estimateRf.h"
+#include "estimateRF.h"
 #include <math.h>
 #include <limits>
-#include "estimateRfSpecificDesign.h"
+#include "estimateRFSpecificDesign.h"
 #include <stdexcept>
-SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, SEXP marker2Range_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_)
+SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, SEXP marker2Range_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_)
 {
 	BEGIN_RCPP
 		Rcpp::NumericVector recombinationFractions;
@@ -129,7 +129,7 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 			Rcpp::S4 currentGeneticData = geneticData(i);
 			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
 			std::string error;
-			estimateRfSpecificDesignArgs args(lineWeightsThisDesign, recombinationFractionsDouble);
+			estimateRFSpecificDesignArgs args(lineWeightsThisDesign, recombinationFractionsDouble);
 			try
 			{
 				args.founders = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("founders"));
@@ -175,7 +175,7 @@ SEXP estimateRf(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 			args.marker1End = marker1End;
 			args.marker2End = marker2End;
 			args.result = &(result[0]);
-			bool successful = estimateRfSpecificDesign(args);
+			bool successful = estimateRFSpecificDesign(args);
 			if(!successful) throw std::runtime_error(args.error);
 		}
 		//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)

@@ -1,3 +1,16 @@
+setMethod(f = "show", signature = "mpcrossRF", definition = function(x)
+{
+  print(x)
+})
+setMethod(f = "show", signature = "mpcross", definition = function(x)
+{
+  print(x)
+})
+setMethod(f = "print", signature = "mpcrossRF", definition = function(x)
+{
+  cat("This mpcross object contains recombination fractions\n\n")
+  callNextMethod()
+})
 setMethod(f = "print", signature = "mpcross", definition = function(x)
 {
   nGeneticDatasets <- length(x@geneticData)

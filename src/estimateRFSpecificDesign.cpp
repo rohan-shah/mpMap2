@@ -1,7 +1,7 @@
-#include "estimateRfSpecificDesign.h"
+#include "estimateRFSpecificDesign.h"
 #include <math.h>
 #include "intercrossingAndSelfingGenerations.h"
-#include "estimateRfCheckFunnels.h"
+#include "estimateRFCheckFunnels.h"
 #include <map>
 #include <set>
 #include "recodeFoundersFinalsHets.h"
@@ -35,7 +35,7 @@ struct rfhaps_internal_args
 	std::vector<funnelID> funnelIDs;
 	std::vector<funnelEncoding> funnelEncodings;
 };
-template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpecificDesign(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
 	std::size_t nDifferentFunnels = args.funnelEncodings.size();
@@ -115,42 +115,42 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRfSpe
 	}
 	return true;
 }
-template<int nFounders, int maxAlleles> bool estimateRfSpecificDesignInternal2(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(rfhaps_internal_args& args)
 {
 		bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
 		if(infiniteSelfing)
 		{
 			std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
-			return estimateRfSpecificDesign<nFounders, maxAlleles, true>(args);
+			return estimateRFSpecificDesign<nFounders, maxAlleles, true>(args);
 		}
-		else return estimateRfSpecificDesign<nFounders, maxAlleles, false>(args);
+		else return estimateRFSpecificDesign<nFounders, maxAlleles, false>(args);
 }
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
-template<int nFounders> bool estimateRfSpecificDesignInternal1(rfhaps_internal_args& args)
+template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args)
 {
 	switch(args.maxAlleles)
 	{
 		case 1:
-			return estimateRfSpecificDesignInternal2<nFounders, 1>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 1>(args);
 		case 2:
-			return estimateRfSpecificDesignInternal2<nFounders, 2>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 2>(args);
 		case 3:
-			return estimateRfSpecificDesignInternal2<nFounders, 3>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 3>(args);
 /*		case 4:
-			return estimateRfSpecificDesignInternal2<nFounders, 4>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 4>(args);
 		case 5:
-			return estimateRfSpecificDesignInternal2<nFounders, 5>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 5>(args);
 		case 6:
-			return estimateRfSpecificDesignInternal2<nFounders, 6>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 6>(args);
 		case 7:
-			return estimateRfSpecificDesignInternal2<nFounders, 7>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 7>(args);
 		case 8:
-			return estimateRfSpecificDesignInternal2<nFounders, 8>(args);*/
+			return estimateRFSpecificDesignInternal2<nFounders, 8>(args);*/
 		default:
 			throw std::runtime_error("Internal error");
 	}
 }
-bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
+bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 {
 	//work out the number of intercrossing generations
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
@@ -174,7 +174,7 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	//Check that everything has a unique funnel - For the case of the lines which are just selfing, we just check that one funnel. For AIC lines, we check the funnels of all the parent lines
 	std::vector<funnelType> allFunnels;
 	{
-		estimateRfCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
+		estimateRFCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
 		for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 		{
 			Rprintf(errors[errorIndex].c_str());
@@ -260,15 +260,15 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	internal_args.funnelEncodings.swap(funnelEncodings);
 	if(nFounders == 2)
 	{
-		return estimateRfSpecificDesignInternal1<2>(internal_args);
+		return estimateRFSpecificDesignInternal1<2>(internal_args);
 	}
 	/*else if(nFounders == 4)
 	{
-		return estimateRfSpecificDesignInternal1<4>(internal_args);
+		return estimateRFSpecificDesignInternal1<4>(internal_args);
 	}
 	else if(nFounders == 8)
 	{
-		return estimateRfSpecificDesignInternal1<8>(internal_args);
+		return estimateRFSpecificDesignInternal1<8>(internal_args);
 	}*/
 	else
 	{

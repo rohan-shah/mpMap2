@@ -1,5 +1,5 @@
-#include "estimateRfCheckFunnels.h"
-#include "estimateRf.h"
+#include "estimateRFCheckFunnels.h"
+#include "estimateRF.h"
 #include "getFunnel.h"
 #include "orderFunnel.h"
 #include "matrices.hpp"
@@ -33,7 +33,7 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 }
 /* This function specifically checks whether the observed data is consistent with the *pedigree*. It assumes that every observed value in the finals is already valid - That is, every observed value contained in the finals is also listed as a possibility in the hetData object
 */
-void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
+void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
 	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));

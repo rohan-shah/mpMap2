@@ -2,9 +2,9 @@
 #define _ESTIMATE_RF_SPECIFIC_DESIGN_H
 #include <Rcpp.h>
 #include <vector>
-struct estimateRfSpecificDesignArgs
+struct estimateRFSpecificDesignArgs
 {
-	estimateRfSpecificDesignArgs(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
+	estimateRFSpecificDesignArgs(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
 		: recombinationFractions(recombinationFractions), lineWeights(lineWeights)
 	{}
 	Rcpp::IntegerMatrix founders;
@@ -19,6 +19,6 @@ struct estimateRfSpecificDesignArgs
 	double* result;
 	std::string error;
 };
-bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args);
+bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args);
 #endif
 

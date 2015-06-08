@@ -1,4 +1,4 @@
-estimateRf <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE)
+estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE)
 {
 	isNewMpcrossArgument(object)
 
@@ -20,14 +20,14 @@ estimateRf <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 			stop(paste0("Value of lineWeights[[", i, "]] must have nLines(object)[", i, "] entries"))
 		}
 	}
-	return(estimateRfSubset(object = object, recombValues=recombValues, lineWeights = lineWeights, start1 = 1, finish1 = nMarkers(object), start2 = 1, finish2 = nMarkers(object), keepLod = keepLod, keepLkhd = keepLkhd))
+	return(estimateRFSubset(object = object, recombValues=recombValues, lineWeights = lineWeights, start1 = 1, finish1 = nMarkers(object), start2 = 1, finish2 = nMarkers(object), keepLod = keepLod, keepLkhd = keepLkhd))
 }
-estimateRfSubset <-
+estimateRFSubset <-
 function(object, recombValues, lineWeights, start1, finish1, start2, finish2, keepLod, keepLkhd)
 { 
 	marker1Range <- c(start1,finish1)
 	marker2Range <- c(start2,finish2)
-	rpairs <- .Call("estimateRf", object, recombValues, marker1Range, marker2Range, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2")
+	rpairs <- .Call("estimateRF", object, recombValues, marker1Range, marker2Range, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2")
 	rf <- new("rf", r = rpairs$r, theta = rpairs$theta, lod = rpairs$lod, lkhd = rpairs$lkhd)
 
 	output <- new ("mpcrossRF", geneticData = object@geneticData, rf = rf)

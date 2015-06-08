@@ -285,7 +285,7 @@ checkMpcross <- function(object)
 #.compressedMatrix <- setClass("compressedMatrix", slots = list(levels = "numeric", data = "integer"), validity = function(object) .Call("checkCompressedMatrix", object, package="mpMap2"))
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 
-checkRF <- function(object)
+checkRf <- function(object)
 {
 	errors <- c()
 	if(storage.mode(object@theta) != "double")
@@ -303,7 +303,7 @@ checkRF <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.rf <- setClass("rf", slots = list(r = "numeric", theta = "matrix", lod = "matrixOrNULL", lkhd = "matrixOrNULL"), validity = checkRF)
+.rf <- setClass("rf", slots = list(r = "numeric", theta = "matrix", lod = "matrixOrNULL", lkhd = "matrixOrNULL"), validity = checkRf)
 .mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"))
 
 checkLG <- function(object)
