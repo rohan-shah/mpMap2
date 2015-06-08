@@ -2,6 +2,7 @@
 #include "estimateRf.h"
 #include "getFunnel.h"
 #include "orderFunnel.h"
+#include "matrices.hpp"
 void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father, long pedigreeRow, int intercrossingGenerations, std::vector<long>& individualsToCheckFunnels)
 {
 	//The lines that we currently need to check goes in individualsToCheckFunnels
@@ -30,6 +31,8 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 		individualsToCheckFunnels.swap(nextGenerationToCheck);
 	}
 }
+/* This function specifically checks whether the observed data is consistent with the *pedigree*. It assumes that every observed value in the finals is already valid - That is, every observed value contained in the finals is also listed as a possibility in the hetData object
+*/
 void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
@@ -40,6 +43,26 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 	Rcpp::CharacterVector markerNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[1]);
 	int nFinals = finals.nrow(), nFounders = founders.nrow(), nMarkers = finals.ncol();
 
+	xMajorMatrix<int> foundersToMarkerAlleles(nFounders, nFounders, nMarkers, -1);
+	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
+	{
+		Rcpp::IntegerMatrix currentMarkerHetData = hetData(markerCounter);
+		for(int founderCounter1 = 0; founderCounter1 < nFounders; founderCounter1++)
+		{
+			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+			{
+				int markerAllele1 = founders(founderCounter1, markerCounter);
+				int markerAllele2 = founders(founderCounter2, markerCounter);
+				for(int hetDataRowCounter = 0; hetDataRowCounter < currentMarkerHetData.nrow(); hetDataRowCounter++)
+				{
+					if(markerAllele1 == currentMarkerHetData(hetDataRowCounter, 0) && markerAllele2 == currentMarkerHetData(hetDataRowCounter, 1))
+					{
+						foundersToMarkerAlleles(founderCounter1, founderCounter2, markerCounter) = currentMarkerHetData(hetDataRowCounter, 2);
+					}
+				}
+			}
+		}
+	}
 	std::vector<long> individualsToCheckFunnels;
 	for(long finalCounter = 0; finalCounter < nFinals; finalCounter++)
 	{
@@ -110,19 +133,21 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 		//Not having all the founders in the input funnels is more serious if it causes the observed marker data to be impossible. So check for this.
 		for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 		{
-			Rcpp::IntegerMatrix currentMarkerHetData = hetData(markerCounter);
 			bool okMarker = false;
 			//If observed value is an NA then than's ok, continue
 			int value = finals(finalCounter, markerCounter);
 			if(value == NA_INTEGER) continue;
 
-			for(std::vector<int>::iterator founderIterator = representedFounders.begin(); founderIterator != representedFounders.end(); founderIterator++)
+			for(std::vector<int>::iterator founderIterator1 = representedFounders.begin(); founderIterator1 != representedFounders.end(); founderIterator1++)
 			{
-				//Note that founderIterator comes from representedFounders, which comes from getFunnel - Which returns values starting at 1, not 0. So we have to subtract one. 
-				if(finals(finalCounter, markerCounter) == founders((*founderIterator)-1, markerCounter))
+				for(std::vector<int>::iterator founderIterator2 = representedFounders.begin(); founderIterator2 != representedFounders.end(); founderIterator2++)
 				{
-					okMarker = true;
-					break;
+					//Note that founderIterator comes from representedFounders, which comes from getFunnel - Which returns values starting at 1, not 0. So we have to subtract one. 
+					if(finals(finalCounter, markerCounter) == foundersToMarkerAlleles((*founderIterator1)-1, (*founderIterator2)-1, markerCounter))
+					{
+						okMarker = true;
+						break;
+					}
 				}
 			}
 			if(!okMarker)
@@ -130,6 +155,7 @@ void estimateRfCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				std::stringstream ss;
 				ss << "Error: Data for marker " << markerNames[markerCounter] << " is impossible for individual " << finalNames[finalCounter] << " with given pedigree\n";
 				errors.push_back(ss.str());
+				if(errors.size() > 1000) return;
 			}
 		}
 		//In this case individualsToCheckFunnels contains one element => getFunnel was only called once => we can reuse the funnel variable

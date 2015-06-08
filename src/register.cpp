@@ -19,7 +19,7 @@ extern "C"
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
 	{
-		R_registerRoutines(info, NULL, callMethods, NULL, NULL);
 		R_init_Rcpp(info);
+		R_registerRoutines(info, NULL, callMethods, NULL, NULL);
 	}
 }

@@ -70,30 +70,31 @@ template<> void genotypeProbabilitiesWithIntercross<2, false>(double (&prob)[nDi
 	double oneMinusRSquared = (1 - r) * (1 - r);
 	//Same homozygote at both loci
 	prob[0] = 
-	(4*oneMinusRSquared*onePlus2R*(-1 + pow2) 
+	0.5*(4*oneMinusRSquared*onePlus2R*(-1 + pow2) 
 		+ onePlus2R*(oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower 
 		- 2*(2*pow2 - powOneMinus2R)*powOneMinusR*(-1 + 2*r)
 	)/(8*onePlus2R*pow2*oneMinusRSquared);
 
 	prob[1] = 
-  	(4*oneMinusRSquared*onePlus2R*(-1 + pow2) 
+  	0.5*(4*oneMinusRSquared*onePlus2R*(-1 + pow2) 
   		+ onePlus2R*(oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower 
   		+ 2*(2*pow2 - powOneMinus2R)*powOneMinusR*(-1 + 2*r)
   	)/(8*onePlus2R*pow2*oneMinusRSquared);
 
  	prob[2] = 
- 	(2*oneMinusRSquared 
+ 	0.125*(2*oneMinusRSquared 
  		- (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
 	)/(2*pow2*oneMinusRSquared);
 
 	prob[3] = 
-	(2*powOneMinus2R*powOneMinusR 
+	0.25*(2*powOneMinus2R*powOneMinusR 
 		+ (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
 	)/(8*pow2*oneMinusRSquared);
 
    	prob[4] = 
-	(-2*powOneMinus2R*powOneMinusR 
+	0.25*(-2*powOneMinus2R*powOneMinusR 
    		+ (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
    	)/(8*pow2*oneMinusRSquared);
+   	prob[3] += prob[4];
 }
 #endif

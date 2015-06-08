@@ -9,13 +9,13 @@ public:
 		: haplotypeProbabilities(haplotypeProbabilities)
 	{}
 	xMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
-	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerations)
+	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		int nPoints = haplotypeProbabilities.getSizeX();
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			array2<nFounders>& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerations);
+			array2<nFounders>& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
 			memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
@@ -58,13 +58,13 @@ public:
 		: haplotypeProbabilities(haplotypeProbabilities)
 	{}
 	xMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
-	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerations)
+	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		int nPoints = haplotypeProbabilities.getSizeX();
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerations);
+			expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
 			memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{

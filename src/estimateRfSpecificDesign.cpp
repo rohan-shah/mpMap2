@@ -10,6 +10,8 @@
 #include <memory>
 #include "constructLookupTable.hpp"
 #include "probabilities2.hpp"
+#include "alleleDataErrors.h"
+#include "recodeHetsAsNA.h"
 struct rfhaps_internal_args
 {
 	rfhaps_internal_args(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
@@ -156,24 +158,36 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	getIntercrossingAndSelfingGenerations(args.pedigree, args.finals, nFounders, intercrossingGenerations, selfingGenerations);
 	bool hasAIC = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end()) > 0;
 
+	/*Check that all the observed marker values are potentially valid (ignoring pedigree). That is, is every observed value for the finals consistent with something in the hetData object?*/
+	Rcpp::List codingErrors = listCodingErrors(args.founders, args.finals, args.hetData);
+	std::vector<std::string> warnings, errors;
+	codingErrorsToStrings(codingErrors, errors, args.finals, Rcpp::as<Rcpp::List>(args.hetData), 6);
+	for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
+	{
+		Rprintf(errors[errorIndex].c_str());
+	}
+	if(errors.size() > 0)
+	{
+		return false;
+	}
+
 	//Check that everything has a unique funnel - For the case of the lines which are just selfing, we just check that one funnel. For AIC lines, we check the funnels of all the parent lines
 	std::vector<funnelType> allFunnels;
 	{
-		std::vector<std::string> funnelWarnings, funnelErrors;
-		estimateRfCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, funnelWarnings, funnelErrors, allFunnels);
-		for(std::size_t errorIndex = 0; errorIndex < funnelErrors.size() && errorIndex < 6; errorIndex++)
+		estimateRfCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
+		for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 		{
-			Rprintf(funnelErrors[errorIndex].c_str());
+			Rprintf(errors[errorIndex].c_str());
 		}
-		if(funnelErrors.size() > 0)
+		if(errors.size() > 0)
 		{
 			return false;
 		}
-		for(std::size_t warningIndex = 0; warningIndex < funnelWarnings.size() && warningIndex < 6; warningIndex++)
+		for(std::size_t warningIndex = 0; warningIndex < warnings.size() && warningIndex < 6; warningIndex++)
 		{
-			Rprintf(funnelWarnings[warningIndex].c_str());
+			Rprintf(warnings[warningIndex].c_str());
 		}
-		if(funnelWarnings.size() > 6)
+		if(warnings.size() > 6)
 		{
 			Rprintf("Supressing further funnel warnings");
 		}
@@ -219,6 +233,16 @@ bool estimateRfSpecificDesign(estimateRfSpecificDesignArgs& args)
 	std::vector<funnelEncoding> funnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, funnelIDs, funnelEncodings, allFunnels, nFounders);
 	
+	//In the case of infinite selfing, we've still allowed hets up to this point. But we want to ignore any potential hets in the final analysis. 
+	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
+	if(infiniteSelfing)
+	{
+		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
+		if(foundHets)
+		{
+			Rprintf("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+		}
+	}
 	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
 	internal_args.finals = recodedFinals;
 	internal_args.pedigree = args.pedigree;

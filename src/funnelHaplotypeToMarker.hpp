@@ -10,7 +10,7 @@ public:
 	{}
 	int funnel[8];
 	rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
-	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerations)
+	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
@@ -20,7 +20,7 @@ public:
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			array2<nFounders>& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, selfingGenerations);
+			array2<nFounders>& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, selfingGenerationsIndex);
 			memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
@@ -65,7 +65,7 @@ public:
 	{}
 	int funnel[8];
 	rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
-	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerations)
+	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
@@ -75,7 +75,7 @@ public:
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, selfingGenerations);
+			expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, selfingGenerationsIndex);
 			memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{

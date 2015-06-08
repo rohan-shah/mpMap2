@@ -7,22 +7,30 @@ RcppExport SEXP alleleDataErrors(SEXP Robject, SEXP Rlimit)
 		Rcpp::S4 mpcross = Robject;
 		Rcpp::IntegerMatrix founders = mpcross.slot("founders"), finals = mpcross.slot("finals");
 		Rcpp::List hetData = mpcross.slot("hetData");
-		Rcpp::CharacterVector markerNames = hetData.attr("names");
 		int limit = Rcpp::as<int>(Rlimit);
 
 		Rcpp::List codingErrors = listCodingErrors(founders, finals, hetData);
+		std::vector<std::string> codingErrorsAsStrings;
+		codingErrorsToStrings(codingErrors, codingErrorsAsStrings, finals, hetData, limit);
+		return Rcpp::wrap(codingErrorsAsStrings);
+	END_RCPP
+}
+RcppExport void codingErrorsToStrings(Rcpp::List codingErrors, std::vector<std::string>& codingErrorsAsStrings, Rcpp::IntegerMatrix finals, Rcpp::List hetData, int limit)
+{
+	BEGIN_RCPP
+		Rcpp::CharacterVector markerNames = hetData.attr("names");
+
 		Rcpp::IntegerMatrix founderErrors = codingErrors["founders"];
 		Rcpp::IntegerMatrix finalErrors = codingErrors["finals"];
 		Rcpp::IntegerVector nullErrors = codingErrors["null"];
 
-		std::vector<std::string> codingErrorsAsStrings;
 		int nFounderErrors = founderErrors.nrow(), nFinalErrors = finalErrors.nrow(), nNullErrors = nullErrors.length();
 		for(int i = 0; i < nFounderErrors; i++)
 		{
 			if((int)codingErrorsAsStrings.size() >= limit) 
 			{
 				codingErrorsAsStrings.push_back("Omitting details of further coding errors");
-				return Rcpp::wrap(codingErrorsAsStrings);
+				return;
 			}
 			int markerIndex = founderErrors(i, 0), hetDataRow = founderErrors(i, 1), hetDataColumn = founderErrors(i, 2);
 			Rcpp::IntegerMatrix hetDataEntry = hetData(markerIndex);
@@ -35,7 +43,7 @@ RcppExport SEXP alleleDataErrors(SEXP Robject, SEXP Rlimit)
 			if((int)codingErrorsAsStrings.size() >= limit) 
 			{
 				codingErrorsAsStrings.push_back("Omitting details of further coding errors");
-				return Rcpp::wrap(codingErrorsAsStrings);
+				return;
 			}
 			Rcpp::IntegerMatrix hetDataEntry = hetData(finalErrors(i, 1));
 			std::stringstream ss;
@@ -47,14 +55,13 @@ RcppExport SEXP alleleDataErrors(SEXP Robject, SEXP Rlimit)
 			if((int)codingErrorsAsStrings.size() >= limit) 
 			{
 				codingErrorsAsStrings.push_back("Omitting details of further coding errors");
-				return Rcpp::wrap(codingErrorsAsStrings);
+				return;
 			}
 			std::stringstream ss;
 			ss << "Coding error for marker " << markerNames[nullErrors(i)] << ": If a founder allele is coded as NA, all founder alleles must be coded as NA, and slot hetData[[" << markerNames[nullErrors(i)] << "]] must be a 0x0 matrix";
 			codingErrorsAsStrings.push_back(ss.str());
 		}
-		return Rcpp::wrap(codingErrorsAsStrings);
-	END_RCPP
+	VOID_END_RCPP
 }
 RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 {

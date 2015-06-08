@@ -72,10 +72,19 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds,
       }
     }
   }
-  #If there's no selfing mark the last set of intercrossing lines as observed
+  #No selfing
   else
   {
-    observed[lastGenerationStart:lastGenerationEnd] <- TRUE
+    #...and no intercrossing
+    if(intercrossingGenerations == 0)
+    {
+      observed[3:length(observed)] <- TRUE
+    }
+    #If there's no selfing but there is intercrossing then mark the last set of intercrossing lines as observed
+    else
+    {
+      observed[lastGenerationStart:lastGenerationEnd] <- TRUE
+    }
   }
   return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:2L, observed = observed, selfing = "infinite"))
 }

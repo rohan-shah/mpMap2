@@ -111,11 +111,11 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 		{
 			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations), aiCounter, (*args.recombinationFractions)[recombCounter], selfingGenerations);
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations-minSelfing), aiCounter, (*args.recombinationFractions)[recombCounter], selfingGenerations);
 			}
 			for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(finerIntercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations), aiCounter, 0.5 * ((double)recombCounter) / ((double)nFinerPoints - 1.0), selfingGenerations);
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(finerIntercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations-minSelfing), aiCounter, 0.5 * ((double)recombCounter) / ((double)nFinerPoints - 1.0), selfingGenerations);
 			}
 		}
 	}
@@ -147,12 +147,12 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 					//Compute marker probabilities for a finer grid. If me seem to see a repeated probability model (numerically, up to a tolerance), then in that particular situtation this pair of markers is no good
 					for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
 					{
-						finerFunnelHaplotypeToMarker.template convert<false>(&(markerProbabilities[0]), (*args.funnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter);
+						finerFunnelHaplotypeToMarker.template convert<false>(&(markerProbabilities[0]), (*args.funnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 						thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues);
 					}
 					for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
 					{
-						finerIntercrossingHaplotypeToMarker.template convert<false>(&(markerProbabilities[0]), intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter);
+						finerIntercrossingHaplotypeToMarker.template convert<false>(&(markerProbabilities[0]), intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 						thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues);
 					}
 					//The next two loops relate to the input recombination fractions
@@ -161,16 +161,16 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 						array2<maxAlleles>* markerProbabilitiesThisIntercrossing = &(thisMarkerPairData.perAIGenerationData(0, intercrossingGeneration-1, selfingCounter - minSelfing));
 						if(thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing))
 						{
-							normalIntercrossingHaplotypeToMarker.template convert<true>(markerProbabilitiesThisIntercrossing, intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter);
+							normalIntercrossingHaplotypeToMarker.template convert<true>(markerProbabilitiesThisIntercrossing, intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 						}
 					}
 					for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
 					{
 						array2<maxAlleles>* markerProbabilitiesThisFunnel = &(thisMarkerPairData.perFunnelData(0, funnelCounter, selfingCounter - minSelfing));
-						memset(&markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
+						memset(markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
 						if(thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing))
 						{
-							normalFunnelHaplotypeToMarker.template convert<true>(markerProbabilitiesThisFunnel, (*args.funnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter);
+							normalFunnelHaplotypeToMarker.template convert<true>(markerProbabilitiesThisFunnel, (*args.funnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 						}
 					}
 				}

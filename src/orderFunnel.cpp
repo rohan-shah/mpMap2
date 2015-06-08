@@ -54,7 +54,14 @@ void orderFunnel8(int* funnel)
 }
 void orderFunnel(int* funnel, int nFounders)
 {
-	if(nFounders == 4)
+	if(nFounders == 2)
+	{
+		int min = std::min(funnel[0], funnel[1]);
+		int max = std::max(funnel[0], funnel[1]);
+		funnel[0] = min;
+		funnel[1] = max;
+	}
+	else if(nFounders == 4)
 	{
 		orderFunnel4(funnel);
 	}

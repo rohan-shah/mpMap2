@@ -48,6 +48,9 @@ public:
 	xMajorMatrix(int sizeX, int sizeY, int sizeZ)
 		: sizeX(sizeX), sizeY(sizeY), sizeZ(sizeZ), data(sizeX*sizeY*sizeZ)
 	{}
+	xMajorMatrix(int sizeX, int sizeY, int sizeZ, T value)
+		: sizeX(sizeX), sizeY(sizeY), sizeZ(sizeZ), data(sizeX*sizeY*sizeZ, value)
+	{}
 	T& operator()(int i, int j, int k)
 	{
 		return data[i + j*sizeX + k * sizeX * sizeY];
