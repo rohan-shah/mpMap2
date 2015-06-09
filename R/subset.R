@@ -17,6 +17,31 @@ setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {
 	return(new("mpcrossRF", callNextMethod(), "rf" = subset(x@rf, ...)))
 })
+setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
+{
+	return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...)))
+})
+setMethod(f = "subset", signature = "lg", definition = function(x, ...)
+{
+	arguments <- list(...)
+	if(!("markers" %in% names(arguments)))
+	{
+		stop("Argument markers is required for function subset.geneticData")
+	}
+	markers <- arguments$markers
+	if(mode(markers) == "numeric")
+	{
+		markerIndices <- markers
+	}
+	else if(mode(markers) == "character")
+	{
+		markerIndices <- match(markers, markers(x))
+	}
+
+	groups <- x@groups[markerIndices]
+	allGroups <- sort(unique(groups))
+	return(new("lg", groups = groups, allGroups = allGroups))
+})
 setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -31,7 +56,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 	}
 	else if(mode(markers) == "character")
 	{
-		markerIndices <- match(markers, colnames(x@founders))
+		markerIndices <- match(markers, markers(x))
 	}
 
 	return(new("geneticData", founders = x@founders[,markerIndices], finals = x@finals[,markerIndices], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
@@ -50,7 +75,7 @@ setMethod(f = "subset", signature = "hetData", definition = function(x, ...)
 	}
 	else if(mode(markers) == "character")
 	{
-		markerIndices <- match(markers, colnames(x@founders))
+		markerIndices <- match(markers, markers(x))
 	}
 	return(new("hetData", x[markerIndices]))
 })
@@ -68,7 +93,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	}
 	else if(mode(markers) == "character")
 	{
-		markerIndices <- match(markers, colnames(x@theta))
+		markerIndices <- match(markers, markers(x))
 	}
 	
 	newTheta <- x@theta[markerIndices, markerIndices]

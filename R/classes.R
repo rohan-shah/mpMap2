@@ -319,7 +319,7 @@ checkLG <- function(object)
 checkMpcrossLG <- function(object)
 {
 	if(!is.null(object@map)) return("An mpcross object with assigned linkage groups cannot have a map")
-	if(any(names(lg@groups) != colnames(object@founders)))
+	if(any(names(object@lg@groups) != markers(object)))
 	{
 		return("Marker names implied by names of slots lg@groups and founders were different")
 	}
