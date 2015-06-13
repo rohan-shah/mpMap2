@@ -1,10 +1,10 @@
 setMethod(f = "show", signature = "mpcrossRF", definition = function(object)
 {
-  print(x)
+  print(object)
 })
 setMethod(f = "show", signature = "mpcross", definition = function(object)
 {
-  print(x)
+  print(object)
 })
 setMethod(f = "show", signature = "mpcrossLG", definition = function(object)
 {
@@ -12,7 +12,7 @@ setMethod(f = "show", signature = "mpcrossLG", definition = function(object)
 })
 setMethod(f = "print", signature = "mpcrossLG", definition = function(x)
 {
-  cat("This mpcross object contains linkage groups\n\n")
+  cat("This mpcross object contains linkage groups\n")
   callNextMethod()
 })
 setMethod(f = "print", signature = "mpcrossRF", definition = function(x)

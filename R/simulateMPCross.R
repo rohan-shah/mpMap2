@@ -7,7 +7,7 @@
 #' @param mapFunction Map function used to convert distances to recombination fractions
 #' @param seed Random seed to use. 
 #' @return Object of class \code{mpcross}. 
-sim.mpcross <- function(map, pedigree, mapFunction, seed)
+simulateMPCross <- function(map, pedigree, mapFunction, seed)
 {
 	isDetailedPedigreeArgument(pedigree)
 	isMapArgument(map)

@@ -15,3 +15,7 @@ setMethod(f = "markers", signature = "lg", definition = function(object)
 {
 	return(names(object@groups))
 })
+setMethod(f = "markers", signature = "hetData", definition = function(object)
+{
+	return(names(object))
+})

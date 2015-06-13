@@ -59,7 +59,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		markerIndices <- match(markers, markers(x))
 	}
 
-	return(new("geneticData", founders = x@founders[,markerIndices], finals = x@finals[,markerIndices], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
+	return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
 })
 setMethod(f = "subset", signature = "hetData", definition = function(x, ...)
 {
@@ -96,7 +96,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 		markerIndices <- match(markers, markers(x))
 	}
 	
-	newTheta <- x@theta[markerIndices, markerIndices]
+	newTheta <- x@theta[markerIndices, markerIndices,drop=FALSE]
 	
 	if(is.null(x@lod))
 	{
@@ -104,7 +104,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	}
 	else
 	{
-		newLod <- x@lod[markerIndices, markerIndices]
+		newLod <- x@lod[markerIndices, markerIndices,drop=FALSE]
 	}
 
 	if(is.null(x@lkhd))
@@ -113,7 +113,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	}
 	else
 	{
-		newLkhd <- x@lkhd[markerIndices, markerIndices]
+		newLkhd <- x@lkhd[markerIndices, markerIndices,drop=FALSE]
 	}
 	return(new("rf", r = x@r, theta = newTheta, lod = newLod, lkhd = newLkhd))
 })

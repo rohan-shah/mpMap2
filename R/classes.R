@@ -255,7 +255,7 @@ checkMpcross <- function(object)
 				geneticErrors <- checkGeneticData(x)
 				if(mode(geneticErrors) != "logical")
 				{
-					errors <<- c(errors, paste0("Error in geneticData[[", i, "]]: ", geneticErrors))
+					errors <- c(errors, paste0("Error in geneticData[[", i, "]]: ", geneticErrors))
 				}
 			}
 		}
