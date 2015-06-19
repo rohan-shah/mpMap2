@@ -1,13 +1,17 @@
 checkMap <- function(object)
 {
+	if(any(unlist(lapply(object, length)) == 0))
+	{
+		return("All chromosomes of a map must contain at least one marker")
+	}
 	allNumeric <- unlist(lapply(object, is.numeric))
-	if(!allNumeric) return("A map object must be a list of numeric vectors")
+	if(!all(allNumeric)) return("A map object must be a list of numeric vectors")
 	return(TRUE)
 }
 .map4 <- setClass("map4", contains = "list", validity = checkMap)
 setOldClass("map", S4Class = "map4")
 removeClass("map4")
-setClassUnion("mapOrNULL", c("map", "NULL"))
+#setClassUnion("mapOrNULL", c("map", "NULL"))
 
 checkPedigree <- function(object)
 {
@@ -280,7 +284,7 @@ checkMpcross <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.mpcross <- setClass("mpcross", slots = list(geneticData = "list", map = "mapOrNULL"), validity=checkMpcross)
+.mpcross <- setClass("mpcross", slots = list(geneticData = "list"), validity=checkMpcross)
 
 #.compressedMatrix <- setClass("compressedMatrix", slots = list(levels = "numeric", data = "integer"), validity = function(object) .Call("checkCompressedMatrix", object, package="mpMap2"))
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
@@ -318,7 +322,6 @@ checkLG <- function(object)
 
 checkMpcrossLG <- function(object)
 {
-	if(!is.null(object@map)) return("An mpcross object with assigned linkage groups cannot have a map")
 	if(any(names(object@lg@groups) != markers(object)))
 	{
 		return("Marker names implied by names of slots lg@groups and founders were different")
@@ -326,3 +329,21 @@ checkMpcrossLG <- function(object)
 	return(TRUE)
 }
 .mpcrossLG <- setClass("mpcrossLG", contains = "mpcrossRF", slots = list(lg = "lg"), validity=checkMpcrossLG)
+
+checkMpcrossMapped <- function(object)
+{
+	if(any(unlist(lapply(object@map, names)) != markers(object)))
+	{
+		return("Marker names implied by genetic data and marker names implied by map were different")
+	}
+	return(TRUE)
+}
+.mpcrossMapped <- setClass("mpcrossMapped", contains = "mpcrossRF", slots = list(map = "map"), validity=checkMpcrossMapped)
+setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
+	{
+		groups <- rep(1:length(from@map), each = unlist(lapply(from@map, length)))
+		names(groups) <- markers(from)
+		allGroups <- unique(groups)
+		lg <- new("lg", allGroups = allGroups, groups = groups)
+		return(new(to, as(object, "mpcrossRF"), lg = lg))
+	})
