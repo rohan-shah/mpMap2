@@ -1,11 +1,25 @@
 checkMap <- function(object)
 {
+	if(length(object) == 0)
+	{
+		return("Map object must contain at least one chromosome")
+	}
 	if(any(unlist(lapply(object, length)) == 0))
 	{
 		return("All chromosomes of a map must contain at least one marker")
 	}
 	allNumeric <- unlist(lapply(object, is.numeric))
 	if(!all(allNumeric)) return("A map object must be a list of numeric vectors")
+	
+	if(length(unique(names(object))) != length(object))
+	{
+		return("Chromosome names must be unique")
+	}
+
+	if(length(unique(unlist(lapply(object, names)))) != length(unlist(object)))
+	{
+		return("Marker names must be unique")
+	}
 	return(TRUE)
 }
 .map4 <- setClass("map4", contains = "list", validity = checkMap)
@@ -125,13 +139,31 @@ checkHets <- function(object)
 checkGeneticData <- function(object)
 {
 	errors <- c()
-	if(!is.integer(object@founders))
+	if(!is.numeric(object@founders))
 	{
-		errors <- c(errors, "Slot founders must be an integer matrix")
+		errors <- c(errors, "Slot founders must be a numeric matrix")
 	}
-	if(!is.integer(object@finals))
+	#Error if all founders are NA (because the next condition after this involves max(,na.rm=T), which requires at least one non-NA val)
+	else if(all(is.na(object@founders)))
 	{
-		errors <- c(errors, "Slot finals must be an integer matrix")
+		errors <- c(errors, "Slot founders cannot contain only NA")
+	}
+	else if(max(abs(round(object@founders) - object@founders), na.rm=TRUE) > 0)
+	{
+		errors <- c(errors, "Slot founders must contain integer values")
+	}
+	
+	if(!is.numeric(object@finals))
+	{
+		errors <- c(errors, "Slot finals must be a numeric matrix")
+	}
+	else if(all(is.na(object@finals)))
+	{
+		errors <- c(errors, "Slot finals cannot contain only NA")
+	}
+	else if(max(abs(round(object@finals) - object@finals), na.rm=TRUE) > 0)
+	{
+		errors <- c(errors, "Slot finals must contain integer values")
 	}
 
 	if(length(dim(object@finals)) != 2)
@@ -209,6 +241,8 @@ checkGeneticData <- function(object)
 			errors <- c(errors, "Final lines did not match those specified in the pedigree")
 		}
 	}
+	#Don't continue to the C code if there are already problems - Especially if the founders / finals slots have the wrong types
+	if(length(errors) > 0) return(errors)
 	#This checks the relation between the het data, founder data and final data. It doesn't check that the het data is itself valid
 	#It also checks that if any of the founders are NULL for a marker, ALL the founder alleles must be NULL, and all the finals alleles must be NULL too
 	alleleDataErrors <- .Call("alleleDataErrors", object, 10, PACKAGE="mpMap2")
@@ -236,6 +270,7 @@ checkCompatibleGeneticData <- function(objects)
 			errors <- c(errors, paste0("Wrong markers in slot geneticData[[", i, "]]"))
 		}
 	}
+
 	return(errors)
 }
 checkMpcross <- function(object)
@@ -265,28 +300,11 @@ checkMpcross <- function(object)
 		}
 		errors <- c(errors, checkCompatibleGeneticData(object@geneticData))
 	}
-	if(!is.null(object@map))
-	{
-		nMapMarkers <- sum(unlist(lapply(object@map, length)))
-		if(nMarkers != nMapMarkers)
-		{
-			errors <- c(errors, "Number of markers in map is different from the number of markers in slot founders")
-		}
-		else
-		{
-			markerNames <- unlist(lapply(object@map, names))
-			if(any(colnames(object@founders) != markerNames))
-			{
-				errors <- c(errors, "Marker names in map disagree with marker names in slot founders")
-			}
-		}
-	}
+	#Check that the line names are unique
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
 .mpcross <- setClass("mpcross", slots = list(geneticData = "list"), validity=checkMpcross)
-
-#.compressedMatrix <- setClass("compressedMatrix", slots = list(levels = "numeric", data = "integer"), validity = function(object) .Call("checkCompressedMatrix", object, package="mpMap2"))
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 
 checkRf <- function(object)
@@ -332,9 +350,18 @@ checkMpcrossLG <- function(object)
 
 checkMpcrossMapped <- function(object)
 {
-	if(any(unlist(lapply(object@map, names)) != markers(object)))
+	nMapMarkers <- sum(unlist(lapply(object@map, length)))
+	if(nMarkers != nMapMarkers)
 	{
-		return("Marker names implied by genetic data and marker names implied by map were different")
+		errors <- c(errors, "Number of markers in map is different from the number of markers in slot founders")
+	}
+	else
+	{
+		markerNames <- unlist(lapply(object@map, names))
+		if(any(colnames(object@founders) != markerNames) || any(colnames(object@founders) != markers(object)))
+		{
+			errors <- c(errors, "Marker names in map disagree with marker names in slot founders")
+		}
 	}
 	return(TRUE)
 }

@@ -1,6 +1,8 @@
 #include "checkHets.h"
 SEXP checkHets(SEXP hets)
 {
+	Rcpp::Function convert("storage.mode<-");
+
 	std::vector<std::string> errors;
 	Rcpp::List hetObject = hets;
 	Rcpp::CharacterVector hetObjectNames = hetObject.names();
@@ -9,6 +11,10 @@ SEXP checkHets(SEXP hets)
 	{
 		if(errors.size() > 10) break;
 		Rcpp::RObject currentHetObject = *i;
+		if(currentHetObject.sexp_type() == REALSXP)
+		{
+			currentHetObject = *i = convert(currentHetObject, "integer");
+		}
 		if(currentHetObject.sexp_type() != INTSXP || !currentHetObject.hasAttribute("dim"))
 		{
 			errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + " was not an integer matrix");

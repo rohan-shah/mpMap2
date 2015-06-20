@@ -1,12 +1,15 @@
 #include "alleleDataErrors.h"
 #include <vector>
 #include <string>
+#include "convertGeneticData.h"
 RcppExport SEXP alleleDataErrors(SEXP Robject, SEXP Rlimit)
 {
 	BEGIN_RCPP
-		Rcpp::S4 mpcross = Robject;
-		Rcpp::IntegerMatrix founders = mpcross.slot("founders"), finals = mpcross.slot("finals");
-		Rcpp::List hetData = mpcross.slot("hetData");
+		Rcpp::S4 geneticData = Robject;
+		convertGeneticData(geneticData);
+
+		Rcpp::IntegerMatrix founders = geneticData.slot("founders"), finals = geneticData.slot("finals");
+		Rcpp::List hetData = geneticData.slot("hetData");
 		int limit = Rcpp::as<int>(Rlimit);
 
 		Rcpp::List codingErrors = listCodingErrors(founders, finals, hetData);
@@ -58,7 +61,7 @@ RcppExport void codingErrorsToStrings(Rcpp::List codingErrors, std::vector<std::
 				return;
 			}
 			std::stringstream ss;
-			ss << "Coding error for marker " << markerNames[nullErrors(i)] << ": If a founder allele is coded as NA, all founder alleles must be coded as NA, and slot hetData[[" << markerNames[nullErrors(i)] << "]] must be a 0x0 matrix";
+			ss << "Coding error for marker " << markerNames[nullErrors(i)] << ": If a founder allele is coded as NA, all founder alleles must be coded as NA, and slot hetData[[" << markerNames[nullErrors(i)] << "]] must be a 0x3 matrix";
 			codingErrorsAsStrings.push_back(ss.str());
 		}
 	VOID_END_RCPP

@@ -1,7 +1,7 @@
 combineGenotypes <- function(finals, hetData)
 {
 	isHetDataArgument(hetData)
-	isIntegerMatrixArgument(finals)
+	isNumericMatrixArgument(finals)
 	if(ncol(finals) != 2*length(hetData))
 	{
 		stop("Inconsistent dimensions for inputs")

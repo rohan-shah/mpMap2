@@ -1,17 +1,21 @@
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 {
-		newGeneticData <- lapply(x@geneticData, 
-			function(geneticData, ...)
-			{
-				subset(geneticData, ...)
-			}
-		, ...)
+	newGeneticData <- lapply(x@geneticData, 
+		function(geneticData, ...)
+		{
+			subset(geneticData, ...)
+		}
+	, ...)
+	return(new("mpcross", geneticData = newGeneticData))
+})
+setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
+{
 	newMap <- NULL
 	if(!is.null(x@map))
 	{
 		newMap <- subset(x@map, ...)
 	}
-	return(new("mpcross", geneticData = newGeneticData, map = newMap))
+	return(new("mpcrossMapped", callNextMethod(), map = newMap))
 })
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {

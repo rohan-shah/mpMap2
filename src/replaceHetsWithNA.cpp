@@ -23,7 +23,8 @@ bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix 
 		}
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
-			if(isHet[recodedFinals(finalCounter, markerCounter)])
+			int finalValue = recodedFinals(finalCounter, markerCounter);
+			if(finalValue != NA_INTEGER && isHet[finalValue])
 			{
 				recodedFinals(finalCounter, markerCounter) = NA_INTEGER;
 				retValue = true;

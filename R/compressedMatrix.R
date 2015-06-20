@@ -1,1 +1,0 @@
-#setMethod("[", signature = c(x = "compressedMatrix", i = "integer", j = "integer"), definition = function(x, i, j) .Call("compressed.[", x, i, j, package="mpMap2"))

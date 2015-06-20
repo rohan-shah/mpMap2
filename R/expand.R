@@ -1,10 +1,10 @@
 expand <- function(mpcross, newMarkers)
 {
-	isNewMpcrossArgument(mpcross)
-	if(!is.null(mpcross@map))
+	inheritsNewMpcrossArgument(mpcross)
+	if(class(mpcross) != "mpcross")
 	{
-		warning("Pre-existing map was removed")
-		mpcross@map <- NULL
+		warning(paste0("Converting object of class ", class(mpcross), " to class mpcross, data may be lost"))
+		mpcross <- as(mpcross, "mpcross")
 	}
 
 	oldMarkers <- markers(mpcross)
@@ -26,11 +26,11 @@ expand <- function(mpcross, newMarkers)
 		newFounders[,oldMarkers] <- x@founders
 		newFinals[,oldMarkers] <- x@finals
 
-		newHetData <- vector(mode = "list", length = nNewMarkers)
+		newHetData <- replicate(nNewMarkers, matrix(0L, 0, 3), simplify=NULL)
 		names(newHetData) <- newMarkers
 		newHetData[oldMarkers] <- x@hetData
 
 		return(new("geneticData", finals = newFinals, founders = newFounders, pedigree = x@pedigree, hetData = new("hetData", newHetData)))
 	})
-	return(new("mpcross", geneticData = newGeneticData, map = NULL))
+	return(new("mpcross", geneticData = newGeneticData))
 }
