@@ -25,7 +25,6 @@ checkMap <- function(object)
 .map4 <- setClass("map4", contains = "list", validity = checkMap)
 setOldClass("map", S4Class = "map4")
 removeClass("map4")
-#setClassUnion("mapOrNULL", c("map", "NULL"))
 
 checkPedigree <- function(object)
 {
@@ -35,6 +34,7 @@ checkPedigree <- function(object)
 	{
 		errors <- c(errors, "Lengths of slots lineNames, mother and father must be the same")
 	}
+	if(length(errors) > 0) return(errors)
 	if(any(is.na(object@lineNames)))
 	{
 		errors <- c(errors, "Slot lineNames contained NA values")
