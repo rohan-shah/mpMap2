@@ -68,6 +68,12 @@ checkPedigree <- function(object)
 		errors <- c(errors, "Slot selfing must be either \"infinite\" or \"auto\"")
 	}
 
+	#Line names must be unique
+	if(length(unique(object@lineNames)) != nTotalLines)
+	{
+		errors <- c(errors, "Line names must be unique")
+	}
+
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
@@ -113,6 +119,7 @@ checkDetailedPedigree <- function(object)
 	{
 		errors <- c(errors, "Slot initial cannot contain duplicate values")
 	}
+	if(length(errors) > 0) return(errors)
 
 	if(!all(sort(object@initial) == 1:max(object@initial)))
 	{

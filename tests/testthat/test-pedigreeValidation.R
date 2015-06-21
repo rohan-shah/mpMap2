@@ -9,19 +9,34 @@ test_that("two-parent pedigree passes validation",
 	})
 test_that("pedigree slots must have correct length", 
 	{
-		#Wrong length lineNames gives an error
+		#Shorter lineNames gives an error
 		copied <- pedigree
-		copied@lineNames <- head(copied@lineNames, -1)
+		copied@lineNames <- head(copied@lineNames, -1L)
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		#Wrong length mother gives an error
+		#Longer lineNames gives an error
 		copied <- pedigree
-		copied@mother <- head(copied@mother, -1)
+		copied@lineNames <- c(copied@lineNames, "aaaaaaa")
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		#Wrong length father given an error
+		#Shorter mother gives an error
 		copied <- pedigree
-		copied@father <- head(copied@father, -1)
+		copied@mother <- head(copied@mother, -1L)
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Longer mother gives an error
+		copied <- pedigree
+		copied@mother <- c(copied@mother, 1L)
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Shorter father given an error
+		copied <- pedigree
+		copied@father <- head(copied@father, -1L)
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Longer father gives an error
+		copied <- pedigree
+		copied@father <- c(copied@father, 1L)
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("pedigree slots cannot contain NA", 
@@ -61,11 +76,6 @@ test_that("Pedigree slots mother and father must be 0 or row indices",
 		copied@father[1] <- length(copied@mother)+1L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
-test_that("lineNames must be unique",
-	{	
-		pedigree@lineNames[3] <- pedigree@lineNames[4]
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-	})
 test_that("Father and mother must come before offspring in pedigree",
 	{
 		copied <- pedigree
@@ -74,5 +84,17 @@ test_that("Father and mother must come before offspring in pedigree",
 
 		copied <- pedigree
 		copied@father[10] <- 11L
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
+test_that("lineNames must be unique",
+	{	
+		copied <- pedigree
+		copied@lineNames[3] <- copied@lineNames[4]
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
+test_that("Attribute selfing must be either \"infinite\" or \"auto\"",
+	{
+		copied <- pedigree
+		copied@selfing <- "other"
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})

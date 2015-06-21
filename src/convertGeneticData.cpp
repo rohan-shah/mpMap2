@@ -17,7 +17,7 @@ void convertGeneticData(Rcpp::S4 obj)
 	{
 		if(Rcpp::as<Rcpp::RObject>(hetData(i)).sexp_type() == REALSXP)
 		{
-			convert(Rcpp::as<Rcpp::NumericMatrix>(hetData(i)), "integer");
+			hetData(i) = convert(Rcpp::as<Rcpp::NumericMatrix>(hetData(i)), "integer");
 		}
 	}
 }
