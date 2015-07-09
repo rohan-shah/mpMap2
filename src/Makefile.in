@@ -1,0 +1,11 @@
+default_target: all
+.PHONY : default_target
+
+clean:
+	cd @PROJECT_BINARY_DIR@; \
+	MAKE= MAKEFLAGS= @FULL_MAKE_PROGRAM@ @PROJECT_BINARY_DIR@/Makefile clean
+
+all:
+	cd @PROJECT_BINARY_DIR@; \
+	MAKE= MAKEFLAGS= @FULL_MAKE_PROGRAM@ @PROJECT_BINARY_DIR@/Makefile all; \
+	MAKE= MAKEFLAGS= @FULL_MAKE_PROGRAM@ @PROJECT_BINARY_DIR@/Makefile install

@@ -65,7 +65,7 @@ test_that("Slot initial must contain unique values",
 		copied@initial <- c(1L,1L,2L)
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
-test_that("Slot initial must contain unique values",
+test_that("Initial lines must be at the start of the pedigree",
 	{
 		copied <- pedigree
 		copied@mother <- c(0L, 0L, copied@mother)
