@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.1)
-project(mpMap2)
 
 #Construct R.lib if we're using Visual studio on Windows
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
@@ -48,18 +47,18 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	endif()
 
 	message(STATUS "Generating import library for R.dll")
-	file(WRITE "${PROJECT_BINARY_DIR}/R.def" "LIBRARY R\n")
-	file(APPEND "${PROJECT_BINARY_DIR}/R.def" "EXPORTS\n")
+	file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/R.def" "LIBRARY R\n")
+	file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/R.def" "EXPORTS\n")
 	execute_process(COMMAND "${DUMPBIN_EXECUTABLE}" /exports "${R_HOME}/bin/x64/R.dll" ERROR_QUIET OUTPUT_VARIABLE DUMPBIN_OUTPUT)
 	#Strip off the junk at the start and end
 	string(REGEX MATCHALL "[ |\t]+[0-9]+[ |\t]+[0-9A-F]+[ |\t]+0[0-9A-F]+[ |\t]+[^\n|\r]+\n" R_EXPORTS_LIST_UNFILTERED "${DUMPBIN_OUTPUT}")
 	foreach(symbolline IN LISTS R_EXPORTS_LIST_UNFILTERED)
 		string(REGEX REPLACE "[ |\t]+[0-9]+[ |\t]+[0-9A-F]+[ |\t]+0[0-9A-F]+[ |\t]+([^\n|\r]+)\n" "\t\\1" symbol "${symbolline}")
-		file(APPEND "${PROJECT_BINARY_DIR}/R.def" "${symbol}\n")
+		file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/R.def" "${symbol}\n")
 	endforeach(symbolline)
-	execute_process(COMMAND "${LIB_EXECUTABLE}" /MACHINE:X64 /nodefaultlib "/def:${PROJECT_BINARY_DIR}/R.def" "/out:${PROJECT_BINARY_DIR}/R.lib" ERROR_QUIET OUTPUT_QUIET)
-	file(REMOVE "${PROJECT_BINARY_DIR}/R.def")
-	if(NOT EXISTS "${PROJECT_BINARY_DIR}/R.lib")
+	execute_process(COMMAND "${LIB_EXECUTABLE}" /MACHINE:X64 /nodefaultlib "/def:${CMAKE_CURRENT_BINARY_DIR}/R.def" "/out:${CMAKE_CURRENT_BINARY_DIR}/R.lib" ERROR_QUIET OUTPUT_QUIET)
+	file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/R.def")
+	if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/R.lib")
 		message(FATAL_ERROR "Generating import library for R.dll - Error R.lib not found")
 	endif()
 	message(STATUS "Generating import library for R.dll - done")
@@ -69,7 +68,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	#Put a Makefile.win in the source directory
 	find_program(FULL_MAKE_PROGRAM nmake)
 	set(FULL_MAKE_PROGRAM "\"${FULL_MAKE_PROGRAM}\" /f ")
-	configure_file(${PROJECT_SOURCE_DIR}/Makefile.in ${PROJECT_BINARY_DIR}/Makefile.win @ONLY)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Makefile.in ${CMAKE_CURRENT_BINARY_DIR}/Makefile.win @ONLY)
 endif()
 
 #Make sure everything installed to the right place
@@ -80,10 +79,14 @@ set(SourceFiles alleleDataErrors.cpp checkHets.cpp combineGenotypes.cpp crc32.cp
 set(HeaderFiles matrices.hpp constructLookupTable.hpp probabilities.hpp probabilities2.hpp convertGeneticData.h)
 add_library(mpMap2 SHARED ${SourceFiles} ${HeaderFiles} ${mpMap2_MOC_SOURCES})
 target_link_libraries(mpMap2 PRIVATE Rcpp)
-target_include_directories(mpMap2 PUBLIC ${PROJECT_SOURCE_DIR}/../inst/include ${PROJECT_SOURCE_DIR})
+target_include_directories(mpMap2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../inst/include ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(mpMap2 PRIVATE CUSTOM_STATIC_RCPP)
 
 #Ensure that it's installed to the right place
 if(WIN32)
-	target_link_libraries(mpMap2 PRIVATE ${PROJECT_BINARY_DIR}/R.lib)
+	foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
+		string(TOUPPER ${BUILD_TYPE} UPPER_BUILD_TYPE)
+		set_target_properties(mpMap2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${UPPER_BUILD_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/../${BUILD_TYPE}/src/ PDB_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/../${BUILD_TYPE}/src/)
+	endforeach()
+	target_link_libraries(mpMap2 PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/R.lib)
 endif()
