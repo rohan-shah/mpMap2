@@ -68,11 +68,11 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 	{
 		individualsToCheckFunnels.clear();
 
-		Rcpp::CharacterVector::iterator findLineName = std::find(pedigreeLineNames.begin(), pedigreeLineNames.end(), finalNames[finalCounter]);
+		Rcpp::CharacterVector::iterator findLineName = std::find(pedigreeLineNames.begin(), pedigreeLineNames.end(), finalNames(finalCounter));
 		if(findLineName == pedigreeLineNames.end())
 		{
 			std::stringstream ss;
-			ss << "Unable to find line number " << finalCounter << " named " << finalNames[finalCounter] << " in pedigree";
+			ss << "Unable to find line number " << finalCounter << " named " << finalNames(finalCounter) << " in pedigree";
 			throw std::runtime_error(ss.str().c_str());
 		}
 		int pedigreeRow = (int)std::distance(pedigreeLineNames.begin(), findLineName);
@@ -98,7 +98,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			catch(...)
 			{
 				std::stringstream ss;
-				ss << "Attempting to trace pedigree for line " << finalNames[finalCounter] << ": Unable to get funnel for line " << pedigreeLineNames[*i];
+				ss << "Attempting to trace pedigree for line " << finalNames(finalCounter) << ": Unable to get funnel for line " << pedigreeLineNames(*i);
 				errors.push_back(ss.str());
 				continue;
 			}
@@ -110,7 +110,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			if(std::unique(&(copiedFunnel.val[0]), &(copiedFunnel.val[0]) + nFounders) != &(copiedFunnel.val[0]) + nFounders)
 			{
 				std::stringstream ss;
-				ss << "Funnel for line " << pedigreeLineNames[*i] << " contained founders {" << funnel.val[0];
+				ss << "Funnel for line " << pedigreeLineNames(*i) << " contained founders {" << funnel.val[0];
 				warnings.push_back(ss.str());
 				if(nFounders == 2)
 				{
@@ -153,7 +153,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			if(!okMarker)
 			{
 				std::stringstream ss;
-				ss << "Error: Data for marker " << markerNames[markerCounter] << " is impossible for individual " << finalNames[finalCounter] << " with given pedigree\n";
+				ss << "Error: Data for marker " << markerNames(markerCounter) << " is impossible for individual " << finalNames(finalCounter) << " with given pedigree\n";
 				errors.push_back(ss.str());
 				if(errors.size() > 1000) return;
 			}

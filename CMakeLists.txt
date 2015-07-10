@@ -1,0 +1,34 @@
+cmake_minimum_required(VERSION 3.1)
+project(mpMap2)
+
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src)
+find_package(R REQUIRED)
+find_package(Rcpp REQUIRED)
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
+add_subdirectory(src)
+
+add_custom_target(copyPackage ALL)	
+set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h unitTypes.hpp)
+set(RFILES classes.R estimateRF.R formGroups.R mapFunctions.R mpcross.R nLines.R pedigree.R Rcpp_exceptions.R simulateMPCross.R twoParentPedigree.R combinedGenotypes.R expand.R fullHetData.R markers.R nFounders.R nMarkers.R print.R show.R subset.R validation.R) 
+#Copy package to binary directory. This works differently on windows and linux
+if(WIN32)
+
+else()
+	#Copy NAMESPACE
+	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE ${CMAKE_BINARY_DIR}/NAMESPACE)
+	#Copy DESCRIPTION
+	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION ${CMAKE_BINARY_DIR}/DESCRIPTION)
+	#Copy include files
+	foreach(HEADER IN LISTS HEADERS)
+		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER} ${CMAKE_BINARY_DIR}/inst/include/${HEADER})
+	endforeach()
+	#Copy R files
+	foreach(RFILE IN LISTS RFILES)
+		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE} ${CMAKE_BINARY_DIR}/R/${RFILE})
+	endforeach()
+endif()
+if(WIN32)
+	install(CODE "execute_process(COMMAND \"${R_COMMAND}\" CMD INSTALL --no-multiarch \$\{CMAKE_INSTALL_CONFIG_NAME\} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})")
+else()
+	install(CODE "execute_process(COMMAND \"${R_COMMAND}\" CMD INSTALL . WORKING_DIRECTORY ${PROJECT_BINARY_DIR})")
+endif()

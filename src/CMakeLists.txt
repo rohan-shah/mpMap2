@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
 project(mpMap2)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-find_package(R REQUIRED)
-find_package(Rcpp REQUIRED)
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 #Construct R.lib if we're using Visual studio on Windows
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
@@ -73,7 +69,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	#Put a Makefile.win in the source directory
 	find_program(FULL_MAKE_PROGRAM nmake)
 	set(FULL_MAKE_PROGRAM "\"${FULL_MAKE_PROGRAM}\" /f ")
-	configure_file(${PROJECT_SOURCE_DIR}/Makefile.in ${PROJECT_SOURCE_DIR}/Makefile.win @ONLY)
+	configure_file(${PROJECT_SOURCE_DIR}/Makefile.in ${PROJECT_BINARY_DIR}/Makefile.win @ONLY)
 endif()
 
 #Make sure everything installed to the right place
@@ -88,11 +84,6 @@ target_include_directories(mpMap2 PUBLIC ${PROJECT_SOURCE_DIR}/../inst/include $
 target_compile_definitions(mpMap2 PRIVATE CUSTOM_STATIC_RCPP)
 
 #Ensure that it's installed to the right place
-install(TARGETS mpMap2 RUNTIME DESTINATION . LIBRARY DESTINATION . COMPONENT Runtime)
-
 if(WIN32)
 	target_link_libraries(mpMap2 PRIVATE ${PROJECT_BINARY_DIR}/R.lib)
 endif()
-
-add_custom_target(mpMap2_install ALL COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
-add_dependencies(mpMap2_install mpMap2)
