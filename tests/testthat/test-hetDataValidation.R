@@ -56,3 +56,18 @@ test_that("hetData encodings must be symmetric",
 		copied[[1]][index2, 3] <- copied[[1]][index1, 3] + 1
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("Duplicate rows not allowed in hetData",
+	{
+		copied <- hetData
+		copied[[1]] <- rbind(copied[[1]], copied[[1]][1,])
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
+test_that("Contradictory rows not allowed in hetData",
+	{
+		copied <- hetData
+		#Duplicate the first row, but give it a different encoding for the finals
+		extraRow <- copied[[1]]
+		extraRow[3] <- extraRow[3] + 1
+		copied[[1]] <- rbind(copied[[1]], extraRow)
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})

@@ -182,11 +182,11 @@ checkGeneticData <- function(object)
 		errors <- c(errors, "Slot founders must be a matrix")
 	}
 	#Check that row and column names of finals and founders exist
-	if(any(unlist(lapply(dimnames(object@founders), is.null))))
+	if(is.null(dimnames(object@founders)) || any(unlist(lapply(dimnames(object@founders), is.null))))
 	{
 		errors <- c(errors, "Slot founders must have row and column names")
 	}
-	if(any(unlist(lapply(dimnames(object@finals), is.null))))
+	if(is.null(dimnames(object@finals)) || any(unlist(lapply(dimnames(object@finals), is.null))))
 	{
 		errors <- c(errors, "Slot finals must have row and column names")
 	}

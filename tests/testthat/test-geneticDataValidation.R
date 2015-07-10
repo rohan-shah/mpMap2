@@ -57,28 +57,29 @@ test_that("Slot finals cannot contain non-integer values",
 		copied@finals[1,1] <- 0.5
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
-test_that("Slot founders must be two-dimensional",
-	{
-		copied <- geneticData
-		dim(copied@founders) <- c(2,3,4)
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-	})
-test_that("Slot finals must be two-dimensional",
-	{
-		copied <- geneticData
-		dim(copied@finals) <- c(2,3,4)
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-	})
+#Apparently setting the dimension wrong like this throws an error before the validObject call anyway
+#test_that("Slot founders must be two-dimensional",
+#	{
+#		copied <- geneticData
+#		dim(copied@founders) <- c(2,3,4)
+#		expect_that(validObject(copied, complete=TRUE), throws_error())
+#	})
+#test_that("Slot finals must be two-dimensional",
+#	{
+#		copied <- geneticData
+#		dim(copied@finals) <- c(2,3,4)
+#		expect_that(validObject(copied, complete=TRUE), throws_error())
+#	})
 test_that("Slots founders must have dimnames",
 	{
 		copied <- geneticData
-		dimnames(copied@founders)[[1]] <- NULL
+		dimnames(copied@founders) <- NULL
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("Slots finals must have dimnames",
 	{
 		copied <- geneticData
-		dimnames(copied@finals)[[1]] <- NULL
+		dimnames(copied@finals) <- NULL
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("Dimnames of founders cannot contain NA",
@@ -132,7 +133,7 @@ test_that("Slots founders, finals and hetData must agree on the number of marker
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
 		copied <- geneticData
-		copied@hetData <- cbind(copied@hetData, newMarker = copied@hetData[[1]])
+		copied@hetData[["newMarker"]] <- copied@hetData[[1]]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("Slots founders, finals and hetData must agree on the marker names",
@@ -198,68 +199,33 @@ test_that("NA founders are allowed, so long as the hetData entry has 0 rows, and
 		copied@finals[,1] <- NA
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})
-#TODO: Other checks made in alleleDataErrors
-test_that("geneticData rejects invalid values", 
+test_that("Values in first two columns of hetData matrix must be founder alleles", 
 	{
-		#Invalid final genotype throws error
+		#Completely invalid values
 		copied <- geneticData
-		copied@finals[1,1] <- 100
+		copied@hetData[[1]][1,1] <- 10
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		#Invalid founder genotype
+		#More completely invalid values
 		copied <- geneticData
-		copied@founders[1,1] <- 100
+		copied@hetData[[1]][1,2] <- 10
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		#This causes the hetData to mismatch the founders, so it throws an error
+		#Case where both founders have a 1 allele, but the hetData contains 2 alleles
 		copied <- geneticData
 		copied@founders[,1] <- 1
-		copied@finals[,1] <- 1
 		expect_that(validObject(copied, complete=TRUE), throws_error())
-
-		#But if we now fix the hetData, there's no error
-		copied@hetData[[1]] <- rbind(c(1,1,1))
-		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})
-test_that("Missing data correctly validated in two-way geneticData", 
+test_that("Values in finals must be valid according to hetData", 
 	{
-		#An NA founder throws an error
+		#Remove hetrozygotes from hetData
 		copied <- geneticData
-		copied@founders[1,1] <- NA
+		indices <- copied@hetData[[1]][,1] == copied@hetData[[1]][,2]
+		copied@hetData[[1]] <- copied@hetData[[1]][indices,]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		#All NA founders throw an error
+		#Completely invalid value
 		copied <- geneticData
-		copied@founders[,1] <- NA
+		copied@finals[1,1] <- 20
 		expect_that(validObject(copied, complete=TRUE), throws_error())
-
-		#All NA founders and finals throw an error
-		copied <- geneticData
-		copied@founders[,1] <- NA
-		copied@finals[,1] <- NA
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-
-		#Deleting the hetData throws an error
-		copied <- geneticData
-		copied@hetData[[1]] <- matrix(0L, 0, 3)
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-
-		#Deleting the hetData and setting all the finals gives no error (There are no finals, so every final can be *found* in the hetData)
-		copied <- geneticData
-		copied@hetData[[1]] <- matrix(0L, 0, 3)
-		copied@finals[,1] <- NA
-		expect_identical(validObject(copied, complete=TRUE), TRUE)
-
-		#Deleting the hetData and the founders gives an error
-		copied <- geneticData
-		copied@hetData[[1]] <- matrix(0L, 0, 3)
-		copied@founders[,1] <- NA
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-
-		#If all founders and finals are NA, and the hetData is a 0x3 matrix, then no error
-		copied <- geneticData
-		copied@founders[,1] <- NA
-		copied@finals[,1] <- NA
-		copied@hetData[[1]] <- matrix(0L, 0, 3)
-		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})

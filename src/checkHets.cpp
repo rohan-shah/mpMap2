@@ -29,24 +29,44 @@ SEXP checkHets(SEXP hets)
 		Rcpp::IntegerMatrix currentHetObjectMat = Rcpp::as<Rcpp::IntegerMatrix>(currentHetObject);
 		int currentHetObjectRows = currentHetObjectDim(0);
 		//Now check symmetry - That is, if we have an encoding for haplotype (a, b), then we must have the same encoding for haplotype (b, a)
+		//Also check for duplicate rows and inconsistent rows
 		for(int rowCounter = 0; rowCounter < currentHetObjectRows; rowCounter++)
 		{
-			int otherRow = 0;
-			for(; otherRow < currentHetObjectRows; otherRow++)
+			bool symmetric = false;
+			for(int otherRow = 0; otherRow < currentHetObjectRows; otherRow++)
 			{
+				if(otherRow != rowCounter)
+				{
+					//This is either a duplicate row or an inconsistent row. Although this shouldn't be applied if currentRow == rowCounter
+					if(currentHetObjectMat(otherRow, 0) == currentHetObjectMat(rowCounter, 0) && currentHetObjectMat(otherRow, 1) == currentHetObjectMat(rowCounter, 1))
+					{
+						if(currentHetObjectMat(otherRow, 2) == currentHetObjectMat(rowCounter, 2))
+						{
+							errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + ": Duplicate marker encodings found in hetData");
+							goto nextMarker;
+						}
+						else
+						{
+							errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + ": Inconsistent marker encodings found in hetData");
+							goto nextMarker;
+						}
+					}
+				}
 				if(currentHetObjectMat(otherRow, 0) == currentHetObjectMat(rowCounter, 1) && currentHetObjectMat(otherRow, 1) == currentHetObjectMat(rowCounter, 0) && currentHetObjectMat(otherRow, 2) == currentHetObjectMat(rowCounter, 2))
 				{
-					break;
+					symmetric = true;
 				}
 			}
 			//If we didn't find the symmetric encoding, that's an error. 
-			if(otherRow == currentHetObjectRows) 
+			if(!symmetric) 
 			{
 				errors.push_back("Entry for marker " + Rcpp::as<std::string>(hetObjectNames[index]) + ": If haplotype (a, b) has an encoding then haplotype (b, a) must have the same encoding");
 				break;
 			}
 
 		}
+	nextMarker:
+		;
 	}
 	if(errors.size() > 0)
 	{
