@@ -12,20 +12,35 @@ set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estim
 set(RFILES classes.R estimateRF.R formGroups.R mapFunctions.R mpcross.R nLines.R pedigree.R Rcpp_exceptions.R simulateMPCross.R twoParentPedigree.R combinedGenotypes.R expand.R fullHetData.R markers.R nFounders.R nMarkers.R print.R show.R subset.R validation.R) 
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
-	foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
+	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")
 		#Copy NAMESPACE
-		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/NAMESPACE)
+		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE ${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE)
 		#Copy DESCRIPTION
-		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/DESCRIPTION)
+		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION ${CMAKE_CURRENT_BINARY_DIR}/DESCRIPTION)
 		#Copy include files
 		foreach(HEADER IN LISTS HEADERS)
-			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/inst/include/${HEADER})
+			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/inst/include/${HEADER})
 		endforeach()
 		#Copy R files
 		foreach(RFILE IN LISTS RFILES)
-			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE} ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/R/${RFILE})
+			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE} ${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE})
 		endforeach()
-	endforeach()
+	else()
+		foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
+			#Copy NAMESPACE
+			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/NAMESPACE)
+			#Copy DESCRIPTION
+			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/DESCRIPTION)
+			#Copy include files
+			foreach(HEADER IN LISTS HEADERS)
+				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/inst/include/${HEADER})
+			endforeach()
+			#Copy R files
+			foreach(RFILE IN LISTS RFILES)
+				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE} ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/R/${RFILE})
+			endforeach()
+		endforeach()
+	endif()
 else()
 	#Copy NAMESPACE
 	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE ${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE)
