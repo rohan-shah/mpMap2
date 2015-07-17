@@ -14,12 +14,12 @@ Depends:
     qtl,
     Rcpp,
     seriation,
-    methods
+    methods,
+    igraph
 Suggests: 
     Rmpi,
     asreml,
-    happy.hbrem,
-    igraph
+    happy.hbrem
 Imports: 
     wgaim,
     ggplot2

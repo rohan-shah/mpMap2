@@ -1,3 +1,4 @@
+#' @export
 linesByNames <- function(pedigree, names)
 {
 	isPedigreeArgument(pedigree)

@@ -1,3 +1,4 @@
+#' @export
 estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE)
 {
 	inheritsNewMpcrossArgument(object)

@@ -1,3 +1,4 @@
+#' @export
 formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average")
 {
 	if(!(clusterBy %in% c("combined", "theta", "lod")))

@@ -1,9 +1,15 @@
-#' Generate a four-parent pedigree which starts from inbred and random funnels
+#' @title Generate a four-parent pedigree
 #'
+#' @description
+#' Generate a four-parent pedigree starting from inbred founders, using a single funnel
+#'
+#' @details
+#' Note that unlike \code{\link{fourParentPedigreeRandomFunnel}}, there is no intercrossing allowed in the single funnel case because the relevant haplotype probabilities assume randomly chosen funnels
+#' @seealso \code{\link{fourParentPedigreeRandomFunnel}}, \code{\link{twoParentPedigree}}
 #' @param initialPopulationSize The number of F1 lines generated
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
-#' No intercrossing in the single funnel case because it would be inaccurate
+#' @export
 fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds)
 {
   nonNegativeIntegerArgument(initialPopulationSize)

@@ -5,46 +5,47 @@
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
 #' @examples
+#' plotWOptions <- function(graph) plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
 #' #F2 design
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = 1,)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #'
 #' #An equivalent F2 design (if the founders really are inbred)
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 0)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #'
 #' #Another equivalent F2 design (if the founders really are inbred)
 #' pedigree <- twoParentPedigree(initialPopulationSize = 1, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds=10)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #' 
 #' #A RIL design (10 generations of inbreeding)
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 10, intercrossingGenerations = 0, nSeeds = 1)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #'
 #' #Another RIL design (10 generations of inbreeding)
 #' pedigree <- twoParentPedigree(initialPopulationSize = 1, selfingGenerations = 10, intercrossingGenerations = 0, nSeeds = 10)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #
 #' #One generation of mixing followed by 10 generations of inbreeding
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 10, intercrossingGenerations = 1, nSeeds = 1)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
+#' plotWOptions(graph)
 #'
 #' #Two generations of mixing and no inbreeding
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 0, intercrossingGenerations = 2, nSeeds = 0)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
-#''
+#' plotWOptions(graph)
+#'
 #' #One generation of mixing, and then two selfed lines are generated (10 generations of selfing)
 #' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 10, intercrossingGenerations = 1, nSeeds = 2)
 #' graph <- pedigreeToGraph(pedigree)
-#' plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
-
+#' plotWOptions(graph)
+#' @export
 twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
