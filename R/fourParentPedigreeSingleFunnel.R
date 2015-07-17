@@ -63,7 +63,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
   #No selfing
   else
   {
-    observed[lastGenerationStart:lastGenerationEnd] <- TRUE
+    observed[7:(6+initialPopulationSize)] <- TRUE
   }
   return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:4L, observed = observed, selfing = "infinite"))
 }

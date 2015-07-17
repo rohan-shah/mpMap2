@@ -401,7 +401,7 @@ setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
 		names(groups) <- markers(from)
 		allGroups <- unique(groups)
 		lg <- new("lg", allGroups = allGroups, groups = groups)
-		return(new(to, as(object, "mpcross"), lg = lg, rf = from@rf))
+		return(new(to, as(from, "mpcross"), lg = lg, rf = from@rf))
 	})
 mpcrossMapped <- function(cross, map, rf=NULL)
 {

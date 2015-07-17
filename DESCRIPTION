@@ -12,7 +12,6 @@ License: GPL-2
 LazyLoad: yes
 Depends: 
     qtl,
-    Rcpp,
     seriation,
     methods,
     igraph

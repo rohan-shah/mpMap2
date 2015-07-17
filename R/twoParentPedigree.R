@@ -1,4 +1,4 @@
-#' Generate a two-parent pedigree which starts from inbred founders
+#' @title Generate a two-parent pedigree which starts from inbred founders
 #'
 #' @param initialPopulationSize The number of F1 lines generated
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree

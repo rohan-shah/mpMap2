@@ -68,7 +68,7 @@ isNumericMatrixArgument <- function(matrix)
 		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " must be a numeric matrix"))
 	}	
 }
-isOldMpcrossArgument <- function(x)
+isOldMpMapMpcrossArgument <- function(x)
 {
 	call <- sys.call(sys.parent(0))
 	parentCall <- sys.call(sys.parent(1))
