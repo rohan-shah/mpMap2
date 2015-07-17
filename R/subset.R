@@ -10,12 +10,9 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 })
 setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
 {
-	newMap <- NULL
-	if(!is.null(x@map))
-	{
-		newMap <- subset(x@map, ...)
-	}
-	return(new("mpcrossMapped", callNextMethod(), map = newMap))
+	subsettedRF <- NULL
+	if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
+	return(new("mpcrossMapped", callNextMethod(), map = subset(x@map, ...), rf = subsettedRF))
 })
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {
@@ -23,7 +20,9 @@ setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 })
 setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 {
-	return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...)))
+	subsettedRF <- NULL
+	if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
+	return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...), "rf" = subsettedRF))
 })
 setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 {

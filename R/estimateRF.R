@@ -21,7 +21,15 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 		}
 	}
 	rf <- estimateRFSubset(object = object, recombValues=recombValues, lineWeights = lineWeights, marker1Range = c(1, nMarkers(object)), marker2Range = c(1, nMarkers(object)), keepLod = keepLod, keepLkhd = keepLkhd)
-	output <- new("mpcrossRF", geneticData = object@geneticData, rf = rf)
+	if(class(object) == "mpcrossLG" || class(object) == "mpcrossMapped")
+	{
+		output <- object
+		output@rf <- rf
+	}
+	else
+	{
+		output <- new("mpcrossRF", geneticData = object@geneticData, rf = rf)
+	}
 	return(output)
 }
 estimateRFInternal <- function(object, recombValues, lineWeights, marker1Range, marker2Range, keepLod, keepLkhd)

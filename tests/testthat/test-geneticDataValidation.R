@@ -58,29 +58,33 @@ test_that("Slot finals cannot contain non-integer values",
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 #Apparently setting the dimension wrong like this throws an error before the validObject call anyway
-#test_that("Slot founders must be two-dimensional",
-#	{
-#		copied <- geneticData
-#		dim(copied@founders) <- c(2,3,4)
-#		expect_that(validObject(copied, complete=TRUE), throws_error())
-#	})
-#test_that("Slot finals must be two-dimensional",
-#	{
-#		copied <- geneticData
-#		dim(copied@finals) <- c(2,3,4)
-#		expect_that(validObject(copied, complete=TRUE), throws_error())
-#	})
+test_that("Slot founders must be two-dimensional",
+	{
+		copied <- geneticData
+		expect_that(dim(copied@founders) <- c(2,3,4), throws_error())
+	})
+test_that("Slot finals must be two-dimensional",
+	{
+		copied <- geneticData
+		expect_that(dim(copied@finals) <- c(2,3,4), throws_error())
+	})
 test_that("Slots founders must have dimnames",
 	{
 		copied <- geneticData
 		dimnames(copied@founders) <- NULL
 		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		copied <- geneticData
+		expect_that(dimnames(copied@founders)[[1]] <- NULL, throws_error())
 	})
 test_that("Slots finals must have dimnames",
 	{
 		copied <- geneticData
 		dimnames(copied@finals) <- NULL
 		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		copied <- geneticData
+		expect_that(dimnames(copied@finals)[[1]] <- NULL, throws_error())
 	})
 test_that("Dimnames of founders cannot contain NA",
 	{
@@ -124,17 +128,45 @@ test_that("Row and column names of slot finals must be unique",
 	})
 test_that("Slots founders, finals and hetData must agree on the number of markers",
 	{
+		#Add marker to founders
 		copied <- geneticData
 		copied@founders <- cbind(copied@founders, newMarker = copied@founders[,1])
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
+		#Add marker to finals
 		copied <- geneticData
 		copied@finals <- cbind(copied@finals, newMarker = copied@finals[,1])
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
+		#Add marker to hetData
 		copied <- geneticData
 		copied@hetData[["newMarker"]] <- copied@hetData[[1]]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Add marker to finals and founders
+		copied <- geneticData
+		copied@founders <- cbind(copied@founders, newMarker = copied@founders[,1])
+		copied@finals <- cbind(copied@finals, newMarker = copied@finals[,1])
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Add marker to finals and hetData
+		copied <- geneticData
+		copied@hetData[["newMarker"]] <- copied@hetData[[1]]
+		copied@finals <- cbind(copied@finals, newMarker = copied@finals[,1])
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Add marker to founders and hetData
+		copied <- geneticData
+		copied@founders <- cbind(copied@founders, newMarker = copied@founders[,1])
+		copied@hetData[["newMarker"]] <- copied@hetData[[1]]
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		#Adding marker to all three is fine
+		copied <- geneticData
+		copied@founders <- cbind(copied@founders, newMarker = copied@founders[,1])
+		copied@finals <- cbind(copied@finals, newMarker = copied@finals[,1])
+		copied@hetData[["newMarker"]] <- copied@hetData[[1]]
+		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})
 test_that("Slots founders, finals and hetData must agree on the marker names",
 	{
@@ -166,7 +198,7 @@ test_that("If slot pedigree has class detailedPedigree, then the founders must m
 	{
 		copied <- geneticData
 		if(!inherits(copied@pedigree, "detailedPedigree")) stop("Slot pedigree should inherit from detailedPedigree")
-		rownames(copied@founders)[1] <- copied@pedigree@lineNames[10]
+		rownames(copied@founders)[1] <- copied@pedigree@lineNames[20]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("If slot pedigree has class detailedPedigree, then the finals must match the observed",
@@ -203,12 +235,12 @@ test_that("Values in first two columns of hetData matrix must be founder alleles
 	{
 		#Completely invalid values
 		copied <- geneticData
-		copied@hetData[[1]][1,1] <- 10
+		copied@hetData[[1]][1,1] <- max(copied@founders[,1])+1
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
 		#More completely invalid values
 		copied <- geneticData
-		copied@hetData[[1]][1,2] <- 10
+		copied@hetData[[1]][1,2] <- max(copied@founders[,1])+1
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
 		#Case where both founders have a 1 allele, but the hetData contains 2 alleles

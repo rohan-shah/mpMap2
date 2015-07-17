@@ -86,15 +86,15 @@ test_that("Father and mother must come before offspring in pedigree",
 		copied@father[10] <- 11L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
-test_that("lineNames must be unique",
-	{	
-		copied <- pedigree
-		copied@lineNames[3] <- copied@lineNames[4]
-		expect_that(validObject(copied, complete=TRUE), throws_error())
-	})
 test_that("Attribute selfing must be either \"infinite\" or \"auto\"",
 	{
 		copied <- pedigree
 		copied@selfing <- "other"
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
+test_that("lineNames must be unique",
+	{	
+		copied <- pedigree
+		copied@lineNames[3] <- copied@lineNames[4]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})

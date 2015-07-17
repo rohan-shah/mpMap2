@@ -15,6 +15,14 @@ test_that("Every entry must have a valid name",
 		copied <- hetData
 		names(copied) <- NULL
 		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		copied <- hetData
+		names(copied)[1] <- ""
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+
+		copied <- hetData
+		names(copied)[1] <- NA
+		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("Names must be unique",
 	{
@@ -23,11 +31,22 @@ test_that("Names must be unique",
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 #Now the stuff checked by the C code
-test_that("hetData entries can be numeric matrices",
+test_that("hetData entries must be numeric matrices",
 	{
+		#Numeric is OK
 		copied <- hetData
 		storage.mode(copied[[1]]) <- "numeric"
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
+
+		#Integer is OK
+		copied <- hetData
+		storage.mode(copied[[1]]) <- "integer"
+		expect_identical(validObject(copied, complete=TRUE), TRUE)
+
+		#Character isn't
+		copied <- hetData
+		storage.mode(copied[[1]]) <- "logical"
+		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("hetData entries must have dimension attribute",
 	{

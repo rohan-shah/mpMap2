@@ -82,6 +82,7 @@ checkDetailedPedigree <- function(object)
 {
 	nTotalLines <- length(object@lineNames)
 	errors <- c()
+	#length(object@mother) == length(object@lineNames) and length(object@father) == length(object@lineNames) are checked in checkPedigree
 	if(length(object@observed) != nTotalLines)
 	{
 		errors <- c(errors, "Lengths of slots lineNames, mother, father and observed must be the same")
@@ -101,7 +102,7 @@ checkDetailedPedigree <- function(object)
 		errors <- c(errors, "Slot initial must be non-empty")
 	}
 
-	if(any(object@initial < 0 | object@initial > nTotalLines))
+	if(any(object@initial <= 0 | object@initial > nTotalLines))
 	{
 		errors <- c(errors, "Values in slot initial had invalid values")
 	}
@@ -314,7 +315,7 @@ checkMpcross <- function(object)
 .mpcross <- setClass("mpcross", slots = list(geneticData = "list"), validity=checkMpcross)
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 
-checkRf <- function(object)
+checkRF <- function(object)
 {
 	errors <- c()
 	if(storage.mode(object@theta) != "double")
@@ -332,52 +333,88 @@ checkRf <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.rf <- setClass("rf", slots = list(r = "numeric", theta = "matrix", lod = "matrixOrNULL", lkhd = "matrixOrNULL"), validity = checkRf)
+.rf <- setClass("rf", slots = list(r = "numeric", theta = "matrix", lod = "matrixOrNULL", lkhd = "matrixOrNULL"), validity = checkRF)
+setClassUnion("rfOrNULL", c("rf", "NULL"))
 .mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"))
 
 checkLG <- function(object)
 {
+	errors <- c()
+	if(any(is.na(object@groups)))
+	{
+		errors <- c(errors, "Slot groups cannot contain NA values")
+	}
+	if(any(is.na(object@allGroups)))
+	{
+		errors <- c(errors, "Slot allGroups cannot contain NA values")
+	}
+	if(any(object@allGroups < 0))
+	{
+		errors <- c(errors, "Slot allGroups cannot contain negative values")
+	}
 	if(!all(object@groups %in% object@allGroups))
 	{
-		return("Only values in slot allGroups are allowed as values in slot groups")
+		errors <- c(errors, "Only values in slot allGroups are allowed as values in slot groups")
 	}
+	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
 .lg <- setClass("lg", slots = list(groups = "integer", allGroups = "integer"), validity = checkLG)
 
 checkMpcrossLG <- function(object)
 {
-	if(any(names(object@lg@groups) != markers(object)))
+	if(any(is.na(names(object@lg@groups)) || names(object@lg@groups) != markers(object)))
 	{
 		return("Marker names implied by names of slots lg@groups and founders were different")
 	}
 	return(TRUE)
 }
-.mpcrossLG <- setClass("mpcrossLG", contains = "mpcrossRF", slots = list(lg = "lg"), validity=checkMpcrossLG)
+.mpcrossLG <- setClass("mpcrossLG", contains = "mpcross", slots = list(lg = "lg", rf = "rfOrNULL"), validity=checkMpcrossLG)
 
 checkMpcrossMapped <- function(object)
 {
+	errors <- c()
 	nMapMarkers <- sum(unlist(lapply(object@map, length)))
-	if(nMarkers != nMapMarkers)
+	if(nMarkers(object) != nMapMarkers)
 	{
 		errors <- c(errors, "Number of markers in map is different from the number of markers in slot founders")
 	}
 	else
 	{
 		markerNames <- unlist(lapply(object@map, names))
-		if(any(colnames(object@founders) != markerNames) || any(colnames(object@founders) != markers(object)))
+		for(i in 1:length(object@geneticData))
 		{
-			errors <- c(errors, "Marker names in map disagree with marker names in slot founders")
+			geneticDataMarkers <- markers(object@geneticData[[i]])
+			if(length(geneticDataMarkers) != length(markerNames) || any(geneticDataMarkers != markerNames))
+			{
+				errors <- c(errors, "Marker names in map disagree with marker names in genetic data")
+			}
 		}
 	}
+	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.mpcrossMapped <- setClass("mpcrossMapped", contains = "mpcrossRF", slots = list(map = "map"), validity=checkMpcrossMapped)
+.mpcrossMapped <- setClass("mpcrossMapped", contains = "mpcross", slots = list(map = "map", rf = "rfOrNULL"), validity=checkMpcrossMapped)
 setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
 	{
 		groups <- rep(1:length(from@map), each = unlist(lapply(from@map, length)))
 		names(groups) <- markers(from)
 		allGroups <- unique(groups)
 		lg <- new("lg", allGroups = allGroups, groups = groups)
-		return(new(to, as(object, "mpcrossRF"), lg = lg))
+		return(new(to, as(object, "mpcross"), lg = lg, rf = from@rf))
 	})
+mpcrossMapped <- function(cross, map, rf=NULL)
+{
+	if(inherits(cross, "mpcrossRF"))
+	{
+		if(!is.null(rf))
+		{
+			stop("Two objects of class rf were specified")
+		}
+		return(new("mpcrossMapped", as(cross, "mpcross"), rf = cross@rf, map = map))
+	}
+	else
+	{
+		return(new("mpcrossMapped", cross, map = map, rf = rf))
+	}
+}
