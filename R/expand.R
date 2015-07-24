@@ -1,11 +1,6 @@
 expand <- function(mpcross, newMarkers)
 {
 	inheritsNewMpcrossArgument(mpcross)
-	if(class(mpcross) != "mpcross")
-	{
-		warning(paste0("Converting object of class ", class(mpcross), " to class mpcross, data may be lost"))
-		mpcross <- as(mpcross, "mpcross")
-	}
 
 	oldMarkers <- markers(mpcross)
 	nOldMarkers <- length(oldMarkers)
@@ -13,6 +8,29 @@ expand <- function(mpcross, newMarkers)
 	if(!all(oldMarkers %in% newMarkers))
 	{
 		stop("New marker set must contain old marker set")
+	}
+	#If the new markers and the old markers are the same, just return the object
+	if(all(newMarkers %in% oldMarkers))
+	{
+		return(subset(mpcross, markers = newMarkers))
+	}
+
+	if(class(mpcross) != "mpcross")
+	{
+		#Warn that RF data will be lost
+		if(inherits(mpcross, "mpcrossRF"))
+		{
+			warning(paste0("Converting object of class mpcrossRF to class mpcross, recombination data will be lost"))
+		}
+		if(inherits(mpcross, "mpcrossLG"))
+		{
+			if(!is.null(mpcross@rf))
+			{
+				warning(paste0("Converting object of class mpcrossLG to class mpcross, recombination data will be lost"))
+			}
+			warning(paste0("Converting object of class mpcrossLG to class mpcross, linkage group data will be lost"))
+		}
+		mpcross <- as(mpcross, "mpcross")
 	}
 
 	newGeneticData <- lapply(mpcross@geneticData, function(x)

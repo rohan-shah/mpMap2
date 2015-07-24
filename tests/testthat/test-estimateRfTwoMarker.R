@@ -9,8 +9,8 @@ distances <- c(1, 5, 10, 20, 50)
 
 test_that("Numerically accurate for an F2 design", 
 	{
-		seed <- 1
-		pedigree <- f2Pedigree(2000)
+		set.seed(1)
+		pedigree <- f2Pedigree(3000)
 		for(distance in distances)
 		{
 			map <- getMap(distance)
@@ -22,8 +22,8 @@ test_that("Numerically accurate for an F2 design",
 
 test_that("Numerically accurate for a RIL design", 
 	{
-		seed <- 1
-		pedigree <- rilPedigree(2000, 8)
+		set.seed(2)
+		pedigree <- rilPedigree(3000, 8)
 		for(distance in distances)
 		{
 			map <- getMap(distance)
