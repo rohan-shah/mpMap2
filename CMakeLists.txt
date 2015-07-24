@@ -25,6 +25,8 @@ if(WIN32)
 		foreach(RFILE IN LISTS RFILES)
 			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE}")
 		endforeach()
+		#Run roxygen2
+		add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2); roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 	else()
 		foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
 			#Copy NAMESPACE
@@ -33,12 +35,14 @@ if(WIN32)
 			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/DESCRIPTION")
 			#Copy include files
 			foreach(HEADER IN LISTS HEADERS)
-				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER}"" ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/inst/include/${HEADER}")
+				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} ARGS "-E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/inst/include/${HEADER}\" \"${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/inst/include/${HEADER}\"")
 			endforeach()
 			#Copy R files
 			foreach(RFILE IN LISTS RFILES)
 				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/R/${RFILE}")
 			endforeach()
+			#Run roxygen2
+			add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2); roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}")
 		endforeach()
 	endif()
 else()
@@ -54,6 +58,8 @@ else()
 	foreach(RFILE IN LISTS RFILES)
 		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE}")
 	endforeach()
+	#Run roxygen2
+	add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2); roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 if(WIN32)
 	install(CODE "execute_process(COMMAND \"${R_COMMAND}\" CMD INSTALL --no-multiarch \$\{CMAKE_INSTALL_CONFIG_NAME\} WORKING_DIRECTORY \"${PROJECT_BINARY_DIR}\")")
