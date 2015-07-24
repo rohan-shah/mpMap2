@@ -9,7 +9,7 @@ add_subdirectory(src)
 
 add_custom_target(copyPackage ALL)	
 set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h unitTypes.hpp)
-set(RFILES classes.R estimateRF.R formGroups.R mapFunctions.R mpcross.R nLines.R pedigree.R Rcpp_exceptions.R simulateMPCross.R twoParentPedigree.R combineGenotypes.R expand.R fullHetData.R markers.R nFounders.R nMarkers.R print.R show.R subset.R validation.R) 
+set(RFILES combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R rf-class.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R)
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
 	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")

@@ -1,5 +1,8 @@
 #' @title Generate a two-parent pedigree which starts from inbred founders
 #'
+#' @description
+#' Generate a two-parent pedigree starting from inbred founders
+#'
 #' @param initialPopulationSize The number of F1 lines generated
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
@@ -98,7 +101,7 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds,
     for(lineCounter in currentIndex:(currentIndex+initialPopulationSize-1))
     {
       mother[nextFree:(nextFree+nSeeds-1)] <- father[nextFree:(nextFree+nSeeds-1)] <- lineCounter
-      observed[nextFree+nSeeds-1] <- TRUE
+      observed[nextFree:(nextFree+nSeeds-1)] <- TRUE
       nextFree <- nextFree + nSeeds
     }
   }
