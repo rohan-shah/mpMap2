@@ -10,16 +10,17 @@ Description: Tools for constructing linkage maps, reconstructing haplotypes,
     designs (e.g. MAGIC)
 License: GPL-2
 LazyLoad: yes
-Depends: 
+Depends:
     qtl,
     seriation,
     methods,
-    igraph
-Suggests: 
+    igraph,
+    Rcpp
+Suggests:
     Rmpi,
     asreml,
     happy.hbrem
-Imports: 
+Imports:
     wgaim,
     ggplot2
 LinkingTo: Rcpp, qtl

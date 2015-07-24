@@ -7,7 +7,7 @@
 #' @examples
 #' plotWOptions <- function(graph) plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)
 #' #F2 design
-#' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = 1,)
+#' pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = 1)
 #' graph <- pedigreeToGraph(pedigree)
 #' plotWOptions(graph)
 #'

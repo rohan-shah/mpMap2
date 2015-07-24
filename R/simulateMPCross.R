@@ -8,8 +8,6 @@
 #' @param seed Random seed to use. 
 #' @return Object of class \code{mpcross}. 
 #' @export
-#' @import qtl
-#' @useDynLib mpMap2
 simulateMPCross <- function(map, pedigree, mapFunction, seed)
 {
 	isDetailedPedigreeArgument(pedigree)
