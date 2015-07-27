@@ -1,3 +1,4 @@
+#' @include mpcross-class.R
 setMethod(f = "print", signature = "mpcrossLG", definition = function(x)
 {
   cat("This mpcross object contains linkage groups\n")

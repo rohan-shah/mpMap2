@@ -1,3 +1,4 @@
+#' @include mpcross-class.R
 setMethod(f = "show", signature = "mpcrossRF", definition = function(object)
 {
   print(object)

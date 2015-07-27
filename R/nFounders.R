@@ -1,3 +1,7 @@
+#' @include detailedPedigree-class.R
+#' @include pedigree-class.R
+#' @include mpcross-class.R
+#' @include geneticData-class.R
 setGeneric(name = "nFounders", def = function(object){standardGeneric("nFounders")})
 setMethod(f = "nFounders", signature = "detailedPedigree", definition = function(object)
 {

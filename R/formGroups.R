@@ -59,6 +59,6 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	names(cut) <- markers(mpcrossRF)
 	
 	lg <- new("lg", allGroups=1:groups, groups=cut)
-	output <- new("mpcrossLG", mpcrossRF, lg = lg)
+	output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
 	return(subset(output, markers = order(cut)))
 }

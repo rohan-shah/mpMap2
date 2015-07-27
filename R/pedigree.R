@@ -10,6 +10,8 @@ linesByNames <- function(pedigree, names)
 	}
 	return(cbind(lineName = names, mother = pedigree@lineNames[pedigree@mother[lineIndices]], father = pedigree@lineNames[pedigree@father[lineIndices]]))
 }
+#' @include pedigree-class.R
+#' @include detailedPedigree-class.R
 setMethod(f = "print", signature = "pedigree", definition = function(x)
 {
 	cat("This is a pedigree object containing ", length(x), " lines\n")

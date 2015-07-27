@@ -1,3 +1,4 @@
+#' @export
 pedigreeToGraph <- function(pedigree)
 {
 	founders <- nFounders(pedigree)

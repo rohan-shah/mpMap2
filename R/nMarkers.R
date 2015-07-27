@@ -1,3 +1,5 @@
+#' @include mpcross-class.R
+#' @include geneticData-class.R
 setGeneric(name = "nMarkers", def = function(object){standardGeneric("nMarkers")})
 setMethod(f = "nMarkers", signature = "mpcross", definition = function(object)
 {
