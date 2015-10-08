@@ -7,14 +7,13 @@ This package can be compiled in two ways; either using the standard package comp
 ##Compilation on Windows using CMake and Visual Studio
 
 1. Download and compile the customized version of Rcpp from github repository rohan-shah/Rcpp. See the associated Readme file for details on compiling that code. 
-2. Choose a binaries directory (E.g. <mpMap2Root>/build)
-3. Run the cmake gui. 
-4. Set Rcpp_DIR to the Rcpp binaries directory. 
-5. Set R_COMMAND to <R_HOME>/bin/x64/R.exe. Ensure that you choose the 64-bit version. 
-6. Enter the source directory and the binaries directory (E.g. <mpMap2Root>/build)
-7. If the output is going to be NMake Makefiles, set CMAKE_BUILD_TYPE appropriately (E.g. as either Release or Debug)
-8. Hit Configure and when prompted choose a Visual Studio 64-bit output, or NMake Makefiles.
-9. When configuring succeeds, hit generate. 
+2. Run the cmake gui. 
+3. Set Rcpp_DIR to the Rcpp binaries directory. 
+4. Set R_COMMAND to <R_HOME>/bin/x64/R.exe. Ensure that you choose the 64-bit version. 
+5. Enter the source directory and the binaries directory (E.g. <mpMap2Root>/build for Visual Studio 64-bit output, or <mpMap2Root>/release for NMake Makefiles output)
+6. If the output is going to be NMake Makefiles, set CMAKE_BUILD_TYPE appropriately (E.g. as either Release or Debug)
+7. Hit Configure and when prompted choose a Visual Studio 64-bit output, or NMake Makefiles.
+8. When configuring succeeds, hit generate. 
 
 The configuration scripts generate an import library for R.dll. This means that the scripts must be able to run cl.exe and lib.exe. If this step fails, check that cl.exe and lib.exe can run. If not, you may need to set up the correct environment for the compiler (by running a script such as vcvarsx86_amd64.bat) before running cmake. 
 
