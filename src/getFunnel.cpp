@@ -13,7 +13,7 @@ void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& fath
 		funnel[1] = fatherRow;
 		return;
 	}
-	int mmRow = mother(motherRow), mfRow = father(motherRow), fmRow = mother(fatherRow), ffRow = father(fatherRow);
+	int mmRow = mother(motherRow-1), mfRow = father(motherRow-1), fmRow = mother(fatherRow-1), ffRow = father(fatherRow-1);
 	if(nFounders == 4)
 	{
 		funnel[0] = mmRow;
@@ -24,8 +24,8 @@ void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& fath
 	}
 	if(nFounders >= 8)
 	{
-		int mmmRow = mother(mmRow), mmfRow = father(mmRow), mfmRow = mother(mfRow), mffRow = father(mfRow);
-		int fmmRow = mother(fmRow), fmfRow = father(fmRow), ffmRow = mother(ffRow), fffRow = father(ffRow);
+		int mmmRow = mother(mmRow-1), mmfRow = father(mmRow-1), mfmRow = mother(mfRow-1), mffRow = father(mfRow-1);
+		int fmmRow = mother(fmRow-1), fmfRow = father(fmRow-1), ffmRow = mother(ffRow-1), fffRow = father(ffRow-1);
 		funnel[0] = mmmRow;
 		funnel[1] = mmfRow;
 		funnel[2] = mfmRow;
@@ -36,10 +36,10 @@ void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& fath
 		funnel[7] = fffRow;
 		if(nFounders == 16)
 		{
-		  int mmmmRow = mother(mmmRow), mmmfRow=father(mmmRow), mmfmRow=mother(mmfRow), mmffRow=father(mmfRow);
-		  int mfmmRow=mother(mfmRow), mfmfRow=father(mfmRow), mffmRow=mother(mffRow), mfffRow=father(mffRow);
-		  int fmmmRow=mother(fmmRow), fmmfRow=father(fmmRow), fmfmRow=mother(fmfRow), fmffRow=father(fmfRow);
-		  int ffmmRow=mother(ffmRow), ffmfRow=father(ffmRow), fffmRow=mother(fffRow), ffffRow=father(fffRow);
+		  int mmmmRow = mother(mmmRow-1), mmmfRow=father(mmmRow-1), mmfmRow=mother(mmfRow)-1, mmffRow=father(mmfRow-1);
+		  int mfmmRow=mother(mfmRow-1), mfmfRow=father(mfmRow-1), mffmRow=mother(mffRow-1), mfffRow=father(mffRow-1);
+		  int fmmmRow=mother(fmmRow-1), fmmfRow=father(fmmRow-1), fmfmRow=mother(fmfRow-1), fmffRow=father(fmfRow-1);
+		  int ffmmRow=mother(ffmRow-1), ffmfRow=father(ffmRow-1), fffmRow=mother(fffRow-1), ffffRow=father(fffRow-1);
 		  funnel[0] = mmmmRow;
 		  funnel[1] = mmmfRow;
 		  funnel[2] = mmfmRow;
