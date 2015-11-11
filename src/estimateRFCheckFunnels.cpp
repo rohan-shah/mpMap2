@@ -3,6 +3,7 @@
 #include "getFunnel.h"
 #include "orderFunnel.h"
 #include "matrices.hpp"
+#include "sortPedigreeLineNames.h"
 void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father, long pedigreeRow, int intercrossingGenerations, std::vector<long>& individualsToCheckFunnels)
 {
 	//The lines that we currently need to check goes in individualsToCheckFunnels
@@ -36,6 +37,11 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
+
+	//We make a copy of the pedigree line names and sort it (otherwise the std::find relating to pedigreeLineNames is prohibitive)
+	std::vector<pedigreeLineStruct> sortedLineNames;
+	sortPedigreeLineNames(pedigreeLineNames, sortedLineNames);
+
 	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));
 	Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 
@@ -67,15 +73,16 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 	for(long finalCounter = 0; finalCounter < nFinals; finalCounter++)
 	{
 		individualsToCheckFunnels.clear();
+		std::string currentLineName = Rcpp::as<std::string>(finalNames(finalCounter));
 
-		Rcpp::CharacterVector::iterator findLineName = std::find(pedigreeLineNames.begin(), pedigreeLineNames.end(), finalNames(finalCounter));
-		if(findLineName == pedigreeLineNames.end())
+		std::vector<pedigreeLineStruct>::iterator findLineName = std::lower_bound(sortedLineNames.begin(), sortedLineNames.end(), pedigreeLineStruct(currentLineName, -1));
+		if(findLineName == sortedLineNames.end() || findLineName->lineName != currentLineName)
 		{
 			std::stringstream ss;
 			ss << "Unable to find line number " << finalCounter << " named " << finalNames(finalCounter) << " in pedigree";
 			throw std::runtime_error(ss.str().c_str());
 		}
-		int pedigreeRow = (int)std::distance(pedigreeLineNames.begin(), findLineName);
+		int pedigreeRow = findLineName->index;
 		if(intercrossingGenerations[finalCounter] == 0)
 		{
 			individualsToCheckFunnels.push_back(pedigreeRow);
