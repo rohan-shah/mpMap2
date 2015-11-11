@@ -9,7 +9,7 @@ add_subdirectory(src)
 
 add_custom_target(copyPackage ALL)	
 set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h unitTypes.hpp)
-set(RFILES combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R rf-class.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R)
+set(RFILES combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R f2Pedigree.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R rf-class.R rilPedigree.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R)
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
 	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")
@@ -59,7 +59,7 @@ else()
 		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE}")
 	endforeach()
 	#Run roxygen2
-	add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2); roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+	add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e" "\"library(roxygen2);roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 if(WIN32)
 	install(CODE "execute_process(COMMAND \"${R_COMMAND}\" CMD INSTALL --no-multiarch \$\{CMAKE_INSTALL_CONFIG_NAME\} WORKING_DIRECTORY \"${PROJECT_BINARY_DIR}\")")
