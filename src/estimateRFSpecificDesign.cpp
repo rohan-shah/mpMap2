@@ -5,36 +5,12 @@
 #include <map>
 #include <set>
 #include "recodeFoundersFinalsHets.h"
-#include "markerPatternsToUniqueValues.h"
-#include "funnelsToUniqueValues.h"
 #include <memory>
 #include "constructLookupTable.hpp"
 #include "probabilities2.hpp"
+#include "probabilities4.hpp"
 #include "alleleDataErrors.h"
 #include "recodeHetsAsNA.h"
-struct rfhaps_internal_args
-{
-	rfhaps_internal_args(std::vector<double>& lineWeights, std::vector<double>& recombinationFractions)
-	: recombinationFractions(recombinationFractions), lineWeights(lineWeights)
-	{}
-	Rcpp::IntegerMatrix finals;
-	Rcpp::S4 pedigree;
-	std::vector<double>& recombinationFractions;
-	
-	std::vector<int> intercrossingGenerations;
-	std::vector<int> selfingGenerations;
-	std::vector<double>& lineWeights;
-	markerPatternsToUniqueValuesArgs markerPatternData;
-	bool hasAI;
-	int marker1Start, marker1End;
-	int marker2Start, marker2End;
-	//maximum number of marker alleles present
-	int maxAlleles;
-	//zeroed by the calling code. Must be added to, not overwritten. 
-	double* result;
-	std::vector<funnelID> funnelIDs;
-	std::vector<funnelEncoding> funnelEncodings;
-};
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -106,7 +82,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 							}
 						}
 						//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
-						if(contribution != contribution) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
+						if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
 						else if(contribution != 0 && allowable) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 					}
 				}
@@ -117,13 +93,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 }
 template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(rfhaps_internal_args& args)
 {
-		bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
-		if(infiniteSelfing)
-		{
-			std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
-			return estimateRFSpecificDesign<nFounders, maxAlleles, true>(args);
-		}
-		else return estimateRFSpecificDesign<nFounders, maxAlleles, false>(args);
+	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
+	if(infiniteSelfing)
+	{
+		std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
+		return estimateRFSpecificDesign<nFounders, maxAlleles, true>(args);
+	}
+	else return estimateRFSpecificDesign<nFounders, maxAlleles, false>(args);
 }
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
 template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args)
@@ -136,7 +112,7 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 			return estimateRFSpecificDesignInternal2<nFounders, 2>(args);
 		case 3:
 			return estimateRFSpecificDesignInternal2<nFounders, 3>(args);
-/*		case 4:
+		case 4:
 			return estimateRFSpecificDesignInternal2<nFounders, 4>(args);
 		case 5:
 			return estimateRFSpecificDesignInternal2<nFounders, 5>(args);
@@ -145,12 +121,66 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 		case 7:
 			return estimateRFSpecificDesignInternal2<nFounders, 7>(args);
 		case 8:
-			return estimateRFSpecificDesignInternal2<nFounders, 8>(args);*/
+			return estimateRFSpecificDesignInternal2<nFounders, 8>(args);
+		case 9:
+			return estimateRFSpecificDesignInternal2<nFounders, 9>(args);
+		case 10:
+			return estimateRFSpecificDesignInternal2<nFounders, 10>(args);
 		default:
 			throw std::runtime_error("Internal error");
 	}
 }
-bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
+unsigned long long estimateLookup(estimateRFSpecificDesignArgs& args)
+{
+	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
+	bool result = toInternalArgs(args, internal_args, true);
+	if(!result) return 0;
+
+	int maxAIGenerations = *std::max_element(internal_args.intercrossingGenerations.begin(), internal_args.intercrossingGenerations.end());
+	int minSelfing = *std::min_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
+	int maxSelfing = *std::max_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
+	std::size_t nDifferentFunnels = internal_args.funnelEncodings.size();
+	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
+
+	std::size_t arraySize;
+	switch(internal_args.maxAlleles)
+	{
+		case 1:
+			arraySize = sizeof(array2<1>);
+			break;
+		case 2:
+			arraySize = sizeof(array2<2>);
+			break;
+		case 3:
+			arraySize = sizeof(array2<3>);
+			break;
+		case 4:
+			arraySize = sizeof(array2<4>);
+			break;
+		case 5:
+			arraySize = sizeof(array2<5>);
+			break;
+		case 6:
+			arraySize = sizeof(array2<6>);
+			break;
+		case 7:
+			arraySize = sizeof(array2<7>);
+			break;
+		case 8:
+			arraySize = sizeof(array2<8>);
+			break;
+		case 9:
+			arraySize = sizeof(array2<9>);
+			break;
+		case 10:
+			arraySize = sizeof(array2<10>);
+			break;
+		default:
+			throw std::runtime_error("Internal error");
+	}
+	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize;
+}
+bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& internal_args, bool supressOutput)
 {
 	//work out the number of intercrossing generations
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
@@ -164,7 +194,7 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 	codingErrorsToStrings(codingErrors, errors, args.finals, Rcpp::as<Rcpp::List>(args.hetData), 6);
 	for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 	{
-		Rprintf(errors[errorIndex].c_str());
+		if(!supressOutput) Rprintf(errors[errorIndex].c_str());
 	}
 	if(errors.size() > 0)
 	{
@@ -177,7 +207,7 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 		estimateRFCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
 		for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 		{
-			Rprintf(errors[errorIndex].c_str());
+			if(!supressOutput) Rprintf(errors[errorIndex].c_str());
 		}
 		if(errors.size() > 0)
 		{
@@ -189,7 +219,7 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 		}
 		if(warnings.size() > 6)
 		{
-			Rprintf("Supressing further funnel warnings");
+			if(!supressOutput) Rprintf("Supressing further funnel warnings");
 		}
 	}
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles
@@ -209,9 +239,9 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 	recodeFoundersFinalsHets(recoded);
 
 	unsigned int maxAlleles = recoded.maxAlleles;
-	if(maxAlleles > 8) 
+	if(maxAlleles > 10)
 	{
-		args.error = "Internal error - Cannot have more than eight alleles per marker";
+		args.error = "Internal error - Cannot have more than ten alleles per marker";
 		return false;
 	}
 
@@ -240,10 +270,9 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
 		if(foundHets)
 		{
-			Rprintf("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+			if(!supressOutput) Rprintf("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
 		}
 	}
-	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
 	internal_args.finals = recodedFinals;
 	internal_args.pedigree = args.pedigree;
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
@@ -258,15 +287,23 @@ bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 	internal_args.result = args.result;
 	internal_args.funnelIDs.swap(funnelIDs);
 	internal_args.funnelEncodings.swap(funnelEncodings);
+	return true;
+}
+bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
+{
+	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
+	bool result = toInternalArgs(args, internal_args, false);
+	if(!result) return false;
+	int nFounders = args.founders.nrow();
 	if(nFounders == 2)
 	{
 		return estimateRFSpecificDesignInternal1<2>(internal_args);
 	}
-	/*else if(nFounders == 4)
+	else if(nFounders == 4)
 	{
 		return estimateRFSpecificDesignInternal1<4>(internal_args);
 	}
-	else if(nFounders == 8)
+	/*else if(nFounders == 8)
 	{
 		return estimateRFSpecificDesignInternal1<8>(internal_args);
 	}*/

@@ -48,8 +48,15 @@ template<> void genotypeProbabilitiesNoIntercross<2, false>(double (&prob)[nDiff
 	prob[1] = (r/(1 + 2*r)) -std::pow(0.5, selfingGenerations+2)*(2 - quadraticPower - oneMinusTwoRPower*(1 - 2 *r)/ ( 1 + 2*r));
 	//One homozygote, one hetrozygote
 	prob[2] = std::pow(0.5, selfingGenerations+1) * (1 - quadraticPower);
-	//Two hetrozygotes
+	//Two hetrozygotes. We don't distinguish between the two different hetrozygote combinations
 	prob[3] = std::pow(0.5, selfingGenerations) * quadraticPower;
+	//But we might want to allow us to get back to the seperate probabilities in code that calls this function, so compute the probability for state 4 by itself. 
+	prob[4] = std::pow(0.5, selfingGenerations-1) * (quadraticPower - oneMinusTwoRPower);
+
+	//The hetrozygotes will be counted twice, so divide by two (or four if there are two hetrozygotes). 
+	prob[2] /= 2;
+	prob[3] /= 4;
+	prob[4] /= 4;
 }
 template<> void genotypeProbabilitiesWithIntercross<2, true>(double (&prob)[nDifferentProbs], int nAIGenerations, double r, int)
 {
@@ -95,6 +102,7 @@ template<> void genotypeProbabilitiesWithIntercross<2, false>(double (&prob)[nDi
 	0.25*(-2*powOneMinus2R*powOneMinusR 
    		+ (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
    	)/(8*pow2*oneMinusRSquared);
+	//We don't distinguish between the two hetrozygote combinations
    	prob[3] += prob[4];
 }
 #endif

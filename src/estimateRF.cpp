@@ -107,6 +107,11 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		if(marker2Start >= marker2End || marker2Start < 0 || marker2End < 0) throw std::runtime_error("Invalid value for input marker2Range");
 		long marker1RangeSize = marker1End - marker1Start, marker2RangeSize = marker2End - marker2Start	;
 
+		//Warn if we're going to allocate over 4gb
+		if(marker1RangeSize * marker2RangeSize * nRecombLevels > 4000000000ULL)
+		{
+			Rcpp::Rcout << "Allocating results matrix of " << ((std::size_t)marker1RangeSize * (std::size_t)marker2RangeSize * (std::size_t)nRecombLevels) << " bytes" << std::endl;
+		}
 		//Indexing has form result[markerCounter1 *nRecombLevels*nMarkers + markerCounter2 * nRecombLevels + recombCounter]
 		//This is not an Rcpp::NumericVector because it can quite easily overflow the size of such a vector (signed int)
 		std::vector<double> result(marker1RangeSize * marker2RangeSize * nRecombLevels, 0);
@@ -122,14 +127,14 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 				throw std::runtime_error("An entry of input lineWeights had the wrong length");
 			}
 		}
-		Rcpp::CharacterVector allMarkerNames = Rcpp::as<Rcpp::List>(Rcpp::as<Rcpp::RObject>(Rcpp::as<Rcpp::S4>(geneticData(0)).slot("finals")).attr("dimnames"))[1];
-		//Now the actual computation
+		//Construct vector of argument Objects
+		std::vector<estimateRFSpecificDesignArgs> argumentObjects;
 		for(int i = 0; i < nDesigns; i++)
 		{
 			Rcpp::S4 currentGeneticData = geneticData(i);
 			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
 			std::string error;
-			estimateRFSpecificDesignArgs args(lineWeightsThisDesign, recombinationFractionsDouble);
+			estimateRFSpecificDesignArgs args(recombinationFractionsDouble);
 			try
 			{
 				args.founders = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("founders"));
@@ -175,9 +180,28 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 			args.marker1End = marker1End;
 			args.marker2End = marker2End;
 			args.result = &(result[0]);
-			bool successful = estimateRFSpecificDesign(args);
-			if(!successful) throw std::runtime_error(args.error);
+			args.lineWeights.swap(lineWeightsThisDesign);
+			argumentObjects.emplace_back(args);
 		}
+		//Estimate required memory usage
+		unsigned long long lookupBytes = 0;
+		for(int i = 0; i < nDesigns; i++)
+		{
+			unsigned long long currentLookupBytes = estimateLookup(argumentObjects[i]);
+			if(currentLookupBytes == 0) throw std::runtime_error(argumentObjects[i].error.c_str());
+			lookupBytes = std::max(lookupBytes, currentLookupBytes);
+		}
+		if(lookupBytes > 1000000000)
+		{
+			Rcpp::Rcout << "Maximum lookup table size of " << lookupBytes << " bytes" << std::endl;
+		}
+		//Now the actual computation
+		for(int i = 0; i < nDesigns; i++)
+		{
+			bool successful = estimateRFSpecificDesign(argumentObjects[i]);
+			if(!successful) throw std::runtime_error(argumentObjects[i].error);
+		}
+		Rcpp::CharacterVector allMarkerNames = Rcpp::as<Rcpp::List>(Rcpp::as<Rcpp::RObject>(Rcpp::as<Rcpp::S4>(geneticData(0)).slot("finals")).attr("dimnames"))[1];
 		//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
 		Rcpp::NumericMatrix theta(marker1RangeSize, marker2RangeSize), lod, lkhd;
 		if(keepLod) lod = Rcpp::NumericMatrix(marker1RangeSize, marker2RangeSize);
