@@ -15,8 +15,11 @@ test_that("Numerically accurate for an F2 design",
 		{
 			map <- getMap(distance)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-			rf <- estimateRF(cross, recombValues = (1:100)/200, keepLod = TRUE, keepLkhd=TRUE)
-			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=distance/80)
+			rf <- estimateRF(cross, recombValues = (0:100)/200, keepLod = TRUE, keepLkhd=TRUE)
+			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=0.05)
+			expect_identical(rf@rf@theta[1,2], rf@rf@theta[2,1])
+			expect_identical(rf@rf@theta[1,1], 0)
+			expect_identical(rf@rf@theta[2,2], 0)
 		}
 	})
 
@@ -28,7 +31,10 @@ test_that("Numerically accurate for a RIL design",
 		{
 			map <- getMap(distance)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-			rf <- estimateRF(cross, recombValues = (1:100)/200, keepLod = TRUE, keepLkhd=TRUE)
-			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=distance/80)
+			rf <- estimateRF(cross, recombValues = (0:100)/200, keepLod = TRUE, keepLkhd=TRUE)
+			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=0.05)
+			expect_identical(rf@rf@theta[1,2], rf@rf@theta[2,1])
+			expect_identical(rf@rf@theta[1,1], 0)
+			expect_identical(rf@rf@theta[2,2], 0)
 		}
 	})
