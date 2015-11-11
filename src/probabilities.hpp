@@ -2,7 +2,7 @@
 #define PROBABILITIES_HEADER_GUARD
 #include <matrices.hpp>
 
-const int nDifferentProbs = 10;
+const int nDifferentProbs = 20;
 template<int nFounders> struct probabilityData;
 template<int nFounders> struct expandedProbabilitiesFiniteSelfing
 {
@@ -60,6 +60,10 @@ public:
 	{
 		double probabilities[nDifferentProbs];
 		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations);
+		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+#ifndef NDEBUG
+		double sum = 0;
+#endif
 		for(int marker1Allele1 = 0; marker1Allele1 < nFounders; marker1Allele1++)
 		{
 			for(int marker1Allele2 = 0; marker1Allele2 < nFounders; marker1Allele2++)
@@ -71,15 +75,25 @@ public:
 						const int index1 = probabilityData<nFounders>::intermediateAllelesMask[marker1Allele1][marker1Allele2];
 						const int index2 = probabilityData<nFounders>::intermediateAllelesMask[marker2Allele1][marker2Allele2];
 						expandedProbabilities.values[marker1Allele1][marker1Allele2][marker2Allele1][marker2Allele2] = probabilities[probabilityData<nFounders>::intermediateProbabilitiesMask[index1][index2]];
+#ifndef NDEBUG
+						sum += expandedProbabilities.values[marker1Allele1][marker1Allele2][marker2Allele1][marker2Allele2];
+#endif
 					}
 				}
 			}
 		}
+#ifndef NDEBUG
+		if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
+#endif
 	}
 	static void withIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations)
 	{	
 		double probabilities[nDifferentProbs];
 		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations);
+		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+#ifndef NDEBUG
+		double sum = 0;
+#endif
 		for(int marker1Allele1 = 0; marker1Allele1 < nFounders; marker1Allele1++)
 		{
 			for(int marker1Allele2 = 0; marker1Allele2 < nFounders; marker1Allele2++)
@@ -91,12 +105,16 @@ public:
 						const int index1 = probabilityData<nFounders>::intermediateAllelesMask[marker1Allele1][marker1Allele2];
 						const int index2 = probabilityData<nFounders>::intermediateAllelesMask[marker2Allele1][marker2Allele2];
 						expandedProbabilities.values[marker1Allele1][marker1Allele2][marker2Allele1][marker2Allele2] = probabilities[probabilityData<nFounders>::intermediateProbabilitiesMask[index1][index2]];
+#ifndef NDEBUG
+						sum += expandedProbabilities.values[marker1Allele1][marker1Allele2][marker2Allele1][marker2Allele2];
+#endif
 					}
 				}
 			}
 		}
+#ifndef NDEBUG
+		if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
+#endif
 	}
 };
-//template<int nFounders, bool infiniteSelfing> void expandedGenotypeProbabilitiesNoIntercross(typename expandedProbabilities<nFounders, infiniteSelfing>::type& expandedProbabilities, double r, int selfingGenerations);
-//template<int nFounders, bool infiniteSelfing> void expandedGenotypeProbabilitiesWithIntercross(typename expandedProbabilities<nFounders, infiniteSelfing>::type& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations);
 #endif
