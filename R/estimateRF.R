@@ -8,6 +8,10 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 	{
 		stop("Input recombValues must contain a value of 0.5")
 	}
+	if(!(0 %in% recombValues))
+	{
+		stop("Input recombValues must contain a value of 0")
+	}
 	if(missing(lineWeights))
 	{
 		lineWeights <- lapply(object@geneticData, function(x) rep(1, nLines(x)))
