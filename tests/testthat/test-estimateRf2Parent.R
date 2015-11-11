@@ -1,4 +1,4 @@
-context("estimateRf two marker tests")
+context("estimateRf biparental tests")
 getMap <- function(distance)
 {
 	map <- list("chr1" = c("a" = 0, "b" = distance))
