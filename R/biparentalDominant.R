@@ -12,12 +12,12 @@ setMethod(f = "+", signature = c("geneticData", "biparentalDominant"), definitio
 	{
 		hetDataThisMarker <- copied@hetData[[x]]
 		isHetRow <- hetDataThisMarker[,1] != hetDataThisMarker[,2]
-		hetCode <- hetDataThisMarker[isHetRow, 3]
+		hetCode <- unique(hetDataThisMarker[isHetRow, 3])
 		homozygoteCodes <- hetDataThisMarker[!isHetRow, 3]
 		dominant <- sample(homozygoteCodes, 1)
 
 		copied@hetData[[x]][isHetRow,3] <<- dominant
-		copied@finals[copied@finals[,x] == hetCode,] <<- dominant
+		copied@finals[copied@finals[,x] == hetCode,x] <<- dominant
 	})
 	return(copied)
 })
