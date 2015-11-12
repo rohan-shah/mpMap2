@@ -73,6 +73,8 @@ checkGeneticData <- function(object)
 	if(ncol(object@finals) != nMarkers || length(object@hetData) != nMarkers)
 	{
 		errors <- c(errors, "Slots finals, founders and hetData had different numbers of markers")
+		#If they have the wronh dimensions then the colnames / names checks have the wrong lengths. So just return from here. 
+		return(errors)
 	}
 	if(any(colnames(object@founders) != markers))
 	{
