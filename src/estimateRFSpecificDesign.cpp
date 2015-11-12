@@ -182,6 +182,8 @@ unsigned long long estimateLookup(estimateRFSpecificDesignArgs& args)
 }
 bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& internal_args, bool supressOutput)
 {
+	args.error = "";
+	std::stringstream ss;
 	//work out the number of intercrossing generations
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
 	std::vector<int> intercrossingGenerations, selfingGenerations;
@@ -194,10 +196,11 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 	codingErrorsToStrings(codingErrors, errors, args.finals, Rcpp::as<Rcpp::List>(args.hetData), 6);
 	for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 	{
-		if(!supressOutput) Rprintf(errors[errorIndex].c_str());
+		ss << errors[errorIndex] << std::endl;
 	}
 	if(errors.size() > 0)
 	{
+		args.error = ss.str();
 		return false;
 	}
 
@@ -207,15 +210,16 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 		estimateRFCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
 		for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 		{
-			if(!supressOutput) Rprintf(errors[errorIndex].c_str());
+			ss << errors[errorIndex] << std::endl;;
 		}
 		if(errors.size() > 0)
 		{
+			args.error = ss.str();
 			return false;
 		}
 		for(std::size_t warningIndex = 0; warningIndex < warnings.size() && warningIndex < 6; warningIndex++)
 		{
-			Rprintf(warnings[warningIndex].c_str());
+			if(!supressOutput) Rprintf(warnings[warningIndex].c_str());
 		}
 		if(warnings.size() > 6)
 		{

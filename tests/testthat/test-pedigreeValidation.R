@@ -98,3 +98,11 @@ test_that("lineNames must be unique",
 		copied@lineNames[3] <- copied@lineNames[4]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("Number of founders must be at least 2",
+	{
+		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1)
+		pedigree@selfing <- "auto"
+		pedigree@initial <- 1L
+		pedigree@mother <- pedigree@father <- 0:1005
+		expect_that(validObject(pedigree, complete=TRUE), throws_error())
+	})

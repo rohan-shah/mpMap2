@@ -1,3 +1,5 @@
+#' @include geneticData-class.R
+#' @include mpcross-class.R
 setClass("biparentalDominant", contains="NULL")
 #' @export
 biparentalDominant <- function()

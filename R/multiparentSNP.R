@@ -1,3 +1,5 @@
+#' @include geneticData-class.R
+#' @include mpcross-class.R
 setClass("multiparentSNP", slots = list(keepHets = "logical"))
 #' @export
 multiparentSNP <- function(keepHets)
@@ -41,6 +43,8 @@ multiparentSNPRemoveHets <- function(e1)
 		copied@finals[becomesOne, x] <<- 1
 		copied@finals[!becomesOne, x] <<- 0
 		copied@finals[isHet, x] <<- NA
+		copied@founders[,x] <<- 0
+		copied@founders[oneAlleles,x] <<- 1
 		copied@hetData[[x]] <<- rbind(c(0,0,0), c(1,1,1))
 	})
 	return(copied)
@@ -48,9 +52,10 @@ multiparentSNPRemoveHets <- function(e1)
 }
 multiparentSNPKeepHets <- function(e1)
 {
-	if(any(unlist(lapply(e1@hetData, function(x) length(unique(x[,3])))) != nFounders*(nFounders-1)))
+	nFounders <- nFounders(e1)
+	if(any(unlist(lapply(e1@hetData, function(x) length(unique(x[,3])))) != nFounders + nFounders*(nFounders-1)/2))
 	{
-		stop("Can only apply multiparentSNP to a fully informative multiparent design (one that has nFounders*(nFounders - 1) possible genotypes at every marker)")
+		stop("Can only apply multiparentSNP to a fully informative multiparent design (one that has nFounders*nFounders possible genotypes at every marker)")
 	}
 
 	copied <- e1
@@ -68,6 +73,8 @@ multiparentSNPKeepHets <- function(e1)
 		copied@finals[becomesOne, x] <<- 1
 		copied@finals[!becomesOne, x] <<- 0
 		copied@finals[becomesHetValues, x] <<- 2
+		copied@founders[,x] <<- 0
+		copied@founders[oneAlleles,x] <<- 1
 		copied@hetData[[x]] <<- rbind(c(0,0,0), c(1,1,1), c(0, 1, 2), c(1, 0, 2))
 	})
 	return(copied)
