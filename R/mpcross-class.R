@@ -58,6 +58,10 @@ setClassUnion("rfOrNULL", c("rf", "NULL"))
 
 checkMpcrossLG <- function(object)
 {
+	if(is.null(names(object@lg@groups)))
+	{
+		return("Slot lg@groups must have names")
+	}
 	if(any(is.na(names(object@lg@groups)) || names(object@lg@groups) != markers(object)))
 	{
 		return("Marker names implied by names of slots lg@groups and founders were different")
