@@ -10,7 +10,22 @@
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
 #' @export
+# This is written in C because otherwise it's just too damn slow (especially for generating the huge populations that we want to use to get numerically accurate results for unit testing)
 fourParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+{
+  nonNegativeIntegerArgument(initialPopulationSize)
+  nonNegativeIntegerArgument(selfingGenerations)
+  nonNegativeIntegerArgument(nSeeds)
+  nonNegativeIntegerArgument(intercrossingGenerations)
+
+  if(initialPopulationSize <= 2 && intercrossingGenerations > 0)
+  {
+    stop("Random mating is impossible with only two lines per generation")
+    #....and more importantly it means that the sample command below gets screwed up, because we're calling sample(x) where length(x) == 1, which samples from 1:x
+  }
+  return(.Call("fourParentPedigreeRandomFunnels", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
+}
+fourParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)

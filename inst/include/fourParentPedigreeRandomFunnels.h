@@ -1,0 +1,5 @@
+#ifndef FOUR_PARENT_PEDIGREE_RANDOM_FUNNELS_HEADER_GUARD
+#define FOUR_PARENT_PEDIGREE_RANDOM_FUNNELS_HEADER_GUARD
+#include "Rcpp.h"
+SEXP fourParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP selfingGenerations_sexp, SEXP nSeeds_sexp, SEXP intercrossingGenerations_sexp);
+#endif
