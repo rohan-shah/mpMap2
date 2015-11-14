@@ -5,6 +5,7 @@
 #include "alleleDataErrors.h"
 #include "estimateRF.h"
 #include "internal.h"
+#include "fourParentPedigreeRandomFunnels.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -18,6 +19,7 @@ extern "C"
 		{"alleleDataErrors", (DL_FUNC)&alleleDataErrors, 2},
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
 		{"estimateRF", (DL_FUNC)&estimateRF, 7},
+		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
