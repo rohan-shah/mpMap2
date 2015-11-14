@@ -76,13 +76,14 @@ BEGIN_RCPP
 	{
 		for(int i = 0; i < intercrossingGenerations; i++)
 		{
+			Rcpp::IntegerVector possibilities = Rcpp::Range(lastGenerationStart+1, lastGenerationEnd-1);
 			for(int lineCounter = lastGenerationStart; lineCounter < lastGenerationEnd; lineCounter++)
 			{
 				mother(lineCounter + initialPopulationSize) = lineCounter+1;
-				Rcpp::IntegerVector possibilities = setdiff(Rcpp::Range(lastGenerationStart, lastGenerationEnd-1), Rcpp::wrap(lineCounter));
 
 				Rcpp::IntegerVector sampled = sample(possibilities, 1);
 				father(lineCounter + initialPopulationSize) = Rcpp::as<int>(sampled) + 1;
+				if(lineCounter != lastGenerationEnd - 1) possibilities(lineCounter - lastGenerationStart) = lineCounter;
 			}
 			lastGenerationStart += initialPopulationSize;
 			lastGenerationEnd += initialPopulationSize;
