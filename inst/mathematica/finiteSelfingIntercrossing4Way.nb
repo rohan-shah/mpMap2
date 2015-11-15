@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     60527,       1690]
-NotebookOptionsPosition[     58796,       1639]
-NotebookOutlinePosition[     59337,       1660]
-CellTagsIndexPosition[     59294,       1657]
+NotebookDataLength[     60346,       1684]
+NotebookOptionsPosition[     58617,       1633]
+NotebookOutlinePosition[     59156,       1654]
+CellTagsIndexPosition[     59113,       1651]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1434,13 +1434,7 @@ Cell[BoxData[
        RowBox[{"(", 
         RowBox[{
          RowBox[{"(", 
-          RowBox[{
-           RowBox[{
-            SuperscriptBox[
-             RowBox[{"(", 
-              RowBox[{
-               RowBox[{"-", "1"}], "+", "r"}], ")"}], "2"], "*", 
-            "combinedProbabilities"}], "//", "Simplify"}], ")"}], "/.", 
+          RowBox[{"combinedProbabilities", "//", "Simplify"}], ")"}], "/.", 
          RowBox[{"{", 
           RowBox[{
            RowBox[{
@@ -1645,7 +1639,7 @@ PrintingOptions->{"Magnification"->1.,
 "PaperOrientation"->"Portrait",
 "PaperSize"->{595.1999999999999, 841.8}},
 TrackCellChangeTimes->False,
-FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (December 4, 2014)",
+FrontEndVersion->"10.1 for Microsoft Windows (64-bit) (March 23, 2015)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -1690,8 +1684,8 @@ Cell[48765, 1331, 756, 25, 53, "Input"],
 Cell[49524, 1358, 944, 29, 53, "Input"],
 Cell[50471, 1389, 944, 29, 53, "Input"],
 Cell[51418, 1420, 188, 4, 31, "Input"],
-Cell[51609, 1426, 7110, 208, 267, "Input"],
-Cell[58722, 1636, 70, 1, 31, "Input"]
+Cell[51609, 1426, 6931, 202, 247, "Input"],
+Cell[58543, 1630, 70, 1, 31, "Input"]
 }
 ]
 *)
