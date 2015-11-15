@@ -1,3 +1,5 @@
+#' @include geneticData-class.R
+#' @include mpcross-class.R
 setClass("biparentalDominant", contains="NULL")
 #' @export
 biparentalDominant <- function()
@@ -6,6 +8,11 @@ biparentalDominant <- function()
 }
 setMethod(f = "+", signature = c("geneticData", "biparentalDominant"), definition = function(e1, e2)
 {
+	#We only want to be able to apply this to a dataset that's fully informative. This is equivalent to the hetData having three unique values in the third column.
+	if(any(unlist(lapply(e1@hetData, function(x) length(unique(x[,3])))) != 3))
+	{
+		stop("Can only apply biparentalDominant to a fully informative biparental design (one that has three possible genotypes at every marker)")
+	}
 	copied <- e1
 	nMarkers <- nMarkers(copied)
 	sapply(1:nMarkers, function(x)

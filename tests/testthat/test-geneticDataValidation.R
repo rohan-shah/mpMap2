@@ -261,3 +261,22 @@ test_that("Values in finals must be valid according to hetData",
 		copied@finals[1,1] <- 20
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("Arbitrary encodings are allowed for the founder alleles",
+	{
+		copied <- geneticData
+		copied@founders[1,1] <- 100
+		copied@founders[2,1] <- 201
+		copied@finals[copied@finals[,1] == 1,1] <- 100
+		copied@finals[copied@finals[,1] == 2,1] <- 201
+		copied@hetData[[1]][copied@hetData[[1]] == 1] <- 100
+		copied@hetData[[1]][copied@hetData[[1]] == 2] <- 201
+		expect_identical(validObject(copied, complete=TRUE), TRUE)
+	})
+test_that("Monomorphic markers are allowed",
+	{
+		copied <- geneticData
+		copied@founders[,1] <- 1
+		copied@finals[,1] <- 1
+		copied@hetData[[1]] <- rbind(c(1,1,1))
+		expect_identical(validObject(copied, complete=TRUE), TRUE)
+	})

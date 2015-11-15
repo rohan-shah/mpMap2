@@ -45,6 +45,10 @@ checkPedigree <- function(object)
 	{
 		errors <- c(errors, "Line names must be unique")
 	}
+	if(nFounders(object) < 2)
+	{
+		errors <- c(errors, "Number of founders must be at least 2")
+	}
 
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
