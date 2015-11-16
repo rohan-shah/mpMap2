@@ -38,14 +38,23 @@ public:
 			}
 			if(takeLogs)
 			{
+#ifndef NDEBUG
+				double sum = 0;
+#endif
 				//now take logs of every value in markerProbabilities
 				for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 				{
 					for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 					{
+#ifndef NDEBUG
+						sum += markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue];
+#endif
 						markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue]);
 					}
 				}
+#ifndef NDEBUG
+				if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
+#endif
 			}
 		}
 	}
@@ -93,14 +102,23 @@ public:
 			}
 			if(takeLogs)
 			{
+#ifndef NDEBUG
+				double sum = 0;
+#endif
 				//now take logs of every value in markerProbabilities
 				for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 				{
 					for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 					{
+#ifndef NDEBUG
+						sum += markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue];
+#endif
 						markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue]);
 					}
 				}
+#ifndef NDEBUG
+				if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
+#endif
 			}
 		}
 	}
