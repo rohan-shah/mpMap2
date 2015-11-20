@@ -2,6 +2,7 @@
 #' @include rf-class.R
 #' @include lg-class.R
 #' @include hetData-class.R
+#' @export
 setGeneric(name = "markers", def = function(object){standardGeneric("markers")})
 setMethod(f = "markers", signature = "mpcross", definition = function(object)
 {

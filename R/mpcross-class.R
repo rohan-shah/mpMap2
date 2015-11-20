@@ -103,6 +103,14 @@ setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
 		lg <- new("lg", allGroups = allGroups, groups = groups)
 		return(new(to, as(from, "mpcross"), lg = lg, rf = from@rf))
 	})
+setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
+	{
+		if(is.null(from@rf))
+		{
+			stop("As no RF data is present, this object of class mpcrossLG cannot be automatically converted to an object of class mpcrossRF. Please call estimateRF to re-estimate recombination fractions")
+		}
+		return(new(to, as(from, "mpcross"), rf = from@rf))
+	})
 mpcrossMapped <- function(cross, map, rf=NULL)
 {
 	if(inherits(cross, "mpcrossRF"))
