@@ -3,6 +3,7 @@
 #include <limits>
 #include "estimateRFSpecificDesign.h"
 #include <stdexcept>
+#include "matrixChunks.h"
 SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, SEXP marker2Range_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_)
 {
 	BEGIN_RCPP
@@ -19,6 +20,12 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
 		int halfIndex = (int)std::distance(recombinationFractions.begin(), halfIterator);
+
+		//Confirm that recombination fractions are in increasing order
+		for(int i = 0; i < recombinationFractions.size()-1; i++)
+		{
+			if(recombinationFractions[i] >= recombinationFractions[i+1]) throw std::runtime_error("Input recombinationFractions must be a vector of increasing values");
+		}
 
 		std::vector<double> recombinationFractionsDouble = Rcpp::as<std::vector<double> >(recombinationFractions);
 		Rcpp::S4 object;
@@ -105,16 +112,21 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 		int marker2Start = marker2Range(0)-1, marker2End = marker2Range(1);
 		if(marker1Start >= marker1End || marker1Start < 0 || marker1End < 0) throw std::runtime_error("Invalid value for input marker1Range");
 		if(marker2Start >= marker2End || marker2Start < 0 || marker2End < 0) throw std::runtime_error("Invalid value for input marker2Range");
-		long marker1RangeSize = marker1End - marker1Start, marker2RangeSize = marker2End - marker2Start	;
+
+		//If the input values of marker1Range, marker2Range give a region that's completely in the lower triangular region, then throw an error
+		if(marker1Start >= marker2End)
+		{
+			throw std::runtime_error("Input values of marker1Range and marker2Range give a region that is contained in the lower triangular part of the matrix");
+		}
+		unsigned long long nValuesToEstimate = countValuesToEstimate(marker1Start, marker1End, marker2Start, marker2End);
 
 		//Warn if we're going to allocate over 4gb
-		if(marker1RangeSize * marker2RangeSize * nRecombLevels > 4000000000ULL)
+		if(nValuesToEstimate > 4000000000ULL)
 		{
-			Rcpp::Rcout << "Allocating results matrix of " << ((std::size_t)marker1RangeSize * (std::size_t)marker2RangeSize * (std::size_t)nRecombLevels) << " bytes" << std::endl;
+			Rcpp::Rcout << "Allocating results matrix of " << (nValuesToEstimate * (std::size_t)nRecombLevels) << " bytes" << std::endl;
 		}
-		//Indexing has form result[markerCounter1 *nRecombLevels*nMarkers + markerCounter2 * nRecombLevels + recombCounter]
 		//This is not an Rcpp::NumericVector because it can quite easily overflow the size of such a vector (signed int)
-		std::vector<double> result(marker1RangeSize * marker2RangeSize * nRecombLevels, 0);
+		std::vector<double> result(nValuesToEstimate * nRecombLevels, 0);
 
 		//Last bit of validation
 		for(int i = 0; i < nDesigns; i++)
@@ -201,60 +213,38 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP marker1Range_, 
 			bool successful = estimateRFSpecificDesign(argumentObjects[i]);
 			if(!successful) throw std::runtime_error(argumentObjects[i].error);
 		}
-		Rcpp::CharacterVector allMarkerNames = Rcpp::as<Rcpp::List>(Rcpp::as<Rcpp::RObject>(Rcpp::as<Rcpp::S4>(geneticData(0)).slot("finals")).attr("dimnames"))[1];
 		//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
-		Rcpp::NumericMatrix theta(marker1RangeSize, marker2RangeSize), lod, lkhd;
-		if(keepLod) lod = Rcpp::NumericMatrix(marker1RangeSize, marker2RangeSize);
-		if(keepLkhd) lkhd = Rcpp::NumericMatrix(marker1RangeSize, marker2RangeSize);
+		Rcpp::NumericVector lod, lkhd;
+		Rcpp::RawVector theta(nValuesToEstimate);
+		if(keepLod) lod = Rcpp::NumericVector(nValuesToEstimate);
+		if(keepLkhd) lkhd = Rcpp::NumericVector(nValuesToEstimate);
 	
-		//row and column names of output
-		Rcpp::CharacterVector outputRowNames(marker1RangeSize), outputColumnNames(marker2RangeSize);
-		std::copy(allMarkerNames.begin() + marker1Start, allMarkerNames.begin() + marker1Start + marker1RangeSize, outputRowNames.begin());
-		std::copy(allMarkerNames.begin() + marker2Start, allMarkerNames.begin() + marker2Start + marker2RangeSize, outputColumnNames.begin());
-
-		Rcpp::List outputDimNames(Rcpp::List::create(outputRowNames, outputColumnNames));
-		theta.attr("dimnames") = outputDimNames;
-		if(keepLod) lod.attr("dimnames") = outputDimNames;
-		if(keepLkhd) lkhd.attr("dimnames") = outputDimNames;
-
 		double* resultPtr = &(result[0]);
-		int maxStart = std::max(marker1Start, marker2Start);
-		int minEnd = std::min(marker1End, marker2End);
-		//first get maximum and minimum likelihoods
-		#ifdef USE_OPENMP
-			#pragma omp parallel for
-		#endif
-		for(int markerCounter1 = marker1Start; markerCounter1 < marker1End; markerCounter1++)
+#ifdef USE_OPENMP
+		#pragma omp parallel for schedule(static, 1)
+#endif
+		for(int counter = 0; counter < nValuesToEstimate; counter++)
 		{
-			for(int markerCounter2 = marker2Start; markerCounter2 < marker2End; markerCounter2++)
+			double* start = resultPtr + counter * nRecombLevels;
+			double* end = resultPtr + (counter + 1) * nRecombLevels;
+			double* maxPtr = std::max_element(start, end), *minPtr = std::min_element(start, end);
+			double max = *maxPtr, min = *minPtr;
+			int currentTheta;
+			double currentLod;
+			//This is the case where no data was available, across any of the experiments. This is precise, no numerical error involved
+			if(max == 0 && min == 0)
 			{
-				int destIndex1 = markerCounter1 - marker1Start, destIndex2 = markerCounter2 - marker2Start;
-				int sourceIndex1 = destIndex1, sourceIndex2 = destIndex2;
-				if(markerCounter2 >= maxStart && markerCounter2 < minEnd && markerCounter1 >= maxStart && markerCounter1 < minEnd && markerCounter2 < markerCounter1)
-				{
-					sourceIndex1 = markerCounter2 - maxStart + (maxStart - marker1Start);
-					sourceIndex2 = markerCounter1 - maxStart + (maxStart - marker2Start);
-				}
-
-				double* start = resultPtr + (long)sourceIndex1 *(long)marker2RangeSize*(long)nRecombLevels + (long)sourceIndex2 * (long)nRecombLevels;
-				double* end = resultPtr + (long)sourceIndex1 *(long)marker2RangeSize*(long)nRecombLevels + (long)sourceIndex2 * (long)nRecombLevels + (long)nRecombLevels;
-				double* maxPtr = std::max_element(start, end), *minPtr = std::min_element(start, end);
-				double max = *maxPtr, min = *minPtr;
-				double currentTheta, currentLod;
-				//This is the case where no data was available, across any of the experiments. This is precise, no numerical error involved
-				if(max == 0 && min == 0)
-				{
-					currentLod = currentTheta = std::numeric_limits<double>::quiet_NaN();
-				}
-				else
-				{
-					currentTheta = recombinationFractions((int)(maxPtr - start));
-					currentLod = max - resultPtr[(long)sourceIndex1*(long)nRecombLevels*(long)marker2RangeSize + (long)sourceIndex2 * (long)nRecombLevels + halfIndex];
-				}
-				theta(destIndex1, destIndex2) = currentTheta;
-				if(keepLkhd) lkhd(destIndex1, destIndex2) = max;
-				if(keepLod) lod(destIndex1, destIndex2) = currentLod;
+				currentLod = std::numeric_limits<double>::quiet_NaN();
+				currentTheta = 0xff;
 			}
+			else
+			{
+				currentTheta = (int)(maxPtr - start);
+				currentLod = max - resultPtr[counter * (unsigned long long)nRecombLevels + halfIndex];
+			}
+			theta(counter) = currentTheta;
+			if(keepLkhd) lkhd(counter) = max;
+			if(keepLod) lod(counter) = currentLod;
 		}
 		Rcpp::RObject lodRet, lkhdRet;
 		

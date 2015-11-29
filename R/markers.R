@@ -14,7 +14,7 @@ setMethod(f = "markers", signature = "geneticData", definition = function(object
 })
 setMethod(f = "markers", signature = "rf", definition = function(object)
 {
-	return(colnames(object@theta))
+	return(object@theta@markers)
 })
 setMethod(f = "markers", signature = "lg", definition = function(object)
 {

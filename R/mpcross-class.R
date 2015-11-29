@@ -53,8 +53,22 @@ checkMpcross <- function(object)
 }
 .mpcross <- setClass("mpcross", slots = list(geneticData = "list"), validity=checkMpcross)
 
+checkMpcrossRF <- function(object)
+{
+	errors <- c()
+	if(length(object@rf@theta@markers) != length(markers(object)))
+	{
+		errors <- "Inconsistent number of markers in slots @geneticData[[1]] and @rf@theta"
+	}
+	else if(any(object@rf@theta@markers != markers(object)))
+	{
+		errors <- "Inconsistent markers in slots @geneticData[[1]] and @rf@theta"
+	}
+	if(length(errors) > 0) return(errors)
+	return(TRUE)
+}
 setClassUnion("rfOrNULL", c("rf", "NULL"))
-.mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"))
+.mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"), validity=checkMpcrossRF)
 
 checkMpcrossLG <- function(object)
 {

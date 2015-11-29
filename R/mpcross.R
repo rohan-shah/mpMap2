@@ -13,7 +13,7 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
 })
 setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = function(e1, e2)
 {
-  if(length(e1@rf@r) != length(e2@rf@r) || any(e1@rf@r != e2@rf@r))
+  if(length(e1@rf@theta@levels) != length(e2@rf@theta@levels) || any(e1@rf@theta@levels != e2@rf@theta@levels))
   {
     stop("Different recombination values were used for numerical maximum likelihood in two objects")
   }
@@ -137,7 +137,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
 #Generally we drop the RF data, unless the sets of markers are disjoint
 setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(e1, e2)
 {
-  #If the sets of markers are disjoint, then we re-run the RF computation (the alternative is to drop the existing RF computations which seems computationall wasteful)
+  #If the sets of markers are disjoint, then we re-run the RF computation (the alternative is to drop the existing RF computations which seems computationally wasteful)
   if(length(intersect(markers(e1), markers(e2))) == 0)
   {
     combined <- as(e1, "mpcross") + e2

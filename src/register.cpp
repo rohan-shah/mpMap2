@@ -7,6 +7,7 @@
 #include "internal.h"
 #include "fourParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
+#include "rawSymmetricMatrix.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -23,6 +24,8 @@ extern "C"
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
 		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 4},
 		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 5},
+		{"rawSymmetricMatrixSubsetIndices", (DL_FUNC)&rawSymmetricMatrixSubsetIndices, 4},
+		{"rawSymmetricMatrixSubsetObject", (DL_FUNC)&rawSymmetricMatrixSubsetObject, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

@@ -75,9 +75,10 @@ endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}")
 
 #Now add the shared libarry target
-set(SourceFiles alleleDataErrors.cpp checkHets.cpp combineGenotypes.cpp crc32.cpp estimateRF.cpp estimateRFCheckFunnels.cpp estimateRFSpecificDesign.cpp fourParentPedigreeRandomFunnels.cpp funnelsToUniqueValues.cpp generateGenotypes.cpp getFunnel.cpp intercrossingAndSelfingGenerations.cpp markerPatternsToUniqueValues.cpp orderFunnel.cpp recodeFoundersFinalsHets.cpp register.cpp replaceHetsWithNA.cpp convertGeneticData.cpp sortPedigreeLineNames.cpp)
-set(HeaderFiles matrices.hpp constructLookupTable.hpp probabilities.hpp probabilities2.hpp convertGeneticData.h probabilities4.hpp)
-add_library(mpMap2 SHARED ${SourceFiles} ${HeaderFiles} ${mpMap2_MOC_SOURCES})
+set(SourceFiles alleleDataErrors.cpp checkHets.cpp combineGenotypes.cpp crc32.cpp estimateRF.cpp estimateRFCheckFunnels.cpp estimateRFSpecificDesign.cpp fourParentPedigreeRandomFunnels.cpp funnelsToUniqueValues.cpp generateGenotypes.cpp getFunnel.cpp intercrossingAndSelfingGenerations.cpp markerPatternsToUniqueValues.cpp orderFunnel.cpp recodeFoundersFinalsHets.cpp register.cpp replaceHetsWithNA.cpp convertGeneticData.cpp sortPedigreeLineNames.cpp matrixChunks.cpp rawSymmetricMatrix.cpp)
+set(TemplateFiles matrices.hpp constructLookupTable.hpp probabilities.hpp probabilities2.hpp probabilities4.hpp)
+set(HeaderFiles)
+add_library(mpMap2 SHARED ${SourceFiles} ${TemplateFiles} ${HeaderFiles} ${mpMap2_MOC_SOURCES})
 target_link_libraries(mpMap2 PRIVATE Rcpp)
 target_include_directories(mpMap2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../inst/include ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(mpMap2 PRIVATE CUSTOM_STATIC_RCPP)

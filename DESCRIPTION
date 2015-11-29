@@ -15,7 +15,8 @@ Depends:
     seriation,
     methods,
     igraph,
-    Rcpp
+    Rcpp,
+    Matrix
 Suggests:
     Rmpi,
     asreml,
@@ -24,3 +25,38 @@ Imports:
     wgaim,
     ggplot2
 LinkingTo: Rcpp, qtl
+Collate:
+    'Rcpp_exceptions.R'
+    'combineGenotypes.R'
+    'pedigree-class.R'
+    'detailedPedigree-class.R'
+    'estimateRF.R'
+    'expand.R'
+    'formGroups.R'
+    'fourParentPedigreeRandomFunnels.R'
+    'fourParentPedigreeSingleFunnel.R'
+    'fullHetData.R'
+    'hetData-class.R'
+    'geneticData-class.R'
+    'lg-class.R'
+    'map-class.R'
+    'mapFunctions.R'
+    'rf-class.R'
+    'mpcross-class.R'
+    'markers.R'
+    'mpcross.R'
+    'nFounders.R'
+    'nLines.R'
+    'nMarkers.R'
+    'pedigree.R'
+    'pedigreeGraph-class.R'
+    'pedigreeGraph.R'
+    'pedigreeToGraph.R'
+    'print.R'
+    'roxygen.R'
+    'show.R'
+    'simulateMPCross.R'
+    'specialTwoParentDesigns.R'
+    'subset.R'
+    'twoParentPedigree.R'
+    'validation.R'

@@ -14,7 +14,8 @@ Depends:
     qtl,
     seriation,
     methods,
-    igraph
+    igraph,
+    Matrix
 Suggests: 
     Rmpi,
     asreml,

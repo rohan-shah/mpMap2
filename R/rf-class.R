@@ -1,20 +1,42 @@
-setClassUnion("matrixOrNULL", c("matrix", "NULL"))
+#' @include rawSymmetricMatrix.R
+setClassUnion("dspMatrixOrNULL", c("dspMatrix", "NULL"))
 checkRF <- function(object)
 {
 	errors <- c()
-	if(storage.mode(object@theta) != "double")
+	thetaMarkers <- object@theta@markers
+	if(!is.null(object@lod))
 	{
-		errors <- c(errors, "storage.mode of slot theta must be double")
+		if(is.null(colnames(object@lod)))
+		{
+			errors <- c(errors, "Slot @lod must have column names")
+		}
+		else if(nrow(object@lod) != length(thetaMarkers))
+		{
+			browser()
+			errors <- c(errors, "Dimensions of @lod were inconsistent with those of @theta")
+		}
+		else if(any(thetaMarkers != colnames(object@lod)))
+		{
+			errors <- c(errors, "Column names of @lod were inconsistent with those of @theta")
+		}
 	}
-	if(!is.null(object@lod) && storage.mode(object@lod) != "double")
+	if(!is.null(object@lkhd))
 	{
-		errors <- c(errors, "storage.mode of slot lod must be double")
-	}
-	if(!is.null(object@lkhd) && storage.mode(object@lkhd) != "double")
-	{
-		errors <- c(errors, "storage.mode of slot lkhd must be double")
+		if(is.null(colnames(object@lkhd)))
+		{
+			errors <- c(errors, "Slot @lkhd must have column names")
+		}
+		else if(nrow(object@lkhd) != length(thetaMarkers))
+		{
+			errors <- c(errors, "Dimensions of @lkhd were inconsistent with those of @theta")
+		}
+		else if(any(thetaMarkers != colnames(object@lkhd)))
+		{
+			errors <- c(errors, "Column names of @lkhd were inconsistent with those of @theta")
+		}
+
 	}
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.rf <- setClass("rf", slots = list(r = "numeric", theta = "matrix", lod = "matrixOrNULL", lkhd = "matrixOrNULL"), validity = checkRF)
+.rf <- setClass("rf", slots = list(theta = "rawSymmetricMatrix", lod = "dspMatrixOrNULL", lkhd = "dspMatrixOrNULL"), validity = checkRF)

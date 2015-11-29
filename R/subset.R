@@ -101,7 +101,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 		markerIndices <- match(markers, markers(x))
 	}
 	
-	newTheta <- x@theta[markerIndices, markerIndices,drop=FALSE]
+	newTheta <- subset(x@theta, markers = markerIndices)
 	
 	if(is.null(x@lod))
 	{
@@ -121,4 +121,32 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 		newLkhd <- x@lkhd[markerIndices, markerIndices,drop=FALSE]
 	}
 	return(new("rf", r = x@r, theta = newTheta, lod = newLod, lkhd = newLkhd))
+})
+setMethod(f = "subset", signature = "rawSymmetricMatrix", definition = function(x, ...)
+{
+	arguments <- list(...)
+	if(!("markers" %in% names(arguments)) || length(arguments) > 1)
+	{
+		stop("Only argument markers is allowed for function subset.rawSymmetricMatrix")
+	}
+	markers <- arguments$markers
+	if(is.character(markers)) 
+	{	
+		markers <- match(markers, x@markers)
+		if(any(is.na(markers)))
+		{
+			stop("Invalid marker names entered in function subset.rawSymetricMatrix")
+		}
+	}
+	markers <- as.integer(markers)
+	if(any(is.na(markers)))
+	{
+		stop("Marker indices cannot be NA in function subset.rawSymmetricMatrix")
+	}
+	if(any(markers < 1) || any(markers > length(x@markers)))
+	{
+		stop("Input marker indices were out of range in function subset.rawSymmetricMatrix")
+	}
+	newRawData <- .Call("rawSymmetricMatrixSubsetObject", x, markers, PACKAGE="mpMap2")
+	return(new("rawSymmetricMatrix", data = newRawData, markers = x@markers[markers], levels = x@levels))
 })

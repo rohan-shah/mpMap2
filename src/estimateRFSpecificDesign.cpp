@@ -11,6 +11,8 @@
 #include "probabilities4.hpp"
 #include "alleleDataErrors.h"
 #include "recodeHetsAsNA.h"
+#include "estimateRF.h"
+#include "matrixChunks.h"
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -36,55 +38,53 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
+	unsigned long long nValuesToEstimate = countValuesToEstimate(args.marker1Start, args.marker1End, args.marker2Start, args.marker2End);
 #ifdef USE_OPENMP
 	#pragma omp parallel for schedule(static, 1)
 #endif
-	//This set of loops DOES grow with problem size. 
-	for(int markerCounter1 = args.marker1Start; markerCounter1 < args.marker1End; markerCounter1++)
+	for(int counter = 0; counter < nValuesToEstimate; counter++)
 	{
-		int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounter1];
-		for(int markerCounter2 = args.marker2Start; markerCounter2 < args.marker2End; markerCounter2++)
-		{
-			//For some bits in the lower triangle we have already calculated a corresponding bit in the upper triangle, so don't recalculate these. This means we have some values in args.result which are never set, but later code is aware of this
-			if(markerCounter2 >= maxStart && markerCounter2 < minEnd && markerCounter1 >= maxStart && markerCounter1 < minEnd && markerCounter2 < markerCounter1) continue;
-			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounter2];
+		int markerCounter1, markerCounter2;
+		singleIndexToPair(args.marker1Start, args.marker1End, args.marker2Start, args.marker2End, counter, markerCounter1, markerCounter2);
 
-			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
-			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+		int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounter1];
+		int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounter2];
+
+		singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+		for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+		{
+			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 			{
-				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+				int marker1Value = args.finals(finalCounter, markerCounter1);
+				int marker2Value = args.finals(finalCounter, markerCounter2);
+				if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 				{
-					int marker1Value = args.finals(finalCounter, markerCounter1);
-					int marker2Value = args.finals(finalCounter, markerCounter2);
-					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
+					double contribution = 0;
+					bool allowable = false;
+					int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+					int selfingGenerations = args.selfingGenerations[finalCounter];
+					if(intercrossingGenerations == 0)
 					{
-						double contribution = 0;
-						bool allowable = false;
-						int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
-						int selfingGenerations = args.selfingGenerations[finalCounter];
-						if(intercrossingGenerations == 0)
+						funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+						allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
+						if(allowable)
 						{
-							funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
-							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
-							if(allowable)
-							{
-								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
-								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
-							}
+							array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
+							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 						}
-						else if(intercrossingGenerations > 0)
-						{
-							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
-							if(allowable)
-							{
-								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
-								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
-							}
-						}
-						//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
-						if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
-						else if(contribution != 0 && allowable) args.result[(long)(markerCounter1 - args.marker1Start) *(long)nRecombLevels*(long)marker2RangeSize + (long)(markerCounter2-args.marker2Start) * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 					}
+					else if(intercrossingGenerations > 0)
+					{
+						allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
+						if(allowable)
+						{
+							array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
+							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+						}
+					}
+					//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
+					if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
+					else if(contribution != 0 && allowable) args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 				}
 			}
 		}

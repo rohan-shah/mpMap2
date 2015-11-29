@@ -4,6 +4,11 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 	inheritsNewMpcrossArgument(object)
 
 	if (missing(recombValues)) recombValues <- c(0:20/200, 11:50/100)
+	if (length(recombValues) >= 255)
+	{
+		stop("This package currently allows a maximum of 254 possible recombination fraction values")
+	}
+	recombValues <- sort(recombValues)
 	if(!(0.5 %in% recombValues))
 	{
 		stop("Input recombValues must contain a value of 0.5")
@@ -25,7 +30,20 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 			stop(paste0("Value of lineWeights[[", i, "]] must have nLines(object)[", i, "] entries"))
 		}
 	}
-	rf <- estimateRFSubset(object = object, recombValues=recombValues, lineWeights = lineWeights, marker1Range = c(1, nMarkers(object)), marker2Range = c(1, nMarkers(object)), keepLod = keepLod, keepLkhd = keepLkhd)
+	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, marker1Range = c(1, nMarkers(object)), marker2Range = c(1, nMarkers(object)), keepLod = keepLod, keepLkhd = keepLkhd)
+	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta) 
+	if(!is.null(listOfResults$lod))
+	{
+		listOfResults$lod <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lod)
+		colnames(listOfResults$lod) <- markers(object)
+	}
+	if(!is.null(listOfResults$lkhd))
+	{
+		listOfResults$lkhd <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lkhd)
+		colnames(listOfResults$lkhd) <- markers(object)
+	}
+	rf <- new("rf", theta = theta, lod = listOfResults$lod, lkhd = listOfResults$lkhd)
+
 	if(class(object) == "mpcrossLG" || class(object) == "mpcrossMapped")
 	{
 		output <- object
@@ -41,10 +59,3 @@ estimateRFInternal <- function(object, recombValues, lineWeights, marker1Range, 
 {
 	return(.Call("estimateRF", object, recombValues, marker1Range, marker2Range, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2"))
 }
-estimateRFSubset <- function(object, recombValues, lineWeights, marker1Range, marker2Range, keepLod, keepLkhd)
-{ 
-	rpairs <- estimateRFInternal(object,  recombValues, lineWeights, marker1Range, marker2Range, keepLod, keepLkhd)
-	rf <- new("rf", r = rpairs$r, theta = rpairs$theta, lod = rpairs$lod, lkhd = rpairs$lkhd)
-	return(rf)
-}
-
