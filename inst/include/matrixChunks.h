@@ -1,8 +1,19 @@
 #ifndef MATRIX_CHUNKS_HEADER_GUARD
 #define MATRIX_CHUNKS_HEADER_GUARD
 #include <Rcpp.h>
-SEXP countValuesToEstimateExported(SEXP marker1Start, SEXP marker1End, SEXP marker2Start, SEXP marker2End);
-unsigned long long countValuesToEstimate(int marker1Start, int marker1End, int marker2Start, int marker2End);
-SEXP singleIndexToPairExported(SEXP marker1Start, SEXP marker1End, SEXP marker2Start, SEXP marker2End, SEXP index);
-void singleIndexToPair(int marker1Start, int marker1End, int marker2Start, int marker2End, unsigned long long index, int& markerCounter1, int& markerCounter2);
+#include <vector>
+class triangularIterator
+{
+public:
+	triangularIterator(const std::vector<int>& markerRows, const std::vector<int>& markerColumns);
+	std::pair<int, int> get() const;
+	void next();
+	bool isDone() const;
+private:
+	const std::vector<int>& markerRows, markerColumns;
+	std::vector<int>::const_iterator markerRow, markerColumn;
+};
+SEXP countValuesToEstimateExported(SEXP markerRows, SEXP markerColumns);
+unsigned long long countValuesToEstimate(const std::vector<int>& markerRows, const std::vector<int>& markerColumns);
+SEXP singleIndexToPairExported(SEXP markerRows, SEXP markerColumns, SEXP index);
 #endif

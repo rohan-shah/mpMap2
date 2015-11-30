@@ -1,46 +1,46 @@
 context("singleIndexToPair")
-singleIndexToPair <- function(marker1Start, marker1End, marker2Start, marker2End, index)
+singleIndexToPair <- function(markerRows, markerColumns, index)
 {
-	.Call("singleIndexToPair", marker1Start, marker1End, marker2Start, marker2End, index, PACKAGE="mpMap2")
+	.Call("singleIndexToPair", markerRows, markerColumns, index, PACKAGE="mpMap2")
 }
-parameteriseRegion <- function(marker1Start, marker1End, marker2Start, marker2End)
+parameteriseRegion <- function(markerRows, markerColumns)
 {
-	nValues <- .Call("countValuesToEstimate", marker1Start, marker1End, marker2Start, marker2End, PACKAGE="mpMap2")
-	return(do.call(rbind, sapply(1:nValues, function(x) singleIndexToPair(marker1Start, marker1End, marker2Start, marker2End, x), simplify=FALSE)))
+	nValues <- .Call("countValuesToEstimate", markerRows, markerColumns, PACKAGE="mpMap2")
+	return(do.call(rbind, sapply(1:nValues, function(x) singleIndexToPair(markerRows, markerColumns, x), simplify=FALSE)))
 }
 
 test_that("Checking that singleIndexToPair works for rectangular regions",
 	{
-		expect_equal(parameteriseRegion(1, 2, 1, 11), cbind(1:10, rep(1, 10)))
-		expect_equal(parameteriseRegion(1, 3, 2, 11), cbind(rep(2:10, each = 2), rep(1:2, times = 9)))
+		expect_equal(parameteriseRegion(1, 1:10), cbind(rep(1, 10), 1:10))
+		expect_equal(parameteriseRegion(1:2, 2:10), cbind(rep(1:2, times = 9), rep(2:10, each = 2)))
 
-		expect_equal(parameteriseRegion(2, 3, 2, 11), cbind(2:10, rep(2, 9)))
-		expect_equal(parameteriseRegion(2, 4, 3, 11), cbind(rep(3:10, each = 2), rep(2:3, times = 8)))
+		expect_equal(parameteriseRegion(2, 2:10), cbind(rep(2, 9), 2:10))
+		expect_equal(parameteriseRegion(2:3, 3:10), cbind(rep(2:3, times = 8), rep(3:10, each = 2)))
 	})
 test_that("Checking that singleIndexToPair works for triangular regions",
 	{
-		expect_equal(parameteriseRegion(1, 2, 1, 2), rbind(c(1,1)))
-		expect_equal(parameteriseRegion(1, 3, 1, 3), rbind(c(1,1), c(2, 1), c(2,2)))
-		expect_equal(parameteriseRegion(1, 4, 1, 4), rbind(c(1,1), c(2, 1), c(2,2), c(3,1), c(3, 2), c(3, 3)))
+		expect_equal(parameteriseRegion(1, 1), rbind(c(1,1)))
+		expect_equal(parameteriseRegion(1:2, 1:2), rbind(c(1,1), c(1,2), c(2,2)))
+		expect_equal(parameteriseRegion(1:3, 1:3), rbind(c(1,1), c(1,2), c(2,2), c(1,3), c(2, 3), c(3, 3)))
 
-		expect_equal(parameteriseRegion(2, 4, 2, 4), rbind(c(2,2), c(3, 2), c(3,3)))
-		expect_equal(parameteriseRegion(2, 5, 2, 5), rbind(c(2,2), c(3,2), c(3,3), c(4,2), c(4,3), c(4,4)))
+		expect_equal(parameteriseRegion(2:3, 2:3), rbind(c(2,2), c(2,3), c(3,3)))
+		expect_equal(parameteriseRegion(2:4, 2:4), rbind(c(2,2), c(2,3), c(3,3), c(2,4), c(3,4), c(4,4)))
 
-		expect_equal(parameteriseRegion(1, 4, 1, 3), rbind(c(1,1), c(2,1), c(2,2)))
-		expect_equal(parameteriseRegion(1, 10, 1, 3), rbind(c(1,1), c(2,1), c(2,2)))
+		expect_equal(parameteriseRegion(1:3, 1:2), rbind(c(1,1), c(1,2), c(2,2)))
+		expect_equal(parameteriseRegion(1:9, 1:2), rbind(c(1,1), c(1,2), c(2,2)))
 	})
 test_that("Checking that singleIndexToPair works for regions that have a rectangular region on the right",
 	{
-		expect_equal(parameteriseRegion(1, 3, 1, 4), rbind(c(1,1), c(2,1), c(2,2), c(3,1), c(3,2)))
-		expect_equal(parameteriseRegion(2, 4, 2, 5), rbind(c(2,2), c(3,2), c(3,3), c(4,2), c(4,3)))
-		expect_equal(parameteriseRegion(1, 3, 1, 5), rbind(c(1,1), c(2,1), c(2,2), c(3,1), c(3,2), c(4,1), c(4, 2)))
-		expect_equal(parameteriseRegion(2, 4, 1, 5), rbind(c(2,2), c(3,2), c(3,3), c(4,2), c(4,3)))
-		expect_equal(parameteriseRegion(2, 4, 2, 6), rbind(c(2,2), c(3,2), c(3,3), c(4,2), c(4,3), c(5,2), c(5, 3)))
+		expect_equal(parameteriseRegion(1:2, 1:3), rbind(c(1,1), c(1,2), c(2,2), c(1,3), c(2,3)))
+		expect_equal(parameteriseRegion(2:3, 2:4), rbind(c(2,2), c(2,3), c(3,3), c(2,4), c(3,4)))
+		expect_equal(parameteriseRegion(1:2, 1:4), rbind(c(1,1), c(1,2), c(2,2), c(1,3), c(2,3), c(1,4), c(2,4)))
+		expect_equal(parameteriseRegion(2:3, 1:4), rbind(c(2,2), c(2,3), c(3,3), c(2,4), c(3,4)))
+		expect_equal(parameteriseRegion(2:3, 2:5), rbind(c(2,2), c(2,3), c(3,3), c(2,4), c(3,4), c(2,5), c(3,5)))
 
 	})
 test_that("Checking that singleIndexToPair works for regions that start with a rectangular region",
 	{
-		expect_equal(parameteriseRegion(1, 4, 2, 4), rbind(c(2,1), c(2,2), c(3,1), c(3,2), c(3,3)))
-		expect_equal(parameteriseRegion(1, 4, 2, 5), rbind(c(2,1), c(2,2), c(3,1), c(3,2), c(3,3), c(4,1), c(4,2), c(4,3)))
-		expect_equal(parameteriseRegion(1, 4, 2, 6), rbind(c(2,1), c(2,2), c(3,1), c(3,2), c(3,3), c(4,1), c(4,2), c(4,3), c(5,1), c(5,2), c(5,3)))
+		expect_equal(parameteriseRegion(1:3, 2:3), rbind(c(1,2), c(2,2), c(1,3), c(2,3), c(3,3)))
+		expect_equal(parameteriseRegion(1:3, 2:4), rbind(c(1,2), c(2,2), c(1,3), c(2,3), c(3,3), c(1,4), c(2,4), c(3,4)))
+		expect_equal(parameteriseRegion(1:3, 2:5), rbind(c(1,2), c(2,2), c(1,3), c(2,3), c(3,3), c(1,4), c(2,4), c(3,4), c(1,5), c(2,5), c(3,5)))
 	})
