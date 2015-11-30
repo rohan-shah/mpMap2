@@ -57,59 +57,47 @@ void singleIndexToPair(int marker1Start, int marker1End, int marker2Start, int m
 	int marker2RangeSize = marker2End - marker2Start;
 	//This is true if the region of the upper triangle is in fact a rectangle (Doesn't intersect the diagonal)
 	bool rectangularRegion = marker2Start >= marker1End-1;
-	//Otherwise if this is true, the first row of the target region intersects the diagonal
-	bool firstRowIntersects = marker2Start <= marker1Start;
+	//Otherwise if this is true, the last column of the target region intersects the diagonal
+	bool lastColumnIntersects = marker1End >= marker2End;
 	if(rectangularRegion)
 	{
-		markerCounter1 = index / marker2RangeSize + marker1Start;
-		markerCounter2 = index % marker2RangeSize + marker2Start;
+		markerCounter1 = index % marker1RangeSize + marker1Start;
+		markerCounter2 = index / marker1RangeSize + marker2Start;
 	}
 	else
 	{
 nonRectangular:
-		if(firstRowIntersects)
+		unsigned long firstMissingColumnLength = 0;
+		if(marker2Start >= marker1Start) firstMissingColumnLength = marker2Start - marker1Start;
+		if(lastColumnIntersects)
 		{
-			unsigned long long firstRowLength = marker2End - marker1Start;
-			unsigned long long completeTriangular = (firstRowLength * (firstRowLength + 1))/2;
-			unsigned long firstMissingRowLength = 0;
-			if(marker1End < marker2End) firstMissingRowLength = marker2End - marker1End;
+			unsigned long long lastColumnLength = marker2End - marker1Start;
+			unsigned long long missingTriangular = (firstMissingColumnLength * (firstMissingColumnLength + 1))/2;
 
-			//Zero-based index from the base of the triangular region
-			int inversed = completeTriangular - index - 1;
-			//Zero-based row above the base of the triangular region
-			markerCounter1 = (std::size_t)sqrt(2 * inversed);
-			if(((markerCounter1+1) * (markerCounter1 + 2))/2 < inversed) throw std::runtime_error("Internal error");
-			while((markerCounter1 * (markerCounter1 + 1)) / 2 > inversed)
+			//Zero-based column from the left side of the triangular region
+			markerCounter2 = (std::size_t)sqrt(2 * (index + missingTriangular));
+			if(((markerCounter2+1) * (markerCounter2 + 2))/2 < index + missingTriangular) throw std::runtime_error("Internal error");
+			while((markerCounter2 * (markerCounter2 + 1)) / 2 > index + missingTriangular)
 			{
-				markerCounter1--;
-				if(markerCounter1 < 0) throw std::runtime_error("Internal error");
+				markerCounter2--;
+				if(markerCounter2 < 0) throw std::runtime_error("Internal error");
 			}
-			//Zero-based column index, but from the right-hand side (and we want from the left)
-			markerCounter2 = inversed - (markerCounter1 * (markerCounter1 + 1)) / 2;
-
-			markerCounter2 = markerCounter1 - markerCounter2;
-			markerCounter1 = marker1RangeSize + firstMissingRowLength - markerCounter1 + marker1Start - 1;
-
-			markerCounter2 += (markerCounter1 - marker1Start) + marker2Start;
+			markerCounter1 = index + missingTriangular - (markerCounter2 * (markerCounter2 + 1)) / 2;
+			markerCounter1 += marker1Start;
+			markerCounter2 += marker2Start - firstMissingColumnLength;
 		}
 		else
 		{
-			unsigned long long firstRowLength = marker2End - marker2Start;
-			if(index+1 > firstRowLength * (marker2Start - marker1Start))
+			unsigned long long lastTriangularColumnLength = marker1End - marker1Start;
+			unsigned long long missingTriangular = (firstMissingColumnLength * (firstMissingColumnLength + 1))/2;
+			if(index + missingTriangular < (lastTriangularColumnLength * (lastTriangularColumnLength+1))/2)
 			{
-				//make some changes and jump back to the first case
-				index -= firstRowLength * (marker2Start - marker1Start);
-				firstRowIntersects = true;
-				marker1Start = marker2Start;
-				marker1End = marker2End;
-				marker1RangeSize = marker1End - marker1Start;
+				lastColumnIntersects = true;
 				goto nonRectangular;
 			}
-			else
-			{
-				markerCounter1 = index / marker2RangeSize + marker1Start;
-				markerCounter2 = index % marker2RangeSize + marker2Start;
-			}
+			index -= (lastTriangularColumnLength * (lastTriangularColumnLength+1))/2 - missingTriangular;
+			markerCounter1 = index % marker1RangeSize + marker1Start;
+			markerCounter2 = index / marker1RangeSize + marker2Start + lastTriangularColumnLength - firstMissingColumnLength;
 		}
 	}
 }
