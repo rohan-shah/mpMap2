@@ -10,7 +10,8 @@ public:
 	void next();
 	bool isDone() const;
 private:
-	const std::vector<int>& markerRows, markerColumns;
+	const std::vector<int>& markerRows;
+	const std::vector<int>& markerColumns;
 	std::vector<int>::const_iterator markerRow, markerColumn;
 };
 SEXP countValuesToEstimateExported(SEXP markerRows, SEXP markerColumns);

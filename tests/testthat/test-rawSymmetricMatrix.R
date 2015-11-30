@@ -43,3 +43,40 @@ test_that("Checking that subsetting works correctly",
 		expect_equal(subset(raw, markers = 2:4)@data, as.raw(as.integer(c(2,4,5,7,8,9))))
 		expect_equal(subset(raw, markers = c(1,3,4))@data, as.raw(as.integer(c(0,3,5,6,8,9))))
 	})
+test_that("Checking that C assignment call works correctly",
+	{
+		#First with a constant value of 100
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 1, 1, as.raw(100))
+		expect_equal(raw@data[1], as.raw(100))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 1:2, 1:2, as.raw(rep(100, 3)))
+		expect_equal(sum(raw@data == as.raw(100)), 3)
+		expect_equal(raw@data[1:3], as.raw(c(100,100,100)))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 2:3, 2:3, as.raw(rep(100, 3)))
+		expect_equal(sum(raw@data == as.raw(100)), 3)
+		expect_equal(raw@data[c(3,5,6)], as.raw(c(100,100,100)))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 2, 2, as.raw(100))
+		expect_equal(raw@data[3], as.raw(100))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 1:3, 1:3, as.raw(rep(100, 6)))
+		expect_equal(sum(raw@data == as.raw(100)), 6)
+		expect_equal(raw@data[1:6], as.raw(rep(100, 6)))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 1:2, 3:4, as.raw(rep(100, 4)))
+		expect_equal(sum(raw@data == as.raw(100)), 4)
+		expect_equal(raw@data[c(4,5,7,8)], as.raw(rep(100, 4)))
+
+		#Now with different values
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		.Call("assignRawSymmetricMatrix", raw, 1:2, 3:4, as.raw(c(100, 101, 102, 103)))
+		expect_equal(sum(raw@data > 99), 4)
+		expect_equal(raw@data[c(4,5,7,8)], as.raw(c(100, 101, 102, 103)))
+	})
