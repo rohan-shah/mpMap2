@@ -17,8 +17,7 @@ BEGIN_RCPP
 			int i = Rcpp::as<int>(i_);
 			int j = Rcpp::as<int>(j_);
 			if(i > j) std::swap(i, j);
-			int inversedY = nMarkers - i;
-			Rbyte rawValue = data[nMarkers*(nMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (j - i)];
+			Rbyte rawValue = data[(j*(j-1))/2 + i-1];
 			if(rawValue == 0xff) return Rcpp::wrap(NA_REAL);
 			return Rcpp::wrap(levels[rawValue]);
 		}
@@ -31,8 +30,7 @@ BEGIN_RCPP
 				int iCopied = i;
 				int jValue = j[jCounter];
 				if(iCopied > jValue) std::swap(iCopied, jValue);
-				int inversedY = nMarkers - iCopied;
-				Rbyte rawValue = data[nMarkers*(nMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (jValue - i)];
+				Rbyte rawValue = data[(jValue*(jValue-1))/2 + iCopied-1];
 				if(rawValue == 0xff) result[jCounter] = NA_REAL;
 				else result[jCounter] = levels[rawValue];
 			}
@@ -47,8 +45,7 @@ BEGIN_RCPP
 				int jCopied = j;
 				int iValue = i[iCounter];
 				if(iValue > jCopied) std::swap(iValue, jCopied);
-				int inversedY = nMarkers - iValue;
-				Rbyte rawValue = data[nMarkers*(nMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (jCopied - iValue)];
+				Rbyte rawValue = data[(jCopied*(jCopied-1))/2 + iValue-1];
 				if(rawValue == 0xff) result[iCounter] = NA_REAL;
 				else result[iCounter] = levels[rawValue];
 			}
@@ -62,8 +59,7 @@ BEGIN_RCPP
 		{
 			int iCopied = i[iCounter], jCopied = j[jCounter];
 			if(iCopied > jCopied) std::swap(iCopied, jCopied);
-			int inversedY = nMarkers - iCopied;
-			Rbyte rawValue = data[nMarkers*(nMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (jCopied - iCopied)];
+			Rbyte rawValue = data[(jCopied*(jCopied-1))/2 + iCopied-1];
 			if(rawValue == 0xff) result(iCounter, jCounter) = NA_REAL;
 			else result(iCounter, jCounter) = levels[rawValue];
 		}
@@ -77,9 +73,9 @@ BEGIN_RCPP
 	Rcpp::S4 object = object;
 	Rcpp::RawVector oldData = object.slot("data");
 	int oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
-	int newNMarkers = indices.size();
 	Rcpp::IntegerVector indices = indices_;
-	Rcpp::RawVector newData((indices.size() * (indices.size() + 1)/2);
+	int newNMarkers = indices.size();
+	Rcpp::RawVector newData((indices.size() * (indices.size() + 1))/2);
 	int counter = 0;
 	//Row
 	for(int i = 0; i < newNMarkers; i++)
@@ -87,8 +83,8 @@ BEGIN_RCPP
 		//Column
 		for(int j = i; j < newNMarkers; j++)
 		{
-			int inversedY = nMarkers - indices[i];
-			newData(counter) = oldData[nMarkers*(nMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (indices[j] - indices[i])];
+			int inversedY = oldNMarkers - indices[i];
+			newData(counter) = oldData[oldNMarkers*(oldNMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (indices[j] - indices[i])];
 			counter++;
 		}
 	}
