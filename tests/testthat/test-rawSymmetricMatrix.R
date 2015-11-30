@@ -36,3 +36,10 @@ test_that("Checking that indexing works correctly",
 		raw  <- new("rawSymmetricMatrix", levels = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), markers = c("a", "b", "c"), data = as.raw(as.integer(c(0:4, 255))))
 		expect_identical(raw[3, 3], as.numeric(NA))
 	})
+test_that("Checking that subsetting works correctly",
+	{
+		raw  <- new("rawSymmetricMatrix", levels = c(0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(as.integer(c(0:9))))
+		expect_equal(subset(raw, markers = 1:3)@data, as.raw(as.integer(c(0,1,2,3,4,5))))
+		expect_equal(subset(raw, markers = 2:4)@data, as.raw(as.integer(c(2,4,5,7,8,9))))
+		expect_equal(subset(raw, markers = c(1,3,4))@data, as.raw(as.integer(c(0,3,5,6,8,9))))
+	})

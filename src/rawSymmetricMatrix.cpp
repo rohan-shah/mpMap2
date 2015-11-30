@@ -70,21 +70,20 @@ END_RCPP
 SEXP rawSymmetricMatrixSubsetObject(SEXP object_, SEXP indices_)
 {
 BEGIN_RCPP
-	Rcpp::S4 object = object;
+	Rcpp::S4 object = object_;
 	Rcpp::RawVector oldData = object.slot("data");
 	int oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
 	Rcpp::IntegerVector indices = indices_;
 	int newNMarkers = indices.size();
 	Rcpp::RawVector newData((indices.size() * (indices.size() + 1))/2);
 	int counter = 0;
-	//Row
-	for(int i = 0; i < newNMarkers; i++)
+	//Column
+	for(int j = 0; j < newNMarkers; j++)
 	{
-		//Column
-		for(int j = i; j < newNMarkers; j++)
+		//Row
+		for(int i = 0; i <= j; i++)
 		{
-			int inversedY = oldNMarkers - indices[i];
-			newData(counter) = oldData[oldNMarkers*(oldNMarkers+1)/2 - (inversedY+2)*(inversedY+1)/2 + (indices[j] - indices[i])];
+			newData(counter) = oldData[(indices[j]*(indices[j]-1))/2 + indices[i] - 1];
 			counter++;
 		}
 	}
