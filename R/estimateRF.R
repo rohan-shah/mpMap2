@@ -30,8 +30,9 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 			stop(paste0("Value of lineWeights[[", i, "]] must have nLines(object)[", i, "] entries"))
 		}
 	}
-	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, marker1Range = c(1, nMarkers(object)), marker2Range = c(1, nMarkers(object)), keepLod = keepLod, keepLkhd = keepLkhd)
-	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta) 
+	markerRange <- 1:nMarkers(object)
+	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd)
+	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta)
 	if(!is.null(listOfResults$lod))
 	{
 		listOfResults$lod <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lod)
@@ -55,7 +56,7 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 	}
 	return(output)
 }
-estimateRFInternal <- function(object, recombValues, lineWeights, marker1Range, marker2Range, keepLod, keepLkhd)
+estimateRFInternal <- function(object, recombValues, lineWeights, markerRows, markerColumns, keepLod, keepLkhd)
 {
-	return(.Call("estimateRF", object, recombValues, marker1Range, marker2Range, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2"))
+	return(.Call("estimateRF", object, recombValues, markerRows, markerColumns, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2"))
 }

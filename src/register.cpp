@@ -22,10 +22,11 @@ extern "C"
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
 		{"estimateRF", (DL_FUNC)&estimateRF, 7},
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
-		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 4},
-		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 5},
+		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 2},
+		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 3},
 		{"rawSymmetricMatrixSubsetIndices", (DL_FUNC)&rawSymmetricMatrixSubsetIndices, 4},
 		{"rawSymmetricMatrixSubsetObject", (DL_FUNC)&rawSymmetricMatrixSubsetObject, 2},
+		{"assignRawSymmetricMatrix", (DL_FUNC)&assignRawSymmetricMatrix, 3},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

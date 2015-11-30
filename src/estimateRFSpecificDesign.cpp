@@ -17,8 +17,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
 	std::size_t nDifferentFunnels = args.funnelEncodings.size();
-	int marker2RangeSize = args.marker2End - args.marker2Start;
-	int maxStart = std::max(args.marker1Start, args.marker2Start), minEnd = std::min(args.marker1End, args.marker2End);
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
@@ -28,6 +26,10 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
+	if(!std::is_sorted(args.markerRows.begin(), args.markerRows.end()) || !std::is_sorted(args.markerColumns.begin(), args.markerColumns.end()))
+	{
+		throw std::runtime_error("Inputs to countValuesToEstimate must be sorted");
+	}
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
@@ -38,53 +40,70 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
-	unsigned long long nValuesToEstimate = countValuesToEstimate(args.marker1Start, args.marker1End, args.marker2Start, args.marker2End);
+	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 #ifdef USE_OPENMP
 	#pragma omp parallel for schedule(static, 1)
 #endif
-	for(int counter = 0; counter < nValuesToEstimate; counter++)
 	{
-		int markerCounter1, markerCounter2;
-		singleIndexToPair(args.marker1Start, args.marker1End, args.marker2Start, args.marker2End, counter, markerCounter1, markerCounter2);
-
-		int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounter1];
-		int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounter2];
-
-		singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
-		for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+		unsigned long long nValuesToEstimate = countValuesToEstimate(args.markerRows, args.markerColumns);
+		triangularIterator indexIterator(args.markerRows, args.markerColumns);
+		int previousCounter = 0;
+#ifdef USE_OPENMP
+		#pragma omp for schedule(static, 1)
+#endif
+		for(int counter = 0; counter < nValuesToEstimate; counter++)
 		{
-			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+			int difference = counter - previousCounter;
+			if(difference < 0) throw std::runtime_error("Internal error");
+			while(difference > 0) 
 			{
-				int marker1Value = args.finals(finalCounter, markerCounter1);
-				int marker2Value = args.finals(finalCounter, markerCounter2);
-				if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
+				indexIterator.next();
+				difference--;
+			}
+			previousCounter = counter;
+
+			std::pair<int, int> markerIndices = indexIterator.get();
+			int markerCounterRow = markerIndices.first, markerCounterColumn = markerIndices.second;
+
+			int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounterRow];
+			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
+
+			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+			{
+				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
-					double contribution = 0;
-					bool allowable = false;
-					int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
-					int selfingGenerations = args.selfingGenerations[finalCounter];
-					if(intercrossingGenerations == 0)
+					int marker1Value = args.finals(finalCounter, markerCounterRow);
+					int marker2Value = args.finals(finalCounter, markerCounterColumn);
+					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 					{
-						funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
-						allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
-						if(allowable)
+						double contribution = 0;
+						bool allowable = false;
+						int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+						int selfingGenerations = args.selfingGenerations[finalCounter];
+						if(intercrossingGenerations == 0)
 						{
-							array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
-							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+							funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
+							if(allowable)
+							{
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
+								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+							}
 						}
-					}
-					else if(intercrossingGenerations > 0)
-					{
-						allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
-						if(allowable)
+						else if(intercrossingGenerations > 0)
 						{
-							array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
-							contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
+							if(allowable)
+							{
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
+								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
+							}
 						}
+						//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
+						if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
+						else if(contribution != 0 && allowable) args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 					}
-					//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
-					if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
-					else if(contribution != 0 && allowable) args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += lineWeights[finalCounter] * contribution;
 				}
 			}
 		}
@@ -132,7 +151,7 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 }
 unsigned long long estimateLookup(estimateRFSpecificDesignArgs& args)
 {
-	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
+	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions, args.markerRows, args.markerColumns);
 	bool result = toInternalArgs(args, internal_args, true);
 	if(!result) return 0;
 
@@ -283,10 +302,6 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 	internal_args.selfingGenerations.swap(selfingGenerations);
 	internal_args.markerPatternData.swap(markerPatternConversionArgs);
 	internal_args.hasAI = hasAIC;
-	internal_args.marker1Start = args.marker1Start;
-	internal_args.marker1End = args.marker1End;
-	internal_args.marker2Start = args.marker2Start;
-	internal_args.marker2End = args.marker2End;
 	internal_args.maxAlleles = maxAlleles;
 	internal_args.result = args.result;
 	internal_args.funnelIDs.swap(funnelIDs);
@@ -295,7 +310,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 }
 bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
 {
-	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions);
+	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions, args.markerRows, args.markerColumns);
 	bool result = toInternalArgs(args, internal_args, false);
 	if(!result) return false;
 	int nFounders = args.founders.nrow();
