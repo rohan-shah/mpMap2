@@ -47,6 +47,11 @@ checkMpcross <- function(object)
 		}
 		errors <- c(errors, checkCompatibleGeneticData(object@geneticData))
 	}
+	allLineNames <- unlist(lapply(object@geneticData, function(x) rownames(x@finals)))
+	if(length(allLineNames) != length(unique(allLineNames)))
+	{
+		errors <- c(errors, "Line names must be unique")
+	}
 	#Check that the line names are unique
 	if(length(errors) > 0) return(errors)
 	return(TRUE)

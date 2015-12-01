@@ -24,6 +24,35 @@ test_that("All elements of geneticData must have correct class",
 		copied@geneticData <- c(copied@geneticData, cross)
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("If there are multiple genetic data sets, founder line names can be repeated",
+	{
+		copied <- cross
+		copied2 <- cross
+
+		rownames(copied2@geneticData[[1]]@finals) <- paste0(rownames(copied2@geneticData[[1]]@finals), ",2")
+		pedigreeSubset <- copied2@geneticData[[1]]@pedigree@lineNames %in% rownames(copied@geneticData[[1]]@finals)
+		copied2@geneticData[[1]]@pedigree@lineNames[pedigreeSubset] <- paste0(copied2@geneticData[[1]]@pedigree@lineNames[pedigreeSubset], ",2")
+		combined <- copied + copied2
+		expect_identical(validObject(combined, complete=TRUE), TRUE)
+	})
+test_that("If there are multiple genetic data sets, line names must still be unique",
+	{
+		copied <- cross
+		copied2 <- cross
+
+		rownames(copied2@geneticData[[1]]@finals) <- paste0(rownames(copied2@geneticData[[1]]@finals), ",2")
+		rownames(copied2@geneticData[[1]]@founders) <- paste0(rownames(copied2@geneticData[[1]]@founders), ",2")
+		copied2@geneticData[[1]]@pedigree@lineNames <- paste0(copied2@geneticData[[1]]@pedigree@lineNames, ",2")
+		expect_identical(validObject(copied2, complete=TRUE), TRUE)
+
+		combined <- copied + copied2
+		expect_identical(validObject(combined, complete=TRUE), TRUE)
+		
+		copied2@geneticData[[1]]@pedigree@lineNames[copied2@geneticData[[1]]@pedigree@lineNames == rownames(copied2@geneticData[[1]]@finals)[1]] <- rownames(copied@geneticData[[1]]@finals)[1]
+		rownames(copied2@geneticData[[1]]@finals)[1] <- rownames(copied@geneticData[[1]]@finals)[1]
+		expect_identical(validObject(copied2, complete=TRUE), TRUE)
+		expect_that(combined <- copied + copied2, throws_error())
+	})
 #Errors in checkCompatibleGeneticData
 test_that("All geneticData entries must have the same markers",
 	{
