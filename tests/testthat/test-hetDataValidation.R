@@ -90,3 +90,4 @@ test_that("Contradictory rows not allowed in hetData",
 		copied[[1]] <- rbind(copied[[1]], extraRow)
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+rm(pedigree, map, cross, hetData)

@@ -27,3 +27,4 @@ test_that("Checking that countValuesToEstimate works for regions that have a rec
 		expect_equal(countValuesToEstimate(1:2,1:10), 19)
 		expect_equal(countValuesToEstimate(1:3,1:10), 27)
 	})
+rm(countValuesToEstimate)

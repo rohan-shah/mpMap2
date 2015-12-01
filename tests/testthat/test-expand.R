@@ -37,3 +37,4 @@ test_that("New markers must contain old markers",
 		lg <- formGroups(rf, groups = 1)
 		expect_that(expand(lg, newMarkers = newMarkers), throws_error())
 	})
+rm(pedigree, map, cross, rf)

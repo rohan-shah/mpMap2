@@ -73,4 +73,4 @@ test_that("Numerically accurate with one generation of intercrossing, no selfing
 			expect_identical(rf@rf@theta[2,2], 0)
 		}
 	})
-
+rm(getMap, distances)

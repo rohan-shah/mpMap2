@@ -27,3 +27,4 @@ test_that("Marker of cross object must agree with markers of map",
 		names(copied@map[[1]])[1:2] <- names(copied@map[[1]])[2:1]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+rm(pedigree, map, cross, rf, mapped)

@@ -29,3 +29,4 @@ test_that("Names of slot lg@groups must be the marker names",
 		names(copied@lg@groups)[1:2] <- names(copied@lg@groups)[2:1]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+rm(pedigree, map, cross, rf, grouped)

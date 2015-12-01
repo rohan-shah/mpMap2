@@ -4,6 +4,10 @@ fromMpMap <- function(mpcross)
 }
 setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1, e2)
 {
+  if(pryr::address(e1) == pryr::address(e2))
+  {
+    stop("Cannot combine an object with itself")
+  }
   allMarkers <- unique(c(markers(e1), markers(e2)))
   #Put all the markers from e1 first
   allMarkers <- c(markers(e1), setdiff(allMarkers, markers(e1)))

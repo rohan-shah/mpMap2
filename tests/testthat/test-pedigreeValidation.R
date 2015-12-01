@@ -106,3 +106,4 @@ test_that("Number of founders must be at least 2",
 		pedigree@mother <- pedigree@father <- 0:1005
 		expect_that(validObject(pedigree, complete=TRUE), throws_error())
 	})
+rm(pedigree)

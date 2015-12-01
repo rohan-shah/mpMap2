@@ -48,3 +48,4 @@ test_that("Slot rf@lkhd must have storage.mode double if it is not NULL",
 		copy <- rf
 		expect_that(copy@rf@lkhd <- as.integer(copy@rf@lkhd), throws_error())
 	})
+rm(pedigree, map, cross, rf)

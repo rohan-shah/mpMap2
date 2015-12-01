@@ -280,3 +280,4 @@ test_that("Monomorphic markers are allowed",
 		copied@hetData[[1]] <- rbind(c(1,1,1))
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})
+rm(pedigree, map, cross, geneticData)

@@ -44,3 +44,4 @@ test_that("Marker names must be unique",
 		names(copiedMap[[1]]) <- names(copiedMap[[2]])
 		expect_that(new("map", copiedMap), throws_error())
 	})
+rm(map)

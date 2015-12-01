@@ -44,3 +44,4 @@ test_that("Checking that singleIndexToPair works for regions that start with a r
 		expect_equal(parameteriseRegion(1:3, 2:4), rbind(c(1,2), c(2,2), c(1,3), c(2,3), c(3,3), c(1,4), c(2,4), c(3,4)))
 		expect_equal(parameteriseRegion(1:3, 2:5), rbind(c(1,2), c(2,2), c(1,3), c(2,3), c(3,3), c(1,4), c(2,4), c(3,4), c(1,5), c(2,5), c(3,5)))
 	})
+rm(singleIndexToPair, parameteriseRegion)

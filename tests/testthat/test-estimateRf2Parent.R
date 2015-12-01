@@ -61,3 +61,18 @@ test_that("Numerically accurate for a RIL design",
 			expect_identical(rf@rf@theta[2,2], 0)
 		}
 	})
+test_that("Checking f2 pedigree split into 100 different datasets",
+	{
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(5000)
+		set.seed(1)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		crosses <- subset(cross, lines = 1:50)
+		for(i in 2:100)
+		{
+			crosses <- crosses + subset(cross, lines = 1:50 + (i-1)*50)
+		}
+		multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE)
+		singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+	})
+rm(getMap, distances, tolerances)

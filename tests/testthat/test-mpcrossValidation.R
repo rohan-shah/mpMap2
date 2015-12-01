@@ -95,3 +95,4 @@ test_that("Object with no final lines is valid",
 		cross@geneticData[[1]]@finals <-cross@geneticData[[1]]@finals[0,,drop=F]
 		expect_identical(validObject(cross,complete=TRUE), TRUE)
 	})
+rm(pedigree, map, cross)

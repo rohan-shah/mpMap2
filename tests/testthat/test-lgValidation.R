@@ -36,3 +36,4 @@ test_that("Slot groups must contain values that are also in allGroups",
 		copied@groups[1] <- 99999L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+rm(pedigree, map, cross, rf, grouped, lg)
