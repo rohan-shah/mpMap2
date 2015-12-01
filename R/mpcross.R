@@ -17,122 +17,71 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   {
     stop("Different recombination values were used for numerical maximum likelihood in two objects")
   }
-  existingLod <- !is.null(e1@rf@lod) || !is.null(e2@rf@lod)
-  existingLkhd <- !is.null(e1@rf@lkhd) || !is.null(e2@rf@lkhd)
+  levels <- e1@rf@theta@levels
+  lineWeights <- lapply(as.list(nLines(combined)), function(x) rep(1, x))
+  keepLod <- !is.null(e1@rf@lod) && !is.null(e2@rf@lod)
+  keepLkhd <- !is.null(e1@rf@lkhd) && !is.null(e2@rf@lkhd)
 
   newLod <- newLkhd <- NULL
 
   combined <- as(e1, "mpcross") + as(e2, "mpcross")
   marker1Indices <- match(markers(e1), markers(combined))
   marker2Indices <- match(markers(e2), markers(combined))
+  intersectionIndices <- intersect(marker1Indices, marker2Indices)
 
-  if(any(diff(sort(marker1Indices)) != 1))
+  #Make a new rawSymmetricMatrix
+  warning("Implicitly setting lineWeights parameter to 1")
+  dataLengths <- nMarkers(combined) *(nMarkers(combined)+1)/2
+  newTheta <- new("rawSymmetricMatrix", data = raw(dataLengths), levels = levels, markers = markers(combined))
+  #Copy over all the existing data
+  .Call("assignRawSymmetricMatrix", newTheta, marker1Indices, marker1Indices, e1@rf@theta@data, PACKAGE = "mpMap2")
+  .Call("assignRawSymmetricMatrix", newTheta, marker2Indices, marker2Indices, e2@rf@theta@data, PACKAGE = "mpMap2")
+  if(keepLod)
   {
-    stop("Internal error: Markers from object 1 should be in one consecutive block")
+    newLod <- new("dspMatrix", x = vector(mode="numeric", length = dataLengths), Dim = c(nMarkers(combined), nMarkers(combined)))
+    newLod[marker1Indices, marker1Indices] <- e1@rf@lod
+    newLod[marker2Indices, marker2Indices] <- e2@rf@lod
   }
-  #If the markers are disjoint we keep the RF data - The resulting matrix is block-diagonal
-  if(length(intersect(markers(e1), markers(e2))) == 0)
+  if(keepLkhd)
   {
-    if(any(diff(sort(marker2Indices)) != 1))
-    {
-      stop("Internal error: Markers from object 2 should be in one consecutive block")
-    }
-
-    newTheta <- matrix(NA, nMarkers(combined), nMarkers(combined))
-    colnames(newTheta) <- rownames(newTheta) <- markers(combined)
-    
-    if(existingLod) 
-    {
-      newLod <- newTheta
-      newLod[marker1Indices, marker1Indices] <- e1@rf@lod
-      newLod[marker2Indices, marker2Indices] <- e2@rf@lod
-    }
-    if(existingLkhd)
-    {
-      newLkhd <- newTheta
-      newLkhd[marker1Indices, marker1Indices] <- e1@rf@lkhd
-      newLkhd[marker2Indices, marker2Indices] <- e2@rf@lkhd
-    }
-
-    newTheta[marker1Indices, marker1Indices] <- e1@rf@theta
-    newTheta[marker2Indices, marker2Indices] <- e2@rf@theta
-
-    newRF <- new("rf", lod = newLod, lkhd = newLkhd, theta = newTheta)
-    return(new("mpcrossRF", combined, rf = newRF))
+    newLkhd <- new("dspMatrix", x = vector(mode="numeric", length = dataLengths), Dim = c(nMarkers(combined), nMarkers(combined)))
+    newLkhd[marker1Indices, marker1Indices] <- e1@rf@lkhd
+    newLkhd[marker2Indices, marker2Indices] <- e2@rf@lkhd
   }
-  #If markers for one are strictly contained within the other
-  else if(all(markers(e1)%in% markers(e2)) || all(markers(e2) %in% markers(e1)))
+  if(length(intersectionIndices) > 0)
   {
-    warning("Implicitly setting lineWeights parameter to 1")
-    #We need both otherings, so combine the objects in the other way
-    combinedOther <- as(e2, "mpcross") + as(e1, "mpcross")
-    marker1IndicesOther <- match(markers(e1), markers(combinedOther))
-    marker2IndicesOther <- match(markers(e2), markers(combinedOther))
-   
-    if(all(markers(e1)%in% markers(e2)))
+    reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices)
+    reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = setdiff(1:nMarkers(combined), intersectionIndices))
+    .Call("assignRawSymmetricMatrix", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatePart1$theta)
+    .Call("assignRawSymmetricMatrix", newTheta, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatePart2$theta)
+    if(keepLod)
     {
-      newTheta <- e2@rf@theta
-
-      marker1Range <- range(marker1Indices)
-      marker2Range <- c(1, nMarkers(combined))
-      extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = lapply(as.list(nLines(combined)), function(x) rep(1, x)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = existingLod, keepLkhd = existingLkhd)
-      indicesX <- match(rownames(extraRFData$theta), rownames(newTheta))
-      indicesY <- match(colnames(extraRFData$theta), colnames(newTheta))
-      
-      newTheta[indicesX, indicesY] <- extraRFData$theta
-      newTheta[indicesY, indicesX] <- t(extraRFData$theta)
-
-      if(existingLkhd)
-      {
-        newLkhd <- e2@rf@lkhd
-        newLkhd[indicesX, indicesY] <- extraRFData$lkhd
-        newLkhd[indicesY, indicesX] <- t(extraRFData$lkhd)
-      }
-      if(existingLod)
-      {
-        newLod <- e2@rf@lod
-        newLod[indicesX, indicesY] <- extraRFData$lod
-        newLod[indicesY, indicesX] <- t(extraRFData$lod)
-      }
-      newRF <- new("rf", theta = newTheta, lkhd = newLkhd, lod = newLod)
-      return(new("mpcrossRF", combinedOther, rf = newRF))
+      .Call("assignDspMatrix", newLod, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lod, PACKAGE="mpMap2")
+      .Call("assignDspMatrix", newLod, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lod, PACKAGE="mpMap2")
     }
-    else
+    if(keepLkhd)
     {
-      newTheta <- e1@rf@theta
-      if(any(diff(sort(marker2IndicesOther)) != 1))
-      {
-        stop("Internal error: Markers from object 2 should be in one consecutive block")
-      }
-      marker1Range <- c(1, nMarkers(combinedOther))
-      marker2Range <- range(marker2IndicesOther)
-      extraRFData <- estimateRFInternal(object = combinedOther, recombValues = e1@rf@r, lineWeights = lapply(as.list(nLines(combined)), function(x) rep(1, x)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = existingLod, keepLkhd = existingLkhd)
-      indicesX <- match(rownames(extraRFData$theta), rownames(newTheta))
-      indicesY <- match(colnames(extraRFData$theta), colnames(newTheta))
-
-      newTheta[indicesX, indicesY] <- extraRFData$theta
-      newTheta[indicesY, indicesX] <- t(extraRFData$theta)
-
-      if(existingLkhd)
-      {
-        newLkhd <- e1@rf@lkhd
-        newLkhd[indicesX, indicesY] <- extraRFData$lkhd
-        newLkhd[indicesY, indicesX] <- t(extraRFData$lkhd)
-      }
-      if(existingLod)
-      {
-        newLod <- e1@rf@lod
-        newLod[indicesX, indicesY] <- extraRFData$lod
-        newLod[indicesY, indicesX] <- t(extraRFData$lod)
-      }
-      newRF <- new("rf", theta = newTheta, lkhd = newLkhd, lod = newLod)
-      return(new("mpcrossRF", combined, rf = newRF))
+      .Call("assignDspMatrix", newLkhd, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lkhd, PACKAGE="mpMap2")
+      .Call("assignDspMatrix", newLkhd, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lkhd, PACKAGE="mpMap2")
     }
   }
-  else
+  rectangularRows <- setdiff(marker1Indices, intersectionIndices)
+  rectangularColumns <- setdiff(marker2Indices, intersectionIndices)
+  if(length(rectangularRows) > 0 && length(rectangularColumns) > 0)
   {
-    return(combined)
+    rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns) 
+    .Call("assignRawSymmetricMatrix", newTheta, rectangularRows, rectangularColumns, rectangularPart$theta)
+    if(keepLod)
+    {
+      .Call("assignDspMatrix", newLod, rectangularRows, rectangularColumns, reEstimatedPart1$lod, PACKAGE="mpMap2")
+    }
+    if(keepLkhd)
+    {
+      .Call("assignDspMatrix", newLkhd, rectangularRows, rectangularColumns, rectangularPart$lkhd, PACKAGE="mpMap2")
+    }
   }
+  newRF <- new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd)
+  return(new("mpcrossRF", combined, rf = newRF))
 })
 #Generally we drop the RF data, unless the sets of markers are disjoint
 setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(e1, e2)

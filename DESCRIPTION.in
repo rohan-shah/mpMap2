@@ -14,13 +14,13 @@ Depends:
     qtl,
     seriation,
     methods,
-    igraph,
-    Matrix
+    igraph
 Suggests: 
     Rmpi,
     asreml,
     happy.hbrem
 Imports: 
     wgaim,
-    ggplot2
+    ggplot2,
+    Matrix
 LinkingTo: qtl

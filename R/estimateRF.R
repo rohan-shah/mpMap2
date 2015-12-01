@@ -36,12 +36,12 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 	if(!is.null(listOfResults$lod))
 	{
 		listOfResults$lod <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lod)
-		colnames(listOfResults$lod) <- markers(object)
+		rownames(listOfResults$lod) <- colnames(listOfResults$lod) <- markers(object)
 	}
 	if(!is.null(listOfResults$lkhd))
 	{
 		listOfResults$lkhd <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lkhd)
-		colnames(listOfResults$lkhd) <- markers(object)
+		rownames(listOfResults$lkhd) <- colnames(listOfResults$lkhd) <- markers(object)
 	}
 	rf <- new("rf", theta = theta, lod = listOfResults$lod, lkhd = listOfResults$lkhd)
 

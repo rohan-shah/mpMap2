@@ -120,7 +120,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	{
 		newLkhd <- x@lkhd[markerIndices, markerIndices,drop=FALSE]
 	}
-	return(new("rf", r = x@r, theta = newTheta, lod = newLod, lkhd = newLkhd))
+	return(new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd))
 })
 setMethod(f = "subset", signature = "rawSymmetricMatrix", definition = function(x, ...)
 {

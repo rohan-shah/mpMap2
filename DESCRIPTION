@@ -15,15 +15,15 @@ Depends:
     seriation,
     methods,
     igraph,
-    Rcpp,
-    Matrix
+    Rcpp
 Suggests:
     Rmpi,
     asreml,
     happy.hbrem
 Imports:
     wgaim,
-    ggplot2
+    ggplot2,
+    Matrix
 LinkingTo: Rcpp, qtl
 Collate:
     'Rcpp_exceptions.R'

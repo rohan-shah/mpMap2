@@ -20,13 +20,14 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	{
 		lod <- mpcrossRF@rf@lod
 		#Reverse lod so that small values indicate similarity
-		lod[is.na(mpcrossRF@rf@lod)] <- 0
-		lod <- max(lod) - lod
+		lod[is.na(mpcrossRF@rf@lod@x)] <- 0
+		lod <- max(lod@x) - lod
 		diag(lod) <- 0
 	}
-	theta <- mpcrossRF@rf@theta
+	nMarkers <- length(mpcrossRF@rf@theta@markers)
+	theta <- mpcrossRF@rf@theta[1:nMarkers, 1:nMarkers]
 	
-	theta[is.na(mpcrossRF@rf@theta)] <- 0.5
+	theta[is.na(theta)] <- 0.5
 
 	if(method == "average")
 	{
@@ -43,7 +44,7 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	if(clusterBy == "combined")
 	{
 		#Cluster by theta first, and then by lod to break any ties
-		distMat <- theta + lod / max(lod) * min(abs(diff(mpcrossRF@rf@r)))
+		distMat <- as(lod / max(lod) * min(abs(diff(mpcrossRF@rf@theta@levels))), "matrix") + theta
 	}
 	else if(clusterBy == "theta")
 	{

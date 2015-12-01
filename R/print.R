@@ -1,15 +1,17 @@
 #' @include mpcross-class.R
-setMethod(f = "print", signature = "mpcrossLG", definition = function(x)
+print.mpcrossLG <- function(x)
 {
   cat("This mpcross object contains linkage groups\n")
   callNextMethod()
-})
-setMethod(f = "print", signature = "mpcrossRF", definition = function(x)
+}
+setMethod(f = "print", signature = "mpcrossLG", definition = print.mpcrossLG)
+print.mpcrossRF <- function(x)
 {
   cat("This mpcross object contains recombination fractions\n\n")
   callNextMethod()
-})
-setMethod(f = "print", signature = "mpcross", definition = function(x)
+}
+setMethod(f = "print", signature = "mpcrossRF", definition = print.mpcrossRF)
+print.mpcross <- function(x)
 {
   nGeneticDatasets <- length(x@geneticData)
   nLines <- nLines(x)
@@ -52,4 +54,5 @@ setMethod(f = "print", signature = "mpcross", definition = function(x)
       cat(sum(proportionMissing>.20), " markers had >20% missing data.\n")
     }
   }
-})
+}
+setMethod(f = "print", signature = "mpcross", definition = print.mpcross)
