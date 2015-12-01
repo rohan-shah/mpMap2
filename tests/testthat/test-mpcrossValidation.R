@@ -87,3 +87,11 @@ test_that("All geneticData entries must have the same markers",
 		colnames(copied@geneticData[[1]]@founders)[1] <- colnames(copied@geneticData[[1]]@finals)[1] <- names(copied@geneticData[[1]]@hetData)[1] <- "newMarker"
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("Object with no final lines is valid",
+	{
+		pedigree <- f2Pedigree(10)
+		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		cross@geneticData[[1]]@finals <-cross@geneticData[[1]]@finals[0,,drop=F]
+		expect_identical(validObject(cross,complete=TRUE), TRUE)
+	})

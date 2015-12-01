@@ -21,13 +21,17 @@ checkGeneticData <- function(object)
 	{
 		errors <- c(errors, "Slot finals must be a numeric matrix")
 	}
-	else if(all(is.na(object@finals)))
+	#Don't do the next two checks if there is no data.
+	else if(length(object@finals) > 0)
 	{
-		errors <- c(errors, "Slot finals cannot contain only NA")
-	}
-	else if(max(abs(round(object@finals) - object@finals), na.rm=TRUE) > 0)
-	{
-		errors <- c(errors, "Slot finals must contain integer values")
+		if(all(is.na(object@finals)))
+		{
+			errors <- c(errors, "Slot finals cannot contain only NA")
+		}
+		else if(max(abs(round(object@finals) - object@finals), na.rm=TRUE) > 0)
+		{
+			errors <- c(errors, "Slot finals must contain integer values")
+		}
 	}
 
 	if(length(dim(object@finals)) != 2)
@@ -43,7 +47,8 @@ checkGeneticData <- function(object)
 	{
 		errors <- c(errors, "Slot founders must have row and column names")
 	}
-	if(is.null(dimnames(object@finals)) || any(unlist(lapply(dimnames(object@finals), is.null))))
+	#Don't check for row and column names if there is no actual data.
+	if(length(object@finals) > 0 && (is.null(dimnames(object@finals)) || any(unlist(lapply(dimnames(object@finals), is.null)))))
 	{
 		errors <- c(errors, "Slot finals must have row and column names")
 	}
@@ -53,7 +58,8 @@ checkGeneticData <- function(object)
 	{
 		errors <- c(errors, "Row and column names of slot founders cannot be NA")
 	}
-	if(any(unlist(lapply(dimnames(object@finals), function(x) any(is.na(x))))))
+	#Skip this if there is no data (this avoids a warnings)
+	if(length(object@finals) > 0 && any(unlist(lapply(dimnames(object@finals), function(x) any(is.na(x))))))
 	{
 		errors <- c(errors, "Row and column names of slot finals cannot be NA")
 	}
@@ -102,9 +108,13 @@ checkGeneticData <- function(object)
 		{
 			errors <- c(errors, "Founder lines did not match those specified in the pedigree")
 		}
-		if(!all(rownames(object@finals) %in% object@pedigree@lineNames[object@pedigree@observed]) || nrow(object@finals) != sum(object@pedigree@observed))
+		#Only check this if there are actually final lines
+		if(length(object@finals) > 0)
 		{
-			errors <- c(errors, "Final lines did not match those specified in the pedigree")
+			if(!all(rownames(object@finals) %in% object@pedigree@lineNames[object@pedigree@observed]) || nrow(object@finals) != sum(object@pedigree@observed))
+			{
+				errors <- c(errors, "Final lines did not match those specified in the pedigree")
+			}
 		}
 	}
 	#Don't continue to the C code if there are already problems - Especially if the founders / finals slots have the wrong types
