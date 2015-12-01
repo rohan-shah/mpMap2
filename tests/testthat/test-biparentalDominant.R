@@ -30,3 +30,13 @@ test_that("Check that biparentalDominant can't be applied twice",
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + biparentalDominant()
 		expect_that(cross+biparentalDominant(), throws_error())
 	})
+test_that("Check that biparentalDominant can't be applied to multiple datasets at once",
+	{
+		pedigree <- f2Pedigree(100)
+		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		cross1 <- subset(cross, markers = 1:5)
+		cross2 <- subset(cross, markers = 6:10)
+		cross <- cross1 + cross2
+		expect_that(cross + biparentalDominant(), throws_error())
+	})

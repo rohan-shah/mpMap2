@@ -18,6 +18,27 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 			arguments$lines <- rownames(x@geneticData[[1]]@finals)[arguments$lines]
 		}
 	}
+	if("markers" %in% names(arguments))
+	{
+		if(mode(arguments$markers) == "character")
+		{
+			if(any(!(arguments$markers %in% markers(x))))
+			{
+				stop("Not all named markers were contained in the input object")
+			}
+		}
+		else if(mode(arguments$markers) == "numeric")
+		{
+			if(any(arguments$markers < 1) || any(arguments$markers > nMarkers(x)))
+			{
+				stop("Input marker indices were out of range")
+			}
+		}
+		else
+		{
+			stop("Input markers must be either a vector of indices or a vector of marker names")
+		}
+	}
 	newGeneticData <- lapply(x@geneticData, 
 		function(geneticData)
 		{
@@ -82,7 +103,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		}
 		else stop("Input markers must be either a vector of marker names or a vector of marker indices")
 	
-		return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = subset(x@hetData, ...), pedigree = as(x@pedigree, "pedigree")))
+		return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
 	}
 	else
 	{
