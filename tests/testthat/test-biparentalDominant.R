@@ -37,6 +37,10 @@ test_that("Check that biparentalDominant can't be applied to multiple datasets a
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross1 <- subset(cross, markers = 1:5)
 		cross2 <- subset(cross, markers = 6:10)
+
+		rownames(cross2@geneticData[[1]]@finals) <- paste0(rownames(cross2@geneticData[[1]]@finals), ",2")
+		rownames(cross2@geneticData[[1]]@founders) <- paste0(rownames(cross2@geneticData[[1]]@founders), ",2")
+		cross2@geneticData[[1]]@pedigree@lineNames <- paste0(cross2@geneticData[[1]]@pedigree@lineNames, ",2")
 		cross <- cross1 + cross2
 		expect_that(cross + biparentalDominant(), throws_error())
 	})

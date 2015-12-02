@@ -22,13 +22,13 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
     stop("Different recombination values were used for numerical maximum likelihood in two objects")
   }
   levels <- e1@rf@theta@levels
-  lineWeights <- lapply(as.list(nLines(combined)), function(x) rep(1, x))
   keepLod <- !is.null(e1@rf@lod) && !is.null(e2@rf@lod)
   keepLkhd <- !is.null(e1@rf@lkhd) && !is.null(e2@rf@lkhd)
 
   newLod <- newLkhd <- NULL
 
   combined <- as(e1, "mpcross") + as(e2, "mpcross")
+  lineWeights <- lapply(as.list(nLines(combined)), function(x) rep(1, x))
   marker1Indices <- match(markers(e1), markers(combined))
   marker2Indices <- match(markers(e2), markers(combined))
   intersectionIndices <- intersect(marker1Indices, marker2Indices)
@@ -52,21 +52,27 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
     newLkhd[marker1Indices, marker1Indices] <- e1@rf@lkhd
     newLkhd[marker2Indices, marker2Indices] <- e2@rf@lkhd
   }
+  complementIntersectionIndices <- setdiff(1:nMarkers(combined), intersectionIndices)
   if(length(intersectionIndices) > 0)
   {
     reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices)
-    reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = setdiff(1:nMarkers(combined), intersectionIndices))
-    .Call("assignRawSymmetricMatrix", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatePart1$theta)
-    .Call("assignRawSymmetricMatrix", newTheta, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatePart2$theta)
+    .Call("assignRawSymmetricMatrix", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$theta)
+
+    if(length(complementIntersectionIndices) > 0)
+    {
+      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = setdiff(1:nMarkers(combined), intersectionIndices))
+      .Call("assignRawSymmetricMatrix", newTheta, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$theta)
+    }
+
     if(keepLod)
     {
       .Call("assignDspMatrix", newLod, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lod, PACKAGE="mpMap2")
-      .Call("assignDspMatrix", newLod, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lod, PACKAGE="mpMap2")
+      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrix", newLod, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lod, PACKAGE="mpMap2")
     }
     if(keepLkhd)
     {
       .Call("assignDspMatrix", newLkhd, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lkhd, PACKAGE="mpMap2")
-      .Call("assignDspMatrix", newLkhd, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lkhd, PACKAGE="mpMap2")
+      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrix", newLkhd, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lkhd, PACKAGE="mpMap2")
     }
   }
   rectangularRows <- setdiff(marker1Indices, intersectionIndices)

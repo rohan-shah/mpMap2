@@ -75,4 +75,81 @@ test_that("Checking f2 pedigree split into 100 different datasets",
 		multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE)
 		singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
 	})
+test_that("Checking f2 pedigree split into 10 different datasets gives the same answer",
+	{
+		set.seed(1)
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(500)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		separateRf <- estimateRF(subset(cross, lines = 1:50))
+		combinedRf <- estimateRF(cross)
+		for(i in 2:10)
+		{
+			suppressWarnings(separateRf <- separateRf + estimateRF(subset(cross, lines = 1:50 + (i-1)*50)))
+		}
+		expect_identical(combinedRf@rf@theta, separateRf@rf@theta)
+		expect_equal(combinedRf@rf@lod, separateRf@rf@lod, tolerance = 0.001)
+		expect_equal(combinedRf@rf@lkhd, separateRf@rf@lkhd, tolerance = 0.001)
+	})
+test_that("Checking that f2 pedigree split into two sets of markers gives the same non-NA rf estimates",
+	{
+		set.seed(1)
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(5000)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+
+		#In this case we're double-counting the data for markers 4-8, which explains the strange regions for the likelihood and lod. 
+		cross1 <- subset(cross, markers = 1:8)
+		cross2 <- subset(cross, markers  = 4:11)
+		
+		#Change dataset2 line names
+		cross2@geneticData[[1]]@pedigree@lineNames <- paste0(cross2@geneticData[[1]]@pedigree@lineNames, ",2")
+		rownames(cross2@geneticData[[1]]@finals) <- paste0(rownames(cross2@geneticData[[1]]@finals), ",2")
+		rownames(cross2@geneticData[[1]]@founders) <- paste0(rownames(cross2@geneticData[[1]]@founders), ",2")
+
+		combined <- cross1 + cross2
+		combinedRf <- estimateRF(combined, keepLod = TRUE, keepLkhd = TRUE)
+		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		#Everything that isn't NA (0xFF) in combinedRf should be equal to the values in rf
+		expect_that(all((combinedRf@rf@theta@data == as.raw(0xff)) | (combinedRf@rf@theta@data == rf@rf@theta@data)), is_true())
+		
+		combinedRfLod <- as(combinedRf@rf@lod, "matrix")
+		rfLod <- as(rf@rf@lod, "matrix")
+
+		combinedRfLkhd <- as(combinedRf@rf@lkhd, "matrix")
+		rfLkhd <- as(rf@rf@lkhd, "matrix")
+		expect_that(all(abs(combinedRfLod[1:8,1:3] - rfLod[1:8, 1:3]) < 1e-5, na.rm=TRUE), is_true())
+		expect_that(all(abs(combinedRfLod[9:11,4:11] - rfLod[9:11, 4:11]) < 1e-5, na.rm=TRUE), is_true())
+		expect_that(all(abs(combinedRfLkhd[1:8,1:3] - rfLkhd[1:8, 1:3]) < 1e-5, na.rm=TRUE), is_true())
+		expect_that(all(abs(combinedRfLkhd[9:11,4:11] - rfLkhd[9:11,4:11]) < 1e-5, na.rm=TRUE), is_true())
+	})
+test_that("Checking that f2 pedigree split into two sets of markers gives the same non-NA rf estimates",
+	{
+		set.seed(1)
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(5000)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+
+		#In this case we avoid double-counting in the centre, but count only half the lines on 1:3 and 9:11. 
+		cross1 <- subset(cross, markers = 1:8)
+		cross2 <- subset(cross, markers  = 4:11)
+
+		cross1 <- subset(cross1, lines = 1:2500)
+		cross2 <- subset(cross2, lines = 2501:5000)
+
+		combined <- cross1 + cross2
+		combinedRf <- estimateRF(combined, keepLod = TRUE, keepLkhd = TRUE)
+		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		#Everything that isn't NA (0xFF) in combinedRf should be equal to the values in rf
+		expect_that(all((combinedRf@rf@theta@data == as.raw(0xff)) | (combinedRf@rf@theta@data == rf@rf@theta@data)), is_true())
+		
+		combinedRfLod <- as(combinedRf@rf@lod, "matrix")
+		rfLod <- as(rf@rf@lod, "matrix")
+
+		combinedRfLkhd <- as(combinedRf@rf@lkhd, "matrix")
+		rfLkhd <- as(rf@rf@lkhd, "matrix")
+		expect_that(all(abs(combinedRfLod[4:8,4:8] - rfLod[4:8, 4:8]) < 1e-5, na.rm=TRUE), is_true())
+		expect_that(all(abs(combinedRfLkhd[4:8,4:8] - rfLkhd[4:8, 4:8]) < 1e-5, na.rm=TRUE), is_true())
+
+	})
 rm(getMap, distances, tolerances)

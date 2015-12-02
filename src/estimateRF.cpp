@@ -241,7 +241,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			//This is the case where no data was available, across any of the experiments. This is precise, no numerical error involved
 			if(max == 0 && min == 0)
 			{
-				currentLod = std::numeric_limits<double>::quiet_NaN();
+				max = currentLod = std::numeric_limits<double>::quiet_NaN();
 				currentTheta = 0xff;
 			}
 			else
