@@ -1,6 +1,6 @@
 #include "dspMatrix.h"
 #include "matrixChunks.h"
-SEXP assignDspMatrix(SEXP destination_, SEXP rowIndices_, SEXP columnIndices_, SEXP source_)
+SEXP assignDspMatrixFromEstimateRF(SEXP destination_, SEXP rowIndices_, SEXP columnIndices_, SEXP source_)
 {
 BEGIN_RCPP
 	Rcpp::S4 destination = destination_;
@@ -9,16 +9,19 @@ BEGIN_RCPP
 	Rcpp::IntegerVector rowIndices = rowIndices_;
 	Rcpp::IntegerVector columnIndices = columnIndices_;
 
+	if(&(source(0)) == &(destinationData(0)))
+	{
+		throw std::runtime_error("Source and destination cannot be the same in assignRawSymmetricMatrixDiagonal");
+	}
+
 	std::vector<int> markerRows, markerColumns;
 	markerRows = Rcpp::as<std::vector<int> >(rowIndices);
 	markerColumns = Rcpp::as<std::vector<int> >(columnIndices);
-	std::sort(markerRows.begin(), markerRows.end());
-	std::sort(markerColumns.begin(), markerColumns.begin());
-
 	if(countValuesToEstimate(markerRows, markerColumns) != source.size())
 	{
 		throw std::runtime_error("Mismatch between index length and source object size");
 	}
+
 	triangularIterator iterator(markerRows, markerColumns);
 	int counter = 0;
 	for(; !iterator.isDone(); iterator.next())

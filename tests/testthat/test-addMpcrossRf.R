@@ -25,3 +25,29 @@ test_that("Checking f2 pedigree split into 10 different datasets gives the same 
 		expect_equal(combinedRf@rf@lod, separateRf@rf@lod, tolerance = 0.001)
 		expect_equal(combinedRf@rf@lkhd, separateRf@rf@lkhd, tolerance = 0.001)
 	})
+test_that("Checking that f2 experiment split into two different subsets gives the same answer",
+	{
+		set.seed(1)
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(5000)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		cross@geneticData[[1]]@finals[1:2500,1:3] <- cross@geneticData[[1]]@finals[2501:5000,9:11] <- NA
+
+		cross1 <- subset(cross, markers = 4:11)
+		cross1 <- subset(cross1, lines = 1:2500)
+
+		cross2 <- subset(cross, markers = 1:8)
+		cross2 <- subset(cross2, lines = 2501:5000)
+
+		rf1 <- estimateRF(cross1, keepLod = TRUE, keepLkhd = TRUE)
+		rf2 <- estimateRF(cross2, keepLod = TRUE, keepLkhd = TRUE)
+
+		#Two different recombination fraction calculations
+		combinedRf <- suppressWarnings(rf1 + rf2)
+		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		#After we give them the same marker orderings, they should have identical data, or close to it.
+		combinedRf <- subset(combinedRf, markers = markers(rf))
+		expect_identical(combinedRf@rf@theta@data, rf@rf@theta@data)
+		expect_equal(combinedRf@rf@lod@x, rf@rf@lod@x)
+		expect_equal(combinedRf@rf@lkhd@x, rf@rf@lkhd@x)
+	})

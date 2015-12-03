@@ -26,10 +26,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
-	if(!std::is_sorted(args.markerRows.begin(), args.markerRows.end()) || !std::is_sorted(args.markerColumns.begin(), args.markerColumns.end()))
-	{
-		throw std::runtime_error("Inputs to countValuesToEstimate must be sorted");
-	}
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
@@ -40,12 +36,14 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
+	std::vector<int> sortedMarkerRows = args.markerRows, sortedMarkerColumns = args.markerColumns;
+	unsigned long long nValuesToEstimate = countValuesToEstimate(sortedMarkerRows, sortedMarkerColumns);
+
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 #ifdef USE_OPENMP
 	#pragma omp parallel for schedule(static, 1)
 #endif
 	{
-		unsigned long long nValuesToEstimate = countValuesToEstimate(args.markerRows, args.markerColumns);
 		triangularIterator indexIterator(args.markerRows, args.markerColumns);
 		int previousCounter = 0;
 #ifdef USE_OPENMP

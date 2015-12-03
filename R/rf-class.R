@@ -12,7 +12,6 @@ checkRF <- function(object)
 		}
 		else if(nrow(object@lod) != length(thetaMarkers))
 		{
-			browser()
 			errors <- c(errors, "Dimensions of @lod were inconsistent with those of @theta")
 		}
 		else if(any(thetaMarkers != colnames(object@lod)))

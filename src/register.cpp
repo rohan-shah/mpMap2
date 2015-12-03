@@ -27,8 +27,9 @@ extern "C"
 		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 3},
 		{"rawSymmetricMatrixSubsetIndices", (DL_FUNC)&rawSymmetricMatrixSubsetIndices, 4},
 		{"rawSymmetricMatrixSubsetObject", (DL_FUNC)&rawSymmetricMatrixSubsetObject, 2},
-		{"assignRawSymmetricMatrix", (DL_FUNC)&assignRawSymmetricMatrix, 4},
-		{"assignDspMatrix", (DL_FUNC)&assignDspMatrix, 4},
+		{"assignRawSymmetricMatrixFromEstimateRF", (DL_FUNC)&assignRawSymmetricMatrixFromEstimateRF, 4},
+		{"assignRawSymmetricMatrixDiagonal", (DL_FUNC)&assignRawSymmetricMatrixDiagonal, 3},
+		{"assignDspMatrixFromEstimateRF", (DL_FUNC)&assignDspMatrixFromEstimateRF, 4},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

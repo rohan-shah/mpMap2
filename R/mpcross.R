@@ -38,17 +38,19 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   dataLengths <- nMarkers(combined) *(nMarkers(combined)+1)/2
   newTheta <- new("rawSymmetricMatrix", data = raw(dataLengths), levels = levels, markers = markers(combined))
   #Copy over all the existing data
-  .Call("assignRawSymmetricMatrix", newTheta, marker1Indices, marker1Indices, e1@rf@theta@data, PACKAGE = "mpMap2")
-  .Call("assignRawSymmetricMatrix", newTheta, marker2Indices, marker2Indices, e2@rf@theta@data, PACKAGE = "mpMap2")
+  .Call("assignRawSymmetricMatrixDiagonal", newTheta, marker1Indices, e1@rf@theta@data, PACKAGE = "mpMap2")
+  .Call("assignRawSymmetricMatrixDiagonal", newTheta, marker2Indices, e2@rf@theta@data, PACKAGE = "mpMap2")
   if(keepLod)
   {
     newLod <- new("dspMatrix", x = vector(mode="numeric", length = dataLengths), Dim = c(nMarkers(combined), nMarkers(combined)))
+    colnames(newLod) <- rownames(newLod) <- markers(combined)
     newLod[marker1Indices, marker1Indices] <- e1@rf@lod
     newLod[marker2Indices, marker2Indices] <- e2@rf@lod
   }
   if(keepLkhd)
   {
     newLkhd <- new("dspMatrix", x = vector(mode="numeric", length = dataLengths), Dim = c(nMarkers(combined), nMarkers(combined)))
+    colnames(newLkhd) <- rownames(newLkhd) <- markers(combined)
     newLkhd[marker1Indices, marker1Indices] <- e1@rf@lkhd
     newLkhd[marker2Indices, marker2Indices] <- e2@rf@lkhd
   }
@@ -56,23 +58,23 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   if(length(intersectionIndices) > 0)
   {
     reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices)
-    .Call("assignRawSymmetricMatrix", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$theta)
+    .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$theta)
 
     if(length(complementIntersectionIndices) > 0)
     {
-      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = setdiff(1:nMarkers(combined), intersectionIndices))
-      .Call("assignRawSymmetricMatrix", newTheta, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$theta)
+      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = complementIntersectionIndices)
+      .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$theta)
     }
 
     if(keepLod)
     {
-      .Call("assignDspMatrix", newLod, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lod, PACKAGE="mpMap2")
-      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrix", newLod, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lod, PACKAGE="mpMap2")
+      .Call("assignDspMatrixFromEstimateRF", newLod, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lod, PACKAGE="mpMap2")
+      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrixFromEstimateRF", newLod, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$lod, PACKAGE="mpMap2")
     }
     if(keepLkhd)
     {
-      .Call("assignDspMatrix", newLkhd, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lkhd, PACKAGE="mpMap2")
-      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrix", newLkhd, intersectionIndices, setdiff(1:nMarkers(combined), intersectionIndices), reEstimatedPart2$lkhd, PACKAGE="mpMap2")
+      .Call("assignDspMatrixFromEstimateRF", newLkhd, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$lkhd, PACKAGE="mpMap2")
+      if(length(complementIntersectionIndices) > 0) .Call("assignDspMatrixFromEstimateRF", newLkhd, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$lkhd, PACKAGE="mpMap2")
     }
   }
   rectangularRows <- setdiff(marker1Indices, intersectionIndices)
@@ -80,14 +82,14 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   if(length(rectangularRows) > 0 && length(rectangularColumns) > 0)
   {
     rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns) 
-    .Call("assignRawSymmetricMatrix", newTheta, rectangularRows, rectangularColumns, rectangularPart$theta)
+    .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, rectangularRows, rectangularColumns, rectangularPart$theta)
     if(keepLod)
     {
-      .Call("assignDspMatrix", newLod, rectangularRows, rectangularColumns, reEstimatedPart1$lod, PACKAGE="mpMap2")
+      .Call("assignDspMatrixFromEstimateRF", newLod, rectangularRows, rectangularColumns, rectangularPart$lod, PACKAGE="mpMap2")
     }
     if(keepLkhd)
     {
-      .Call("assignDspMatrix", newLkhd, rectangularRows, rectangularColumns, rectangularPart$lkhd, PACKAGE="mpMap2")
+      .Call("assignDspMatrixFromEstimateRF", newLkhd, rectangularRows, rectangularColumns, rectangularPart$lkhd, PACKAGE="mpMap2")
     }
   }
   newRF <- new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd)
@@ -110,7 +112,6 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(
       stop("Internal error: Markers should have been combined as two blocks")
     }
     marker2Range <- range(match(markers(e2), markers(combined)))
-    browser()
     extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd)
     stop("Need to check this section")
   }

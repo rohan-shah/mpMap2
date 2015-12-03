@@ -46,7 +46,6 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input markerRows must be an integer vector");
 		}
-		std::sort(markerRows.begin(), markerRows.end());
 		for(std::vector<int>::iterator markerRow = markerRows.begin(); markerRow != markerRows.end(); markerRow++)
 		{
 			(*markerRow)--;
@@ -61,7 +60,6 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input markerColumns must be an integer vector");
 		}
-		std::sort(markerColumns.begin(), markerColumns.end());
 		for(std::vector<int>::iterator markerColumn = markerColumns.begin(); markerColumn != markerColumns.end(); markerColumn++)
 		{
 			(*markerColumn)--;

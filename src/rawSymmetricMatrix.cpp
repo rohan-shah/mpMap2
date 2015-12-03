@@ -84,14 +84,16 @@ BEGIN_RCPP
 		//Row
 		for(int i = 0; i <= j; i++)
 		{
-			newData(counter) = oldData[(indices[j]*(indices[j]-1))/2 + indices[i] - 1];
+			int indexJ = indices[j], indexI = indices[i];
+			if(indexI > indexJ) std::swap(indexI, indexJ);
+			newData(counter) = oldData[(indexJ*(indexJ-1))/2 + indexI - 1];
 			counter++;
 		}
 	}
 	return newData;
 END_RCPP
 }
-SEXP assignRawSymmetricMatrix(SEXP destination_, SEXP rowIndices_, SEXP columnIndices_, SEXP source_)
+SEXP assignRawSymmetricMatrixFromEstimateRF(SEXP destination_, SEXP rowIndices_, SEXP columnIndices_, SEXP source_)
 {
 BEGIN_RCPP
 	Rcpp::S4 destination = destination_;
@@ -100,16 +102,19 @@ BEGIN_RCPP
 	Rcpp::IntegerVector rowIndices = rowIndices_;
 	Rcpp::IntegerVector columnIndices = columnIndices_;
 
+	if(&(source(0)) == &(destinationData(0)))
+	{
+		throw std::runtime_error("Source and destination cannot be the same in assignRawSymmetricMatrixDiagonal");
+	}
+
 	std::vector<int> markerRows, markerColumns;
 	markerRows = Rcpp::as<std::vector<int> >(rowIndices);
 	markerColumns = Rcpp::as<std::vector<int> >(columnIndices);
-	std::sort(markerRows.begin(), markerRows.end());
-	std::sort(markerColumns.begin(), markerColumns.begin());
-
 	if(countValuesToEstimate(markerRows, markerColumns) != source.size())
 	{
 		throw std::runtime_error("Mismatch between index length and source object size");
 	}
+
 	triangularIterator iterator(markerRows, markerColumns);
 	int counter = 0;
 	for(; !iterator.isDone(); iterator.next())
@@ -121,4 +126,34 @@ BEGIN_RCPP
 	}
 	return R_NilValue;
 END_RCPP
+}
+SEXP assignRawSymmetricMatrixDiagonal(SEXP destination_, SEXP indices_, SEXP source_)
+{
+	Rcpp::S4 destination = destination_;
+	Rcpp::RawVector source = source_;
+	Rcpp::RawVector destinationData = destination.slot("data");
+	Rcpp::IntegerVector indices = indices_;
+
+	if(&(source(0)) == &(destinationData(0)))
+	{
+		throw std::runtime_error("Source and destination cannot be the same in assignRawSymmetricMatrixDiagonal");
+	}
+
+	if((indices.size()*(indices.size()+1))/2 != source.size())
+	{
+		throw std::runtime_error("Mismatch between index length and source object size");
+	}
+	for(int column = 0; column < indices.size(); column++)
+	{
+		for(int row = 0; row <= column; row++)
+		{
+			int rowIndex = indices[row];
+			int columnIndex = indices[column];
+			if(rowIndex > columnIndex)
+			{
+				std::swap(rowIndex, columnIndex);
+			}
+			destinationData((columnIndex*(columnIndex-1))/2+rowIndex-1) = source((column*(column+1))/2 + row);
+		}
+	}
 }
