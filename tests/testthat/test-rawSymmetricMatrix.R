@@ -124,3 +124,25 @@ test_that("Checking that rawSymmetricMatrixEstimateRF works correctly, for out-o
 		.Call("assignRawSymmetricMatrixFromEstimateRF", raw, c(4,1), c(1,4), as.raw(c(0, 0, 9)))
 		expect_identical(raw[1:4,1:4], cbind(c(0,0,0,0.5), rep(0, 4), rep(0, 4), c(0.5,0,0,0)))
 	})
+test_that("Checking that rawSymmetricMatrixDiagonal works correctly, for in-order indices",
+	{
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, 1:2, as.raw(1:3))
+		expect_identical(raw@data, as.raw(c(1:3, rep(0, 7))))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, 2:1, as.raw(1:3))
+		expect_identical(raw@data, as.raw(c(3:1, rep(0, 7))))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, 2:1, as.raw(1:3))
+		expect_identical(raw@data, as.raw(c(1:3, rep(0, 7))))
+		
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, 2:3, as.raw(1:3))
+		expect_identical(raw@data, as.raw(c(0, 0, 1, 0, 2, 3, 0, 0, 0, 0)))
+
+		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, c(4, 1, 2), as.raw(1:6))
+		expect_identical(raw@data, as.raw(c(3, 5, 6, 0, 0, 0, 2, 4, 0, 1)))
+	})

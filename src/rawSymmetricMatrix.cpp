@@ -129,6 +129,7 @@ END_RCPP
 }
 SEXP assignRawSymmetricMatrixDiagonal(SEXP destination_, SEXP indices_, SEXP source_)
 {
+BEGIN_RCPP
 	Rcpp::S4 destination = destination_;
 	Rcpp::RawVector source = source_;
 	Rcpp::RawVector destinationData = destination.slot("data");
@@ -156,4 +157,5 @@ SEXP assignRawSymmetricMatrixDiagonal(SEXP destination_, SEXP indices_, SEXP sou
 			destinationData((columnIndex*(columnIndex-1))/2+rowIndex-1) = source((column*(column+1))/2 + row);
 		}
 	}
+END_RCPP
 }

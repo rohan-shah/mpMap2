@@ -127,21 +127,21 @@ test_that("Checking that f2 pedigree split into two sets of markers gives the sa
 	{
 		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(5000)
+		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 
 		#In this case we avoid double-counting in the centre, but count only half the lines on 1:3 and 9:11. 
 		cross1 <- subset(cross, markers = 1:8)
 		cross2 <- subset(cross, markers  = 4:11)
 
-		cross1 <- subset(cross1, lines = 1:2500)
-		cross2 <- subset(cross2, lines = 2501:5000)
+		cross1 <- subset(cross1, lines = 1:250)
+		cross2 <- subset(cross2, lines = 251:500)
 
 		combined <- cross1 + cross2
 		combinedRf <- estimateRF(combined, keepLod = TRUE, keepLkhd = TRUE)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
 		#Everything that isn't NA (0xFF) in combinedRf should be equal to the values in rf
-		expect_that(all((combinedRf@rf@theta@data == as.raw(0xff)) | (combinedRf@rf@theta@data == rf@rf@theta@data)), is_true())
+		expect_identical(rf@rf@theta[4:8, 4:8], combinedRf@rf@theta[4:8,4:8])
 		
 		combinedRfLod <- as(combinedRf@rf@lod, "matrix")
 		rfLod <- as(rf@rf@lod, "matrix")
