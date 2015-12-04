@@ -49,7 +49,7 @@ test_that("Numerically accurate with selfing and a fixed funnel",
 			map <- getMap(distance)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			#Ignore the warning about residual hetrozygosity
-			capture.output(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE))
+			suppressWarnings(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE))
 			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=0.01)
 			expect_identical(rf@rf@theta[1,2], rf@rf@theta[2,1])
 			expect_identical(rf@rf@theta[1,1], 0)

@@ -291,7 +291,17 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
 		if(foundHets)
 		{
-			if(!supressOutput) Rprintf("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+			Rcpp::Function warning("warning");
+			if(!supressOutput) 
+			{
+				//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
+				try
+				{
+					warning("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+				}
+				catch(...)
+				{}
+			}
 		}
 	}
 	internal_args.finals = recodedFinals;

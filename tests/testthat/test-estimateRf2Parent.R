@@ -54,48 +54,18 @@ test_that("Numerically accurate for a RIL design",
 			map <- getMap(distance)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			#There is a warning that we're analysing a population with hetrozygotes as if hetrozygotes were impossible. 
-			capture.output(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE))
+			suppressWarnings(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE))
 			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=tolerances[index])
 			expect_identical(rf@rf@theta[1,2], rf@rf@theta[2,1])
 			expect_identical(rf@rf@theta[1,1], 0)
 			expect_identical(rf@rf@theta[2,2], 0)
 		}
 	})
-test_that("Checking f2 pedigree split into 100 different datasets",
-	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(5000)
-		set.seed(1)
-		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
-		crosses <- subset(cross, lines = 1:50)
-		for(i in 2:100)
-		{
-			crosses <- crosses + subset(cross, lines = 1:50 + (i-1)*50)
-		}
-		multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE)
-		singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
-	})
-test_that("Checking f2 pedigree split into 10 different datasets gives the same answer",
-	{
-		set.seed(1)
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(500)
-		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
-		separateRf <- estimateRF(subset(cross, lines = 1:50))
-		combinedRf <- estimateRF(cross)
-		for(i in 2:10)
-		{
-			suppressWarnings(separateRf <- separateRf + estimateRF(subset(cross, lines = 1:50 + (i-1)*50)))
-		}
-		expect_identical(combinedRf@rf@theta, separateRf@rf@theta)
-		expect_equal(combinedRf@rf@lod, separateRf@rf@lod, tolerance = 0.001)
-		expect_equal(combinedRf@rf@lkhd, separateRf@rf@lkhd, tolerance = 0.001)
-	})
 test_that("Checking that f2 pedigree split into two sets of markers gives the same non-NA rf estimates",
 	{
 		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(5000)
+		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 
 		#In this case we're double-counting the data for markers 4-8, which explains the strange regions for the likelihood and lod. 
@@ -110,6 +80,8 @@ test_that("Checking that f2 pedigree split into two sets of markers gives the sa
 		combined <- cross1 + cross2
 		combinedRf <- estimateRF(combined, keepLod = TRUE, keepLkhd = TRUE)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		#Reorganise the markers of combinedRf
+		combinedRf <- subset(combinedRf, markers = markers(rf))
 		#Everything that isn't NA (0xFF) in combinedRf should be equal to the values in rf
 		expect_that(all((combinedRf@rf@theta@data == as.raw(0xff)) | (combinedRf@rf@theta@data == rf@rf@theta@data)), is_true())
 		
@@ -140,6 +112,8 @@ test_that("Checking that f2 pedigree split into two sets of markers gives the sa
 		combined <- cross1 + cross2
 		combinedRf <- estimateRF(combined, keepLod = TRUE, keepLkhd = TRUE)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		#Reorganise the markers of combinedRf
+		combinedRf <- subset(combinedRf, markers = markers(rf))
 		#Everything that isn't NA (0xFF) in combinedRf should be equal to the values in rf
 		expect_identical(rf@rf@theta[4:8, 4:8], combinedRf@rf@theta[4:8,4:8])
 		

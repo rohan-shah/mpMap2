@@ -8,12 +8,32 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
   {
     stop("Cannot combine an object with itself")
   }
-  allMarkers <- unique(c(markers(e1), markers(e2)))
-  #Put all the markers from e1 first
-  allMarkers <- c(markers(e1), setdiff(allMarkers, markers(e1)))
-  e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
-  e2ExpandedGeneticData <- expand(e2, newMarkers = allMarkers)
-  return(new("mpcross", geneticData = c(e1ExpandedGeneticData@geneticData, e2ExpandedGeneticData@geneticData))) 
+  allMarkers <- sort(unique(c(markers(e1), markers(e2))))
+  #If e1 and e2 have exactly the same markers, this is trivial. 
+  if(nMarkers(e1) == nMarkers(e1) && all(markers(e1) == markers(e2)))
+  {
+    return(new("mpcross", geneticData = c(e1@geneticData, e2@geneticData)))
+  }
+  #If all the markers are already in e1, then use that order and only expand e2
+  else if(nMarkers(e1) == length(allMarkers) && all(allMarkers == sort(markers(e1))))
+  {
+    e2ExpandedGeneticData <- expand(e2, newMarkers = allMarkers)
+    return(new("mpcross", geneticData = c(e1@geneticData, e2ExpandedGeneticData@geneticData)))
+  }
+  #If all the markers are already in e2, then use that order and only expand e1
+  else if(nMarkers(e2) == length(allMarkers) && all(allMarkers == sort(markers(e2))))
+  {
+    e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
+    return(new("mpcross", geneticData = c(e1ExpandedGeneticData@geneticData, e2@geneticData)))
+  }
+  else
+  {
+    #Put all the markers from e1 first
+    allMarkers <- c(markers(e1), setdiff(allMarkers, markers(e1)))
+    e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
+    e2ExpandedGeneticData <- expand(e2, newMarkers = allMarkers)
+    return(new("mpcross", geneticData = c(e1ExpandedGeneticData@geneticData, e2ExpandedGeneticData@geneticData))) 
+  }
 })
 setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = function(e1, e2)
 {

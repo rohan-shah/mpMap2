@@ -135,7 +135,7 @@ test_that("Checking that rawSymmetricMatrixDiagonal works correctly, for in-orde
 		expect_identical(raw@data, as.raw(c(3:1, rep(0, 7))))
 
 		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
-		.Call("assignRawSymmetricMatrixDiagonal", raw, 2:1, as.raw(1:3))
+		.Call("assignRawSymmetricMatrixDiagonal", raw, 2:1, as.raw(3:1))
 		expect_identical(raw@data, as.raw(c(1:3, rep(0, 7))))
 		
 		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
