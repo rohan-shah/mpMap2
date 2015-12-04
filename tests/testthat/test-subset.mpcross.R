@@ -12,7 +12,6 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 			expect_identical(length(subsetted@geneticData[[1]]@hetData), 1L)
 			expect_identical(cross@geneticData[[1]]@hetData[[marker]], subsetted@geneticData[[1]]@hetData[[1]])
 		}
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(5000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -38,7 +37,6 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 	})
 test_that("Subset changes the pedigree from detailedPedigree to pedigree when subsetting by lines",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(5000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -52,7 +50,6 @@ test_that("Subset changes the pedigree from detailedPedigree to pedigree when su
 	})
 test_that("Checking subset on object of class mpcross by markers, with two datasets",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(5000)
 

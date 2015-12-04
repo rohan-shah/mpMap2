@@ -9,7 +9,6 @@ distances <- c(1, 5, 10, 20, 50)
 
 test_that("Numerically accurate with no intercrossing or selfing, fixed funnel", 
 	{
-		set.seed(1)
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize=50000, selfingGenerations = 0, nSeeds = 1)
 		pedigree@selfing <- "auto"
 		for(distance in distances)
@@ -25,7 +24,6 @@ test_that("Numerically accurate with no intercrossing or selfing, fixed funnel",
 	})
 test_that("Numerically accurate with no intercrossing and one generation of selfing, fixed funnel", 
 	{
-		set.seed(1)
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize=50000, selfingGenerations = 1, nSeeds = 1)
 		pedigree@selfing <- "auto"
 		for(distance in distances)
@@ -42,7 +40,6 @@ test_that("Numerically accurate with no intercrossing and one generation of self
 
 test_that("Numerically accurate with selfing and a fixed funnel", 
 	{
-		set.seed(1)
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize=50000, selfingGenerations = 8, nSeeds = 1)
 		for(distance in distances)
 		{
@@ -58,7 +55,6 @@ test_that("Numerically accurate with selfing and a fixed funnel",
 	})
 test_that("Numerically accurate with one generation of intercrossing, no selfing and randomly chosen funnels", 
 	{
-		set.seed(1)
 		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize=50000, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
 		pedigree@selfing <- "auto"
 		for(distance in distances)

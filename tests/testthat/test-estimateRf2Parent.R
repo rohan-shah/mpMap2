@@ -10,7 +10,6 @@ tolerances <- c(0.015, 0.01, 0.01, 0.01, 0.01)
 
 test_that("Numerically accurate for an F2 design, fully informative", 
 	{
-		set.seed(1)
 		pedigree <- f2Pedigree(30000)
 		for(index in 1:length(distances))
 		{
@@ -26,7 +25,6 @@ test_that("Numerically accurate for an F2 design, fully informative",
 	})
 test_that("Numerically accurate for an F2 design, with dominant markers", 
 	{
-		set.seed(1)
 		pedigree <- f2Pedigree(100000)
 		distances <- c(7.5, 10, 20, 50)
 		tolerances <- c(0.02, 0.02, 0.02, 0.02)
@@ -46,7 +44,6 @@ test_that("Numerically accurate for an F2 design, with dominant markers",
 
 test_that("Numerically accurate for a RIL design", 
 	{
-		set.seed(2)
 		pedigree <- rilPedigree(100000, 10)
 		for(index in 1:length(distances))
 		{
@@ -63,7 +60,6 @@ test_that("Numerically accurate for a RIL design",
 	})
 test_that("Checking that f2 pedigree split into two sets of markers gives the same non-NA rf estimates",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -97,7 +93,6 @@ test_that("Checking that f2 pedigree split into two sets of markers gives the sa
 	})
 test_that("Checking that f2 pedigree split into two sets of markers gives the same non-NA rf estimates",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)

@@ -2,7 +2,6 @@ context("Test addition of mpcrossRf objects")
 
 test_that("Cannot combine object with itself",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(5000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -11,7 +10,6 @@ test_that("Cannot combine object with itself",
 	})
 test_that("Checking f2 pedigree split into 10 different datasets gives the same answer",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -27,7 +25,6 @@ test_that("Checking f2 pedigree split into 10 different datasets gives the same 
 	})
 test_that("Checking that f2 experiment split into two different subsets gives the same answer",
 	{
-		set.seed(1)
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(5000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
