@@ -6,11 +6,11 @@ getMap <- function(distance)
 	return(map)
 }
 distances <- c(1, 5, 10, 20, 50)
-tolerances <- c(0.015, 0.01, 0.01, 0.01, 0.01)
+tolerances <- c(0.015, 0.01, 0.01, 0.01, 0.03)
 
 test_that("Numerically accurate for an F2 design, fully informative", 
 	{
-		pedigree <- f2Pedigree(30000)
+		pedigree <- f2Pedigree(100000)
 		for(index in 1:length(distances))
 		{
 			distance <- distances[index]
@@ -25,7 +25,7 @@ test_that("Numerically accurate for an F2 design, fully informative",
 	})
 test_that("Numerically accurate for an F2 design, with dominant markers", 
 	{
-		pedigree <- f2Pedigree(100000)
+		pedigree <- f2Pedigree(200000)
 		distances <- c(7.5, 10, 20, 50)
 		tolerances <- c(0.02, 0.02, 0.02, 0.02)
 		#The smaller distances don't pass due to the sample size

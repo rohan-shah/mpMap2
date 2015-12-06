@@ -67,12 +67,16 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
 
 			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
+			bool swap = markerPatternID1 > markerPatternID2;
 			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
 				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
 					int marker1Value = args.finals(finalCounter, markerCounterRow);
 					int marker2Value = args.finals(finalCounter, markerCounterColumn);
+					//If necessary swap the data
+					if(swap) std::swap(marker1Value, marker2Value);
 					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 					{
 						double contribution = 0;
