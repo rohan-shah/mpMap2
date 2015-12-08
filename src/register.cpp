@@ -9,6 +9,7 @@
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"
 #include "dspMatrix.h"
+#include "preClusterStep.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -30,6 +31,7 @@ extern "C"
 		{"assignRawSymmetricMatrixFromEstimateRF", (DL_FUNC)&assignRawSymmetricMatrixFromEstimateRF, 4},
 		{"assignRawSymmetricMatrixDiagonal", (DL_FUNC)&assignRawSymmetricMatrixDiagonal, 3},
 		{"assignDspMatrixFromEstimateRF", (DL_FUNC)&assignDspMatrixFromEstimateRF, 4},
+		{"preClusterStep", (DL_FUNC)&preClusterStep, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
