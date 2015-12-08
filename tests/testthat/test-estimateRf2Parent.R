@@ -27,7 +27,7 @@ test_that("Numerically accurate for an F2 design, with dominant markers",
 	{
 		pedigree <- f2Pedigree(200000)
 		distances <- c(7.5, 10, 20, 50)
-		tolerances <- c(0.02, 0.02, 0.02, 0.02)
+		tolerances <- c(0.02, 0.02, 0.02, 0.025)
 		#The smaller distances don't pass due to the sample size
 		for(index in 1:length(distances))
 		{
