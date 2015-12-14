@@ -1,5 +1,5 @@
 #' @export
-formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average")
+formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average", preCluster = FALSE)
 {
 	if(!(clusterBy %in% c("combined", "theta", "lod")))
 	{
@@ -18,48 +18,71 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	}
 	if(clusterBy %in% c("combined", "lod"))
 	{
-		lod <- mpcrossRF@rf@lod
+		if(is.null(mpcrossRF@rf@lod))
+		{
+			stop("Lod must be calculated if clusterBy is \"combined\" or \"lod\"")
+		}
+		lod <- as(mpcrossRF@rf@lod, "matrix")
 		#Reverse lod so that small values indicate similarity
 		lod[is.na(mpcrossRF@rf@lod@x)] <- 0
 		lod <- max(lod@x) - lod
 		diag(lod) <- 0
 	}
-	nMarkers <- length(mpcrossRF@rf@theta@markers)
-	theta <- mpcrossRF@rf@theta[1:nMarkers, 1:nMarkers]
-	
-	theta[is.na(theta)] <- 0.5
+	if(!preCluster)
+	{
+		nMarkers <- length(mpcrossRF@rf@theta@markers)
+		theta <- mpcrossRF@rf@theta[1:nMarkers, 1:nMarkers]
+		theta[is.na(theta)] <- 0.5
 
-	if(method == "average")
-	{
-		linkFunction <- function(x) mean(x, na.rm=TRUE)
+		if(method == "average")
+		{
+			linkFunction <- function(x) mean(x, na.rm=TRUE)
+		}
+		else if(method == "complete")
+		{
+			linkFunction <- function(x) max(x, na.rm=TRUE)
+		}
+		else
+		{
+			linkFunction <- function(x) min(x, na.rm=TRUE)
+		}
+		if(clusterBy == "combined")
+		{
+			#Cluster by theta first, and then by lod to break any ties
+			distMat <- as(lod / max(lod) * min(abs(diff(mpcrossRF@rf@theta@levels))), "matrix") + theta
+		}
+		else if(clusterBy == "theta")
+		{
+			distMat <- theta
+		}
+		else
+		{
+			distMat <- lod
+		}
+		clustered <- hclust(as.dist(distMat), method=method)
+
+		cut <- cutree(clustered, k=groups)
+		names(cut) <- markers(mpcrossRF)
+		
+		lg <- new("lg", allGroups=1:groups, groups=cut)
+		output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
+		return(subset(output, markers = order(cut)))
 	}
-	else if(method == "complete")
-	{
-		linkFunction <- function(x) max(x, na.rm=TRUE)
-	}
+	#If we have a huge number of markers, it might be necessary to do a pre-clustering step, where we join together all the markers that have zero recombination fractions. 
 	else
 	{
-		linkFunction <- function(x) min(x, na.rm=TRUE)
+		preClusterResults <- .Call("preClusterStep", mpcrossRF, PACKAGE="mpMap2")
+		if(clusterBy == "combined")
+		{
+			distMat <- .Call("hclustCombinedMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+		}
+		else if(clusterBy == "theta")
+		{
+			distMat <- .Call("hclustThetaMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+		}
+		else
+		{
+			distMat <- .Call("hclustLodMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+		}
 	}
-	if(clusterBy == "combined")
-	{
-		#Cluster by theta first, and then by lod to break any ties
-		distMat <- as(lod / max(lod) * min(abs(diff(mpcrossRF@rf@theta@levels))), "matrix") + theta
-	}
-	else if(clusterBy == "theta")
-	{
-		distMat <- theta
-	}
-	else
-	{
-		distMat <- lod
-	}
-	clustered <- hclust(as.dist(distMat), method=method)
-
-	cut <- cutree(clustered, k=groups)
-	names(cut) <- markers(mpcrossRF)
-	
-	lg <- new("lg", allGroups=1:groups, groups=cut)
-	output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
-	return(subset(output, markers = order(cut)))
 }
