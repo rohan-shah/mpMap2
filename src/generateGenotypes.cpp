@@ -7,12 +7,14 @@ void createGamete(Rcpp::NumericVector& recombinationFractions, Rcpp::IntegerVect
 	int runningHaplotype = 0;
 	if(Rcpp::as<float>(Rcpp::runif(1, 0, 1)) < 0.5) runningHaplotype = 1;
 	output[0] = geneticData[nMarkers * runningHaplotype];
+	GetRNGstate();
 	for(int i = 1; i < nMarkers; i++)
 	{
 		//recombination if we fall below the relevant recombination fraction
-		if(Rcpp::as<float>(Rcpp::runif(1, 0, 1)) < recombinationFractions(i-1)) runningHaplotype = abs(runningHaplotype-1);
+		if(::unif_rand() < recombinationFractions(i-1)) runningHaplotype = abs(runningHaplotype-1);
 		output[i] = geneticData[nMarkers * runningHaplotype + i];
 	}
+	PutRNGstate();
 }
 SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpedigree)
 {

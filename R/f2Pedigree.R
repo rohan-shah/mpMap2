@@ -7,7 +7,7 @@
 #' @export
 f2Pedigree <- function(populationSize)
 {
-	pedigree <- twoParentPedigree(initialPopulationSize = populationSize, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = 1)
+	pedigree <- twoParentPedigree(initialPopulationSize = 1, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = populationSize)
 	pedigree@selfing <- "auto"
 	return(pedigree)
 }
