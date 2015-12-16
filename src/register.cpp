@@ -14,9 +14,6 @@
 extern "C"
 {
 	char* package_name = "mpMap2";
-#ifdef CUSTOM_STATIC_RCPP
-	void R_init_Rcpp(DllInfo *info);
-#endif
 	R_CallMethodDef callMethods[] = 
 	{
 		{"checkHets", (DL_FUNC)&checkHets, 1},
