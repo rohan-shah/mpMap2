@@ -53,6 +53,8 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   marker2Indices <- match(markers(e2), markers(combined))
   intersectionIndices <- intersect(marker1Indices, marker2Indices)
 
+  newGbLimit <- min(e1@rf@gbLimit, e2@rf@gbLimit)
+
   #Make a new rawSymmetricMatrix
   warning("Implicitly setting lineWeights parameter to 1")
   dataLengths <- nMarkers(combined) *(nMarkers(combined)+1)/2
@@ -77,12 +79,12 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   complementIntersectionIndices <- setdiff(1:nMarkers(combined), intersectionIndices)
   if(length(intersectionIndices) > 0)
   {
-    reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices)
+    reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices, gbLimit = newGbLimit)
     .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$theta)
 
     if(length(complementIntersectionIndices) > 0)
     {
-      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = complementIntersectionIndices)
+      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = complementIntersectionIndices, gbLimit = newGbLimit)
       .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$theta)
     }
 
@@ -101,7 +103,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   rectangularColumns <- setdiff(marker2Indices, intersectionIndices)
   if(length(rectangularRows) > 0 && length(rectangularColumns) > 0)
   {
-    rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns) 
+    rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns, gbLimit = newGbLimit)
     .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, rectangularRows, rectangularColumns, rectangularPart$theta)
     if(keepLod)
     {
@@ -112,7 +114,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
       .Call("assignDspMatrixFromEstimateRF", newLkhd, rectangularRows, rectangularColumns, rectangularPart$lkhd, PACKAGE="mpMap2")
     }
   }
-  newRF <- new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd)
+  newRF <- new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd, gbLimit = newGbLimit)
   return(new("mpcrossRF", combined, rf = newRF))
 })
 #Generally we drop the RF data, unless the sets of markers are disjoint
@@ -132,7 +134,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(
       stop("Internal error: Markers should have been combined as two blocks")
     }
     marker2Range <- range(match(markers(e2), markers(combined)))
-    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd)
+    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = e1@rf@gbLimit)
     stop("Need to check this section")
   }
   #If the markers are all the same, keep them in the same order

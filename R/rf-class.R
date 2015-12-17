@@ -38,4 +38,4 @@ checkRF <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.rf <- setClass("rf", slots = list(theta = "rawSymmetricMatrix", lod = "dspMatrixOrNULL", lkhd = "dspMatrixOrNULL"), validity = checkRF)
+.rf <- setClass("rf", slots = list(theta = "rawSymmetricMatrix", lod = "dspMatrixOrNULL", lkhd = "dspMatrixOrNULL", gbLimit = "numeric"), validity = checkRF)

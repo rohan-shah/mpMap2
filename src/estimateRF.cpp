@@ -4,7 +4,7 @@
 #include "estimateRFSpecificDesign.h"
 #include <stdexcept>
 #include "matrixChunks.h"
-SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SEXP markerColumns_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_)
+SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SEXP markerColumns_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_, SEXP gbLimit_)
 {
 	BEGIN_RCPP
 		Rcpp::NumericVector recombinationFractions;
@@ -73,6 +73,16 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input lineWeights must be a list");
 		}
+		double gbLimit;
+		try
+		{
+			gbLimit = Rcpp::as<double>(gbLimit_);
+		}
+		catch(Rcpp::not_compatible&)
+		{
+			throw Rcpp::not_compatible("Input gbLimit must be a single numeric value");
+		}
+		signed long long bytesLimit = gbLimit*1000000000LL + 1;
 	
 		Rcpp::List geneticData;
 		try
@@ -130,12 +140,21 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		}
 
 		//Warn if we're going to allocate over 4gb
-		if(nValuesToEstimate > 4000000000ULL)
+		std::size_t valuesToEstimateInChunk;
+		if(bytesLimit < 0)
 		{
-			Rcpp::Rcout << "Allocating results matrix of " << (nValuesToEstimate * (std::size_t)nRecombLevels) << " bytes" << std::endl;
+			valuesToEstimateInChunk = nValuesToEstimate;
+		}
+		else
+		{
+			valuesToEstimateInChunk = std::min(nValuesToEstimate, bytesLimit / ((std::size_t)nRecombLevels * sizeof(double)) + 1);
+		}
+		if(valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double) > 4000000000ULL && bytesLimit < 0)
+		{
+			Rcpp::Rcout << "Allocating results matrix of " << (valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double)) << " bytes = " << ((valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double))/1000000000ULL) << " gb" << std::endl;
 		}
 		//This is not an Rcpp::NumericVector because it can quite easily overflow the size of such a vector (signed int)
-		std::vector<double> result(nValuesToEstimate * nRecombLevels, 0);
+		std::vector<double> result(valuesToEstimateInChunk * nRecombLevels, 0);
 
 		//Last bit of validation
 		for(int i = 0; i < nDesigns; i++)
@@ -148,8 +167,8 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				throw std::runtime_error("An entry of input lineWeights had the wrong length");
 			}
 		}
-		//Construct vector of argument Objects
-		std::vector<estimateRFSpecificDesignArgs> argumentObjects;
+		//Construct vector of rfhaps_internal_args objects
+		std::vector<rfhaps_internal_args> internalArgumentObjects;
 		for(int i = 0; i < nDesigns; i++)
 		{
 			Rcpp::S4 currentGeneticData = geneticData(i);
@@ -196,60 +215,72 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				ss << "hetData slot of design " << i << " was not an S4 object";
 				throw std::runtime_error(ss.str().c_str());
 			}
-			args.result = &(result[0]);
+			//This has to be copied / swapped in, because it's a local temporary at the moment
 			args.lineWeights.swap(lineWeightsThisDesign);
-			argumentObjects.emplace_back(args);
+			rfhaps_internal_args internalArgs(args.recombinationFractions, args.markerRows, args.markerColumns);
+			bool converted = toInternalArgs(std::move(args), internalArgs, error);
+			if(!converted)
+			{
+				std::stringstream ss;
+				ss << "Error pre-processing data for dataset " << i << ": " << error;
+				throw std::runtime_error(ss.str().c_str());
+			}
+			internalArgumentObjects.emplace_back(std::move(internalArgs));
 		}
 		//Estimate required memory usage
 		unsigned long long lookupBytes = 0;
 		for(int i = 0; i < nDesigns; i++)
 		{
-			unsigned long long currentLookupBytes = estimateLookup(argumentObjects[i]);
-			if(currentLookupBytes == 0) throw std::runtime_error(argumentObjects[i].error.c_str());
-			lookupBytes = std::max(lookupBytes, currentLookupBytes);
+			unsigned long long currentLookupBytes = estimateLookup(internalArgumentObjects[i]);
+			lookupBytes += currentLookupBytes;
 		}
 		if(lookupBytes > 1000000000)
 		{
-			Rcpp::Rcout << "Maximum lookup table size of " << lookupBytes << " bytes" << std::endl;
+			Rcpp::Rcout << "Total lookup table size of " << lookupBytes << " bytes" << std::endl;
 		}
-		//Now the actual computation
-		for(int i = 0; i < nDesigns; i++)
-		{
-			bool successful = estimateRFSpecificDesign(argumentObjects[i]);
-			if(!successful) throw std::runtime_error(argumentObjects[i].error);
-		}
-		//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
 		Rcpp::NumericVector lod, lkhd;
 		Rcpp::RawVector theta(nValuesToEstimate);
 		if(keepLod) lod = Rcpp::NumericVector(nValuesToEstimate);
 		if(keepLkhd) lkhd = Rcpp::NumericVector(nValuesToEstimate);
-	
 		double* resultPtr = &(result[0]);
-#ifdef USE_OPENMP
-		#pragma omp parallel for schedule(static, 1)
-#endif
-		for(int counter = 0; counter < nValuesToEstimate; counter++)
+
+		for(unsigned long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
 		{
-			double* start = resultPtr + counter * nRecombLevels;
-			double* end = resultPtr + (counter + 1) * nRecombLevels;
-			double* maxPtr = std::max_element(start, end), *minPtr = std::min_element(start, end);
-			double max = *maxPtr, min = *minPtr;
-			int currentTheta;
-			double currentLod;
-			//This is the case where no data was available, across any of the experiments. This is precise, no numerical error involved
-			if(max == 0 && min == 0)
+			//Now the actual computation
+			for(int i = 0; i < nDesigns; i++)
 			{
-				max = currentLod = std::numeric_limits<double>::quiet_NaN();
-				currentTheta = 0xff;
+				internalArgumentObjects[i].result = resultPtr;
+				internalArgumentObjects[i].offset = offset;
+				internalArgumentObjects[i].valuesToEstimateInChunk = valuesToEstimateInChunk;
+				std::string error;
+				bool successful = estimateRFSpecificDesign(internalArgumentObjects[i]);
+				if(!successful) throw std::runtime_error("Internal error");
 			}
-			else
+			//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
+			unsigned long long endValue = std::min(nValuesToEstimate, offset + valuesToEstimateInChunk);
+			for(unsigned long long counter = offset; counter < endValue; counter++)
 			{
-				currentTheta = (int)(maxPtr - start);
-				currentLod = max - resultPtr[counter * (unsigned long long)nRecombLevels + halfIndex];
+				double* start = resultPtr + (counter - offset) * nRecombLevels;
+				double* end = resultPtr + (counter - offset + 1) * nRecombLevels;
+				double* maxPtr = std::max_element(start, end), *minPtr = std::min_element(start, end);
+				double max = *maxPtr, min = *minPtr;
+				int currentTheta;
+				double currentLod;
+				//This is the case where no data was available, across any of the experiments. This is precise, no numerical error involved
+				if(max == 0 && min == 0)
+				{
+					max = currentLod = std::numeric_limits<double>::quiet_NaN();
+					currentTheta = 0xff;
+				}
+				else
+				{
+					currentTheta = (int)(maxPtr - start);
+					currentLod = max - resultPtr[(counter - offset)* (unsigned long long)nRecombLevels + halfIndex];
+				}
+				theta(counter) = currentTheta;
+				if(keepLkhd) lkhd(counter) = max;
+				if(keepLod) lod(counter) = currentLod;
 			}
-			theta(counter) = currentTheta;
-			if(keepLkhd) lkhd(counter) = max;
-			if(keepLod) lod(counter) = currentLod;
 		}
 		Rcpp::RObject lodRet, lkhdRet;
 		

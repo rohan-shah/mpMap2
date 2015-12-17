@@ -16,24 +16,23 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	{
 		stop("Input mpcrossRF object must have a @rf@lod entry (likelihood ratio) in order to use combined or lod grouping")
 	}
-	if(clusterBy %in% c("combined", "lod"))
-	{
-		if(is.null(mpcrossRF@rf@lod))
-		{
-			stop("Lod must be calculated if clusterBy is \"combined\" or \"lod\"")
-		}
-		lod <- as(mpcrossRF@rf@lod, "matrix")
-		#Reverse lod so that small values indicate similarity
-		lod[is.na(mpcrossRF@rf@lod@x)] <- 0
-		lod <- max(lod@x) - lod
-		diag(lod) <- 0
-	}
 	if(!preCluster)
 	{
 		nMarkers <- length(mpcrossRF@rf@theta@markers)
 		theta <- mpcrossRF@rf@theta[1:nMarkers, 1:nMarkers]
 		theta[is.na(theta)] <- 0.5
-
+		if(clusterBy %in% c("combined", "lod"))
+		{
+			if(is.null(mpcrossRF@rf@lod))
+			{
+				stop("Lod must be calculated if clusterBy is \"combined\" or \"lod\"")
+			}
+			lod <- as(mpcrossRF@rf@lod, "matrix")
+			#Reverse lod so that small values indicate similarity
+			lod[is.na(lod)] <- 0
+			lod <- max(lod) - lod
+			diag(lod) <- 0
+		}
 		if(method == "average")
 		{
 			linkFunction <- function(x) mean(x, na.rm=TRUE)

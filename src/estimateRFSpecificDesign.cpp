@@ -151,12 +151,8 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 			throw std::runtime_error("Internal error");
 	}
 }
-unsigned long long estimateLookup(estimateRFSpecificDesignArgs& args)
+unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 {
-	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions, args.markerRows, args.markerColumns);
-	bool result = toInternalArgs(args, internal_args, true);
-	if(!result) return 0;
-
 	int maxAIGenerations = *std::max_element(internal_args.intercrossingGenerations.begin(), internal_args.intercrossingGenerations.end());
 	int minSelfing = *std::min_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
@@ -201,9 +197,9 @@ unsigned long long estimateLookup(estimateRFSpecificDesignArgs& args)
 	}
 	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize;
 }
-bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& internal_args, bool supressOutput)
+bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& internal_args, std::string& error)
 {
-	args.error = "";
+	error = "";
 	std::stringstream ss;
 	//work out the number of intercrossing generations
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
@@ -221,7 +217,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 	}
 	if(errors.size() > 0)
 	{
-		args.error = ss.str();
+		error = ss.str();
 		return false;
 	}
 
@@ -235,16 +231,16 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 		}
 		if(errors.size() > 0)
 		{
-			args.error = ss.str();
+			error = ss.str();
 			return false;
 		}
 		for(std::size_t warningIndex = 0; warningIndex < warnings.size() && warningIndex < 6; warningIndex++)
 		{
-			if(!supressOutput) Rprintf(warnings[warningIndex].c_str());
+			Rprintf(warnings[warningIndex].c_str());
 		}
 		if(warnings.size() > 6)
 		{
-			if(!supressOutput) Rprintf("Supressing further funnel warnings");
+			Rprintf("Supressing further funnel warnings");
 		}
 	}
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles
@@ -266,7 +262,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 10)
 	{
-		args.error = "Internal error - Cannot have more than ten alleles per marker";
+		error = "Internal error - Cannot have more than ten alleles per marker";
 		return false;
 	}
 
@@ -296,36 +292,33 @@ bool toInternalArgs(estimateRFSpecificDesignArgs& args, rfhaps_internal_args& in
 		if(foundHets)
 		{
 			Rcpp::Function warning("warning");
-			if(!supressOutput) 
+			//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
+			try
 			{
-				//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
-				try
-				{
-					warning("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
-				}
-				catch(...)
-				{}
+				warning("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
 			}
+			catch(...)
+			{}
 		}
+		std::fill(selfingGenerations.begin(), selfingGenerations.end(), 0);
 	}
+	
 	internal_args.finals = recodedFinals;
+	internal_args.founders = recodedFounders;
 	internal_args.pedigree = args.pedigree;
 	internal_args.intercrossingGenerations.swap(intercrossingGenerations);
 	internal_args.selfingGenerations.swap(selfingGenerations);
+	internal_args.lineWeights.swap(args.lineWeights);
 	internal_args.markerPatternData.swap(markerPatternConversionArgs);
 	internal_args.hasAI = hasAIC;
 	internal_args.maxAlleles = maxAlleles;
-	internal_args.result = args.result;
 	internal_args.funnelIDs.swap(funnelIDs);
 	internal_args.funnelEncodings.swap(funnelEncodings);
 	return true;
 }
-bool estimateRFSpecificDesign(estimateRFSpecificDesignArgs& args)
+bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args)
 {
-	rfhaps_internal_args internal_args(args.lineWeights, args.recombinationFractions, args.markerRows, args.markerColumns);
-	bool result = toInternalArgs(args, internal_args, false);
-	if(!result) return false;
-	int nFounders = args.founders.nrow();
+	int nFounders = internal_args.founders.nrow();
 	if(nFounders == 2)
 	{
 		return estimateRFSpecificDesignInternal1<2>(internal_args);

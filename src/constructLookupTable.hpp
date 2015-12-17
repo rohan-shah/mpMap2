@@ -48,7 +48,7 @@ public:
 	allMarkerPairData<maxAlleles>& computedContributions;
 	markerPatternsToUniqueValuesArgs& markerPatternData;
 	std::vector<funnelEncoding>* funnelEncodings;
-	std::vector<double>* recombinationFractions;
+	const std::vector<double>* recombinationFractions;
 	std::vector<int>* intercrossingGenerations;
 	std::vector<int>* selfingGenerations;
 };

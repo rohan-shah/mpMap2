@@ -1,5 +1,5 @@
 #' @export
-estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE)
+estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE)
 {
 	inheritsNewMpcrossArgument(object)
 
@@ -31,7 +31,7 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 		}
 	}
 	markerRange <- 1:nMarkers(object)
-	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd)
+	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = gbLimit)
 	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta)
 	if(!is.null(listOfResults$lod))
 	{
@@ -43,7 +43,7 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 		listOfResults$lkhd <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lkhd)
 		rownames(listOfResults$lkhd) <- colnames(listOfResults$lkhd) <- markers(object)
 	}
-	rf <- new("rf", theta = theta, lod = listOfResults$lod, lkhd = listOfResults$lkhd)
+	rf <- new("rf", theta = theta, lod = listOfResults$lod, lkhd = listOfResults$lkhd, gbLimit = gbLimit)
 
 	if(class(object) == "mpcrossLG" || class(object) == "mpcrossMapped")
 	{
@@ -56,7 +56,7 @@ estimateRF <- function(object, recombValues, lineWeights, keepLod = FALSE, keepL
 	}
 	return(output)
 }
-estimateRFInternal <- function(object, recombValues, lineWeights, markerRows, markerColumns, keepLod, keepLkhd)
+estimateRFInternal <- function(object, recombValues, lineWeights, markerRows, markerColumns, keepLod, keepLkhd, gbLimit)
 {
-	return(.Call("estimateRF", object, recombValues, markerRows, markerColumns, lineWeights, keepLod, keepLkhd, PACKAGE="mpMap2"))
+	return(.Call("estimateRF", object, recombValues, markerRows, markerColumns, lineWeights, keepLod, keepLkhd, gbLimit, PACKAGE="mpMap2"))
 }
