@@ -9,6 +9,7 @@ public:
 	std::pair<int, int> get() const;
 	void next();
 	bool isDone() const;
+	triangularIterator& operator=(const triangularIterator& other);
 private:
 	const std::vector<int>& markerRows;
 	const std::vector<int>& markerColumns;

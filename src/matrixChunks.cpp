@@ -8,6 +8,13 @@ std::pair<int, int> triangularIterator::get() const
 {
 	return std::make_pair(*markerRow, *markerColumn);
 }
+triangularIterator& triangularIterator::operator=(const triangularIterator& other)
+{
+	if(&markerRows != &other.markerRows || &markerColumns != &other.markerColumns) throw std::runtime_error("Internal error");
+	markerRow = other.markerRow;
+	markerColumn = other.markerColumn;
+	return *this;
+}
 void triangularIterator::next()
 {
 	if(markerColumn == markerColumns.end()) throw std::runtime_error("Tried to increment iterator past the end");

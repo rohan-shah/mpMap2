@@ -168,13 +168,14 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			}
 		}
 		//Construct vector of rfhaps_internal_args objects
+		triangularIterator startPosition(markerRows, markerColumns);
 		std::vector<rfhaps_internal_args> internalArgumentObjects;
 		for(int i = 0; i < nDesigns; i++)
 		{
 			Rcpp::S4 currentGeneticData = geneticData(i);
 			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
 			std::string error;
-			estimateRFSpecificDesignArgs args(recombinationFractionsDouble, markerRows, markerColumns);
+			estimateRFSpecificDesignArgs args(recombinationFractionsDouble);
 			try
 			{
 				args.founders = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("founders"));
@@ -217,7 +218,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			}
 			//This has to be copied / swapped in, because it's a local temporary at the moment
 			args.lineWeights.swap(lineWeightsThisDesign);
-			rfhaps_internal_args internalArgs(args.recombinationFractions, args.markerRows, args.markerColumns);
+			rfhaps_internal_args internalArgs(args.recombinationFractions, startPosition);
 			bool converted = toInternalArgs(std::move(args), internalArgs, error);
 			if(!converted)
 			{
@@ -246,18 +247,20 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 
 		for(unsigned long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
 		{
-			//Now the actual computation
+			long long valuesToEstimateInCurrentChunk = std::min((long long)valuesToEstimateInChunk, (long long)(nValuesToEstimate - offset));
+			if(offset != 0) memset(resultPtr, 0, result.size() * sizeof(double));
+			//Now the actual computation)
 			for(int i = 0; i < nDesigns; i++)
 			{
 				internalArgumentObjects[i].result = resultPtr;
-				internalArgumentObjects[i].offset = offset;
-				internalArgumentObjects[i].valuesToEstimateInChunk = valuesToEstimateInChunk;
+				internalArgumentObjects[i].valuesToEstimateInChunk = valuesToEstimateInCurrentChunk;
+				internalArgumentObjects[i].startPosition = startPosition;
 				std::string error;
 				bool successful = estimateRFSpecificDesign(internalArgumentObjects[i]);
 				if(!successful) throw std::runtime_error("Internal error");
 			}
 			//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
-			unsigned long long endValue = std::min(nValuesToEstimate, offset + valuesToEstimateInChunk);
+			unsigned long long endValue = std::min(nValuesToEstimate, offset + valuesToEstimateInCurrentChunk);
 			for(unsigned long long counter = offset; counter < endValue; counter++)
 			{
 				double* start = resultPtr + (counter - offset) * nRecombLevels;
@@ -280,6 +283,11 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				theta(counter) = currentTheta;
 				if(keepLkhd) lkhd(counter) = max;
 				if(keepLod) lod(counter) = currentLod;
+			}
+			while(valuesToEstimateInCurrentChunk > 0)
+			{
+				startPosition.next();
+				valuesToEstimateInCurrentChunk--;
 			}
 		}
 		Rcpp::RObject lodRet, lkhdRet;

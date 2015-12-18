@@ -36,20 +36,17 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
-	std::vector<int> sortedMarkerRows = args.markerRows, sortedMarkerColumns = args.markerColumns;
-	unsigned long long nValuesToEstimate = countValuesToEstimate(sortedMarkerRows, sortedMarkerColumns);
-
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 #ifdef USE_OPENMP
-	#pragma omp parallel for schedule(static, 1)
+	#pragma omp parallel 
 #endif
 	{
-		triangularIterator indexIterator(args.markerRows, args.markerColumns);
+		triangularIterator indexIterator = args.startPosition;
 		int previousCounter = 0;
 #ifdef USE_OPENMP
 		#pragma omp for schedule(static, 1)
 #endif
-		for(int counter = 0; counter < nValuesToEstimate; counter++)
+		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
 			int difference = counter - previousCounter;
 			if(difference < 0) throw std::runtime_error("Internal error");

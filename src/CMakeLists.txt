@@ -81,7 +81,11 @@ add_library(mpMap2 SHARED ${SourceFiles} ${HeaderFiles} ${mpMap2_MOC_SOURCES})
 target_link_libraries(mpMap2 PRIVATE Rcpp)
 target_include_directories(mpMap2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../inst/include ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(mpMap2 PRIVATE CUSTOM_STATIC_RCPP)
-target_compile_features(mpMap2 PUBLIC cxx_rvalue_references)
+if(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
+	target_compile_features(mpMap2 PUBLIC cxx_rvalue_references)
+else()
+	target_compile_options(mpMap2 PUBLIC "-std=c++11")
+endif()
 
 #Ensure that it's installed to the right place
 if(WIN32)

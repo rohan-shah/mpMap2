@@ -4,13 +4,14 @@
 #include <vector>
 #include "markerPatternsToUniqueValues.h"
 #include "funnelsToUniqueValues.h"
+#include "matrixChunks.h"
 struct estimateRFSpecificDesignArgs
 {
-	estimateRFSpecificDesignArgs(std::vector<double>& recombinationFractions, const std::vector<int>& markerRows, const std::vector<int>& markerColumns)
-		: recombinationFractions(recombinationFractions), markerRows(markerRows), markerColumns(markerColumns)
+	estimateRFSpecificDesignArgs(std::vector<double>& recombinationFractions)
+		: recombinationFractions(recombinationFractions)
 	{}
 	estimateRFSpecificDesignArgs(const estimateRFSpecificDesignArgs& other)
-		:founders(other.founders), finals(other.finals), pedigree(other.pedigree), hetData(other.hetData), recombinationFractions(other.recombinationFractions), lineWeights(other.lineWeights), markerRows(other.markerRows), markerColumns(other.markerColumns)
+		:founders(other.founders), finals(other.finals), pedigree(other.pedigree), hetData(other.hetData), recombinationFractions(other.recombinationFractions), lineWeights(other.lineWeights)
 	{}
 	Rcpp::IntegerMatrix founders;
 	Rcpp::IntegerMatrix finals;
@@ -19,16 +20,14 @@ struct estimateRFSpecificDesignArgs
 	std::vector<double>& recombinationFractions;
 	
 	std::vector<double> lineWeights;
-	const std::vector<int>& markerRows;
-	const std::vector<int>& markerColumns;
 };
 struct rfhaps_internal_args
 {
-	rfhaps_internal_args(const std::vector<double>& recombinationFractions, const std::vector<int>& markerRows, const std::vector<int>& markerColumns)
-	: recombinationFractions(recombinationFractions), markerRows(markerRows), markerColumns(markerColumns)
+	rfhaps_internal_args(const std::vector<double>& recombinationFractions, triangularIterator& startPosition)
+	: recombinationFractions(recombinationFractions), startPosition(startPosition)
 	{}
 	rfhaps_internal_args(rfhaps_internal_args&& other)
-		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), markerRows(other.markerRows), markerColumns(other.markerColumns), maxAlleles(other.maxAlleles), result(other.result), funnelIDs(std::move(other.funnelIDs)), funnelEncodings(std::move(other.funnelEncodings))
+		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), maxAlleles(other.maxAlleles), result(other.result), funnelIDs(std::move(other.funnelIDs)), funnelEncodings(std::move(other.funnelEncodings)), startPosition(other.startPosition)
 	{}
 	Rcpp::IntegerMatrix finals, founders;
 	Rcpp::S4 pedigree;
@@ -39,15 +38,14 @@ struct rfhaps_internal_args
 	std::vector<double> lineWeights;
 	markerPatternsToUniqueValuesArgs markerPatternData;
 	bool hasAI;
-	const std::vector<int>& markerRows;
-	const std::vector<int>& markerColumns;
 	//maximum number of marker alleles present
 	int maxAlleles;
 	//zeroed by the calling code. Must be added to, not overwritten. 
 	double* result;
-	unsigned long long valuesToEstimateInChunk, offset;
+	unsigned long long valuesToEstimateInChunk;
 	std::vector<funnelID> funnelIDs;
 	std::vector<funnelEncoding> funnelEncodings;
+	triangularIterator startPosition;
 };
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args);
 bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args);
