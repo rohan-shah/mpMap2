@@ -86,7 +86,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, 0);
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, currentLineFunnelID, selfingGenerations - minSelfing);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -95,7 +95,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, 0);
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, selfingGenerations-minSelfing);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -109,15 +109,149 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	}
 	return true;
 }
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesignNoLineWeights(rfhaps_internal_args& args)
+{
+	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
+	std::size_t nDifferentFunnels = args.funnelEncodings.size();
+	std::vector<double>& lineWeights = args.lineWeights;
+	Rcpp::List finalDimNames = args.finals.attr("dimnames");
+	Rcpp::CharacterVector finalNames = finalDimNames[0];
+
+	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
+	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
+	int minAIGenerations = *std::min_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
+	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
+	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
+
+	//This is basically just a huge lookup table
+	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
+	
+	constructLookupTableArgs<maxAlleles, nFounders> lookupArgs(computedContributions, args.markerPatternData);
+	lookupArgs.recombinationFractions = &args.recombinationFractions;
+	lookupArgs.funnelEncodings = &args.funnelEncodings;
+	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
+	lookupArgs.selfingGenerations = &args.selfingGenerations;
+	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
+
+	const int product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
+	const int product2 = (maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
+	const int product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations+1;
+	//Indexing is of the form table[allele1 * product1 + allele2*product2 + selfingGenerations * product3 + (ai OR funnel)]. Funnels come first. 
+	std::vector<int> table(maxAlleles*product1);
+
+	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
+#ifdef USE_OPENMP
+	#pragma omp parallel 
+#endif
+	{
+		triangularIterator indexIterator = args.startPosition;
+		int previousCounter = 0;
+#ifdef USE_OPENMP
+		#pragma omp for schedule(static, 1)
+#endif
+		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
+		{
+			std::fill(table.begin(), table.end(), 0);
+			int difference = counter - previousCounter;
+			if(difference < 0) throw std::runtime_error("Internal error");
+			while(difference > 0) 
+			{
+				indexIterator.next();
+				difference--;
+			}
+			previousCounter = counter;
+
+			std::pair<int, int> markerIndices = indexIterator.get();
+			int markerCounterRow = markerIndices.first, markerCounterColumn = markerIndices.second;
+
+			int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounterRow];
+			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
+
+			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
+			bool swap = markerPatternID1 > markerPatternID2;
+			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+			{
+				int marker1Value = args.finals(finalCounter, markerCounterRow);
+				int marker2Value = args.finals(finalCounter, markerCounterColumn);
+				//If necessary swap the data
+				if(swap) std::swap(marker1Value, marker2Value);
+				if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
+				{
+					bool allowable = false;
+					int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+					int selfingGenerations = args.selfingGenerations[finalCounter];
+					if(intercrossingGenerations == 0)
+					{
+						funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+						table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + currentLineFunnelID]++;
+					}
+					else if(intercrossingGenerations > 0)
+					{
+						table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations]++;
+					}
+				}
+			}
+			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+			{
+				double contribution = 0;
+				for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)
+				{
+					for(int marker1Value = 0; marker1Value < maxAlleles; marker1Value++)
+					{
+						for(int marker2Value = 0; marker2Value < maxAlleles; marker2Value++)
+						{
+							for(int intercrossingGenerations = std::max(minAIGenerations,1); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+							{
+								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
+								if(count == 0) continue;
+								bool allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
+								if(allowable)
+								{
+									array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, selfingGenerations - minSelfing);
+									contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
+								}
+							}
+							for(int funnelID = 0; funnelID < nDifferentFunnels; funnelID++)
+							{
+								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
+								if(count == 0) continue;
+								bool allowable = markerPairData.allowableFunnel(funnelID, selfingGenerations - minSelfing);
+								if(allowable)
+								{
+									array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perFunnelData(recombCounter, funnelID, selfingGenerations - minSelfing);
+									contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
+								}
+							}
+
+						}
+					}
+				}
+				//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
+				if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
+				else args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += contribution;
+			}
+		}
+	}
+	return true;
+}
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign3(rfhaps_internal_args& args)
+{
+	for(std::vector<double>::iterator i = args.lineWeights.begin(); i != args.lineWeights.end(); i++)
+	{
+		if(*i != 1) return estimateRFSpecificDesign<nFounders, maxAlleles, infiniteSelfing>(args);
+	}
+	return estimateRFSpecificDesignNoLineWeights<nFounders, maxAlleles, infiniteSelfing>(args);
+}
 template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(rfhaps_internal_args& args)
 {
 	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
 	if(infiniteSelfing)
 	{
 		std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
-		return estimateRFSpecificDesign<nFounders, maxAlleles, true>(args);
+		return estimateRFSpecificDesign3<nFounders, maxAlleles, true>(args);
 	}
-	else return estimateRFSpecificDesign<nFounders, maxAlleles, false>(args);
+	else return estimateRFSpecificDesign3<nFounders, maxAlleles, false>(args);
 }
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
 template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args)
