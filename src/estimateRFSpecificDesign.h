@@ -50,7 +50,7 @@ struct rfhaps_internal_args
 	std::function<void(unsigned long long)> updateProgress;
 };
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args);
-bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args);
+bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long long& counter);
 /* Preprocess inputs
  *
  * Preprocess inputs in preparation for estimating recombination fractions

@@ -13,7 +13,7 @@
 #include "recodeHetsAsNA.h"
 #include "estimateRF.h"
 #include "matrixChunks.h"
-template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
 	std::size_t nDifferentFunnels = args.funnelEncodings.size();
@@ -36,8 +36,9 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
-	unsigned long long done = 0;
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
+	//Use this to only call setTxtProgressBar every 10 calls to updateProgress. Probably no point in updating status more frequently than that.
+	unsigned long long updateProgressCounter = 0;
 #ifdef USE_OPENMP
 	#pragma omp parallel 
 #endif
@@ -110,19 +111,20 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			#pragma omp critical
 #endif
 			{
-				done++;
+				progressCounter++;
 			}
 #ifdef USE_OPENMP
 			#pragma omp master
 #endif
 			{
-				args.updateProgress(done);
+				updateProgressCounter++;
+				if(updateProgressCounter % 10 == 0) args.updateProgress(progressCounter);
 			}
 		}
 	}
 	return true;
 }
-template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesignNoLineWeights(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesignNoLineWeights(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
 	std::size_t nDifferentFunnels = args.funnelEncodings.size();
@@ -150,8 +152,9 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	const int product2 = (maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
 	const int product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations+1;
 
-	unsigned long long done = 0;
-	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
+	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work.
+	//Use this to only call setTxtProgressBar every 10 calls to updateProgress. Probably no point in updating status more frequently than that.
+	unsigned long long updateProgressCounter = 0;
 #ifdef USE_OPENMP
 	#pragma omp parallel 
 #endif
@@ -250,61 +253,62 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			#pragma omp critical
 #endif
 			{
-				done++;
+				progressCounter++;
 			}
 #ifdef USE_OPENMP
 			#pragma omp master
 #endif
 			{
-				args.updateProgress(done);
+				updateProgressCounter++;
+				if(updateProgressCounter % 10 == 0) args.updateProgress(progressCounter);
 			}
 		}
 	}
 	return true;
 }
-template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign3(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign3(rfhaps_internal_args& args, unsigned long long& counter)
 {
 	for(std::vector<double>::iterator i = args.lineWeights.begin(); i != args.lineWeights.end(); i++)
 	{
-		if(*i != 1) return estimateRFSpecificDesign<nFounders, maxAlleles, infiniteSelfing>(args);
+		if(*i != 1) return estimateRFSpecificDesign<nFounders, maxAlleles, infiniteSelfing>(args, counter);
 	}
-	return estimateRFSpecificDesignNoLineWeights<nFounders, maxAlleles, infiniteSelfing>(args);
+	return estimateRFSpecificDesignNoLineWeights<nFounders, maxAlleles, infiniteSelfing>(args, counter);
 }
-template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(rfhaps_internal_args& args)
+template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(rfhaps_internal_args& args, unsigned long long& counter)
 {
 	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
 	if(infiniteSelfing)
 	{
 		std::fill(args.selfingGenerations.begin(), args.selfingGenerations.end(), 0);
-		return estimateRFSpecificDesign3<nFounders, maxAlleles, true>(args);
+		return estimateRFSpecificDesign3<nFounders, maxAlleles, true>(args, counter);
 	}
-	else return estimateRFSpecificDesign3<nFounders, maxAlleles, false>(args);
+	else return estimateRFSpecificDesign3<nFounders, maxAlleles, false>(args, counter);
 }
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
-template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args)
+template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args, unsigned long long& counter)
 {
 	switch(args.maxAlleles)
 	{
 		case 1:
-			return estimateRFSpecificDesignInternal2<nFounders, 1>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 1>(args, counter);
 		case 2:
-			return estimateRFSpecificDesignInternal2<nFounders, 2>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 2>(args, counter);
 		case 3:
-			return estimateRFSpecificDesignInternal2<nFounders, 3>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 3>(args, counter);
 		case 4:
-			return estimateRFSpecificDesignInternal2<nFounders, 4>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 4>(args, counter);
 		case 5:
-			return estimateRFSpecificDesignInternal2<nFounders, 5>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 5>(args, counter);
 		case 6:
-			return estimateRFSpecificDesignInternal2<nFounders, 6>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 6>(args, counter);
 		case 7:
-			return estimateRFSpecificDesignInternal2<nFounders, 7>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 7>(args, counter);
 		case 8:
-			return estimateRFSpecificDesignInternal2<nFounders, 8>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 8>(args, counter);
 		case 9:
-			return estimateRFSpecificDesignInternal2<nFounders, 9>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 9>(args, counter);
 		case 10:
-			return estimateRFSpecificDesignInternal2<nFounders, 10>(args);
+			return estimateRFSpecificDesignInternal2<nFounders, 10>(args, counter);
 		default:
 			throw std::runtime_error("Internal error");
 	}
@@ -474,16 +478,16 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	internal_args.funnelEncodings.swap(funnelEncodings);
 	return true;
 }
-bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args)
+bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long long& counter)
 {
 	int nFounders = internal_args.founders.nrow();
 	if(nFounders == 2)
 	{
-		return estimateRFSpecificDesignInternal1<2>(internal_args);
+		return estimateRFSpecificDesignInternal1<2>(internal_args, counter);
 	}
 	else if(nFounders == 4)
 	{
-		return estimateRFSpecificDesignInternal1<4>(internal_args);
+		return estimateRFSpecificDesignInternal1<4>(internal_args, counter);
 	}
 	/*else if(nFounders == 8)
 	{

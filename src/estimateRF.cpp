@@ -261,23 +261,20 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		Rcpp::Function close("close");
 		Rcpp::RObject barHandle;
 		std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
-		if(verbose && nDesigns == 1)
+		if(verbose)
 		{
-			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = nValuesToEstimate, Rcpp::Named("initial") = 0);
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = nDesigns*nValuesToEstimate, Rcpp::Named("initial") = 0);
 			updateProgress = [barHandle,setTxtProgressBar](unsigned long long value)
 				{
-					if(value % 10 == 0)
+					try
 					{
-						try
-						{
-							setTxtProgressBar(barHandle, value);
-						}
-						catch(...)
-						{}
+						setTxtProgressBar(barHandle, value);
 					}
+					catch(...)
+					{}
 				};
 		}
-
+		unsigned long long counter = 0;
 		for(unsigned long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
 		{
 			long long valuesToEstimateInCurrentChunk = std::min((long long)valuesToEstimateInChunk, (long long)(nValuesToEstimate - offset));
@@ -290,7 +287,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				internalArgumentObjects[i].startPosition = startPosition;
 				internalArgumentObjects[i].updateProgress = updateProgress;
 				std::string error;
-				bool successful = estimateRFSpecificDesign(internalArgumentObjects[i]);
+				bool successful = estimateRFSpecificDesign(internalArgumentObjects[i], counter);
 				if(!successful) throw std::runtime_error("Internal error");
 			}
 			//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
@@ -324,7 +321,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				valuesToEstimateInCurrentChunk--;
 			}
 		}
-		if(verbose && nDesigns == 1)
+		if(verbose)
 		{
 			close(barHandle);
 		}
