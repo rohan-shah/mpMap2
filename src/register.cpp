@@ -20,7 +20,7 @@ extern "C"
 		{"generateGenotypes", (DL_FUNC)&generateGenotypes, 3},
 		{"alleleDataErrors", (DL_FUNC)&alleleDataErrors, 2},
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
-		{"estimateRF", (DL_FUNC)&estimateRF, 8},
+		{"estimateRF", (DL_FUNC)&estimateRF, 9},
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
 		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 2},
 		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 3},

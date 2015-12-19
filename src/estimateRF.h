@@ -16,7 +16,8 @@ struct funnelType
   * @param keepLod Boolean telling whether or not to return the likelihood ratio statistic for testing the estimated value being different from 0.
   * @param gbLimit The number of gigabytes to use for the results matrix. A value of negative 1 indicates no limit.
   * @param keepLkhd Boolean telling whether or not to return the maximum likelihood value
+  * @param verbose Boolean telling whether or not to output diagnostic and progress information
   * @return A list returning the specified data. In the case of theta, the values are returned as a raw vector. Each entry is an index into the possible recombination fractions. This saves us a factor of 8 in terms of memory usage. The raw vector is indexed column-major, but only contains the values for the upper triangular part of the matrix. 
  **/
-SEXP estimateRF(SEXP object, SEXP recombinationFractions, SEXP markerRows, SEXP markerColumns, SEXP lineWeights, SEXP keepLod, SEXP keepLkhd, SEXP gbLimit);
+SEXP estimateRF(SEXP object, SEXP recombinationFractions, SEXP markerRows, SEXP markerColumns, SEXP lineWeights, SEXP keepLod, SEXP keepLkhd, SEXP gbLimit, SEXP verbose);
 #endif

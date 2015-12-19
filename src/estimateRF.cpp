@@ -4,7 +4,7 @@
 #include "estimateRFSpecificDesign.h"
 #include <stdexcept>
 #include "matrixChunks.h"
-SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SEXP markerColumns_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_, SEXP gbLimit_)
+SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SEXP markerColumns_, SEXP lineWeights_, SEXP keepLod_, SEXP keepLkhd_, SEXP gbLimit_, SEXP verbose_)
 {
 	BEGIN_RCPP
 		Rcpp::NumericVector recombinationFractions;
@@ -123,6 +123,15 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw std::runtime_error("Input keepLkhd must be a boolean");
 		}
+		bool verbose;
+		try
+		{
+			verbose = Rcpp::as<bool>(verbose_);
+		}
+		catch(Rcpp::not_compatible&)
+		{
+			throw std::runtime_error("Input verbose must be a boolean");
+		}
 		if(nDesigns <= 0) throw std::runtime_error("There must be at least one design");
 		if(markerRows.size() == 0) throw std::runtime_error("Input markerRows must have at least one entry");
 		if(markerColumns.size() == 0) throw std::runtime_error("Input markerColumns must have at least one entry");
@@ -149,7 +158,8 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			valuesToEstimateInChunk = std::min(nValuesToEstimate, bytesLimit / ((std::size_t)nRecombLevels * sizeof(double)) + 1);
 		}
-		if(valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double) > 4000000000ULL && bytesLimit < 0)
+		//Output a message detailing allocation size here, if either we're going to allocate more than 4gb, and the user didn't attempt to limit this, or the verbose option is specified. 
+		if((valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double) > 4000000000ULL && bytesLimit < 0) || verbose)
 		{
 			Rcpp::Rcout << "Allocating results matrix of " << (valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double)) << " bytes = " << ((valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double))/1000000000ULL) << " gb" << std::endl;
 		}
@@ -235,7 +245,8 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			unsigned long long currentLookupBytes = estimateLookup(internalArgumentObjects[i]);
 			lookupBytes += currentLookupBytes;
 		}
-		if(lookupBytes > 1000000000)
+		//Output a message giving the allocation size, if either it's more than a gb, or the verbose option is specified
+		if(lookupBytes > 1000000000 || verbose)
 		{
 			Rcpp::Rcout << "Total lookup table size of " << lookupBytes << " bytes" << std::endl;
 		}
@@ -244,6 +255,28 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		if(keepLod) lod = Rcpp::NumericVector(nValuesToEstimate);
 		if(keepLkhd) lkhd = Rcpp::NumericVector(nValuesToEstimate);
 		double* resultPtr = &(result[0]);
+
+		Rcpp::Function txtProgressBar("txtProgressBar");
+		Rcpp::Function setTxtProgressBar("setTxtProgressBar");
+		Rcpp::Function close("close");
+		Rcpp::RObject barHandle;
+		std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
+		if(verbose && nDesigns == 1)
+		{
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = nValuesToEstimate, Rcpp::Named("initial") = 0);
+			updateProgress = [barHandle,setTxtProgressBar](unsigned long long value)
+				{
+					if(value % 10 == 0)
+					{
+						try
+						{
+							setTxtProgressBar(barHandle, value);
+						}
+						catch(...)
+						{}
+					}
+				};
+		}
 
 		for(unsigned long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
 		{
@@ -255,6 +288,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				internalArgumentObjects[i].result = resultPtr;
 				internalArgumentObjects[i].valuesToEstimateInChunk = valuesToEstimateInCurrentChunk;
 				internalArgumentObjects[i].startPosition = startPosition;
+				internalArgumentObjects[i].updateProgress = updateProgress;
 				std::string error;
 				bool successful = estimateRFSpecificDesign(internalArgumentObjects[i]);
 				if(!successful) throw std::runtime_error("Internal error");
@@ -289,6 +323,10 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				startPosition.next();
 				valuesToEstimateInCurrentChunk--;
 			}
+		}
+		if(verbose && nDesigns == 1)
+		{
+			close(barHandle);
 		}
 		Rcpp::RObject lodRet, lkhdRet;
 		

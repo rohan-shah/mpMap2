@@ -30,11 +30,10 @@ test_that("Checking that value of gbLimit option doesn't change results for f2",
 test_that("Check that huge number of markers cannot be analysed except using gbLimit option",
 	{
 		f2Pedigree <- f2Pedigree(10)
-		map <- sim.map(len = 100, n.mar = 20000, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- sim.map(len = 100, n.mar = 30000, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 
-#		expect_that(rf <- estimateRF(cross), throws_error())
-
-#		rf <- estimateRF(cross, gbLimit = 0.5)
+		expect_that(rf <- estimateRF(cross), throws_error())
+		#rf <- estimateRF(cross, gbLimit = 0.5)
 	})
 rm(check)

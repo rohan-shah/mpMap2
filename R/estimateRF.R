@@ -1,5 +1,5 @@
 #' @export
-estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE)
+estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE)
 {
 	inheritsNewMpcrossArgument(object)
 
@@ -31,7 +31,7 @@ estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod 
 		}
 	}
 	markerRange <- 1:nMarkers(object)
-	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = gbLimit)
+	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = gbLimit, verbose = verbose)
 	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta)
 	if(!is.null(listOfResults$lod))
 	{
@@ -56,7 +56,7 @@ estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod 
 	}
 	return(output)
 }
-estimateRFInternal <- function(object, recombValues, lineWeights, markerRows, markerColumns, keepLod, keepLkhd, gbLimit)
+estimateRFInternal <- function(object, recombValues, lineWeights, markerRows, markerColumns, keepLod, keepLkhd, gbLimit, verbose)
 {
-	return(.Call("estimateRF", object, recombValues, markerRows, markerColumns, lineWeights, keepLod, keepLkhd, gbLimit, PACKAGE="mpMap2"))
+	return(.Call("estimateRF", object, recombValues, markerRows, markerColumns, lineWeights, keepLod, keepLkhd, gbLimit, verbose, PACKAGE="mpMap2"))
 }

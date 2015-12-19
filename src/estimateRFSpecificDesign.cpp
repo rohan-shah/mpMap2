@@ -36,6 +36,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
+	unsigned long long done = 0;
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 #ifdef USE_OPENMP
 	#pragma omp parallel 
@@ -105,6 +106,18 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 					}
 				}
 			}
+#ifdef USE_OPENMP
+			#pragma omp critical
+#endif
+			{
+				done++;
+			}
+#ifdef USE_OPENMP
+			#pragma omp master
+#endif
+			{
+				args.updateProgress(done);
+			}
 		}
 	}
 	return true;
@@ -136,15 +149,17 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	const int product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
 	const int product2 = (maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
 	const int product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations+1;
-	//Indexing is of the form table[allele1 * product1 + allele2*product2 + selfingGenerations * product3 + (ai OR funnel)]. Funnels come first. 
-	std::vector<int> table(maxAlleles*product1);
 
+	unsigned long long done = 0;
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 #ifdef USE_OPENMP
 	#pragma omp parallel 
 #endif
 	{
 		triangularIterator indexIterator = args.startPosition;
+		//Indexing is of the form table[allele1 * product1 + allele2*product2 + selfingGenerations * product3 + (ai OR funnel)]. Funnels come first. 
+		std::vector<int> table(maxAlleles*product1);
+
 		int previousCounter = 0;
 #ifdef USE_OPENMP
 		#pragma omp for schedule(static, 1)
@@ -230,6 +245,18 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 				//We get an NA from trying to take the logarithm of zero - That is, this parameter is completely impossible for the given data, so put in -Inf
 				if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
 				else args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += contribution;
+			}
+#ifdef USE_OPENMP
+			#pragma omp critical
+#endif
+			{
+				done++;
+			}
+#ifdef USE_OPENMP
+			#pragma omp master
+#endif
+			{
+				args.updateProgress(done);
 			}
 		}
 	}

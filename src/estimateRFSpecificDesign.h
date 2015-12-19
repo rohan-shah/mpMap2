@@ -5,6 +5,7 @@
 #include "markerPatternsToUniqueValues.h"
 #include "funnelsToUniqueValues.h"
 #include "matrixChunks.h"
+#include <functional>
 struct estimateRFSpecificDesignArgs
 {
 	estimateRFSpecificDesignArgs(std::vector<double>& recombinationFractions)
@@ -46,6 +47,7 @@ struct rfhaps_internal_args
 	std::vector<funnelID> funnelIDs;
 	std::vector<funnelEncoding> funnelEncodings;
 	triangularIterator startPosition;
+	std::function<void(unsigned long long)> updateProgress;
 };
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args);
 bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args);
