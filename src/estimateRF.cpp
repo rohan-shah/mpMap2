@@ -12,13 +12,14 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			recombinationFractions = recombinationFractions_;
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input recombinationFractions must be a numeric vector");
 		}
 		int nRecombLevels = recombinationFractions.size();
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
+		if(std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.0) == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0");
 		int halfIndex = (int)std::distance(recombinationFractions.begin(), halfIterator);
 
 		//Confirm that recombination fractions are in increasing order
@@ -33,7 +34,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			object = object_;
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input object must be an S4 object");
 		}
@@ -42,7 +43,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			markerRows = Rcpp::as<std::vector<int> >(markerRows_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input markerRows must be an integer vector");
 		}
@@ -56,7 +57,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			markerColumns = Rcpp::as<std::vector<int> >(markerColumns_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input markerColumns must be an integer vector");
 		}
@@ -64,21 +65,18 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			(*markerColumn)--;
 		}
-		Rcpp::List lineWeights;
-		try
-		{
-			lineWeights = lineWeights_;
-		}
-		catch(Rcpp::not_compatible&)
+		Rcpp::RObject lineWeights_noType = lineWeights_;
+		if(lineWeights_noType.sexp_type() != VECSXP)
 		{
 			throw Rcpp::not_compatible("Input lineWeights must be a list");
 		}
+		Rcpp::List lineWeights = lineWeights_;
 		double gbLimit;
 		try
 		{
 			gbLimit = Rcpp::as<double>(gbLimit_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input gbLimit must be a single numeric value");
 		}
@@ -89,12 +87,12 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			geneticData = object.slot("geneticData");
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw Rcpp::not_compatible("Input object must have a slot named \"geneticData\" which must be a list");
 		}
 		int nDesigns = geneticData.length();
-		if(lineWeights.size() != nDesigns) throw std::runtime_error("Inut lineWeights had the wrong number of entries");
+		if(lineWeights.size() != nDesigns) throw std::runtime_error("Input lineWeights had the wrong number of entries");
 		try
 		{
 			for(int i = 0; i < nDesigns; i++)
@@ -102,7 +100,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				Rcpp::NumericVector currentDesignLineWeights = lineWeights(i);
 			}
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw std::runtime_error("Input lineWeights must be a list of numeric vectors");
 		}
@@ -111,7 +109,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			keepLod = Rcpp::as<bool>(keepLod_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw std::runtime_error("Input keepLod must be a boolean");
 		}
@@ -119,7 +117,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			keepLkhd = Rcpp::as<bool>(keepLkhd_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw std::runtime_error("Input keepLkhd must be a boolean");
 		}
@@ -128,7 +126,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			verbose = Rcpp::as<bool>(verbose_);
 		}
-		catch(Rcpp::not_compatible&)
+		catch(...)
 		{
 			throw std::runtime_error("Input verbose must be a boolean");
 		}
@@ -190,7 +188,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			{
 				args.founders = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("founders"));
 			}
-			catch(Rcpp::not_compatible&)
+			catch(...)
 			{
 				std::stringstream ss; 
 				ss << "Founders slot of design " << i << " was not an integer matrix";
@@ -200,7 +198,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			{
 				args.finals = Rcpp::as<Rcpp::IntegerMatrix>(currentGeneticData.slot("finals"));
 			}
-			catch(Rcpp::not_compatible&)
+			catch(...)
 			{
 				std::stringstream ss; 
 				ss << "Finals slot of design " << i << " was not an integer matrix";
@@ -210,7 +208,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			{
 				args.pedigree = Rcpp::as<Rcpp::S4>(currentGeneticData.slot("pedigree"));
 			}
-			catch(Rcpp::not_compatible&)
+			catch(...)
 			{
 				std::stringstream ss; 
 				ss << "Pedigree slot of design " << i << " was not an S4 object";
@@ -220,7 +218,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			{
 				args.hetData = Rcpp::as<Rcpp::S4>(currentGeneticData.slot("hetData"));
 			}
-			catch(Rcpp::not_compatible&)
+			catch(...)
 			{
 				std::stringstream ss; 
 				ss << "hetData slot of design " << i << " was not an S4 object";
