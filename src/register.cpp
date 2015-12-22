@@ -11,6 +11,7 @@
 #include "dspMatrix.h"
 #include "preClusterStep.h"
 #include "hclustMatrices.h"
+#include "mpMap2_openmp.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -33,6 +34,7 @@ extern "C"
 		{"hclustThetaMatrix", (DL_FUNC)&hclustThetaMatrix, 2},
 		{"hclustCombinedMatrix", (DL_FUNC)&hclustCombinedMatrix, 2},
 		{"hclustLodMatrix", (DL_FUNC)&hclustLodMatrix, 2},
+		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

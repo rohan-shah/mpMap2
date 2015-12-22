@@ -13,6 +13,10 @@
 #include "recodeHetsAsNA.h"
 #include "estimateRF.h"
 #include "matrixChunks.h"
+#ifdef USE_OPENMP
+#include "mpMap2_openmp.h"
+#include <omp.h>
+#endif
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -114,7 +118,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 				progressCounter++;
 			}
 #ifdef USE_OPENMP
-			#pragma omp master
+			if(omp_get_thread_num() == 0)
 #endif
 			{
 				updateProgressCounter++;
@@ -256,7 +260,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 				progressCounter++;
 			}
 #ifdef USE_OPENMP
-			#pragma omp master
+			if(omp_get_thread_num() == 0)
 #endif
 			{
 				updateProgressCounter++;
