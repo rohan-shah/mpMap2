@@ -59,13 +59,8 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 			distMat <- lod
 		}
 		clustered <- hclust(as.dist(distMat), method=method)
-
 		cut <- cutree(clustered, k=groups)
 		names(cut) <- markers(mpcrossRF)
-		
-		lg <- new("lg", allGroups=1:groups, groups=cut)
-		output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
-		return(subset(output, markers = order(cut)))
 	}
 	#If we have a huge number of markers, it might be necessary to do a pre-clustering step, where we join together all the markers that have zero recombination fractions. 
 	else
@@ -73,15 +68,32 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 		preClusterResults <- .Call("preClusterStep", mpcrossRF, PACKAGE="mpMap2")
 		if(clusterBy == "combined")
 		{
-			distMat <- .Call("hclustCombinedMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+			distMat <- .Call("hclustCombinedMatrix", mpcrossRF, preClusterResults, PACKAGE="mpMap2")
 		}
 		else if(clusterBy == "theta")
 		{
-			distMat <- .Call("hclustThetaMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+			distMat <- .Call("hclustThetaMatrix", mpcrossRF, preClusterResults, PACKAGE="mpMap2")
 		}
 		else
 		{
-			distMat <- .Call("hclustLodMatrix", preClusterResults, mpcrossRF, PACKAGE="mpMap2")
+			distMat <- .Call("hclustLodMatrix", mpcrossRF, preClusterResults, PACKAGE="mpMap2")
 		}
+		attr(distMat, "Size") <- length(preClusterResults)
+		clustered <- hclust(distMat, method = method)
+		#This cut is for the grouped markers, we want a similar object for the ungrouped markers
+		cut <- cutree(clustered, k=groups)
+
+		originalCut <- vector(mode = "integer", length = nMarkers(mpcrossRF))
+		names(originalCut) <- markers(mpcrossRF)
+		for(i in 1:groups)
+		{
+			originalCut[unlist(preClusterResults[which(cut == i)])] <- i
+		}
+		cut <- originalCut
 	}
+	
+	lg <- new("lg", allGroups=1:groups, groups=cut)
+	output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
+	return(subset(output, markers = order(cut)))
+
 }

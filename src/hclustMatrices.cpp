@@ -133,14 +133,14 @@ BEGIN_RCPP
 					int row = std::min(marker1, marker2);
 					Rbyte thetaDataValue = data((column*(column+1))/2 + row);
 					double currentLodDataValue = lodData((column*(column+1))/2 + row);
-					if(thetaDataValue != 0xFF)
+					if(thetaDataValue != 0xFF && currentLodDataValue != NA_REAL && currentLodDataValue == currentLodDataValue)
 					{
-						total += levels(thetaDataValue) + currentLodDataValue *lodMultiplier;
+						total += levels(thetaDataValue) + (maxLod - currentLodDataValue) *lodMultiplier;
 						counter++;
 					}
 				}
 			}
-			if(counter == 0) total = 0.5;
+			if(counter == 0) total = 0.5 + minDifference;
 			else total /= counter;
 			result(((resultDimension-1)*resultDimension)/2 - ((resultDimension - column)*(resultDimension-column-1))/2 + row-column-1) = total;
 		}
@@ -174,6 +174,7 @@ BEGIN_RCPP
 		throw std::runtime_error("Number of markers in precluster object was inconsistent with number of markers in mpcrossRF object");
 	}
 	int resultDimension = preClusterResults.size();
+	double maxLod = *std::max_element(lodData.begin(), lodData.end());
 	//Allocate enough storage. This symmetric matrix stores the *LOWER* triangular part, in column-major storage. Excluding the diagonal. 
 	Rcpp::NumericVector result(((resultDimension-1)*resultDimension)/2);
 	for(int column = 0; column < resultDimension; column++)
@@ -200,9 +201,9 @@ BEGIN_RCPP
 					}
 				}
 			}
-			if(counter == 0) total = 0.5;
+			if(counter == 0) total = maxLod;
 			else total /= counter;
-			result(((resultDimension-1)*resultDimension)/2 - ((resultDimension - column)*(resultDimension-column-1))/2 + row-column-1) = total;
+			result(((resultDimension-1)*resultDimension)/2 - ((resultDimension - column)*(resultDimension-column-1))/2 + row-column-1) = maxLod - total;
 		}
 	}
 	return result;
