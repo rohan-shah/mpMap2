@@ -13,8 +13,6 @@ set(RFILES biparentalDominant.R combineGenotypes.R detailedPedigree-class.R esti
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
 	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")
-		#Copy NAMESPACE
-		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE")
 		#Copy DESCRIPTION
 		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/DESCRIPTION")
 		#Copy include files
@@ -29,8 +27,6 @@ if(WIN32)
 		add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2); roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 	else()
 		foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
-			#Copy NAMESPACE
-			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/NAMESPACE")
 			#Copy DESCRIPTION
 			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/DESCRIPTION")
 			#Copy include files
@@ -46,8 +42,6 @@ if(WIN32)
 		endforeach()
 	endif()
 else()
-	#Copy NAMESPACE
-	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE")
 	#Copy DESCRIPTION
 	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/DESCRIPTION")
 	#Copy include files

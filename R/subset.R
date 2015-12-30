@@ -1,5 +1,4 @@
 #' @export
-setGeneric(name = "subset", def = function(x, ...){standardGeneric("subset")})
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 {
 	arguments <- list(...)
