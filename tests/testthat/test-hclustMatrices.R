@@ -108,10 +108,11 @@ test_that("hclustLodMatrix call gives expected results",
 	f2Pedigree <- f2Pedigree(10)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross, keepLod = TRUE)
+	maxLod <- max(rf@rf@lod)
 	
 	#This takes the average of the first two lod values
 	newLod <- .Call("hclustLodMatrix", rf, c(list(1:2), 3:11), PACKAGE="mpMap2")
-	oldLod <- as(rf@rf@lod, "matrix")
+	oldLod <- maxLod - as(rf@rf@lod, "matrix")
 	averagedPart <- apply(oldLod[1:2,-(1:2)], 2, mean)
 	expectedNewLod <- rbind(c(mean(oldLod[1:2,1:2]), averagedPart), cbind(averagedPart, oldLod[3:11, 3:11]))
 	expectedNewLod <- as.dist(expectedNewLod)
@@ -164,7 +165,8 @@ test_that("hclustCombinedMatrix call gives expected results",
 	minimumDistance <- min(diff(rf@rf@theta@levels))
 	theta <- rf@rf@theta[1:11,1:11]
 	lod <- as(rf@rf@lod, "matrix")
-	combined <- theta + (lod/max(lod))*minimumDistance
+	maxLod <- max(rf@rf@lod)
+	combined <- theta + ((maxLod - lod)/max(lod))*minimumDistance
 	
 	#This takes the average of the first two combined values
 	newMatrix <- .Call("hclustCombinedMatrix", rf, c(list(1:2), 3:11), PACKAGE="mpMap2")
