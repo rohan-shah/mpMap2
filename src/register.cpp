@@ -12,6 +12,7 @@
 #include "preClusterStep.h"
 #include "hclustMatrices.h"
 #include "mpMap2_openmp.h"
+#include "order.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -35,6 +36,7 @@ extern "C"
 		{"hclustCombinedMatrix", (DL_FUNC)&hclustCombinedMatrix, 2},
 		{"hclustLodMatrix", (DL_FUNC)&hclustLodMatrix, 2},
 		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
+		{"order", (DL_FUNC)&order, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
