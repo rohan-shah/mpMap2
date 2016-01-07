@@ -23,14 +23,14 @@ test_that("Checking that indexing works correctly",
 		expect_identical(raw[2,1], 0.1)
 		expect_identical(raw[3,1], 0.3)
 		expect_identical(raw[1,3], 0.3)
-		expect_identical(raw[1,3,drop=F], cbind(0.3))
-		expect_identical(raw[3,1,drop=F], cbind(0.3))
+		expect_identical(raw[1,3,drop=F], cbind("c" = c("a" = 0.3)))
+		expect_identical(raw[3,1,drop=F], cbind("a" = c("c" = 0.3)))
 
-		expect_identical(raw[1,1:3], c(0, 0.1, 0.3))
-		expect_identical(raw[1:3,1], c(0, 0.1, 0.3))
+		expect_identical(raw[1,1:3], c("a" = 0, "b" = 0.1, "c" = 0.3))
+		expect_identical(raw[1:3,1], c("a" = 0, "b" = 0.1, "c" = 0.3))
 		
-		expect_identical(raw[1,1:3,drop=F], rbind(c(0, 0.1, 0.3)))
-		expect_identical(raw[1:3,1,drop=F], cbind(c(0, 0.1, 0.3)))
+		expect_identical(raw[1,1:3,drop=F], rbind("a" = c("a" = 0, "b" = 0.1, "c" = 0.3)))
+		expect_identical(raw[1:3,1,drop=F], cbind("a" = c("a" = 0, "b" = 0.1, "c" = 0.3)))
 
 		#Check NA values work
 		raw  <- new("rawSymmetricMatrix", levels = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), markers = c("a", "b", "c"), data = as.raw(as.integer(c(0:4, 255))))
@@ -122,7 +122,9 @@ test_that("Checking that rawSymmetricMatrixEstimateRF works correctly, for out-o
 
 		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
 		.Call("assignRawSymmetricMatrixFromEstimateRF", raw, c(4,1), c(1,4), as.raw(c(0, 0, 9)))
-		expect_identical(raw[1:4,1:4], cbind(c(0,0,0,0.5), rep(0, 4), rep(0, 4), c(0.5,0,0,0)))
+		value <- cbind(c(0,0,0,0.5), rep(0, 4), rep(0, 4), c(0.5,0,0,0))
+		rownames(value) <- colnames(value) <- c("a", "b", "c", "d")
+		expect_identical(raw[1:4,1:4], value)
 	})
 test_that("Checking that rawSymmetricMatrixDiagonal works correctly, for in-order indices",
 	{
@@ -145,4 +147,33 @@ test_that("Checking that rawSymmetricMatrixDiagonal works correctly, for in-orde
 		raw  <- new("rawSymmetricMatrix", levels = (0:9)/18, markers = c("a", "b", "c", "d"), data = as.raw(rep(0, 10)))
 		.Call("assignRawSymmetricMatrixDiagonal", raw, c(4, 1, 2), as.raw(1:6))
 		expect_identical(raw@data, as.raw(c(3, 5, 6, 0, 0, 0, 2, 4, 0, 1)))
+	})
+test_that("Checking that subsetting results in objects with correct row and column names",
+	{
+		f2Pedigree <- f2Pedigree(100)
+		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		for(i in 1:10)
+		{
+			cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+			rf <- estimateRF(cross)
+			for(j in 1:10)
+			{
+				rows <- sample(1:10, sample(2:10, 1))
+				columns <- sample(1:10, sample(2:10, 1))
+				subsetted <- rf@rf@theta[rows, columns]
+				expect_identical(rownames(subsetted), rf@rf@theta@markers[rows])
+				expect_identical(colnames(subsetted), rf@rf@theta@markers[columns])
+			}
+		}
+	})
+test_that("Checking that conversion functions work",
+	{
+		for(i in 1:10)
+		{
+			m <- c(0.5, 0, 0, rbinom(97, 10, 0.5) / 20)
+			dim(m) <- c(10,10)
+			m <- (m + t(m)) / 2
+			rownames(m) <- colnames(m) <- LETTERS[1:10]
+			expect_identical(as(as(m, "rawSymmetricMatrix"), "matrix"), m)
+		}
 	})

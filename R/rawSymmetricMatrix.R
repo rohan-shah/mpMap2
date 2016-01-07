@@ -38,3 +38,24 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", dro
 		if(any(i > nMarkers) || any(j > nMarkers) || any(i < 1) || any(j < 1)) stop("Indices were out of range")
 		return(.Call("rawSymmetricMatrixSubsetIndices", x, i, j, TRUE, PACKAGE="mpMap2"))
 	})
+setAs("matrix", "rawSymmetricMatrix", def = function(from, to)
+	{
+		#This is mostly for testing purposes. Haven't bothered with writing efficient C code, because I don't think it can really be made that efficient. This function is mostly for testing purposes, giving us an easy way to generate objects of class rawSymmetricMatrix. 
+		if(!isSymmetric(from))
+		{
+			stop("Input matrix must be symmetric")
+		}
+		if(is.null(rownames(from)) || is.null(colnames(from)) || !all.equal(rownames(from), colnames(from)))
+		{
+			stop("Row and column names are required, and must be identical")
+		}
+		levels <- sort(unique(as.vector(from)))
+		values <- from[upper.tri(from, diag = TRUE)]
+		indices <- match(values, levels)-1
+		indices[is.na(values)] <- 0xff
+		return(new("rawSymmetricMatrix", data = as.raw(indices), markers = rownames(from), levels = levels))
+	})
+setAs("rawSymmetricMatrix", "matrix", def = function(from, to)
+	{
+		return(from[1:length(from@markers), 1:length(from@markers)])
+	})

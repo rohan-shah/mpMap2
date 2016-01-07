@@ -26,36 +26,44 @@ BEGIN_RCPP
 		{
 			Rcpp::NumericVector result(j.size());
 			int i = Rcpp::as<int>(i_);
+			Rcpp::CharacterVector names(j.size());
 			for(int jCounter = 0; jCounter < j.size(); jCounter++)
 			{
 				int iCopied = i;
 				int jValue = j[jCounter];
+				names[jCounter] = markers[jValue-1];
 				if(iCopied > jValue) std::swap(iCopied, jValue);
 				Rbyte rawValue = data[(jValue*(jValue-1))/2 + iCopied-1];
 				if(rawValue == 0xff) result[jCounter] = NA_REAL;
 				else result[jCounter] = levels[rawValue];
 			}
+			result.attr("names") = names;
 			return result;
 		}
 		else if(j.size() == 1)
 		{
 			Rcpp::NumericVector result(i.size());
 			int j = Rcpp::as<int>(j_);
+			Rcpp::CharacterVector names(i.size());
 			for(int iCounter = 0; iCounter < i.size(); iCounter++)
 			{
 				int jCopied = j;
 				int iValue = i[iCounter];
+				names[iCounter] = markers[iValue-1];
 				if(iValue > jCopied) std::swap(iValue, jCopied);
 				Rbyte rawValue = data[(jCopied*(jCopied-1))/2 + iValue-1];
 				if(rawValue == 0xff) result[iCounter] = NA_REAL;
 				else result[iCounter] = levels[rawValue];
 			}
+			result.attr("names") = names;
 			return result;
 		}
 	}
 	Rcpp::NumericMatrix result(i.size(), j.size());
+	Rcpp::CharacterVector rownames(i.size()), colnames(j.size());
 	for(int iCounter = 0; iCounter < i.size(); iCounter++)
 	{
+		rownames[iCounter] = markers[i[iCounter]-1];
 		for(int jCounter = 0; jCounter < j.size(); jCounter++)
 		{
 			int iCopied = i[iCounter], jCopied = j[jCounter];
@@ -65,6 +73,11 @@ BEGIN_RCPP
 			else result(iCounter, jCounter) = levels[rawValue];
 		}
 	}
+	for(int jCounter = 0; jCounter < j.size(); jCounter++)
+	{
+		colnames[jCounter] = markers[j[jCounter]-1];
+	}
+	result.attr("dimnames") = Rcpp::List::create(rownames, colnames);
 	return result;
 END_RCPP
 }
