@@ -1,4 +1,5 @@
 #include "order.h"
+#include "impute.h"
 SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 {
 	Rcpp::S4 mpcrossLG;
@@ -51,10 +52,10 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 		throw std::runtime_error("Slot mpcrossLG@rf@theta@data must be a raw vector");
 	}
 
-	Rcpp::NumericVector levels;
+	std::vector<double> levels;
 	try
 	{
-		levels = Rcpp::as<Rcpp::NumericVector>(theta.slot("levels"));
+		levels = Rcpp::as<std::vector<double> >(Rcpp::as<Rcpp::NumericVector>(theta.slot("levels")));
 	}
 	catch(...)
 	{
@@ -114,6 +115,8 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 	std::vector<int> permutation, currentGroupPermutation;
 	permutation.reserve(nMarkers);
 	std::vector<int> markersThisGroup;
+	//This holds a copy of the raw data, for the purposes of doing imputation. We don't want to touch the original, obviously. 
+	std::vector<unsigned char> imputedRaw;
 	for(std::vector<int>::iterator currentGroup = allGroups.begin(); currentGroup != allGroups.end(); currentGroup++)
 	{
 		markersThisGroup.clear();
@@ -127,9 +130,33 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 		}
 		int nMarkersCurrentGroup = (int)markersThisGroup.size();
 		if(nMarkersCurrentGroup == 0) continue;
-		Rcpp::NumericMatrix subMatrix(nMarkersCurrentGroup, nMarkersCurrentGroup);
-
 		
+		//Do imputation
+		//So first make a copy of the raw data subset
+		imputedRaw.resize((nMarkersCurrentGroup * (nMarkersCurrentGroup + 1)) / 2);
+		//column
+		for(int i = 0; i < nMarkersCurrentGroup; i++)
+		{
+			//row
+			for(int j = 0; j <= i; j++)
+			{
+				int row = markersThisGroup[j], column = markersThisGroup[i];
+				if(row > column) std::swap(row, column);
+				imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
+			}
+		}
+		//For the purposes of imputation the markers to be imputed are 0 to nMarkersCurrentGroup-1
+		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
+		for(int i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = i;
+		std::string error;
+		bool imputationResult = impute(&(imputedRaw[0]), levels, NULL, NULL, contiguousIndices, error);
+		if(!imputationResult)
+		{
+			throw std::runtime_error(error.c_str());
+		}
+
+		//Form the numeric matrix for ordering. 
+		Rcpp::NumericMatrix subMatrix(nMarkersCurrentGroup, nMarkersCurrentGroup);
 		double* mem = &(subMatrix(0,0));
 		//Determine whether or not the submatrix is zero, as seriation seems to screw up for all-zero matrices.
 		bool nonZero = false;
@@ -138,9 +165,11 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 			for(int j = 0; j < nMarkersCurrentGroup; j++)
 			{
 				double* dest = mem + i + j * nMarkersCurrentGroup;
-				int row = markersThisGroup[i], column = markersThisGroup[j];
+				int row = i, column = j;
 				if(row > column) std::swap(row, column);
-				*dest = levels[originalRawData[(column * (column + 1))/2 + row]];
+				unsigned char rawValue = imputedRaw[(column * (column + 1))/2 + row];
+				if(rawValue == 0xff) throw std::runtime_error("Internal error: NA value found when constructing matrix to order");
+				*dest = levels[rawValue];
 				nonZero |= (*dest != 0);
 			}
 		}

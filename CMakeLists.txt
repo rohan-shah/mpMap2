@@ -8,7 +8,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 add_subdirectory(src)
 
 add_custom_target(copyPackage ALL)	
-set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h sortPedigreeLineNames.h unitTypes.hpp fourParentPedigreeRandomFunnels.h matrixChunks.h rawSymmetricMatrix.h dspMatrix.h)
+set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h sortPedigreeLineNames.h unitTypes.hpp fourParentPedigreeRandomFunnels.h matrixChunks.h rawSymmetricMatrix.h dspMatrix.h impute.h)
 set(RFILES biparentalDominant.R combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R f2Pedigree.R formGroups.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R multiparentSNP.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R removeHets.R rf-class.R rilPedigree.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R rawSymmetricMatrix.R orderCross.R)
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
