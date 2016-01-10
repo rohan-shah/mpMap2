@@ -22,16 +22,16 @@ template<int nFounders> struct expandedProbabilities<nFounders, false>
 };
 
 //Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
-template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(double (&prob)[nDifferentProbs], double recombinationFraction, int selfingGenerations);
-template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double (&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations);
+	template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(double(&prob)[nDifferentProbs], double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
+	template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double(&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
 template<int nFounders, bool infiniteSelfing> struct expandedGenotypeProbabilities;
 template<int nFounders> struct expandedGenotypeProbabilities<nFounders, true>
 {
 public:
-	static void noIntercross(array2<nFounders>& expandedProbabilities, double r, int selfingGenerations)
+	static void noIntercross(array2<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations);
+		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations, nFunnels);
 		for(int i = 0; i < nFounders; i++)
 		{
 			for(int j = 0; j < nFounders; j++)
@@ -40,10 +40,10 @@ public:
 			}
 		}
 	}
-	static void withIntercross(array2<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations)
+	static void withIntercross(array2<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations);
+		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
 		for(int i = 0; i < nFounders; i++)
 		{
 			for(int j = 0; j < nFounders; j++)
@@ -56,10 +56,10 @@ public:
 template<int nFounders> struct expandedGenotypeProbabilities<nFounders, false>
 {
 public:
-	static void noIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, double r, int selfingGenerations)
+	static void noIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations);
+		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
 #ifndef NDEBUG
 		double sum = 0;
@@ -86,10 +86,10 @@ public:
 		if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
 #endif
 	}
-	static void withIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations)
+	static void withIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 	{	
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations);
+		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
 #ifndef NDEBUG
 		double sum = 0;

@@ -261,12 +261,12 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
 		if(verbose)
 		{
-			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = nDesigns*nValuesToEstimate, Rcpp::Named("initial") = 0);
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = (int)nDesigns*(int)nValuesToEstimate, Rcpp::Named("initial") = 0);
 			updateProgress = [barHandle,setTxtProgressBar](unsigned long long value)
 				{
 					try
 					{
-						setTxtProgressBar(barHandle, value);
+						setTxtProgressBar(barHandle, (int)value);
 					}
 					catch(...)
 					{}
