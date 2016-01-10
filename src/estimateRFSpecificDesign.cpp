@@ -38,6 +38,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.funnelEncodings = &args.funnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
+	lookupArgs.funnelIDs = &args.funnelIDs;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
