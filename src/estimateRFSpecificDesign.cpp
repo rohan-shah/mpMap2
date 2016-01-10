@@ -151,6 +151,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.funnelEncodings = &args.funnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
+	lookupArgs.funnelIDs = &args.funnelIDs;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
 	const int product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);

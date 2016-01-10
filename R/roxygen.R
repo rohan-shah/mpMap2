@@ -2,7 +2,9 @@
 #' @import igraph
 #' @import seriation
 #' @importFrom pryr address
-#' @exportMethod subset
+#' @exportClass pedigreeGraph
+#' @exportMethod subset 
+#' @exportMethod plot
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @useDynLib mpMap2
 NULL

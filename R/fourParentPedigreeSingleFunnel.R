@@ -10,14 +10,22 @@
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @export
-fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds)
+fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
   nonNegativeIntegerArgument(nSeeds)
+  intercrossingGenerations <- as.integer(intercrossingGenerations)
+  initialPopulationSize <- as.integer(initialPopulationSize)
+
+  if(initialPopulationSize <= 2 && intercrossingGenerations > 0)
+  {
+    stop("Random mating is impossible with only two lines per generation")
+#....and more importantly it means that the sample command below gets screwed up, because we're calling sample(x) where length(x) == 1, which samples from 1:x
+  }
 
   #Four founders, + 6 pairs + intialPopulationSize funnels
-  entries <- 4L + 2L + initialPopulationSize + nSeeds*selfingGenerations*initialPopulationSize
+  entries <- 4L + 2L + initialPopulationSize + intercrossingGenerations*initialPopulationSize + nSeeds*selfingGenerations*initialPopulationSize
 
   mother <- father <- rep(NA, entries)
   observed <- rep(FALSE, entries)
@@ -34,6 +42,19 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
 
   currentIndex <- 7L
   nextFree <- currentIndex + initialPopulationSize
+  if(intercrossingGenerations > 0)
+  {
+    for(i in 1:intercrossingGenerations)
+    {
+      for(lineCounter in nextFree:(nextFree+initialPopulationSize-1))
+      {
+        mother[lineCounter] <- lineCounter - initialPopulationSize
+	father[lineCounter] <- sample(setdiff((nextFree-initialPopulationSize):(nextFree-1), lineCounter - initialPopulationSize), 1)
+      }
+      currentIndex <- currentIndex + initialPopulationSize
+      nextFree <- nextFree + initialPopulationSize
+    }
+  }
 
   #Now the selfing. 
   #First the case of one generation of selfing

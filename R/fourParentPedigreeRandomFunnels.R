@@ -31,6 +31,8 @@ fourParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, self
   nonNegativeIntegerArgument(selfingGenerations)
   nonNegativeIntegerArgument(nSeeds)
   nonNegativeIntegerArgument(intercrossingGenerations)
+  intercrossingGenerations <- as.integer(intercrossingGenerations)
+  initialPopulationSize <- as.integer(initialPopulationSize)
 
   if(initialPopulationSize <= 2 && intercrossingGenerations > 0)
   {
