@@ -183,10 +183,10 @@ template<> void genotypeProbabilitiesWithIntercross<4, false>(double(&prob)[nDif
 		prob[8] = pow24*(-(complex3*(powOneMinus2R1 - quadraticPower1)) + complex4*(powOneMinus2R1 + quadraticPower1));
 		prob[9] = pow21*(2 * oneMinus2R*oneMinusR*powOneMinus2R1*powOneMinusR1*(1 - oneMinus2R*powOneMinusR1) + (1 - oneMinus2RSquared*powOneMinusR2)*quadraticPower1);
 		prob[10] = pow21*(4 + 4 * oneMinus2R*oneMinusR*powOneMinusR1 + quadraticPower1*(-3 - 2 * oneMinus2R*oneMinusR*powOneMinusR1 + oneMinus2RSquared*powOneMinusR2*twoRMinus3));
-		prob[11] = pow23*(16 * complex1*(1 / 4 - (oneMinus2RSquared*powOneMinusR1) / 4)*(-powOneMinus2R1 + quadraticPower1) + complex3*(powOneMinus2R1 + quadraticPower1));
+		prob[11] = pow23*(16 * complex1*(0.25 - (oneMinus2RSquared*powOneMinusR1) / 4)*(-powOneMinus2R1 + quadraticPower1) + complex3*(powOneMinus2R1 + quadraticPower1));
 		prob[12] = pow24*(-(complex3*(powOneMinus2R1 - quadraticPower1)) + complex5*(powOneMinus2R1 + quadraticPower1));
 		prob[13] = pow22*(1 - oneMinus2R*powOneMinusR1)*(4 + (-3 - oneMinus2R*powOneMinusR1)*quadraticPower1);
-		prob[14] = pow23*(-(complex3*(powOneMinus2R1 - quadraticPower1)) + 16 * complex1*(1 / 4 - (oneMinus2RSquared*powOneMinusR1) / 4)*(powOneMinus2R1 + quadraticPower1));
+		prob[14] = pow23*(-(complex3*(powOneMinus2R1 - quadraticPower1)) + 16 * complex1*(0.25 - (oneMinus2RSquared*powOneMinusR1) / 4)*(powOneMinus2R1 + quadraticPower1));
 		prob[15] = pow24*(16 * complex2*(-powOneMinus2R1 + quadraticPower1) + complex3*(powOneMinus2R1 + quadraticPower1));
 		prob[16] = pow24*(16 * complex6*(-powOneMinus2R1 + quadraticPower1) + complex3*(powOneMinus2R1 + quadraticPower1));
 		prob[17] = complex7*pow23*quadraticPower1;

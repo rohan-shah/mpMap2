@@ -1,6 +1,39 @@
 #include "funnelsToUniqueValues.h"
-void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation, std::vector<funnelID>& funnelIDs, std::vector<funnelEncoding>& funnelEncodings, std::vector<funnelType>& allFunnels, int nFounders)
+void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation, std::vector<funnelID>& lineFunnelIDs, std::vector<funnelEncoding>& lineFunnelEncodings, std::vector<funnelEncoding>& allFunnelEncodings, std::vector<funnelType>& lineFunnels, std::vector<funnelType>& allFunnels, int nFounders)
 {
+	//First the line Funnels
+	funnelTranslation.clear();
+	for(std::vector<funnelType>::iterator i = lineFunnels.begin(); i != lineFunnels.end(); i++)
+	{
+		funnelType funnel = *i;
+		int encoded = 0;
+		bool isZero = true;
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			encoded += ((funnel.val[founderCounter]-1) << (3 * founderCounter));
+			isZero &= (funnel.val[founderCounter] == 0);
+		}
+		//If it's a dummy value, ignore it
+		if(isZero)
+		{
+			lineFunnelIDs.push_back(-1);
+		}
+		else
+		{
+			if(funnelTranslation.find(encoded) == funnelTranslation.end())
+			{
+				lineFunnelIDs.push_back((int)funnelTranslation.size());
+				funnelTranslation.insert(std::make_pair(encoded, (int)funnelTranslation.size()));
+				lineFunnelEncodings.push_back(encoded);
+			}
+			else
+			{
+				lineFunnelIDs.push_back(funnelTranslation.find(encoded)->second);
+			}
+		}
+	}
+	//Then the set of all funnels involved
+	funnelTranslation.clear();
 	for(std::vector<funnelType>::iterator i = allFunnels.begin(); i != allFunnels.end(); i++)
 	{
 		funnelType funnel = *i;
@@ -11,13 +44,9 @@ void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation
 		}
 		if(funnelTranslation.find(encoded) == funnelTranslation.end())
 		{
-			funnelIDs.push_back((int)funnelTranslation.size());
 			funnelTranslation.insert(std::make_pair(encoded, (int)funnelTranslation.size()));
-			funnelEncodings.push_back(encoded);
-		}
-		else
-		{
-			funnelIDs.push_back(funnelTranslation.find(encoded)->second);
+			allFunnelEncodings.push_back(encoded);
 		}
 	}
+
 }

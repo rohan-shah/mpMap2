@@ -28,7 +28,7 @@ struct rfhaps_internal_args
 	: recombinationFractions(recombinationFractions), startPosition(startPosition)
 	{}
 	rfhaps_internal_args(rfhaps_internal_args&& other)
-		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), maxAlleles(other.maxAlleles), result(other.result), funnelIDs(std::move(other.funnelIDs)), funnelEncodings(std::move(other.funnelEncodings)), startPosition(other.startPosition)
+		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), maxAlleles(other.maxAlleles), result(other.result), lineFunnelIDs(std::move(other.lineFunnelIDs)), lineFunnelEncodings(std::move(other.lineFunnelEncodings)), allFunnelEncodings(std::move(other.allFunnelEncodings)), startPosition(other.startPosition)
 	{}
 	Rcpp::IntegerMatrix finals, founders;
 	Rcpp::S4 pedigree;
@@ -44,8 +44,9 @@ struct rfhaps_internal_args
 	//zeroed by the calling code. Must be added to, not overwritten. 
 	double* result;
 	unsigned long long valuesToEstimateInChunk;
-	std::vector<funnelID> funnelIDs;
-	std::vector<funnelEncoding> funnelEncodings;
+	std::vector<funnelID> lineFunnelIDs;
+	std::vector<funnelEncoding> lineFunnelEncodings;
+	std::vector<funnelEncoding> allFunnelEncodings;
 	triangularIterator startPosition;
 	std::function<void(unsigned long long)> updateProgress;
 };
