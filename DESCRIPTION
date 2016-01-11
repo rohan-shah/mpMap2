@@ -10,6 +10,7 @@ Description: Tools for constructing linkage maps, reconstructing haplotypes,
     designs (e.g. MAGIC)
 License: GPL-2
 LazyLoad: yes
+SystemRequirements: C++11
 Depends:
     qtl,
     seriation,
