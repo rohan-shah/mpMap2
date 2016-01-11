@@ -15,7 +15,7 @@ BEGIN_RCPP
 		throw std::runtime_error("Slot levels in mpcrossRF@rf@theta must contain the value 0");
 	}
 	Rbyte zeroLevel = (Rbyte)std::distance(levels.begin(), zeroIterator);
-	int nMarkers = markers.size();
+	R_xlen_t nMarkers = markers.size();
 	struct group
 	{
 	public:

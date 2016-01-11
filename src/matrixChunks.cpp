@@ -39,7 +39,9 @@ SEXP countValuesToEstimateExported(SEXP markerRows_, SEXP markerColumns_)
 BEGIN_RCPP
 	std::vector<int> markerRows = Rcpp::as<std::vector<int> >(markerRows_);
 	std::vector<int> markerColumns = Rcpp::as<std::vector<int> >(markerColumns_);
-	return Rcpp::wrap<int>(countValuesToEstimate(markerRows, markerColumns));
+	unsigned long long result = countValuesToEstimate(markerRows, markerColumns);
+	if (result > std::numeric_limits<int>::max()) throw std::runtime_error("Return value exceeds maximum value of 32-bit integer");
+	return Rcpp::wrap<int>((int)result);
 END_RCPP
 }
 unsigned long long countValuesToEstimate(const std::vector<int>& markerRows, const std::vector<int>& markerColumns)

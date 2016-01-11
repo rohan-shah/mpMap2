@@ -2,7 +2,7 @@
 #include <Rcpp.h>
 void createGamete(Rcpp::NumericVector& recombinationFractions, Rcpp::IntegerVector& geneticData, int* output)
 {
-	int nMarkers = recombinationFractions.length() + 1;
+	R_xlen_t nMarkers = recombinationFractions.length() + 1;
 	//Set the first marker separately as it's set without reference to any other
 	int runningHaplotype = 0;
 	if(Rcpp::as<float>(Rcpp::runif(1, 0, 1)) < 0.5) runningHaplotype = 1;
@@ -54,9 +54,9 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));
 		Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 		
-		int nMarkers = recombinationFractions.length() + 1, nPedRows = lineNames.size();
+		R_xlen_t nMarkers = recombinationFractions.length() + 1, nPedRows = lineNames.size();
 		//Columns 0 and nMarkers correspond to the the pair of alleles at the first marker
-		Rcpp::IntegerMatrix result(lineNames.size(), 2*nMarkers);
+		Rcpp::IntegerMatrix result((int)lineNames.size(), (int)(2*nMarkers));
 		//once we encounter a line with parents which are not set to zero we set this to true. And subsequently don't allow any zero-values for mother or father
 		bool finishedFounders = false;
 		int founderCounter = 0;

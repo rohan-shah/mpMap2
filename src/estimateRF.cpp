@@ -16,7 +16,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input recombinationFractions must be a numeric vector");
 		}
-		int nRecombLevels = recombinationFractions.size();
+		R_xlen_t nRecombLevels = recombinationFractions.size();
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
 		if(std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.0) == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0");
@@ -80,7 +80,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input gbLimit must be a single numeric value");
 		}
-		signed long long bytesLimit = gbLimit*1000000000LL + 1;
+		signed long long bytesLimit = (signed long long)gbLimit*1000000000LL + 1LL;
 	
 		Rcpp::List geneticData;
 		try
@@ -91,11 +91,11 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input object must have a slot named \"geneticData\" which must be a list");
 		}
-		int nDesigns = geneticData.length();
+		R_xlen_t nDesigns = geneticData.length();
 		if(lineWeights.size() != nDesigns) throw std::runtime_error("Input lineWeights had the wrong number of entries");
 		try
 		{
-			for(int i = 0; i < nDesigns; i++)
+			for(R_xlen_t i = 0; i < nDesigns; i++)
 			{
 				Rcpp::NumericVector currentDesignLineWeights = lineWeights(i);
 			}
@@ -140,21 +140,21 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		if(markerColumnMin < 0) throw std::runtime_error("Invalid value for input markerColumns");
 
 		//If the input values of markerRows and markerColumns give a region that's completely in the lower triangular region, then throw an error
-		unsigned long long nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);
+		signed long long nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);
 		if(nValuesToEstimate == 0)
 		{
 			throw std::runtime_error("Input values of markerRows and markerColumns give a region that is contained in the lower triangular part of the matrix");
 		}
 
 		//Warn if we're going to allocate over 4gb
-		std::size_t valuesToEstimateInChunk;
+		R_xlen_t valuesToEstimateInChunk;
 		if(bytesLimit < 0)
 		{
 			valuesToEstimateInChunk = nValuesToEstimate;
 		}
 		else
 		{
-			valuesToEstimateInChunk = std::min(nValuesToEstimate, bytesLimit / ((std::size_t)nRecombLevels * sizeof(double)) + 1);
+			valuesToEstimateInChunk = std::min(nValuesToEstimate, bytesLimit / (R_xlen_t)(nRecombLevels * sizeof(double)) + 1LL);
 		}
 		//Output a message detailing allocation size here, if either we're going to allocate more than 4gb, and the user didn't attempt to limit this, or the verbose option is specified. 
 		if((valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double) > 4000000000ULL && bytesLimit < 0) || verbose)
@@ -237,7 +237,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			internalArgumentObjects.emplace_back(std::move(internalArgs));
 		}
 		//Estimate required memory usage
-		unsigned long long lookupBytes = 0;
+		signed long long lookupBytes = 0;
 		for(int i = 0; i < nDesigns; i++)
 		{
 			unsigned long long currentLookupBytes = estimateLookup(internalArgumentObjects[i]);
@@ -273,9 +273,9 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				};
 		}
 		unsigned long long counter = 0;
-		for(unsigned long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
+		for(signed long long offset = 0; offset < nValuesToEstimate; offset += valuesToEstimateInChunk)
 		{
-			long long valuesToEstimateInCurrentChunk = std::min((long long)valuesToEstimateInChunk, (long long)(nValuesToEstimate - offset));
+			signed long long valuesToEstimateInCurrentChunk = std::min(valuesToEstimateInChunk, nValuesToEstimate - offset);
 			if(offset != 0) memset(resultPtr, 0, result.size() * sizeof(double));
 			//Now the actual computation)
 			for(int i = 0; i < nDesigns; i++)
@@ -289,8 +289,8 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				if(!successful) throw std::runtime_error("Internal error");
 			}
 			//now for some post-processing to get out the MLE, lod (maybe) and lkhd (maybe)
-			unsigned long long endValue = std::min(nValuesToEstimate, offset + valuesToEstimateInCurrentChunk);
-			for(unsigned long long counter = offset; counter < endValue; counter++)
+			signed long long endValue = std::min(nValuesToEstimate, offset + valuesToEstimateInCurrentChunk);
+			for(signed long long counter = offset; counter < endValue; counter++)
 			{
 				double* start = resultPtr + (counter - offset) * nRecombLevels;
 				double* end = resultPtr + (counter - offset + 1) * nRecombLevels;

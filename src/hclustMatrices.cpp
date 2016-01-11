@@ -1,5 +1,5 @@
 #include "hclustMatrices.h"
-int countPreClusterMarkers(SEXP preClusterResults_, bool& noDuplicates)
+R_xlen_t countPreClusterMarkers(SEXP preClusterResults_, bool& noDuplicates)
 {
 	Rcpp::List preClusterResults = preClusterResults_;
 	std::vector<int> markers;
@@ -11,10 +11,10 @@ int countPreClusterMarkers(SEXP preClusterResults_, bool& noDuplicates)
 			markers.push_back(*j);
 		}
 	}
-	int nMarkers1 = markers.size();
+	R_xlen_t nMarkers1 = markers.size();
 	std::sort(markers.begin(), markers.end());
 	std::vector<int>::iterator lastUnique = std::unique(markers.begin(), markers.end());
-	int nMarkers2 = std::distance(markers.begin(), lastUnique);
+	R_xlen_t nMarkers2 = std::distance(markers.begin(), lastUnique);
 	noDuplicates = nMarkers1 == nMarkers2;
 	return nMarkers1;
 }
@@ -23,7 +23,7 @@ SEXP hclustThetaMatrix(SEXP mpcrossRF_, SEXP preClusterResults_)
 BEGIN_RCPP
 	Rcpp::List preClusterResults = preClusterResults_;
 	bool noDuplicates;
-	int preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
+	R_xlen_t preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
 	if(!noDuplicates)
 	{
 		throw std::runtime_error("Duplicate marker indices in call to hclustThetaMatrix");
@@ -40,7 +40,7 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Number of markers in precluster object was inconsistent with number of markers in mpcrossRF object");
 	}
-	int resultDimension = preClusterResults.size();
+	R_xlen_t resultDimension = preClusterResults.size();
 	//Allocate enough storage. This symmetric matrix stores the *LOWER* triangular part, in column-major storage. Excluding the diagonal. 
 	Rcpp::NumericVector result(((resultDimension-1)*resultDimension)/2);
 	for(int column = 0; column < resultDimension; column++)
@@ -79,7 +79,7 @@ SEXP hclustCombinedMatrix(SEXP mpcrossRF_, SEXP preClusterResults_)
 {
 BEGIN_RCPP
 	bool noDuplicates;
-	int preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
+	R_xlen_t preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
 	if(!noDuplicates)
 	{
 		throw std::runtime_error("Duplicate marker indices in call to hclustThetaMatrix");
@@ -104,7 +104,7 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Number of markers in precluster object was inconsistent with number of markers in mpcrossRF object");
 	}
-	int resultDimension = preClusterResults.size();
+	R_xlen_t resultDimension = preClusterResults.size();
 	//Work out minimum difference between recombination levels
 	double minDifference = 1;
 	for(int i = 0; i < levels.size()-1; i++)
@@ -152,7 +152,7 @@ SEXP hclustLodMatrix(SEXP mpcrossRF_, SEXP preClusterResults_)
 {
 BEGIN_RCPP
 	bool noDuplicates;
-	int preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
+	R_xlen_t preClusterMarkers = countPreClusterMarkers(preClusterResults_, noDuplicates);
 	if(!noDuplicates)
 	{
 		throw std::runtime_error("Duplicate marker indices in call to hclustThetaMatrix");
@@ -173,7 +173,7 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Number of markers in precluster object was inconsistent with number of markers in mpcrossRF object");
 	}
-	int resultDimension = preClusterResults.size();
+	R_xlen_t resultDimension = preClusterResults.size();
 	double maxLod = *std::max_element(lodData.begin(), lodData.end());
 	//Allocate enough storage. This symmetric matrix stores the *LOWER* triangular part, in column-major storage. Excluding the diagonal. 
 	Rcpp::NumericVector result(((resultDimension-1)*resultDimension)/2);

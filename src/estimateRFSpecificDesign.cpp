@@ -154,9 +154,9 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	lookupArgs.funnelIDs = &args.funnelIDs;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
-	const int product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
-	const int product2 = (maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
-	const int product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations+1;
+	const R_xlen_t product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
+	const R_xlen_t product2 = (maxSelfing - minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations + 1);
+	const R_xlen_t product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations + 1;
 
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work.
 	//Use this to only call setTxtProgressBar every 10 calls to updateProgress. Probably no point in updating status more frequently than that.
