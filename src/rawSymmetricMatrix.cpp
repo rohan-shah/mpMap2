@@ -5,7 +5,7 @@ SEXP rawSymmetricMatrixSubsetIndices(SEXP object_, SEXP i_, SEXP j_, SEXP drop_)
 BEGIN_RCPP
 	Rcpp::S4 object = object_;
 	Rcpp::CharacterVector markers = object.slot("markers");
-	int nMarkers = markers.size();
+	R_xlen_t nMarkers = markers.size();
 	Rcpp::NumericVector levels = object.slot("levels");
 	Rcpp::RawVector data = object.slot("data");
 	Rcpp::IntegerVector i = i_;
@@ -59,7 +59,7 @@ BEGIN_RCPP
 			return result;
 		}
 	}
-	Rcpp::NumericMatrix result(i.size(), j.size());
+	Rcpp::NumericMatrix result((int)i.size(), (int)j.size());
 	Rcpp::CharacterVector rownames(i.size()), colnames(j.size());
 	for(int iCounter = 0; iCounter < i.size(); iCounter++)
 	{
@@ -86,9 +86,9 @@ SEXP rawSymmetricMatrixSubsetObject(SEXP object_, SEXP indices_)
 BEGIN_RCPP
 	Rcpp::S4 object = object_;
 	Rcpp::RawVector oldData = object.slot("data");
-	int oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
+	R_xlen_t oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
 	Rcpp::IntegerVector indices = indices_;
-	int newNMarkers = indices.size();
+	R_xlen_t newNMarkers = indices.size();
 	Rcpp::RawVector newData((indices.size() * (indices.size() + 1))/2);
 	int counter = 0;
 	//Column

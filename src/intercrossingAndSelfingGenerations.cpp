@@ -3,7 +3,7 @@
 bool getIntercrossingAndSelfingGenerations(Rcpp::S4 pedigree, Rcpp::IntegerMatrix finals, int nFounders, std::vector<int>& intercrossing, std::vector<int>& selfing)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
-	int nPedigreeRows = pedigreeLineNames.length();
+	R_xlen_t nPedigreeRows = pedigreeLineNames.length();
 	//We make a copy of the pedigree line names and sort it (otherwise the std::find relating to pedigreeLineNames is prohibitive)
 	std::vector<pedigreeLineStruct> sortedPedigreeLineNames;
 	sortPedigreeLineNames(pedigreeLineNames, sortedPedigreeLineNames);

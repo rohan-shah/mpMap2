@@ -27,7 +27,7 @@ RcppExport void codingErrorsToStrings(Rcpp::List codingErrors, std::vector<std::
 		Rcpp::IntegerMatrix finalErrors = codingErrors["finals"];
 		Rcpp::IntegerVector nullErrors = codingErrors["null"];
 
-		int nFounderErrors = founderErrors.nrow(), nFinalErrors = finalErrors.nrow(), nNullErrors = nullErrors.length();
+		R_xlen_t nFounderErrors = founderErrors.nrow(), nFinalErrors = finalErrors.nrow(), nNullErrors = nullErrors.length();
 		for(int i = 0; i < nFounderErrors; i++)
 		{
 			if((int)codingErrorsAsStrings.size() >= limit) 
@@ -76,11 +76,11 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 		std::vector<int> finalErrorRow, finalErrorMarker;
 		std::vector<int> nullErrorMarkers;
 
-		int nMarkers = hetData.length();
+		R_xlen_t nMarkers = hetData.length();
 		int nFinals = finals.nrow(), nFounders = founders.nrow();
 		//Possible values for finals
 		std::vector<int> validFinalValues, validFounderValues;
-		for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
+		for(R_xlen_t markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 		{
 			bool hasNullFounder = false;
 			validFounderValues.clear();
@@ -98,7 +98,7 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 			{
 				if(currentHetData.nrow() != 0)
 				{
-					nullErrorMarkers.push_back(markerCounter);
+					nullErrorMarkers.push_back((int)markerCounter);
 				}
 				else
 				{
@@ -106,7 +106,7 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 					{
 						if(finals(finalCounter, markerCounter) != NA_INTEGER)
 						{
-							nullErrorMarkers.push_back(markerCounter);
+							nullErrorMarkers.push_back((int)markerCounter);
 							break;
 						}
 					}
@@ -118,13 +118,13 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 				{
 					if(std::find(validFounderValues.begin(), validFounderValues.end(), currentHetData(hetRowCounter, 0)) == validFounderValues.end())
 					{
-						founderErrorMarker.push_back(markerCounter);
+						founderErrorMarker.push_back((int)markerCounter);
 						founderErrorRow.push_back(hetRowCounter);
 						founderErrorColumn.push_back(0);
 					}
 					if(std::find(validFounderValues.begin(), validFounderValues.end(), currentHetData(hetRowCounter, 1)) == validFounderValues.end())
 					{
-						founderErrorMarker.push_back(markerCounter);
+						founderErrorMarker.push_back((int)markerCounter);
 						founderErrorRow.push_back(hetRowCounter);
 						founderErrorColumn.push_back(1);
 					}
@@ -135,7 +135,7 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 					if(finals(finalCounter, markerCounter) != NA_INTEGER && std::find(validFinalValues.begin(), validFinalValues.end(), finals(finalCounter, markerCounter)) == validFinalValues.end())
 					{
 						finalErrorRow.push_back(finalCounter);
-						finalErrorMarker.push_back(markerCounter);
+						finalErrorMarker.push_back((int)markerCounter);
 					}
 				}
 			}

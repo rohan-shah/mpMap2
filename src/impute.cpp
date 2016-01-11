@@ -46,7 +46,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 					unsigned char value2 = theta[(pair2Column * (pair2Column + 1))/2 + pair2Row];
 					if(value1 != 0xff && value2 != 0xff)
 					{
-						float val = fabs(levels[value1] - levels[value2]);
+						float val = (float)fabs(levels[value1] - levels[value2]);
 						totalDifference += val;
 						usableLocations++;
 					}

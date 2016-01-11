@@ -4,7 +4,9 @@
 #include "generateGenotypes.h"
 #include "alleleDataErrors.h"
 #include "estimateRF.h"
+#ifdef CUSTOM_STATIC_RCPP
 #include "internal.h"
+#endif
 #include "fourParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"

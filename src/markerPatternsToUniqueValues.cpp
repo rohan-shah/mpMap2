@@ -58,7 +58,7 @@ void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 		//If not, add it to the list of all possible marker patterns, and give it a new ID
 		if(existingPattern == args.markerPatterns.end())
 		{
-			args.markerPatternIDs.push_back(args.markerPatterns.size());
+			args.markerPatternIDs.push_back((int)args.markerPatterns.size());
 			args.markerPatterns.insert(std::make_pair(currentPattern, args.markerPatterns.size()));
 			args.allMarkerPatterns.push_back(currentPattern);
 		}
