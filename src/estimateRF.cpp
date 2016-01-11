@@ -154,7 +154,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		}
 		else
 		{
-			valuesToEstimateInChunk = std::min(nValuesToEstimate, bytesLimit / (R_xlen_t)(nRecombLevels * sizeof(double) + 1LL));
+			valuesToEstimateInChunk = std::min(nValuesToEstimate, (R_xlen_t) bytesLimit / (R_xlen_t)(nRecombLevels * sizeof(double)) + (R_xlen_t)1LL);
 		}
 		//Output a message detailing allocation size here, if either we're going to allocate more than 4gb, and the user didn't attempt to limit this, or the verbose option is specified. 
 		if((valuesToEstimateInChunk * (std::size_t)nRecombLevels * sizeof(double) > 4000000000ULL && bytesLimit < 0) || verbose)

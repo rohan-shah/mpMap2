@@ -51,7 +51,7 @@ test_that("Checking that a ril design, when split into 100 different datasets, g
 test_that("Checking that a 4-way ril design with a single funnel, when split into 100 different datasets, gives the same RF estimates",
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		fourParentPedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1)
+		fourParentPedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		cross <- simulateMPCross(map=map, pedigree=fourParentPedigree, mapFunction = haldane)
 		crosses <- subset(cross, lines = 1:5)
 		for(i in 2:100)
@@ -67,7 +67,7 @@ test_that("Checking that a 4-way ril design with a single funnel, when split int
 test_that("Checking that a 4-way design without selfing and with a single funnel, when split into 100 different datasets, gives the same RF estimates",
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		fourParentPedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1)
+		fourParentPedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
 		fourParentPedigree@selfing <- "auto"
 		cross <- simulateMPCross(map=map, pedigree=fourParentPedigree, mapFunction = haldane)
 		crosses <- subset(cross, lines = 1:5)

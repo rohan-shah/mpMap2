@@ -19,7 +19,7 @@ test_that("Check that biparentalDominant works for a RIL",
 	})
 test_that("Check that biparentalDominant doesn't work on a 4-way design",
 	{
-		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1)
+		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		expect_that(cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + biParentalDominant(), throws_error())
 	})
