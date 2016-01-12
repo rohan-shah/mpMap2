@@ -51,7 +51,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 		triangularIterator indexIterator = args.startPosition;
 		int previousCounter = 0;
 #ifdef USE_OPENMP
-		#pragma omp for schedule(static, 1)
+		#pragma omp for schedule(dynamic)
 #endif
 		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
@@ -171,7 +171,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 		int previousCounter = 0;
 #ifdef USE_OPENMP
-		#pragma omp for schedule(static, 1)
+		#pragma omp for schedule(dynamic)
 #endif
 		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
@@ -266,7 +266,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 #endif
 			{
 				updateProgressCounter++;
-				if(updateProgressCounter % 10 == 0) args.updateProgress(progressCounter);
+				if(updateProgressCounter % 100 == 0) args.updateProgress(progressCounter);
 			}
 		}
 	}
