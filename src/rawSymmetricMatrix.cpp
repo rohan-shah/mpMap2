@@ -172,3 +172,18 @@ BEGIN_RCPP
 	}
 END_RCPP
 }
+//Returns the value of any((object@data >= length(object@levels)) & object@data != as.raw(255))
+SEXP checkRawSymmetricMatrix(SEXP rawSymmetric_)
+{
+BEGIN_RCPP
+	Rcpp::S4 rawSymmetric = rawSymmetric_;
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	R_xlen_t size = data.size(), levelsSize = levels.size();
+	for(R_xlen_t i = 0; i < size; i++)
+	{
+		if(data[i] >= levelsSize && data[i] != 0xff) return Rcpp::wrap(true);
+	}
+	return Rcpp::wrap(false);
+END_RCPP
+}

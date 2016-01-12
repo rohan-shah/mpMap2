@@ -17,7 +17,9 @@ checkRawSymmetricMatrix <- function(object)
 	{
 		errors <- c(errors, "At most 254 possible levels are allowed")
 	}
-	if(any((object@data >= length(object@levels)) & object@data != as.raw(255)))
+	#Note that this creates a logical vector having the same length as object@data, before the any(...) is applied. Logicals are 4 bytes! So this is replaced with C code
+	#if(any((object@data >= length(object@levels)) & object@data != as.raw(255)))
+	if(.Call("checkRawSymmetricMatrix", object, PACKAGE="mpMap2"))
 	{
 		errors <- c(errors, "Value in slot data was too large")
 	}
