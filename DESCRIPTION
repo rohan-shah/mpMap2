@@ -16,7 +16,8 @@ Depends:
     seriation,
     methods,
     igraph,
-    Rcpp
+    Rcpp,
+    fastcluster
 Suggests:
     Rmpi,
     asreml,

@@ -15,6 +15,7 @@
 #include "hclustMatrices.h"
 #include "mpMap2_openmp.h"
 #include "order.h"
+#include "arsa.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -40,6 +41,7 @@ extern "C"
 		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
 		{"order", (DL_FUNC)&order, 2},
 		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
+		{"arsa", (DL_FUNC)&arsa, 5},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

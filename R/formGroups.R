@@ -58,7 +58,7 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 		{
 			distMat <- lod
 		}
-		clustered <- hclust(as.dist(distMat), method=method)
+		clustered <- fastcluster::hclust(as.dist(distMat), method=method)
 		cut <- cutree(clustered, k=groups)
 		names(cut) <- markers(mpcrossRF)
 	}
@@ -79,7 +79,7 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 			distMat <- .Call("hclustLodMatrix", mpcrossRF, preClusterResults, PACKAGE="mpMap2")
 		}
 		attr(distMat, "Size") <- length(preClusterResults)
-		clustered <- hclust(distMat, method = method)
+		clustered <- fastcluster::hclust(distMat, method = method)
 		#This cut is for the grouped markers, we want a similar object for the ungrouped markers
 		cut <- cutree(clustered, k=groups)
 
