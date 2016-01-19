@@ -26,11 +26,7 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	{
 		if(i == swap1 || i == swap2) continue;
 		R_xlen_t permutationI = randomPermutation[i];
-		R_xlen_t permutationI_1 = randomPermutation[i], copiedPermutationSwap1 = permutationSwap1, copiedPermutationSwap2 = permutationSwap2;
-		R_xlen_t permutationI_2 = permutationI_1;
-		if(copiedPermutationSwap1 < permutationI_1) std::swap(copiedPermutationSwap1, permutationI_1);
-		if(copiedPermutationSwap2 < permutationI_2) std::swap(copiedPermutationSwap2, permutationI_2);
-		delta += (abs(i - swap1) - abs(i - swap2)) * (levels[rawDist[(copiedPermutationSwap2 * (copiedPermutationSwap2+1))/2 + permutationI_2]] - levels[rawDist[(copiedPermutationSwap1 *(copiedPermutationSwap1 + 1))/2 + permutationI_1]]);
+		delta += (abs(i - swap1) - abs(i - swap2)) * (levels[rawDist[permutationSwap2 * n + permutationI]] - levels[rawDist[permutationSwap1 * n + permutationI]]);
 	}
 	//subtract off the case i == swap1.
 	//if(permutationSwap2 < permutationSwap1) std::swap(permutationSwap1, permutationSwap2);
@@ -99,8 +95,18 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input cool must be a number");
 	}
+
+	//We unpack the rawDist data into a symmetric matrix, for the purposes of running the ordering
+	std::vector<Rbyte> distMatrix(n*n);
+	for(std::size_t i = 0; i < n; i++)
+	{
+		for(std::size_t j = 0; j <= i; j++)
+		{
+			distMatrix[i * n + j] = distMatrix[j * n + i] = rawDist(i *(i + 1) + j);
+		}
+	}
 	std::vector<int> permutation;
-	arsaRaw(n, &(rawDist[0]), levels, cool, temperatureMin, nReps, permutation);
+	arsaRaw(n, &(distMatrix[0]), levels, cool, temperatureMin, nReps, permutation);
 	return Rcpp::wrap(permutation);
 END_RCPP
 }
@@ -137,9 +143,7 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 			for(R_xlen_t j = i+1; j < n; j++)
 			{
 				R_xlen_t l = bestPermutationThisRep[j];
-				R_xlen_t kCopied = k;
-				if(l < k) std::swap(l, kCopied);
-				z += (j-i) * levels[rawDist[(l*(l+1))/2 + kCopied]];
+				z += (j-i) * levels[rawDist[l*n + k]];
 			}
 		}
 		double zbestThisRep = z;
@@ -205,41 +209,31 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 							for(R_xlen_t counter2 = swap2+1; counter2 < n; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 += levels[rawDist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1]];
+								delta1 += levels[rawDist[permutedCounter2*n + permutedCounter1]];
 							}
 							for(R_xlen_t counter2 = 0; counter2 < swap1; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 -= levels[rawDist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1]];
+								delta1 -= levels[rawDist[permutedCounter2*n + permutedCounter1]];
 							}
 						}
 						//compute delta2
 						for(R_xlen_t counter1 = 0; counter1 < swap1; counter1++)
 						{
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 += levels[rawDist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta2 += levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 						for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
 						{
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 -= levels[rawDist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta2 -= levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 						//compute delta3
 						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
 						{
 							span2 -= 2;
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//permutedCounter1 = row, copiedPermutedSwap1 = column
-							delta3 += span2 * levels[rawDist[(copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta3 += span2 * levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 					}
 					else
@@ -250,41 +244,31 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 							for(R_xlen_t counter2 = swap1+1; counter2 < n; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 -= levels[rawDist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1]];
+								delta1 -= levels[rawDist[permutedCounter2*n + permutedCounter1]];
 							}
 							for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 += levels[rawDist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1]];
+								delta1 += levels[rawDist[permutedCounter2*n + permutedCounter1]];
 							}
 						}
 						//compute delta2
 						for(R_xlen_t counter1 = 0; counter1 < swap2; counter1++)
 						{
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 -= levels[rawDist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta2 -= levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 						for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
 						{
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 += levels[rawDist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta2 += levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 						//compute delta3
 						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
 						{
 							span2 -= 2;
-							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
-							//permutedCounter1 = row, copiedPermutedSwap1 = column
-							delta3 -= span2 * levels[rawDist[(copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1]];
+							R_xlen_t permutedCounter1 = currentPermutation[counter1];
+							delta3 -= span2 * levels[rawDist[permutedSwap1*n + permutedCounter1]];
 						}
 					}
 					double delta = delta1 + span * delta2 + delta3;

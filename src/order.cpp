@@ -187,7 +187,16 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		{
 			throw std::runtime_error(error.c_str());
 		}
-		arsaRaw(nMarkersCurrentGroup, &(imputedRaw[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation);
+		//Unpack the data into a symmetric matrix
+		std::vector<Rbyte> distMatrix(nMarkersCurrentGroup*nMarkersCurrentGroup);
+		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++)
+		{
+			for(std::size_t j = 0; j <= i; j++)
+			{
+				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRaw[(i*(i+1))/2 + j];
+			}
+		}
+		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation);
 
 		for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
 	}
