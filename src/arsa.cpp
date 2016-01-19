@@ -1,6 +1,6 @@
 #include "arsa.h"
 #include <Rcpp.h>
-bool descendingComparer(double i, double j)
+inline bool descendingComparer(double i, double j)
 {
 	return i > j;
 }
@@ -91,15 +91,12 @@ BEGIN_RCPP
 	}
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
-	double zbest = 0;
+	double zbestAllReps = 0;
 	//A copy of the best permutation found
-	std::vector<int> bestPermutation(n);
+	std::vector<int> bestPermutationThisRep(n), bestPermutationAllReps(n);
 	//We use this to build the random permutations
 	std::vector<int> consecutive(n);
 	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = i;
-	//The random permutation create at each step. 
-	std::vector<int> randomPermutation(n);
-	double temperatureMax = 0;
 	//We're doing lots of simulation, so we use the old-fashioned approach to dealing with Rs random number generation
 	GetRNGstate();
 
@@ -111,204 +108,204 @@ BEGIN_RCPP
 			double rand = unif_rand();
 			R_xlen_t index = rand*(n-i);
 			if(index == n-i) index--;
-			randomPermutation[i] = consecutive[index];
+			bestPermutationThisRep[i] = consecutive[index];
 			std::swap(consecutive[index], *(consecutive.rbegin()+i));
 		}
 		//calculate value of z
 		double z = 0;
 		for(R_xlen_t i = 0; i < n-1; i++)
 		{
-			R_xlen_t k = randomPermutation[i];
+			R_xlen_t k = bestPermutationThisRep[i];
 			for(R_xlen_t j = i+1; j < n; j++)
 			{
-				R_xlen_t l = randomPermutation[j];
+				R_xlen_t l = bestPermutationThisRep[j];
 				R_xlen_t kCopied = k;
 				if(l < k) std::swap(l, kCopied);
 				z += (j-i) * dist((l*(l+1))/2 + kCopied);
 			}
 		}
+		double zbestThisRep = z;
+		double temperatureMax = 0;
 		//Now try 5000 random swaps
 		for(R_xlen_t swapCounter = 0; swapCounter < 5000; swapCounter++)
 		{
 			R_xlen_t swap1, swap2;
 			getPairForSwap(n, swap1, swap2);
-			double delta = computeDelta(randomPermutation, swap1, swap2, dist);
+			double delta = computeDelta(bestPermutationThisRep, swap1, swap2, dist);
 			if(delta < 0)
 			{
 				if(fabs(delta) > temperatureMax) temperatureMax = fabs(delta);
 			}
-			if(z > zbest)
-			{
-				zbest = z;
-				bestPermutation.swap(randomPermutation);
-			}
 		}
-	}
-	double temperature = temperatureMax;
-	std::vector<int> currentPermutation = bestPermutation;
-	int nloop = (log(temperatureMin) - log(temperatureMax)) / log(cool);
-	Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
-	double z = zbest;
-	for(R_xlen_t idk = 0; idk < nloop; idk++)
-	{
-		Rcpp::Rcout << "Temp = " << temperature << std::endl;
-		for(R_xlen_t k = 0; k < 100*n; k++)
+		double temperature = temperatureMax;
+		std::vector<int> currentPermutation = bestPermutationThisRep;
+		int nloop = (log(temperatureMin) - log(temperatureMax)) / log(cool);
+		Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
+		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
-			double equalProb = unif_rand();
-			R_xlen_t swap1, swap2;
-			getPairForSwap(n, swap1, swap2);
-			//swap
-			if(equalProb <= 0.5)
+			Rcpp::Rcout << "Temp = " << temperature << std::endl;
+			for(R_xlen_t k = 0; k < 100*n; k++)
 			{
-				double delta = computeDelta(currentPermutation, swap1, swap2, dist);
-				if(delta > -1e-8)
+				R_xlen_t swap1, swap2;
+				getPairForSwap(n, swap1, swap2);
+				//swap
+				if(unif_rand() <= 0.5)
 				{
-					z += delta;
-					std::swap(currentPermutation[swap1], currentPermutation[swap2]);
-					if(z > zbest)
-					{
-						zbest = z;
-						bestPermutation = currentPermutation;
-					}
-				}
-				else
-				{
-					if(unif_rand() <= exp(delta / temperature))
+					double delta = computeDelta(currentPermutation, swap1, swap2, dist);
+					if(delta > -1e-8)
 					{
 						z += delta;
 						std::swap(currentPermutation[swap1], currentPermutation[swap2]);
-					}
-				}
-			}
-			//insertion
-			else
-			{
-				R_xlen_t permutedSwap1 = currentPermutation[swap1];
-				//three different patrs of delta
-				double delta1 = 0, delta2 = 0, delta3 = 0;
-				double span = abs(swap1 - swap2);
-				double span2 = span + 1;
-				if(swap2 > swap1)
-				{
-					//compute delta1
-					for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
-					{
-						for(R_xlen_t counter2 = swap2+1; counter2 < n; counter2++)
+						if(z > zbestThisRep)
 						{
-							R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-							//permutedCounter1 = row, permutedCounter2 = column
-							delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+							zbestThisRep = z;
+							bestPermutationThisRep = currentPermutation;
 						}
-						for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
-						{
-							R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-							//permutedCounter1 = row, permutedCounter2 = column
-							delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
-						}
-					}
-					//compute delta2
-					for(R_xlen_t counter1 = 0; counter1 < swap1; counter1++)
-					{
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//copiedPermutedSwap1 = column,  permutedCounter1 = row
-						delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-					for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
-					{
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//copiedPermutedSwap1 = column,  permutedCounter1 = row
-						delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-					//compute delta3
-					for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
-					{
-						span2 -= 2;
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//permutedCounter1 = row, copiedPermutedSwap1 = column
-						delta3 += span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-				}
-				else
-				{
-					//compute delta1
-					for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
-					{
-						for(R_xlen_t counter2 = swap1+1; counter2 < n; counter2++)
-						{
-							R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-							//permutedCounter1 = row, permutedCounter2 = column
-							delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
-						}
-						for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
-						{
-							R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
-							if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
-							//permutedCounter1 = row, permutedCounter2 = column
-							delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
-						}
-					}
-					//compute delta2
-					for(R_xlen_t counter1 = 0; counter1 < swap2; counter1++)
-					{
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//copiedPermutedSwap1 = column,  permutedCounter1 = row
-						delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-					for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
-					{
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//copiedPermutedSwap1 = column,  permutedCounter1 = row
-						delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-					//compute delta3
-					for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
-					{
-						span2 -= 2;
-						R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
-						if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
-						//permutedCounter1 = row, copiedPermutedSwap1 = column
-						delta3 -= span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
-					}
-
-				}
-				double delta = delta1 + span * delta2 + delta3;
-				if(delta > -1e-8 || unif_rand() <= exp(delta / temperature))
-				{
-					z += delta;
-					if(swap2 > swap1)
-					{
-						for(R_xlen_t i = swap1; i < swap2; i++)
-						{
-							currentPermutation[i] = currentPermutation[i+1];
-						}
-						currentPermutation[swap2] = permutedSwap1;
 					}
 					else
 					{
-						for(R_xlen_t i = swap1; i > swap2; i--)
+						if(unif_rand() <= exp(delta / temperature))
 						{
-							currentPermutation[i] = currentPermutation[i-1];
+							z += delta;
+							std::swap(currentPermutation[swap1], currentPermutation[swap2]);
 						}
-						currentPermutation[swap2] = permutedSwap1; 
 					}
 				}
-				if(delta > -1e-8 && z > zbest)
+				//insertion
+				else
 				{
-					bestPermutation = currentPermutation;
+					//three different patrs of delta
+					double delta1 = 0, delta2 = 0, delta3 = 0;
+					double span = abs(swap1 - swap2);
+					double span2 = span + 1;
+					R_xlen_t permutedSwap1 = currentPermutation[swap1];
+					if(swap2 > swap1)
+					{
+						//compute delta1
+						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
+						{
+							for(R_xlen_t counter2 = swap2+1; counter2 < n; counter2++)
+							{
+								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
+								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
+								//permutedCounter1 = row, permutedCounter2 = column
+								delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+							}
+							for(R_xlen_t counter2 = 0; counter2 < swap1; counter2++)
+							{
+								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
+								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
+								//permutedCounter1 = row, permutedCounter2 = column
+								delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+							}
+						}
+						//compute delta2
+						for(R_xlen_t counter1 = 0; counter1 < swap1; counter1++)
+						{
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//copiedPermutedSwap1 = column,  permutedCounter1 = row
+							delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+						for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
+						{
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//copiedPermutedSwap1 = column,  permutedCounter1 = row
+							delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+						//compute delta3
+						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
+						{
+							span2 -= 2;
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//permutedCounter1 = row, copiedPermutedSwap1 = column
+							delta3 += span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+					}
+					else
+					{
+						//compute delta1
+						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
+						{
+							for(R_xlen_t counter2 = swap1+1; counter2 < n; counter2++)
+							{
+								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
+								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
+								//permutedCounter1 = row, permutedCounter2 = column
+								delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+							}
+							for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
+							{
+								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
+								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
+								//permutedCounter1 = row, permutedCounter2 = column
+								delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+							}
+						}
+						//compute delta2
+						for(R_xlen_t counter1 = 0; counter1 < swap2; counter1++)
+						{
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//copiedPermutedSwap1 = column,  permutedCounter1 = row
+							delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+						for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
+						{
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//copiedPermutedSwap1 = column,  permutedCounter1 = row
+							delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+						//compute delta3
+						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
+						{
+							span2 -= 2;
+							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
+							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
+							//permutedCounter1 = row, copiedPermutedSwap1 = column
+							delta3 -= span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+						}
+					}
+					double delta = delta1 + span * delta2 + delta3;
+					if(delta > -1e-8 || unif_rand() <= exp(delta / temperature))
+					{
+						z += delta;
+						if(swap2 > swap1)
+						{
+							for(R_xlen_t i = swap1; i < swap2; i++)
+							{
+								currentPermutation[i] = currentPermutation[i+1];
+							}
+							currentPermutation[swap2] = permutedSwap1;
+						}
+						else
+						{
+							for(R_xlen_t i = swap1; i > swap2; i--)
+							{
+								currentPermutation[i] = currentPermutation[i-1];
+							}
+							currentPermutation[swap2] = permutedSwap1; 
+						}
+					}
+					if(delta > -1e-8 && z > zbestThisRep)
+					{
+						bestPermutationThisRep = currentPermutation;
+						zbestThisRep = z;
+					}
 				}
 			}
+			temperature *= cool;
 		}
-		temperature *= cool;
+		if(zbestThisRep > zbestAllReps)
+		{
+			zbestAllReps = zbestThisRep;
+			bestPermutationAllReps.swap(bestPermutationThisRep);
+		}
 	}
 	PutRNGstate();
-	return Rcpp::wrap(bestPermutation);
+	return Rcpp::wrap(bestPermutationAllReps);
 END_RCPP
 }
