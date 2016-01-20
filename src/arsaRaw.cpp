@@ -1,5 +1,8 @@
 #include "arsaRaw.h"
 #include <Rcpp.h>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 inline bool descendingComparer(double i, double j)
 {
 	return i > j;
@@ -117,11 +120,12 @@ BEGIN_RCPP
 		}
 	}
 	std::vector<int> permutation;
-	arsaRaw(n, &(distMatrix[0]), levels, cool, temperatureMin, nReps, permutation);
+	std::function<void(long,long)> progressFunction = [](long,long){};
+	arsaRaw(n, &(distMatrix[0]), levels, cool, temperatureMin, nReps, permutation, progressFunction);
 	return Rcpp::wrap(permutation);
 END_RCPP
 }
-void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation)
+void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(long, long)> progressFunction)
 {
 	permutation.resize(n);
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
@@ -174,6 +178,9 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
 		int nloop = (log(temperatureMin) - log(temperatureMax)) / log(cool);
+		long totalSteps = nloop * 100 * n;
+		long done = 0;
+		long threadZeroCounter = 0;
 		//Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
@@ -312,6 +319,23 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 						zbestThisRep = z;
 					}
 				}
+#ifdef USE_OPENMY
+				#pragma omp atomic
+#endif
+				{
+					done++;
+				}
+#ifdef USE_OPENMP
+				if(omp_get_thread_num() == 0)
+#endif
+				{
+					threadZeroCounter++;
+					if(threadZeroCounter % 100 == 0)
+					{
+						progressFunction(done, totalSteps);
+					}
+				}
+
 			}
 			temperature *= cool;
 		}

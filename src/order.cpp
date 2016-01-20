@@ -1,7 +1,7 @@
 #include "order.h"
 #include "impute.h"
 #include "arsaRaw.h"
-SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_)
+SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP verbose_)
 {
 	Rcpp::S4 mpcrossLG;
 	try
@@ -123,6 +123,16 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		throw std::runtime_error("Input nReps must be an integer");
 	}
 
+	bool verbose;
+	try
+	{
+		verbose = Rcpp::as<bool>(verbose_);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input verbose must be a boolean");
+	}
+
 
 	//Check that groupsToOrder contains unique values, which are contained in allGroups
 	std::sort(groupsToOrder.begin(), groupsToOrder.end());
@@ -149,6 +159,9 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 	std::vector<int> markersThisGroup;
 	//This holds a copy of the raw data, for the purposes of doing imputation. We don't want to touch the original, obviously. 
 	std::vector<unsigned char> imputedRaw;
+	//Stuff for the verbose output case
+	Rcpp::RObject barHandle;
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
 	for(std::vector<int>::iterator currentGroup = allGroups.begin(); currentGroup != allGroups.end(); currentGroup++)
 	{
 		markersThisGroup.clear();
@@ -196,8 +209,21 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRaw[(i*(i+1))/2 + j];
 			}
 		}
-		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation);
-
+		std::function<void(long,long)> progressFunction = [](long,long){};
+		if(verbose)
+		{
+			Rcpp::Rcout << "Starting to order group " << *currentGroup << std::endl;
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			progressFunction = [barHandle, setTxtProgressBar](long done, long totalSteps)
+			{
+				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+			};
+		}
+		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, progressFunction);
+		if(verbose)
+		{
+			close(barHandle);
+		}
 		for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
 	}
 	return Rcpp::wrap(permutation);
