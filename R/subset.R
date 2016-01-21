@@ -200,5 +200,6 @@ setMethod(f = "subset", signature = "rawSymmetricMatrix", definition = function(
 		stop("Input marker indices were out of range in function subset.rawSymmetricMatrix")
 	}
 	newRawData <- .Call("rawSymmetricMatrixSubsetObject", x, markers, PACKAGE="mpMap2")
-	return(new("rawSymmetricMatrix", data = newRawData, markers = x@markers[markers], levels = x@levels))
+	retVal <- new("rawSymmetricMatrix", data = newRawData, markers = x@markers[markers], levels = x@levels)
+	return(retVal)
 })

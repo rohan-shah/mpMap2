@@ -20,7 +20,7 @@
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
-	std::size_t nDifferentFunnels = args.funnelEncodings.size();
+	std::size_t nDifferentFunnels = args.lineFunnelEncodings.size();
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
@@ -35,10 +35,10 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	
 	constructLookupTableArgs<maxAlleles, nFounders> lookupArgs(computedContributions, args.markerPatternData);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
-	lookupArgs.funnelEncodings = &args.funnelEncodings;
+	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
-	lookupArgs.funnelIDs = &args.funnelIDs;
+	lookupArgs.allFunnelEncodings = &args.allFunnelEncodings;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
@@ -51,7 +51,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 		triangularIterator indexIterator = args.startPosition;
 		int previousCounter = 0;
 #ifdef USE_OPENMP
-		#pragma omp for schedule(static, 1)
+		#pragma omp for schedule(dynamic)
 #endif
 		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
@@ -89,7 +89,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 						int selfingGenerations = args.selfingGenerations[finalCounter];
 						if(intercrossingGenerations == 0)
 						{
-							funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+							funnelID currentLineFunnelID = args.lineFunnelIDs[finalCounter];
 							allowable = markerPairData.allowableFunnel(currentLineFunnelID, selfingGenerations - minSelfing);
 							if(allowable)
 							{
@@ -123,7 +123,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 #endif
 			{
 				updateProgressCounter++;
-				if(updateProgressCounter % 10 == 0) args.updateProgress(progressCounter);
+				if(updateProgressCounter % 100 == 0) args.updateProgress(progressCounter);
 			}
 		}
 	}
@@ -132,7 +132,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesignNoLineWeights(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
-	std::size_t nDifferentFunnels = args.funnelEncodings.size();
+	std::size_t nDifferentFunnels = args.lineFunnelEncodings.size();
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
@@ -148,10 +148,10 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	
 	constructLookupTableArgs<maxAlleles, nFounders> lookupArgs(computedContributions, args.markerPatternData);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
-	lookupArgs.funnelEncodings = &args.funnelEncodings;
+	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
 	lookupArgs.selfingGenerations = &args.selfingGenerations;
-	lookupArgs.funnelIDs = &args.funnelIDs;
+	lookupArgs.allFunnelEncodings = &args.allFunnelEncodings;
 	constructLookupTable<nFounders, maxAlleles, infiniteSelfing>(lookupArgs);
 
 	const R_xlen_t product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
@@ -171,7 +171,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 		int previousCounter = 0;
 #ifdef USE_OPENMP
-		#pragma omp for schedule(static, 1)
+		#pragma omp for schedule(dynamic)
 #endif
 		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
@@ -207,7 +207,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 					int selfingGenerations = args.selfingGenerations[finalCounter];
 					if(intercrossingGenerations == 0)
 					{
-						funnelID currentLineFunnelID = args.funnelIDs[finalCounter];
+						funnelID currentLineFunnelID = args.lineFunnelIDs[finalCounter];
 						table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + currentLineFunnelID]++;
 					}
 					else if(intercrossingGenerations > 0)
@@ -266,7 +266,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 #endif
 			{
 				updateProgressCounter++;
-				if(updateProgressCounter % 10 == 0) args.updateProgress(progressCounter);
+				if(updateProgressCounter % 100 == 0) args.updateProgress(progressCounter);
 			}
 		}
 	}
@@ -324,7 +324,7 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 	int maxAIGenerations = *std::max_element(internal_args.intercrossingGenerations.begin(), internal_args.intercrossingGenerations.end());
 	int minSelfing = *std::min_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
-	std::size_t nDifferentFunnels = internal_args.funnelEncodings.size();
+	std::size_t nDifferentFunnels = internal_args.lineFunnelEncodings.size();
 	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
 
 	std::size_t arraySize;
@@ -389,10 +389,11 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 		return false;
 	}
 
-	//Check that everything has a unique funnel - For the case of the lines which are just selfing, we just check that one funnel. For AIC lines, we check the funnels of all the parent lines
-	std::vector<funnelType> allFunnels;
+	//Check that everything has proper funnels - For the case of the lines which are just selfing, we just check that one funnel. For AIC lines, we check the funnels of all the parent lines
+	//allFunnels stores a vector of all the funnels involved in any way. lineFunnels stores a value per line, specifying the funnel per line, if the line is not an intercrossing line. If it is a dummy value is inserted. 
+	std::vector<funnelType> allFunnels, lineFunnels;
 	{
-		estimateRFCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels);
+		estimateRFCheckFunnels(args.finals, args.founders,  Rcpp::as<Rcpp::List>(args.hetData), args.pedigree, intercrossingGenerations, warnings, errors, allFunnels, lineFunnels);
 		for(std::size_t errorIndex = 0; errorIndex < errors.size() && errorIndex < 6; errorIndex++)
 		{
 			ss << errors[errorIndex] << std::endl;;
@@ -447,10 +448,12 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	//map containing encodings of the funnels involved in the experiment (as key), and an associated unique index (again, using the encoded values directly is no good because they'll be all over the place). Unique indices are contiguous again.
 	std::map<funnelEncoding, funnelID> funnelTranslation;
 	//vector giving the funnel ID for each individual
-	std::vector<funnelID> funnelIDs;
+	std::vector<funnelID> lineFunnelIDs;
 	//vector giving the encoded value for each individual
-	std::vector<funnelEncoding> funnelEncodings;
-	funnelsToUniqueValues(funnelTranslation, funnelIDs, funnelEncodings, allFunnels, nFounders);
+	std::vector<funnelEncoding> lineFunnelEncodings;
+	//vector giving the encoded value for each value in allFunnels
+	std::vector<funnelEncoding> allFunnelEncodings;
+	funnelsToUniqueValues(funnelTranslation, lineFunnelIDs, lineFunnelEncodings, allFunnelEncodings, lineFunnels, allFunnels, nFounders);
 	
 	//In the case of infinite selfing, we've still allowed hets up to this point. But we want to ignore any potential hets in the final analysis. 
 	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
@@ -480,8 +483,9 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	internal_args.markerPatternData.swap(markerPatternConversionArgs);
 	internal_args.hasAI = hasAIC;
 	internal_args.maxAlleles = maxAlleles;
-	internal_args.funnelIDs.swap(funnelIDs);
-	internal_args.funnelEncodings.swap(funnelEncodings);
+	internal_args.lineFunnelIDs.swap(lineFunnelIDs);
+	internal_args.lineFunnelEncodings.swap(lineFunnelEncodings);
+	internal_args.allFunnelEncodings.swap(allFunnelEncodings);
 	return true;
 }
 bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long long& counter)

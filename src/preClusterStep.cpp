@@ -43,26 +43,26 @@ BEGIN_RCPP
 	std::vector<group> newContinuingGroups(nMarkers);
 
 	//Initially every marker is in its own group
-	for(int i = 0; i < nMarkers; i++) continuingGroups[i].data.push_back(i);
+	for(R_xlen_t i = 0; i < nMarkers; i++) continuingGroups[i].data.push_back((int)i);
 	while(continuingGroups.size() > 0)
 	{
-		for(int i = 0; i < continuingGroups.size(); i++)
+		for(R_xlen_t i = 0; i < continuingGroups.size(); i++)
 		{
 			if(continuingGroups[i].data.size() == 0) continue;
-			for(int j = i + 1; j < continuingGroups.size(); j++)
+			for(R_xlen_t j = i + 1; j < continuingGroups.size(); j++)
 			{
 				const std::vector<int>& iData = continuingGroups[i].data, &jData = continuingGroups[j].data;
 				if(jData.size() == 0) continue;
 				//Check that every marker has recombination 0 with every marker in group j
-				for(int i_ = 0; i_ < iData.size(); i_++)
+				for(R_xlen_t i_ = 0; i_ < iData.size(); i_++)
 				{
-					int iMarker = iData[i_];
-					for(int j_ = 0; j_ < jData.size(); j_++)
+					R_xlen_t iMarker = iData[i_];
+					for(R_xlen_t j_ = 0; j_ < jData.size(); j_++)
 					{
-						int jMarker = jData[j_];
-						int rowMarker = std::min(jMarker, iMarker);
-						int columnMarker = std::max(jMarker, iMarker);
-						if(data[(columnMarker * (columnMarker+1))/2 + rowMarker] != zeroLevel)
+						R_xlen_t jMarker = jData[j_];
+						R_xlen_t rowMarker = std::min(jMarker, iMarker);
+						R_xlen_t columnMarker = std::max(jMarker, iMarker);
+						if(data[(columnMarker * (columnMarker+(R_xlen_t)1))/(R_xlen_t)2 + rowMarker] != zeroLevel)
 						{
 							//If it doesn't, continue to the next group j
 							goto nextJ;

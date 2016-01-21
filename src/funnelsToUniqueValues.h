@@ -4,5 +4,5 @@
 #include <vector>
 #include "estimateRF.h"
 #include "unitTypes.hpp"
-void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation, std::vector<funnelID>& funnelIDs, std::vector<funnelEncoding>& funnelEncodings, std::vector<funnelType>& allFunnels, int nFounders);
+void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation, std::vector<funnelID>& lineFunnelIDs, std::vector<funnelEncoding>& lineFunnelEncodings, std::vector<funnelEncoding>& allFunnelEncodings, std::vector<funnelType>& lineFunnels, std::vector<funnelType>& allFunnels, int nFounders);
 #endif

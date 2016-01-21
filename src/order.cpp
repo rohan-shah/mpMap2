@@ -1,6 +1,7 @@
 #include "order.h"
 #include "impute.h"
-SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
+#include "arsaRaw.h"
+SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP verbose_)
 {
 	Rcpp::S4 mpcrossLG;
 	try
@@ -92,6 +93,47 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 		throw std::runtime_error("Input groupsToOrder must be an integerVector");
 	}
 
+	double cool;
+	try
+	{
+		cool = Rcpp::as<double>(cool_);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input cool must be a number");
+	}
+
+	double temperatureMin;
+	try
+	{
+		temperatureMin = Rcpp::as<double>(temperatureMin_);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input temperatureMin must be a number");
+	}
+
+	long nReps;
+	try
+	{
+		nReps = Rcpp::as<int>(nReps_);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input nReps must be an integer");
+	}
+
+	bool verbose;
+	try
+	{
+		verbose = Rcpp::as<bool>(verbose_);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input verbose must be a boolean");
+	}
+
+
 	//Check that groupsToOrder contains unique values, which are contained in allGroups
 	std::sort(groupsToOrder.begin(), groupsToOrder.end());
 	std::sort(allGroups.begin(), allGroups.end());
@@ -117,6 +159,9 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 	std::vector<int> markersThisGroup;
 	//This holds a copy of the raw data, for the purposes of doing imputation. We don't want to touch the original, obviously. 
 	std::vector<unsigned char> imputedRaw;
+	//Stuff for the verbose output case
+	Rcpp::RObject barHandle;
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
 	for(std::vector<int>::iterator currentGroup = allGroups.begin(); currentGroup != allGroups.end(); currentGroup++)
 	{
 		markersThisGroup.clear();
@@ -145,62 +190,41 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp)
 				imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
 			}
 		}
-		//For the purposes of imputation the markers to be imputed are 0 to nMarkersCurrentGroup-1
+
 		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
 		for(int i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = i;
+
 		std::string error;
 		bool imputationResult = impute(&(imputedRaw[0]), levels, NULL, NULL, contiguousIndices, error);
 		if(!imputationResult)
 		{
 			throw std::runtime_error(error.c_str());
 		}
-
-		//Form the numeric matrix for ordering. 
-		Rcpp::NumericMatrix subMatrix(nMarkersCurrentGroup, nMarkersCurrentGroup);
-		double* mem = &(subMatrix(0,0));
-		//Determine whether or not the submatrix is zero, as seriation seems to screw up for all-zero matrices.
-		bool nonZero = false;
-		for(int i = 0; i < nMarkersCurrentGroup; i++)
+		//Unpack the data into a symmetric matrix
+		std::vector<Rbyte> distMatrix(nMarkersCurrentGroup*nMarkersCurrentGroup);
+		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++)
 		{
-			for(int j = 0; j < nMarkersCurrentGroup; j++)
+			for(std::size_t j = 0; j <= i; j++)
 			{
-				double* dest = mem + i + j * nMarkersCurrentGroup;
-				int row = i, column = j;
-				if(row > column) std::swap(row, column);
-				unsigned char rawValue = imputedRaw[(column * (column + 1))/2 + row];
-				if(rawValue == 0xff) throw std::runtime_error("Internal error: NA value found when constructing matrix to order");
-				*dest = levels[rawValue];
-				nonZero |= (*dest != 0);
+				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRaw[(i*(i+1))/2 + j];
 			}
 		}
-		if(nonZero)
+		std::function<void(long,long)> progressFunction = [](long,long){};
+		if(verbose)
 		{
-			Rcpp::RObject distSubMatrix = asDist(Rcpp::Named("m") = subMatrix);
-			
-			Rcpp::List nRepsControl = Rcpp::List::create(Rcpp::Named("nreps") = 5);
-			Rcpp::RObject result = seriate(Rcpp::Named("x") = distSubMatrix, Rcpp::Named("method") = "ARSA", Rcpp::Named("control") = nRepsControl);
-			std::vector<int> arsaResult = Rcpp::as<std::vector<int> >(getOrder(result));
-			double arsaCriterionResult = Rcpp::as<double>(criterion(Rcpp::Named("x") = distSubMatrix, Rcpp::Named("order") = result, Rcpp::Named("method") = "AR_events"));
-
-			//now consider identity permutation
-			double identityCriterionResult = Rcpp::as<double>(criterion(Rcpp::Named("x") = distSubMatrix, Rcpp::Named("method") = "AR_events"));
-
-			if(arsaCriterionResult < identityCriterionResult)
+			Rcpp::Rcout << "Starting to order group " << *currentGroup << std::endl;
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			progressFunction = [barHandle, setTxtProgressBar](long done, long totalSteps)
 			{
-				currentGroupPermutation.swap(arsaResult);
-			}
-			else
-			{
-				std::vector<int> identity;
-				for(int i = 0; i < nMarkersCurrentGroup; i++) identity.push_back(i+1);
-				currentGroupPermutation.swap(identity);
-			}
-			for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]-1]+1);
+				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+			};
 		}
-		else
+		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, progressFunction);
+		if(verbose)
 		{
-			for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[i]+1);
+			close(barHandle);
 		}
+		for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
 	}
 	return Rcpp::wrap(permutation);
 }

@@ -34,7 +34,7 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 }
 /* This function specifically checks whether the observed data is consistent with the *pedigree*. It assumes that every observed value in the finals is already valid - That is, every observed value contained in the finals is also listed as a possibility in the hetData object
 */
-void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels)
+void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix founders, Rcpp::List hetData, Rcpp::S4 pedigree, std::vector<int>& intercrossingGenerations, std::vector<std::string>& warnings, std::vector<std::string>& errors, std::vector<funnelType>& allFunnels, std::vector<funnelType>& lineFunnels)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
 
@@ -133,6 +133,10 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				}
 				ss << ". Did you intend to use all " << nFounders << " founders?";
 			}
+			else
+			{
+				allFunnels.push_back(funnel);
+			}
 		}
 		//remove duplicates in representedFounders
 		std::sort(representedFounders.begin(), representedFounders.end());
@@ -169,7 +173,13 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 		if(intercrossingGenerations[finalCounter] == 0)
 		{
 			orderFunnel(&(funnel.val[0]), nFounders);
-			allFunnels.push_back(funnel);
+			lineFunnels.push_back(funnel);
+		}
+		else
+		{
+			//Add a dummy value in lineFunnel
+			for(int i = 0; i < 8; i++) funnel.val[i] = 0;
+			lineFunnels.push_back(funnel);
 		}
 	}
 }

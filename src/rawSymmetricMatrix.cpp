@@ -15,25 +15,25 @@ BEGIN_RCPP
 	{
 		if(i.size() == 1 && j.size() == 1)
 		{
-			int i = Rcpp::as<int>(i_);
-			int j = Rcpp::as<int>(j_);
+			R_xlen_t i = Rcpp::as<int>(i_);
+			R_xlen_t j = Rcpp::as<int>(j_);
 			if(i > j) std::swap(i, j);
-			Rbyte rawValue = data[(j*(j-1))/2 + i-1];
+			Rbyte rawValue = data[(j*(j-(R_xlen_t)1))/(R_xlen_t)2 + i-(R_xlen_t)1];
 			if(rawValue == 0xff) return Rcpp::wrap(NA_REAL);
 			return Rcpp::wrap(levels[rawValue]);
 		}
 		else if(i.size() == 1)
 		{
 			Rcpp::NumericVector result(j.size());
-			int i = Rcpp::as<int>(i_);
+			R_xlen_t i = Rcpp::as<int>(i_);
 			Rcpp::CharacterVector names(j.size());
-			for(int jCounter = 0; jCounter < j.size(); jCounter++)
+			for(R_xlen_t jCounter = 0; jCounter < j.size(); jCounter++)
 			{
-				int iCopied = i;
-				int jValue = j[jCounter];
-				names[jCounter] = markers[jValue-1];
+				R_xlen_t iCopied = i;
+				R_xlen_t jValue = j[jCounter];
+				names[jCounter] = markers[jValue-(R_xlen_t)1];
 				if(iCopied > jValue) std::swap(iCopied, jValue);
-				Rbyte rawValue = data[(jValue*(jValue-1))/2 + iCopied-1];
+				Rbyte rawValue = data[(jValue*(jValue-(R_xlen_t)1))/(R_xlen_t)2 + iCopied-(R_xlen_t)1];
 				if(rawValue == 0xff) result[jCounter] = NA_REAL;
 				else result[jCounter] = levels[rawValue];
 			}
@@ -43,15 +43,15 @@ BEGIN_RCPP
 		else if(j.size() == 1)
 		{
 			Rcpp::NumericVector result(i.size());
-			int j = Rcpp::as<int>(j_);
+			R_xlen_t j = Rcpp::as<int>(j_);
 			Rcpp::CharacterVector names(i.size());
-			for(int iCounter = 0; iCounter < i.size(); iCounter++)
+			for(R_xlen_t iCounter = 0; iCounter < i.size(); iCounter++)
 			{
-				int jCopied = j;
-				int iValue = i[iCounter];
-				names[iCounter] = markers[iValue-1];
+				R_xlen_t jCopied = j;
+				R_xlen_t iValue = i[iCounter];
+				names[iCounter] = markers[iValue-(R_xlen_t)1];
 				if(iValue > jCopied) std::swap(iValue, jCopied);
-				Rbyte rawValue = data[(jCopied*(jCopied-1))/2 + iValue-1];
+				Rbyte rawValue = data[(jCopied*(jCopied-(R_xlen_t)1))/(R_xlen_t)2 + iValue-(R_xlen_t)1];
 				if(rawValue == 0xff) result[iCounter] = NA_REAL;
 				else result[iCounter] = levels[rawValue];
 			}
@@ -61,21 +61,21 @@ BEGIN_RCPP
 	}
 	Rcpp::NumericMatrix result((int)i.size(), (int)j.size());
 	Rcpp::CharacterVector rownames(i.size()), colnames(j.size());
-	for(int iCounter = 0; iCounter < i.size(); iCounter++)
+	for(R_xlen_t iCounter = 0; iCounter < i.size(); iCounter++)
 	{
-		rownames[iCounter] = markers[i[iCounter]-1];
-		for(int jCounter = 0; jCounter < j.size(); jCounter++)
+		rownames[iCounter] = markers[i[iCounter]-(R_xlen_t)1];
+		for(R_xlen_t jCounter = 0; jCounter < j.size(); jCounter++)
 		{
-			int iCopied = i[iCounter], jCopied = j[jCounter];
+			R_xlen_t iCopied = i[iCounter], jCopied = j[jCounter];
 			if(iCopied > jCopied) std::swap(iCopied, jCopied);
-			Rbyte rawValue = data[(jCopied*(jCopied-1))/2 + iCopied-1];
+			Rbyte rawValue = data[(jCopied*(jCopied-(R_xlen_t)1))/(R_xlen_t)2 + iCopied-(R_xlen_t)1];
 			if(rawValue == 0xff) result(iCounter, jCounter) = NA_REAL;
 			else result(iCounter, jCounter) = levels[rawValue];
 		}
 	}
-	for(int jCounter = 0; jCounter < j.size(); jCounter++)
+	for(R_xlen_t jCounter = 0; jCounter < j.size(); jCounter++)
 	{
-		colnames[jCounter] = markers[j[jCounter]-1];
+		colnames[jCounter] = markers[j[jCounter]-(R_xlen_t)1];
 	}
 	result.attr("dimnames") = Rcpp::List::create(rownames, colnames);
 	return result;
@@ -89,17 +89,17 @@ BEGIN_RCPP
 	R_xlen_t oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
 	Rcpp::IntegerVector indices = indices_;
 	R_xlen_t newNMarkers = indices.size();
-	Rcpp::RawVector newData((indices.size() * (indices.size() + 1))/2);
-	int counter = 0;
+	Rcpp::RawVector newData((indices.size() * (indices.size() + (R_xlen_t)1))/(R_xlen_t)2);
+	R_xlen_t counter = 0;
 	//Column
-	for(int j = 0; j < newNMarkers; j++)
+	for(R_xlen_t j = 0; j < newNMarkers; j++)
 	{
 		//Row
-		for(int i = 0; i <= j; i++)
+		for(R_xlen_t i = 0; i <= j; i++)
 		{
-			int indexJ = indices[j], indexI = indices[i];
+			R_xlen_t indexJ = indices[j], indexI = indices[i];
 			if(indexI > indexJ) std::swap(indexI, indexJ);
-			newData(counter) = oldData[(indexJ*(indexJ-1))/2 + indexI - 1];
+			newData(counter) = oldData[(indexJ*(indexJ-(R_xlen_t)1))/(R_xlen_t)2 + indexI - (R_xlen_t)1];
 			counter++;
 		}
 	}
@@ -129,12 +129,12 @@ BEGIN_RCPP
 	}
 
 	triangularIterator iterator(markerRows, markerColumns);
-	int counter = 0;
+	R_xlen_t counter = 0;
 	for(; !iterator.isDone(); iterator.next())
 	{
 		std::pair<int, int> markerPair = iterator.get();
-		int markerRow = markerPair.first, markerColumn = markerPair.second;
-		destinationData((markerColumn*(markerColumn-1))/2 + (markerRow - 1)) = source(counter);
+		R_xlen_t markerRow = markerPair.first, markerColumn = markerPair.second;
+		destinationData((markerColumn*(markerColumn-(R_xlen_t)1))/(R_xlen_t)2 + (markerRow - (R_xlen_t)1)) = source(counter);
 		counter++;
 	}
 	return R_NilValue;
@@ -153,22 +153,37 @@ BEGIN_RCPP
 		throw std::runtime_error("Source and destination cannot be the same in assignRawSymmetricMatrixDiagonal");
 	}
 
-	if((indices.size()*(indices.size()+1))/2 != source.size())
+	if((indices.size()*(indices.size()+(R_xlen_t)1))/(R_xlen_t)2 != source.size())
 	{
 		throw std::runtime_error("Mismatch between index length and source object size");
 	}
-	for(int column = 0; column < indices.size(); column++)
+	for(R_xlen_t column = 0; column < indices.size(); column++)
 	{
-		for(int row = 0; row <= column; row++)
+		for(R_xlen_t row = 0; row <= column; row++)
 		{
-			int rowIndex = indices[row];
-			int columnIndex = indices[column];
+			R_xlen_t rowIndex = indices[row];
+			R_xlen_t columnIndex = indices[column];
 			if(rowIndex > columnIndex)
 			{
 				std::swap(rowIndex, columnIndex);
 			}
-			destinationData((columnIndex*(columnIndex-1))/2+rowIndex-1) = source((column*(column+1))/2 + row);
+			destinationData((columnIndex*(columnIndex-(R_xlen_t)1))/(R_xlen_t)2+rowIndex-(R_xlen_t)1) = source((column*(column+(R_xlen_t)1))/(R_xlen_t)2 + row);
 		}
 	}
+END_RCPP
+}
+//Returns the value of any((object@data >= length(object@levels)) & object@data != as.raw(255))
+SEXP checkRawSymmetricMatrix(SEXP rawSymmetric_)
+{
+BEGIN_RCPP
+	Rcpp::S4 rawSymmetric = rawSymmetric_;
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	R_xlen_t size = data.size(), levelsSize = levels.size();
+	for(R_xlen_t i = 0; i < size; i++)
+	{
+		if(data[i] >= levelsSize && data[i] != 0xff) return Rcpp::wrap(true);
+	}
+	return Rcpp::wrap(false);
 END_RCPP
 }

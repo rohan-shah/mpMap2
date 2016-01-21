@@ -4,7 +4,9 @@
 #include "generateGenotypes.h"
 #include "alleleDataErrors.h"
 #include "estimateRF.h"
+#ifdef CUSTOM_STATIC_RCPP
 #include "internal.h"
+#endif
 #include "fourParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"
@@ -13,6 +15,7 @@
 #include "hclustMatrices.h"
 #include "mpMap2_openmp.h"
 #include "order.h"
+#include "arsa.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -36,7 +39,9 @@ extern "C"
 		{"hclustCombinedMatrix", (DL_FUNC)&hclustCombinedMatrix, 2},
 		{"hclustLodMatrix", (DL_FUNC)&hclustLodMatrix, 2},
 		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
-		{"order", (DL_FUNC)&order, 2},
+		{"order", (DL_FUNC)&order, 6},
+		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
+		{"arsa", (DL_FUNC)&arsa, 5},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

@@ -100,7 +100,7 @@ test_that("lineNames must be unique",
 	})
 test_that("Number of founders must be at least 2",
 	{
-		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1)
+		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree@selfing <- "auto"
 		pedigree@initial <- 1L
 		pedigree@mother <- pedigree@father <- 0:1005
