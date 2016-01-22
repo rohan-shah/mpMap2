@@ -9,6 +9,7 @@
 #include "constructLookupTable.hpp"
 #include "probabilities2.hpp"
 #include "probabilities4.hpp"
+#include "probabilities8.hpp"
 #include "alleleDataErrors.h"
 #include "recodeHetsAsNA.h"
 #include "estimateRF.h"
@@ -499,10 +500,10 @@ bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long
 	{
 		return estimateRFSpecificDesignInternal1<4>(internal_args, counter);
 	}
-	/*else if(nFounders == 8)
+	else if(nFounders == 8)
 	{
-		return estimateRFSpecificDesignInternal1<8>(internal_args);
-	}*/
+		return estimateRFSpecificDesignInternal1<8>(internal_args, counter);
+	}
 	else
 	{
 		Rprintf("Number of founders must be 2, 4 or 8\n");
