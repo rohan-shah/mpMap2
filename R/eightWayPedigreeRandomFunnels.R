@@ -33,6 +33,8 @@ eightParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, sel
   nonNegativeIntegerArgument(intercrossingGenerations)
   intercrossingGenerations <- as.integer(intercrossingGenerations)
   initialPopulationSize <- as.integer(initialPopulationSize)
+  selfingGenerations <- as.integer(selfingGenerations)
+  nSeeds <- as.integer(nSeeds)
 
   if(initialPopulationSize <= 2 && intercrossingGenerations > 0)
   {
@@ -127,7 +129,7 @@ eightParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, sel
     #...and no intercrossing
     if(intercrossingGenerations == 0)
     {
-      observed[11:length(observed)] <- TRUE
+      observed[(nextFree-initialPopulationSize+1):length(observed)] <- TRUE
     }
     #If there's no selfing but there is intercrossing then mark the last set of intercrossing lines as observed
     else

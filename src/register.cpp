@@ -8,6 +8,7 @@
 #include "internal.h"
 #endif
 #include "fourParentPedigreeRandomFunnels.h"
+#include "eightParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"
 #include "dspMatrix.h"
@@ -27,6 +28,7 @@ extern "C"
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
 		{"estimateRF", (DL_FUNC)&estimateRF, 9},
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
+		{"eightParentPedigreeRandomFunnels", (DL_FUNC)&eightParentPedigreeRandomFunnels, 4},
 		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 2},
 		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 3},
 		{"rawSymmetricMatrixSubsetIndices", (DL_FUNC)&rawSymmetricMatrixSubsetIndices, 4},
