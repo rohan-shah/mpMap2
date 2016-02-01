@@ -143,7 +143,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 		intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing> normalIntercrossingHaplotypeToMarker(intercrossingHaplotypeProbabilities);
 		//This next loop is a big chunk of code, but does NOT grow with problem size (number of markers, number of lines). Well, it grows but to some fixed limit, because there are only so many marker patterns. 
 #ifdef USE_OPENMP
-		#pragma omp for schedule(static, 1)
+		#pragma omp for schedule(dynamic)
 #endif
 		for(int firstPattern = 0; firstPattern < nMarkerPatternIDs; firstPattern++)
 		{
