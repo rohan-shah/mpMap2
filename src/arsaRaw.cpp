@@ -125,7 +125,7 @@ BEGIN_RCPP
 	return Rcpp::wrap(permutation);
 END_RCPP
 }
-void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(long, long)> progressFunction)
+void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(unsigned long, unsigned long)> progressFunction)
 {
 	permutation.resize(n);
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
@@ -178,9 +178,9 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
 		int nloop = (log(temperatureMin) - log(temperatureMax)) / log(cool);
-		long totalSteps = nloop * 100 * n;
-		long done = 0;
-		long threadZeroCounter = 0;
+		unsigned long totalSteps = nloop * 100 * n;
+		unsigned long done = 0;
+		unsigned long threadZeroCounter = 0;
 		//Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{

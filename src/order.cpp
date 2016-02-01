@@ -190,12 +190,28 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
 			}
 		}
-
 		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
 		for(int i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = i;
 
+		
 		std::string error;
-		bool imputationResult = impute(&(imputedRaw[0]), levels, NULL, NULL, contiguousIndices, error);
+		std::function<void(unsigned long,unsigned long)> imputationProgressFunction = [](unsigned long,unsigned long){};
+		if(verbose)
+		{
+			Rcpp::Rcout << "Starting imputation for group " << *currentGroup << std::endl;
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			imputationProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
+			{
+				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+			};
+		}
+		bool imputationResult = impute(&(imputedRaw[0]), levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
+		if(verbose)
+		{
+			close(barHandle);
+		}
+
+		
 		if(!imputationResult)
 		{
 			throw std::runtime_error(error.c_str());
@@ -209,17 +225,19 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRaw[(i*(i+1))/2 + j];
 			}
 		}
-		std::function<void(long,long)> progressFunction = [](long,long){};
+	
+		
+		std::function<void(unsigned long, unsigned long)> orderingProgressFunction = [](unsigned long,unsigned long){};
 		if(verbose)
 		{
 			Rcpp::Rcout << "Starting to order group " << *currentGroup << std::endl;
 			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
-			progressFunction = [barHandle, setTxtProgressBar](long done, long totalSteps)
+			orderingProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 			{
-				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
 			};
 		}
-		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, progressFunction);
+		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, orderingProgressFunction);
 		if(verbose)
 		{
 			close(barHandle);

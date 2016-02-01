@@ -4,9 +4,19 @@
 #include <math.h>
 #include <limits>
 #include <sstream>
-template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error)
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
+template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
+	unsigned long done = 0;
+	unsigned long total = markersThisGroup.size();
+	unsigned long doneThreadZero = 0;
+	bool hasError = false;
 	//This is a marker row
+#ifdef USE_OPENMP
+	#pragma omp parallel for schedule(dynamic)
+#endif
 	for(std::vector<int>::iterator marker1 = markersThisGroup.begin(); marker1 != markersThisGroup.end(); marker1++)
 	{
 		bool missing = false;
@@ -89,30 +99,50 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 						std::stringstream ss;
 						ss << "Unable to impute a value for marker " << (*marker1+1) << " and marker " << (*marker2+1);
 						error = ss.str();
+						hasError = true;
+#ifndef USE_OPENMP
+						//We can't return early if we're using openmp
 						return false;
+#endif
 					}
 				}
 			}
 		}
+#ifdef USE_OPENMP
+		#pragma omp critical
+#endif
+		{
+			done++;
+		}
+#ifdef USE_OPENMP
+		if(omp_get_thread_num() == 0)
+#endif
+		{
+			doneThreadZero++;
+			if(doneThreadZero % 100 == 0)
+			{
+				statusFunction(done, total);
+			}
+		}
 	}
-	return true;
+	return !hasError;
 }
-bool impute(unsigned char* theta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error)
+bool impute(unsigned char* theta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
 	if(lod != NULL && lkhd != NULL)
 	{
-		return imputeInternal<true, true>(theta, thetaLevels, lod, lkhd, markers, error);
+		return imputeInternal<true, true>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else if(lod != NULL && lkhd == NULL)
 	{
-		return imputeInternal<true, false>(theta, thetaLevels, lod, lkhd, markers, error);
+		return imputeInternal<true, false>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else if(lod == NULL && lkhd != NULL)
 	{
-		return imputeInternal<false, true>(theta, thetaLevels, lod, lkhd, markers, error);
+		return imputeInternal<false, true>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else
 	{
-		return imputeInternal<false, false>(theta, thetaLevels, lod, lkhd, markers, error);
+		return imputeInternal<false, false>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 }
