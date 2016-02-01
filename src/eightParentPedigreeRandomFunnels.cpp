@@ -113,7 +113,7 @@ SEXP eightParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP self
 	Rcpp::CharacterVector lineNames = paste0("L", Rcpp::Range(1, entries));
 
 	Rcpp::Function sample("sample");
-	Rcpp::IntegerVector funnelNumbers = sample(Rcpp::Range(0, 314), initialPopulationSize, Rcpp::Named("replace") = false);
+	Rcpp::IntegerVector funnelNumbers = sample(Rcpp::Range(0, 314), initialPopulationSize, Rcpp::Named("replace") = true);
 
 	for(int i = 0; i < initialPopulationSize; i++)
 	{

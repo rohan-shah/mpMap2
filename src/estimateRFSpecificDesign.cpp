@@ -294,6 +294,7 @@ template<int nFounders, int maxAlleles> bool estimateRFSpecificDesignInternal2(r
 //here we transfer maxAlleles over to the templated parameter section - This can make a BIG difference to memory usage if this is smaller, and it's going into a type so it has to be templated.
 template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_args& args, unsigned long long& counter)
 {
+	//for i in `seq 1 64`; do echo -e "case $i:\n\t\treturn estimateRFSpecificDesignInternal2<nFounders, $i>(args, counter);"; done
 	switch(args.maxAlleles)
 	{
 		case 1:
@@ -316,6 +317,114 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 			return estimateRFSpecificDesignInternal2<nFounders, 9>(args, counter);
 		case 10:
 			return estimateRFSpecificDesignInternal2<nFounders, 10>(args, counter);
+		case 11:
+			return estimateRFSpecificDesignInternal2<nFounders, 11>(args, counter);
+		case 12:
+			return estimateRFSpecificDesignInternal2<nFounders, 12>(args, counter);
+		case 13:
+			return estimateRFSpecificDesignInternal2<nFounders, 13>(args, counter);
+		case 14:
+			return estimateRFSpecificDesignInternal2<nFounders, 14>(args, counter);
+		case 15:
+			return estimateRFSpecificDesignInternal2<nFounders, 15>(args, counter);
+		case 16:
+			return estimateRFSpecificDesignInternal2<nFounders, 16>(args, counter);
+		case 17:
+			return estimateRFSpecificDesignInternal2<nFounders, 17>(args, counter);
+		case 18:
+			return estimateRFSpecificDesignInternal2<nFounders, 18>(args, counter);
+		case 19:
+			return estimateRFSpecificDesignInternal2<nFounders, 19>(args, counter);
+		case 20:
+			return estimateRFSpecificDesignInternal2<nFounders, 20>(args, counter);
+		case 21:
+			return estimateRFSpecificDesignInternal2<nFounders, 21>(args, counter);
+		case 22:
+			return estimateRFSpecificDesignInternal2<nFounders, 22>(args, counter);
+		case 23:
+			return estimateRFSpecificDesignInternal2<nFounders, 23>(args, counter);
+		case 24:
+			return estimateRFSpecificDesignInternal2<nFounders, 24>(args, counter);
+		case 25:
+			return estimateRFSpecificDesignInternal2<nFounders, 25>(args, counter);
+		case 26:
+			return estimateRFSpecificDesignInternal2<nFounders, 26>(args, counter);
+		case 27:
+			return estimateRFSpecificDesignInternal2<nFounders, 27>(args, counter);
+		case 28:
+			return estimateRFSpecificDesignInternal2<nFounders, 28>(args, counter);
+		case 29:
+			return estimateRFSpecificDesignInternal2<nFounders, 29>(args, counter);
+		case 30:
+			return estimateRFSpecificDesignInternal2<nFounders, 30>(args, counter);
+		case 31:
+			return estimateRFSpecificDesignInternal2<nFounders, 31>(args, counter);
+		case 32:
+			return estimateRFSpecificDesignInternal2<nFounders, 32>(args, counter);
+		case 33:
+			return estimateRFSpecificDesignInternal2<nFounders, 33>(args, counter);
+		case 34:
+			return estimateRFSpecificDesignInternal2<nFounders, 34>(args, counter);
+		case 35:
+			return estimateRFSpecificDesignInternal2<nFounders, 35>(args, counter);
+		case 36:
+			return estimateRFSpecificDesignInternal2<nFounders, 36>(args, counter);
+		case 37:
+			return estimateRFSpecificDesignInternal2<nFounders, 37>(args, counter);
+		case 38:
+			return estimateRFSpecificDesignInternal2<nFounders, 38>(args, counter);
+		case 39:
+			return estimateRFSpecificDesignInternal2<nFounders, 39>(args, counter);
+		case 40:
+			return estimateRFSpecificDesignInternal2<nFounders, 40>(args, counter);
+		case 41:
+			return estimateRFSpecificDesignInternal2<nFounders, 41>(args, counter);
+		case 42:
+			return estimateRFSpecificDesignInternal2<nFounders, 42>(args, counter);
+		case 43:
+			return estimateRFSpecificDesignInternal2<nFounders, 43>(args, counter);
+		case 44:
+			return estimateRFSpecificDesignInternal2<nFounders, 44>(args, counter);
+		case 45:
+			return estimateRFSpecificDesignInternal2<nFounders, 45>(args, counter);
+		case 46:
+			return estimateRFSpecificDesignInternal2<nFounders, 46>(args, counter);
+		case 47:
+			return estimateRFSpecificDesignInternal2<nFounders, 47>(args, counter);
+		case 48:
+			return estimateRFSpecificDesignInternal2<nFounders, 48>(args, counter);
+		case 49:
+			return estimateRFSpecificDesignInternal2<nFounders, 49>(args, counter);
+		case 50:
+			return estimateRFSpecificDesignInternal2<nFounders, 50>(args, counter);
+		case 51:
+			return estimateRFSpecificDesignInternal2<nFounders, 51>(args, counter);
+		case 52:
+			return estimateRFSpecificDesignInternal2<nFounders, 52>(args, counter);
+		case 53:
+			return estimateRFSpecificDesignInternal2<nFounders, 53>(args, counter);
+		case 54:
+			return estimateRFSpecificDesignInternal2<nFounders, 54>(args, counter);
+		case 55:
+			return estimateRFSpecificDesignInternal2<nFounders, 55>(args, counter);
+		case 56:
+			return estimateRFSpecificDesignInternal2<nFounders, 56>(args, counter);
+		case 57:
+			return estimateRFSpecificDesignInternal2<nFounders, 57>(args, counter);
+		case 58:
+			return estimateRFSpecificDesignInternal2<nFounders, 58>(args, counter);
+		case 59:
+			return estimateRFSpecificDesignInternal2<nFounders, 59>(args, counter);
+		case 60:
+			return estimateRFSpecificDesignInternal2<nFounders, 60>(args, counter);
+		case 61:
+			return estimateRFSpecificDesignInternal2<nFounders, 61>(args, counter);
+		case 62:
+			return estimateRFSpecificDesignInternal2<nFounders, 62>(args, counter);
+		case 63:
+			return estimateRFSpecificDesignInternal2<nFounders, 63>(args, counter);
+		case 64:
+			return estimateRFSpecificDesignInternal2<nFounders, 64>(args, counter);
 		default:
 			throw std::runtime_error("Internal error");
 	}
@@ -329,6 +438,7 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
 
 	std::size_t arraySize;
+	//for i in `seq 1 64`; do echo -e "\t\tcase $i:\n\t\t\tarraySize = sizeof(array2<$i>);\n\t\t\tbreak;"; done > tmp
 	switch(internal_args.maxAlleles)
 	{
 		case 1:
@@ -360,6 +470,168 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 			break;
 		case 10:
 			arraySize = sizeof(array2<10>);
+			break;
+		case 11:
+			arraySize = sizeof(array2<11>);
+			break;
+		case 12:
+			arraySize = sizeof(array2<12>);
+			break;
+		case 13:
+			arraySize = sizeof(array2<13>);
+			break;
+		case 14:
+			arraySize = sizeof(array2<14>);
+			break;
+		case 15:
+			arraySize = sizeof(array2<15>);
+			break;
+		case 16:
+			arraySize = sizeof(array2<16>);
+			break;
+		case 17:
+			arraySize = sizeof(array2<17>);
+			break;
+		case 18:
+			arraySize = sizeof(array2<18>);
+			break;
+		case 19:
+			arraySize = sizeof(array2<19>);
+			break;
+		case 20:
+			arraySize = sizeof(array2<20>);
+			break;
+		case 21:
+			arraySize = sizeof(array2<21>);
+			break;
+		case 22:
+			arraySize = sizeof(array2<22>);
+			break;
+		case 23:
+			arraySize = sizeof(array2<23>);
+			break;
+		case 24:
+			arraySize = sizeof(array2<24>);
+			break;
+		case 25:
+			arraySize = sizeof(array2<25>);
+			break;
+		case 26:
+			arraySize = sizeof(array2<26>);
+			break;
+		case 27:
+			arraySize = sizeof(array2<27>);
+			break;
+		case 28:
+			arraySize = sizeof(array2<28>);
+			break;
+		case 29:
+			arraySize = sizeof(array2<29>);
+			break;
+		case 30:
+			arraySize = sizeof(array2<30>);
+			break;
+		case 31:
+			arraySize = sizeof(array2<31>);
+			break;
+		case 32:
+			arraySize = sizeof(array2<32>);
+			break;
+		case 33:
+			arraySize = sizeof(array2<33>);
+			break;
+		case 34:
+			arraySize = sizeof(array2<34>);
+			break;
+		case 35:
+			arraySize = sizeof(array2<35>);
+			break;
+		case 36:
+			arraySize = sizeof(array2<36>);
+			break;
+		case 37:
+			arraySize = sizeof(array2<37>);
+			break;
+		case 38:
+			arraySize = sizeof(array2<38>);
+			break;
+		case 39:
+			arraySize = sizeof(array2<39>);
+			break;
+		case 40:
+			arraySize = sizeof(array2<40>);
+			break;
+		case 41:
+			arraySize = sizeof(array2<41>);
+			break;
+		case 42:
+			arraySize = sizeof(array2<42>);
+			break;
+		case 43:
+			arraySize = sizeof(array2<43>);
+			break;
+		case 44:
+			arraySize = sizeof(array2<44>);
+			break;
+		case 45:
+			arraySize = sizeof(array2<45>);
+			break;
+		case 46:
+			arraySize = sizeof(array2<46>);
+			break;
+		case 47:
+			arraySize = sizeof(array2<47>);
+			break;
+		case 48:
+			arraySize = sizeof(array2<48>);
+			break;
+		case 49:
+			arraySize = sizeof(array2<49>);
+			break;
+		case 50:
+			arraySize = sizeof(array2<50>);
+			break;
+		case 51:
+			arraySize = sizeof(array2<51>);
+			break;
+		case 52:
+			arraySize = sizeof(array2<52>);
+			break;
+		case 53:
+			arraySize = sizeof(array2<53>);
+			break;
+		case 54:
+			arraySize = sizeof(array2<54>);
+			break;
+		case 55:
+			arraySize = sizeof(array2<55>);
+			break;
+		case 56:
+			arraySize = sizeof(array2<56>);
+			break;
+		case 57:
+			arraySize = sizeof(array2<57>);
+			break;
+		case 58:
+			arraySize = sizeof(array2<58>);
+			break;
+		case 59:
+			arraySize = sizeof(array2<59>);
+			break;
+		case 60:
+			arraySize = sizeof(array2<60>);
+			break;
+		case 61:
+			arraySize = sizeof(array2<61>);
+			break;
+		case 62:
+			arraySize = sizeof(array2<62>);
+			break;
+		case 63:
+			arraySize = sizeof(array2<63>);
+			break;
+		case 64:
+			arraySize = sizeof(array2<64>);
 			break;
 		default:
 			throw std::runtime_error("Internal error");
@@ -430,9 +702,9 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	recodeFoundersFinalsHets(recoded);
 
 	unsigned int maxAlleles = recoded.maxAlleles;
-	if(maxAlleles > 10)
+	if(maxAlleles > 64)
 	{
-		error = "Internal error - Cannot have more than ten alleles per marker";
+		error = "Internal error - Cannot have more than 64 alleles per marker";
 		return false;
 	}
 

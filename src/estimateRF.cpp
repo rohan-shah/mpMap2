@@ -264,7 +264,12 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			updateProgress = [barHandle,nDesigns,nValuesToEstimate,setTxtProgressBar](unsigned long long value)
 				{
-					setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
+					try
+					{
+						setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
+					}
+					catch(...)
+					{}
 				};
 		}
 		unsigned long long counter = 0;
