@@ -266,10 +266,11 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				{
 					try
 					{
-						setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
+						setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
 					}
 					catch(...)
-					{}
+					{
+					}
 				};
 		}
 		unsigned long long counter = 0;
