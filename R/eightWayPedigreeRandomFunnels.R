@@ -57,7 +57,7 @@ eightParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, sel
     addons <- which(lapply(apply(quads[,i:ncol(quads)], 2, function(x) return(intersect(quads[,i], x))), length)==0)
     funnels <- cbind(funnels, rbind(matrix(rep(quads[,i], length(addons)), nrow=4, ncol=length(addons)), quads[,(i:ncol(quads))[addons]]))
   }
-  funnelNumbers <- sample(1:ncol(funnels), initialPopulationSize, replace=FALSE)
+  funnelNumbers <- sample(1:ncol(funnels), initialPopulationSize, replace=TRUE)
 
   entries <- 8L + 7L*initialPopulationSize + intercrossingGenerations*initialPopulationSize + nSeeds*selfingGenerations*initialPopulationSize
   mother <- father <- rep(NA, entries)
