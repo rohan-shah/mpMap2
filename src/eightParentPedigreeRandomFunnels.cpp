@@ -37,7 +37,7 @@ SEXP eightParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP self
 	int entries = 8 + 7 * initialPopulationSize + intercrossingGenerations*initialPopulationSize + nSeeds*selfingGenerations*initialPopulationSize;
 
 	//The funnels matrix could be hard-coded, but I'll stick to doing it this way for now.
-	Rcpp::NumericMatrix pairs(2, 28);
+	Rcpp::IntegerMatrix pairs(2, 28);
 	int counter = 0;
 	for(int i = 1; i < 9; i++)
 	{
@@ -49,7 +49,7 @@ SEXP eightParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP self
 		}
 	}
 
-	Rcpp::NumericMatrix quads(4, 210);
+	Rcpp::IntegerMatrix quads(4, 210);
 	counter = 0;
 	std::vector<int> possibleQuad(4), copiedPossibleQuad(4);
 	for(int pairCounter1 = 0; pairCounter1 < 28; pairCounter1++)
@@ -73,7 +73,7 @@ SEXP eightParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP self
 		}
 	}
 
-	Rcpp::NumericMatrix funnels(8, 315);
+	Rcpp::IntegerMatrix funnels(8, 315);
 	counter = 0;
 	std::vector<int> possibleEight(8), copiedPossibleEight(8);
 	for(int quadCounter1 = 0; quadCounter1 < 210; quadCounter1++)

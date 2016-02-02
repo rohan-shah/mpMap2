@@ -46,18 +46,18 @@ BEGIN_RCPP
 	for(R_xlen_t i = 0; i < nMarkers; i++) continuingGroups[i].data.push_back((int)i);
 	while(continuingGroups.size() > 0)
 	{
-		for(R_xlen_t i = 0; i < continuingGroups.size(); i++)
+		for(std::size_t i = 0; i < continuingGroups.size(); i++)
 		{
 			if(continuingGroups[i].data.size() == 0) continue;
-			for(R_xlen_t j = i + 1; j < continuingGroups.size(); j++)
+			for(std::size_t j = i + 1; j < continuingGroups.size(); j++)
 			{
 				const std::vector<int>& iData = continuingGroups[i].data, &jData = continuingGroups[j].data;
 				if(jData.size() == 0) continue;
 				//Check that every marker has recombination 0 with every marker in group j
-				for(R_xlen_t i_ = 0; i_ < iData.size(); i_++)
+				for(std::size_t i_ = 0; i_ < iData.size(); i_++)
 				{
 					R_xlen_t iMarker = iData[i_];
-					for(R_xlen_t j_ = 0; j_ < jData.size(); j_++)
+					for(std::size_t j_ = 0; j_ < jData.size(); j_++)
 					{
 						R_xlen_t jMarker = jData[j_];
 						R_xlen_t rowMarker = std::min(jMarker, iMarker);

@@ -8,8 +8,8 @@ inline void getPairForSwap(R_xlen_t n, R_xlen_t& swap1, R_xlen_t& swap2)
 {
 	do
 	{
-		swap1 = unif_rand()*n;
-		swap2 = unif_rand()*n;
+		swap1 = (R_xlen_t)(unif_rand()*n);
+		swap2 = (R_xlen_t)(unif_rand()*n);
 		if(swap1 == n) swap1--;
 		if(swap2 == n) swap2--;
 	}
@@ -96,7 +96,7 @@ BEGIN_RCPP
 	std::vector<int> bestPermutationThisRep(n), bestPermutationAllReps(n);
 	//We use this to build the random permutations
 	std::vector<int> consecutive(n);
-	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = i;
+	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = (int)i;
 	//We're doing lots of simulation, so we use the old-fashioned approach to dealing with Rs random number generation
 	GetRNGstate();
 
@@ -106,7 +106,7 @@ BEGIN_RCPP
 		for(R_xlen_t i = 0; i < n; i++)
 		{
 			double rand = unif_rand();
-			R_xlen_t index = rand*(n-i);
+			R_xlen_t index = (R_xlen_t)(rand*(n-i));
 			if(index == n-i) index--;
 			bestPermutationThisRep[i] = consecutive[index];
 			std::swap(consecutive[index], *(consecutive.rbegin()+i));
@@ -139,7 +139,7 @@ BEGIN_RCPP
 		}
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
-		int nloop = (log(temperatureMin) - log(temperatureMax)) / log(cool);
+		int nloop = (int)((log(temperatureMin) - log(temperatureMax)) / log(cool));
 		Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
@@ -176,8 +176,8 @@ BEGIN_RCPP
 				{
 					//three different patrs of delta
 					double delta1 = 0, delta2 = 0, delta3 = 0;
-					double span = abs(swap1 - swap2);
-					double span2 = span + 1;
+					R_xlen_t span = abs(swap1 - swap2);
+					R_xlen_t span2 = span + 1;
 					R_xlen_t permutedSwap1 = currentPermutation[swap1];
 					if(swap2 > swap1)
 					{
@@ -279,7 +279,7 @@ BEGIN_RCPP
 							{
 								currentPermutation[i] = currentPermutation[i+1];
 							}
-							currentPermutation[swap2] = permutedSwap1;
+							currentPermutation[swap2] = (int)permutedSwap1;
 						}
 						else
 						{
@@ -287,7 +287,7 @@ BEGIN_RCPP
 							{
 								currentPermutation[i] = currentPermutation[i-1];
 							}
-							currentPermutation[swap2] = permutedSwap1; 
+							currentPermutation[swap2] = (int)permutedSwap1; 
 						}
 					}
 					if(delta > -1e-8 && z > zbestThisRep)
