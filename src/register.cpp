@@ -17,6 +17,7 @@
 #include "mpMap2_openmp.h"
 #include "order.h"
 #include "arsa.h"
+#include "impute.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -66,5 +67,6 @@ extern "C"
 #ifdef CUSTOM_STATIC_RCPP
 		init_Rcpp_cache();
 #endif
+		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
 	}
 }

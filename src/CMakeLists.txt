@@ -89,6 +89,10 @@ if(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
 else()
 	target_compile_options(mpMap2 PUBLIC "-std=c++11")
 endif()
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
+	#Add the /bigobj flag, which is required for builds involving debug information
+	target_compile_options(mpMap2 PUBLIC /bigobj)
+endif()
 
 #Ensure that it's installed to the right place
 if(WIN32)
