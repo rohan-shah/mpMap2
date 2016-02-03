@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(mpMap2)
 
+option(USE_OPENMP "Use OpenMP" ON)
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src)
 find_package(R REQUIRED)
 find_package(Rcpp REQUIRED)
