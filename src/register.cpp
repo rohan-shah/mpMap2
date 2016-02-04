@@ -45,6 +45,7 @@ extern "C"
 		{"order", (DL_FUNC)&order, 6},
 		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
 		{"arsa", (DL_FUNC)&arsa, 5},
+		{"impute", (DL_FUNC)&imputeWholeObject, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
