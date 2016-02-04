@@ -119,10 +119,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 #endif
 		{
 			doneThreadZero++;
-			if(doneThreadZero % 100 == 0)
-			{
-				statusFunction(done, total);
-			}
+			statusFunction(done, total);
 		}
 	}
 	return !hasError;
