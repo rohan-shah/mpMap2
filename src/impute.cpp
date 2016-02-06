@@ -280,7 +280,6 @@ BEGIN_RCPP
 		throw std::runtime_error("Slot mpcross@lg@allGroups must be an integer vector");
 	}
 
-
 	bool verbose;
 	try
 	{
@@ -302,6 +301,8 @@ BEGIN_RCPP
 		lkhdPtr = &(copiedLkhd[0]);
 	}
 
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
+	Rcpp::RObject barHandle;
 	std::function<void(unsigned long, unsigned long)> progressFunction = [](unsigned long, unsigned long){};
 	for(std::vector<int>::iterator group = allGroups.begin(); group != allGroups.end(); group++)
 	{
@@ -313,6 +314,16 @@ BEGIN_RCPP
 				markersCurrentGroup.push_back((int)markerCounter);
 			}
 		}
+		if(verbose)
+		{
+			Rcpp::Rcout << "Starting imputation for group " << *group << std::endl;
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
+			{
+				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+			};
+		}
+
 		std::string error;
 		bool ok = impute(&(copiedThetaData[0]), levels, lodPtr, lkhdPtr, markersCurrentGroup, error, progressFunction);
 		if(!ok)
@@ -321,7 +332,211 @@ BEGIN_RCPP
 			ss << "Error performing imputation for group " << *group << ": " << error;
 			throw std::runtime_error(ss.str().c_str());
 		}
+		if(verbose)
+		{
+			close(barHandle);
+		}
 	}
-	return R_NilValue;
+	return Rcpp::List::create(Rcpp::Named("theta") = copiedThetaData, Rcpp::Named("lod") = copiedLod, Rcpp::Named("lkhd") = copiedLkhd);
+END_RCPP
+}
+SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp)
+{
+BEGIN_RCPP
+	Rcpp::S4 mpcrossLG;
+	try
+	{
+		mpcrossLG = Rcpp::as<Rcpp::S4>(mpcrossLG_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input mpcrossLG must be an S4 object");
+	}
+
+	Rcpp::S4 rf;
+	try
+	{
+		rf = Rcpp::as<Rcpp::S4>(mpcrossLG.slot("rf"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot mpcrossLG@rf must be an S4 object");
+	}
+
+	Rcpp::S4 theta;
+	try
+	{
+		theta = Rcpp::as<Rcpp::S4>(rf.slot("theta"));
+	}
+	catch(...)
+	{
+		 throw std::runtime_error("Slot mpcrossLG@rf@theta must be an S4 object");
+	}
+
+	Rcpp::RawVector thetaData;
+	try
+	{
+		thetaData = Rcpp::as<Rcpp::RawVector>(theta.slot("data"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot mpcrossLG@rf@theta@data must be a raw vector");
+	}
+	
+	Rcpp::RawVector copiedThetaData(thetaData.size());
+	memcpy(&(copiedThetaData[0]), &(thetaData[0]), sizeof(Rbyte)*thetaData.size());
+
+	std::vector<double> levels;
+	try
+	{
+		levels = Rcpp::as<std::vector<double> >(theta.slot("levels"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot mpcrossLG@rf@theta@levels must be an integer vector");
+	}
+
+	Rcpp::NumericVector copiedLod, copiedLkhd;
+	double *copiedLodPtr = NULL, *copiedLkhdPtr = NULL;
+	Rcpp::NumericVector lodS4Data, lkhdS4Data;
+	if(!Rcpp::as<Rcpp::RObject>(rf.slot("lkhd")).isNULL())
+	{
+		Rcpp::S4 lkhdS4;
+		try
+		{
+			lkhdS4 = Rcpp::as<Rcpp::S4>(rf.slot("lkhd"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@lkhd must be an S4 object or NULL");
+		}
+		
+		try
+		{
+			lkhdS4Data = Rcpp::as<Rcpp::NumericVector>(lkhdS4.slot("x"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@lkhd@x must be a numeric vector");
+		}
+		copiedLkhd = Rcpp::NumericVector(lkhdS4Data.size());
+		copiedLkhdPtr = &(copiedLkhd[0]);
+	}
+
+	if(!Rcpp::as<Rcpp::RObject>(rf.slot("lod")).isNULL())
+	{
+		Rcpp::S4 lodS4;
+		try
+		{
+			lodS4 = Rcpp::as<Rcpp::S4>(rf.slot("lod"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@lod must be an S4 object or NULL");
+		}
+		
+		try
+		{
+			lodS4Data = Rcpp::as<Rcpp::NumericVector>(lodS4.slot("x"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@lod@x must be a numeric vector");
+		}
+		copiedLod = Rcpp::NumericVector(lodS4Data.size());
+		copiedLodPtr = &(copiedLod[0]);
+	}
+
+	Rcpp::S4 lg;
+	try
+	{
+		lg = Rcpp::as<Rcpp::S4>(mpcrossLG.slot("lg"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot mpcross@lg must be an S4 object");
+	}
+
+	Rcpp::IntegerVector groups;
+	try
+	{
+		groups = Rcpp::as<Rcpp::IntegerVector>(lg.slot("groups"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot mpcross@lg@groups must be an integer vector");
+	}
+
+	int group;
+	try
+	{
+		group = Rcpp::as<int>(group_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input group must be an integer");
+	}
+
+	std::vector<int> markersCurrentGroup;
+	for(R_xlen_t markerCounter = 0; markerCounter < groups.size(); markerCounter++)
+	{
+		if(groups[markerCounter] == group)
+		{
+			markersCurrentGroup.push_back((int)markerCounter);
+		}
+	}
+	if(markersCurrentGroup.size() == 0)
+	{
+		throw std::runtime_error("No markers belonged to the specified group");
+	}
+
+	bool verbose;
+	try
+	{
+		verbose = Rcpp::as<bool>(verbose_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input verbose must be a boolean");
+	}
+
+	Rcpp::RawVector copiedTheta((markersCurrentGroup.size()*(markersCurrentGroup.size() + 1))/2);
+	//column
+	for(int marker1Counter = 0; marker1Counter < markersCurrentGroup.size(); marker1Counter++)
+	{
+		//row
+		for(int marker2Counter = 0; marker2Counter <= marker1Counter; marker2Counter++)
+		{
+			copiedTheta[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = thetaData[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
+			if(copiedLodPtr) copiedLodPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lodS4Data[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
+			if(copiedLkhdPtr) copiedLkhdPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lkhdS4Data[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
+		}
+	}
+
+	std::function<void(unsigned long, unsigned long)> progressFunction = [](unsigned long, unsigned long){};
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
+	Rcpp::RObject barHandle;
+	if(verbose)
+	{
+		Rcpp::Rcout << "Starting imputation for group " << group << std::endl;
+		barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+		progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
+		{
+			setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+		};
+	}
+	std::string error;
+	bool ok = impute(&(copiedThetaData[0]), levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
+	if(!ok)
+	{
+		std::stringstream ss;
+		ss << "Error performing imputation for group " << group << ": " << error;
+		throw std::runtime_error(ss.str().c_str());
+	}
+	if(verbose)
+	{
+		close(barHandle);
+	}
+	return Rcpp::List::create(Rcpp::Named("theta") = copiedTheta, Rcpp::Named("lod") = copiedLod, Rcpp::Named("lkhd") = copiedLkhd);
 END_RCPP
 }

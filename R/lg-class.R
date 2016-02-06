@@ -17,7 +17,41 @@ checkLG <- function(object)
 	{
 		errors <- c(errors, "Only values in slot allGroups are allowed as values in slot groups")
 	}
+	if(!is.null(object@imputedTheta))
+	{
+		if(!is.list(object@imputedTheta))
+		{
+			errors <- c(errors, "If slot imputedTheta is not null, it must be a list of rawSymmetricMatrix objects")
+			return(errors)
+		}
+		if(any(unlist(lapply(object@imputedTheta, class)) != "rawSymmetricMatrix"))
+		{
+			errors <- c(errors, "If slot imputedTheta is not null, it must be a list of rawSymmetricMatrix objects")
+			return(errors)
+		}
+		groupCounts <- sapply(object@allGroups, function(x) sum(object@groups == x))
+		imputedThetaLengths <- unlist(lapply(object@imputedTheta, function(x) length(x@data)))
+		if(any(imputedThetaLengths != groupCounts*(groupCounts + 1)/2))
+		{
+			errors <- c(errors, "Slot imputedTheta contained objects with the wrong length")
+			return(errors)
+		}
+		#Check that markers are correct
+		correctMarkers <- sapply(1:length(object@allGroups), function(x)
+			{
+				group <- object@allGroups[x]
+				imputedMarkers <- object@imputedTheta[x]@markers
+				groupMarkers <- names(which(object@groups == group))
+				return(length(groupMarkers) == length(imputedMarkers) && all(groupMarkers == imputedMarkers))
+			})
+		if(any(!correctMarkers))
+		{
+			errors <- c(errors, "Markers in matrices contained in object@imputedTheta were inconsistent with those in slot object@groups")
+			return(errors)
+		}
+	}
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.lg <- setClass("lg", slots = list(groups = "integer", allGroups = "integer"), validity = checkLG)
+setClassUnion("listOrNULL", c("list", "NULL"))
+.lg <- setClass("lg", slots = list(groups = "integer", allGroups = "integer", imputedTheta = "listOrNULL"), validity = checkLG)
