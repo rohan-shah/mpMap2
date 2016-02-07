@@ -24,6 +24,11 @@ checkLG <- function(object)
 			errors <- c(errors, "If slot imputedTheta is not null, it must be a list of rawSymmetricMatrix objects")
 			return(errors)
 		}
+		if(length(object@imputedTheta) != length(object@allGroups))
+		{
+			errors <- c(errors, "Slot imputedTheta had the wrong length")
+			return(errors)
+		}
 		if(any(unlist(lapply(object@imputedTheta, class)) != "rawSymmetricMatrix"))
 		{
 			errors <- c(errors, "If slot imputedTheta is not null, it must be a list of rawSymmetricMatrix objects")
@@ -40,7 +45,7 @@ checkLG <- function(object)
 		correctMarkers <- sapply(1:length(object@allGroups), function(x)
 			{
 				group <- object@allGroups[x]
-				imputedMarkers <- object@imputedTheta[x]@markers
+				imputedMarkers <- object@imputedTheta[[x]]@markers
 				groupMarkers <- names(which(object@groups == group))
 				return(length(groupMarkers) == length(imputedMarkers) && all(groupMarkers == imputedMarkers))
 			})
