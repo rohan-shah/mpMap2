@@ -1,4 +1,14 @@
 context("Test ordering function")
+test_that("Test that not having rf data generates an error",
+	{
+		f2Pedigree <- f2Pedigree(100)
+		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		cross <- subset(cross, markers = sample(1:101))
+		rf <- estimateRF(cross)
+		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
+		expect_that(orderCross(grouped), throws_error("did not contain recombination fraction"))
+	})
 test_that("Test that correct ordering is generated for an F2 population", 
 	{
 		f2Pedigree <- f2Pedigree(10000)

@@ -26,9 +26,9 @@ expand <- function(mpcross, newMarkers)
 		{
 			if(!is.null(mpcross@rf))
 			{
-				warning(paste0("Converting object of class mpcrossLG to class mpcross, recombination data will be lost"))
+				warning(paste0("Converting object of class mpcrossLG to class mpcross, recombination and linkage group data will be lost"))
 			}
-			warning(paste0("Converting object of class mpcrossLG to class mpcross, linkage group data will be lost"))
+			else warning(paste0("Converting object of class mpcrossLG to class mpcross, linkage group data will be lost"))
 		}
 		mpcross <- as(mpcross, "mpcross")
 	}

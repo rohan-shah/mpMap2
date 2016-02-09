@@ -383,9 +383,6 @@ BEGIN_RCPP
 		throw std::runtime_error("Slot mpcrossLG@rf@theta@data must be a raw vector");
 	}
 	
-	Rcpp::RawVector copiedThetaData(thetaData.size());
-	memcpy(&(copiedThetaData[0]), &(thetaData[0]), sizeof(Rbyte)*thetaData.size());
-
 	std::vector<double> levels;
 	try
 	{
@@ -526,7 +523,7 @@ BEGIN_RCPP
 		};
 	}
 	std::string error;
-	bool ok = impute(&(copiedThetaData[0]), levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
+	bool ok = impute(&(copiedTheta[0]), levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
 	if(!ok)
 	{
 		std::stringstream ss;

@@ -15,6 +15,8 @@ test_that("Check that formGroups requires lod entry if clusterBy is \"combined\"
 			}
 			formGroups <- formGroups(mpcrossRF = rf, groups = 2, method = method, clusterBy = "theta")
 			formGroupsPreCluster <- formGroups(mpcrossRF = rf, groups = 2, method = method, clusterBy = "theta", preCluster = TRUE)
+			expect_null(formGroups@lg@imputedTheta)
+			expect_null(formGroupsPreCluster@imputedTheta)
 		}
 	})
 test_that("Check that formGroups works for an f2 design",
@@ -38,6 +40,7 @@ test_that("Check that formGroups works for an f2 design",
 				names(expectedGroups) <- markers(cross)
 
 				expect_identical(formGroups@lg@groups, expectedGroups)
+				expect_null(formGroups@lg@imputedTheta)
 			}
 		}
 	})
@@ -62,6 +65,7 @@ test_that("Check that formGroups works for an f2 design with small chromosomes",
 				names(expectedGroups) <- markers(cross)
 
 				expect_identical(formGroups@lg@groups, expectedGroups)
+				expect_null(formGroups@lg@imputedTheta)
 			}
 		}
 	})
@@ -87,6 +91,7 @@ test_that("Check that formGroups works for a ril design",
 				names(expectedGroups) <- markers(cross)
 
 				expect_identical(formGroups@lg@groups, expectedGroups)
+				expect_null(formGroups@lg@imputedTheta)
 			}
 		}
 	})
