@@ -18,6 +18,7 @@
 #include "order.h"
 #include "arsa.h"
 #include "impute.h"
+#include "multiparentSNP.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -47,6 +48,8 @@ extern "C"
 		{"arsa", (DL_FUNC)&arsa, 5},
 		{"imputeWholeObject", (DL_FUNC)&imputeWholeObject, 2},
 		{"imputeGroup", (DL_FUNC)&imputeGroup, 3},
+		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
+		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

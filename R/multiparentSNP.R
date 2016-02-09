@@ -27,27 +27,7 @@ multiparentSNPRemoveHets <- function(e1)
 	{
 		stop("Can only apply multiparentSNP to a fully informative multiparent design (one that has a different genotypes for every homozygote, at every marker)")
 	}
-
-	copied <- e1
-	nMarkers <- nMarkers(copied)
-	sapply(1:nMarkers, function(x)
-	{
-		numberOfOnes <- sample(nFounders-1, 1)
-		oneAlleles <- sample(1:nFounders, numberOfOnes)
-		oneAllelesOldValues <- copied@founders[oneAlleles, x]
-		zeroAllelesOldValues <- copied@founders[-oneAlleles, x]
-
-		becomesOne <- copied@finals[,x] %in% oneAllelesOldValues
-		isHet <- !(copied@finals[,x] %in% copied@founders[,x])
-
-		copied@finals[becomesOne, x] <<- 1
-		copied@finals[!becomesOne, x] <<- 0
-		copied@finals[isHet, x] <<- NA
-		copied@founders[,x] <<- 0
-		copied@founders[oneAlleles,x] <<- 1
-		copied@hetData[[x]] <<- rbind(c(0,0,0), c(1,1,1))
-	})
-	return(copied)
+	return(.Call("multiparentSNPRemoveHets", e1, PACKAGE="mpMap2"))
 
 }
 multiparentSNPKeepHets <- function(e1)
@@ -57,27 +37,7 @@ multiparentSNPKeepHets <- function(e1)
 	{
 		stop("Can only apply multiparentSNP to a fully informative multiparent design (one that has nFounders*nFounders possible genotypes at every marker)")
 	}
-
-	copied <- e1
-	nMarkers <- nMarkers(copied)
-	sapply(1:nMarkers, function(x)
-	{
-		numberOfOnes <- sample(nFounders-1, 1)
-		oneAlleles <- sample(1:nFounders, numberOfOnes)
-		oneAllelesOldValues <- copied@founders[oneAlleles, x]
-		zeroAllelesOldValues <- copied@founders[-oneAlleles, x]
-
-		becomesOne <- copied@finals[,x] %in% oneAllelesOldValues
-		becomesHetValues <- xor(copied@hetData[[x]][,1] %in% oneAllelesOldValues, copied@hetData[[x]][,2] %in% oneAllelesOldValues)
-
-		copied@finals[becomesOne, x] <<- 1
-		copied@finals[!becomesOne, x] <<- 0
-		copied@finals[becomesHetValues, x] <<- 2
-		copied@founders[,x] <<- 0
-		copied@founders[oneAlleles,x] <<- 1
-		copied@hetData[[x]] <<- rbind(c(0,0,0), c(1,1,1), c(0, 1, 2), c(1, 0, 2))
-	})
-	return(copied)
+	return(.Call("multiparentSNPKeepHets", e1, PACKAGE="mpMap2"))
 }
 setMethod(f = "+", signature = c("mpcross", "multiparentSNP"), definition = function(e1, e2)
 {
