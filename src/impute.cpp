@@ -22,11 +22,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 		bool missing = false;
 		for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
 		{
-			int copiedMarker1 = *marker1;
-			int copiedMarker2 = *marker2;
+			unsigned long long copiedMarker1 = *marker1;
+			unsigned long long copiedMarker2 = *marker2;
 			if(copiedMarker1 > copiedMarker2) std::swap(copiedMarker1, copiedMarker2);
 			//record whether there's a missing value for marker1 anywhere.
-			float val = theta[(copiedMarker2 * (copiedMarker2 + 1))/2 + copiedMarker1];
+			float val = theta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
 			if(val == 0xff) 
 			{
 				missing = true;
@@ -48,12 +48,12 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 				//This iterates over the other markers in the column/row
 				for(std::vector<int>::iterator marker3 = markersThisGroup.begin(); marker3 != markersThisGroup.end(); marker3++)
 				{
-					int pair1Row = *marker1, pair1Column = *marker3;
-					int pair2Row = *marker2, pair2Column = *marker3;
+					unsigned long long pair1Row = *marker1, pair1Column = *marker3;
+					unsigned long long pair2Row = *marker2, pair2Column = *marker3;
 					if(pair1Row > pair1Column) std::swap(pair1Row, pair1Column);
 					if(pair2Row > pair2Column) std::swap(pair2Row, pair2Column);
-					unsigned char value1 = theta[(pair1Column * (pair1Column + 1))/2 + pair1Row];
-					unsigned char value2 = theta[(pair2Column * (pair2Column + 1))/2 + pair2Row];
+					unsigned char value1 = theta[(pair1Column * (pair1Column + 1ULL))/2ULL + pair1Row];
+					unsigned char value2 = theta[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
 					if(value1 != 0xff && value2 != 0xff)
 					{
 						float val = (float)fabs(levels[value1] - levels[value2]);
@@ -69,10 +69,10 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 			}
 			for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
 			{
-				int pair1Row = *marker1;
-				int pair1Column = *marker2;
+				unsigned long long pair1Row = *marker1;
+				unsigned long long pair1Column = *marker2;
 				if(pair1Row > pair1Column) std::swap(pair1Row, pair1Column);
-				unsigned char& toReplace = theta[(pair1Column*(pair1Column + 1))/2 + pair1Row];
+				unsigned char& toReplace = theta[(pair1Column*(pair1Column + 1ULL))/2ULL+ pair1Row];
 				//if this is missing, we need to impute it
 				if(toReplace == 0xff) 
 				{
@@ -80,15 +80,15 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 					bool replacementFound = false;
 					for(std::map<float, int>::iterator marker3 = averageDifferences.begin(); marker3 != averageDifferences.end(); marker3++)
 					{
-						int pair2Row = marker3->second;
-						int pair2Column = *marker2;
+						unsigned long long pair2Row = marker3->second;
+						unsigned long long pair2Column = *marker2;
 						if(pair2Row > pair2Column) std::swap(pair2Row, pair2Column);
-						unsigned char& newValue = theta[(pair2Column * (pair2Column + 1))/2 + pair2Row];
+						unsigned char& newValue = theta[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
 						if(newValue != 0xff)
 						{
 							toReplace = newValue;
-							if(hasLOD) lod[(pair1Column*(pair1Column + 1))/2 + pair1Row] = lod[(pair2Column * (pair2Column + 1))/2 + pair2Row];
-							if(hasLKHD) lkhd[(pair1Column*(pair1Column + 1))/2 + pair1Row] = lkhd[(pair2Column * (pair2Column + 1))/2 + pair2Row];
+							if(hasLOD) lod[(pair1Column*(pair1Column + 1ULL))/2ULL + pair1Row] = lod[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
+							if(hasLKHD) lkhd[(pair1Column*(pair1Column + 1ULL))/2ULL + pair1Row] = lkhd[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
 							//We only need to copy the value from the best other similar marker, so we can break here
 							replacementFound = true;
 							break;
@@ -497,16 +497,16 @@ BEGIN_RCPP
 		throw std::runtime_error("Input verbose must be a boolean");
 	}
 
-	Rcpp::RawVector copiedTheta((markersCurrentGroup.size()*(markersCurrentGroup.size() + 1))/2);
+	Rcpp::RawVector copiedTheta(((unsigned long long)markersCurrentGroup.size()*((unsigned long long)markersCurrentGroup.size() + 1ULL))/2ULL);
 	//column
-	for(int marker1Counter = 0; marker1Counter < markersCurrentGroup.size(); marker1Counter++)
+	for(unsigned long long marker1Counter = 0; marker1Counter < markersCurrentGroup.size(); marker1Counter++)
 	{
 		//row
-		for(int marker2Counter = 0; marker2Counter <= marker1Counter; marker2Counter++)
+		for(unsigned long long marker2Counter = 0; marker2Counter <= marker1Counter; marker2Counter++)
 		{
-			copiedTheta[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = thetaData[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
-			if(copiedLodPtr) copiedLodPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lodS4Data[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
-			if(copiedLkhdPtr) copiedLkhdPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lkhdS4Data[(markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
+			copiedTheta[(marker1Counter*(marker1Counter+1ULL))/2ULL + marker2Counter] = thetaData[((unsigned long long)markersCurrentGroup[marker1Counter] *((unsigned long long)markersCurrentGroup[marker1Counter] + 1ULL))/2ULL + (unsigned long long)markersCurrentGroup[marker2Counter]];
+			if(copiedLodPtr) copiedLodPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lodS4Data[((unsigned long long)markersCurrentGroup[marker1Counter] *(markersCurrentGroup[marker1Counter] + 1))/2 + markersCurrentGroup[marker2Counter]];
+			if(copiedLkhdPtr) copiedLkhdPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lkhdS4Data[((unsigned long long)markersCurrentGroup[marker1Counter] *((unsigned long long)markersCurrentGroup[marker1Counter] + 1ULL))/2ULL + (unsigned long long)markersCurrentGroup[marker2Counter]];
 		}
 	}
 
@@ -521,6 +521,11 @@ BEGIN_RCPP
 		{
 			setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
 		};
+	}
+	//Now overwrite the markersCurrentGroup vector with consecutive numbers. Because we've extracted a subset of the matrix into its own memory. 
+	for(int i = 0; i < markersCurrentGroup.size(); i++)
+	{
+		markersCurrentGroup[i] = i;
 	}
 	std::string error;
 	bool ok = impute(&(copiedTheta[0]), levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
