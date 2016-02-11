@@ -85,6 +85,16 @@ checkMpcrossLG <- function(object)
 	{
 		return("Marker names implied by names of slots lg@groups and founders were different")
 	}
+	if(!is.null(object@lg@imputedTheta) && !is.null(object@rf))
+	{
+		if(length(object@lg@imputedTheta) > 0)
+		{
+			if(!identical(object@lg@imputedTheta[[1]]@levels, object@rf@theta@levels))
+			{
+				return("Slots lg@imputedTheta and rf@theta must have the same levels")
+			}
+		}
+	}
 	return(TRUE)
 }
 .mpcrossLG <- setClass("mpcrossLG", contains = "mpcross", slots = list(lg = "lg", rf = "rfOrNULL"), validity=checkMpcrossLG)

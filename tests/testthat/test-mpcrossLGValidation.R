@@ -29,4 +29,11 @@ test_that("Names of slot lg@groups must be the marker names",
 		names(copied@lg@groups)[1:2] <- names(copied@lg@groups)[2:1]
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
+test_that("If slot lg@imputedTheta contains data, the levels slots must be the same as the levels slots for copied@rf@theta",
+	{
+		imputed <- impute(grouped)
+		validObject(imputed)
+		imputed@lg@imputedTheta[[1]]@levels <- imputed@lg@imputedTheta[[2]]@levels <- c(0, 0.25, 0.5)
+		expect_that(validObject(imputed), throws_error())
+	})
 rm(pedigree, map, cross, rf, grouped)

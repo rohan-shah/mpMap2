@@ -16,7 +16,7 @@ test_that("Check that formGroups requires lod entry if clusterBy is \"combined\"
 			formGroups <- formGroups(mpcrossRF = rf, groups = 2, method = method, clusterBy = "theta")
 			formGroupsPreCluster <- formGroups(mpcrossRF = rf, groups = 2, method = method, clusterBy = "theta", preCluster = TRUE)
 			expect_null(formGroups@lg@imputedTheta)
-			expect_null(formGroupsPreCluster@imputedTheta)
+			expect_null(formGroupsPreCluster@lg@imputedTheta)
 		}
 	})
 test_that("Check that formGroups works for an f2 design",

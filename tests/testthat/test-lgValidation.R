@@ -64,20 +64,61 @@ test_that("Slot imputedTheta must have objects with the right number of markers"
 		marker2Names <- names(which(lg@groups == 2))
 		copied <- lg
 		copied@imputedTheta <- vector(mode = "list", length = 2)
-		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers1-1)*nMarkers1/2)), markers = marker1Names[1:(nMarkers1-1)], levels = 0)
-		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers2-1)*nMarkers2/2)), markers = marker2Names[1:(nMarkers2-1)], levels = 0)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers1-1)*nMarkers1/2)), markers = marker1Names[1:(nMarkers1-1)], levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers2-1)*nMarkers2/2)), markers = marker2Names[1:(nMarkers2-1)], levels = rf@rf@theta@levels)
 		expect_that(validObject(copied, complete=TRUE), throws_error("imputedTheta contained objects with the wrong length"))
 
-		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers1-1)*nMarkers1/2)), markers = marker1Names[1:(nMarkers1-1)], levels = 0)
-		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names[1:nMarkers2], levels = 0)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers1-1)*nMarkers1/2)), markers = marker1Names[1:(nMarkers1-1)], levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names[1:nMarkers2], levels = rf@rf@theta@levels)
 		expect_that(validObject(copied, complete=TRUE), throws_error("imputedTheta contained objects with the wrong length"))
 
-		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names[1:nMarkers1], levels = 0)
-		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers2-1)*nMarkers2/2)), markers = marker2Names[1:(nMarkers2-1)], levels = 0)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names[1:nMarkers1], levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer((nMarkers2-1)*nMarkers2/2)), markers = marker2Names[1:(nMarkers2-1)], levels = rf@rf@theta@levels)
 		expect_that(validObject(copied, complete=TRUE), throws_error("imputedTheta contained objects with the wrong length"))
 
-		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names[1:nMarkers1], levels = 0)
-		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names[1:nMarkers2], levels = 0)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = rf@rf@theta@levels)
 		expect_that(validObject(copied, complete=TRUE), not(throws_error()))
 	})
+test_that("Slot imputedTheta must have objects with the correct marker names",
+	{
+		marker1Names <- names(which(lg@groups == 1))
+		marker2Names <- names(which(lg@groups == 2))
+		nMarkers1 <- sum(lg@groups == 1)
+		nMarkers2 <- sum(lg@groups == 2)
+
+		copied <- lg
+		copied@imputedTheta <- vector(mode = "list", length = 2)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = rf@rf@theta@levels)
+		copied@imputedTheta[[1]]@markers[1] <- "invalidMarker"
+		expect_that(validObject(copied, complete=TRUE), throws_error("object@imputedTheta were inconsistent with those in slot object@groups"))
+	})
+test_that("Slot imputedTheta must have objects with the correct levels",
+	{
+		marker1Names <- names(which(lg@groups == 1))
+		marker2Names <- names(which(lg@groups == 2))
+		nMarkers1 <- sum(lg@groups == 1)
+		nMarkers2 <- sum(lg@groups == 2)
+
+		copied <- lg
+		copied@imputedTheta <- vector(mode = "list", length = 2)
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = 0)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = rf@rf@theta@levels)
+		expect_that(validObject(copied, complete=TRUE), throws_error("levels must be the same"))
+
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = 0)
+		expect_that(validObject(copied, complete=TRUE), throws_error("levels must be the same"))
+
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = rf@rf@theta@levels)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = rf@rf@theta@levels)
+		expect_that(validObject(copied, complete=TRUE), not(throws_error()))
+
+		copied@imputedTheta[[1]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers1*(nMarkers1+1)/2)), markers = marker1Names, levels = 0)
+		copied@imputedTheta[[2]] <- new("rawSymmetricMatrix", data = as.raw(integer(nMarkers2*(nMarkers2+1)/2)), markers = marker2Names, levels = 0)
+		expect_that(validObject(copied, complete=TRUE), not(throws_error()))
+
+	})
+
 rm(pedigree, map, cross, rf, grouped, lg)

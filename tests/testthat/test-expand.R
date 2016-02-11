@@ -19,7 +19,7 @@ test_that("Function warns when discarding recombination data",
 		expect_that(expand(rf, newMarkers = newMarkers), gives_warning("recombination data will be lost"))
 
 		lg <- formGroups(rf, groups = 1)
-		expect_that(expand(lg, newMarkers = newMarkers), gives_warning("recombination data will be lost"))
+		expect_that(expand(lg, newMarkers = newMarkers), gives_warning("recombination and linkage group data will be lost"))
 	})
 
 test_that("Function warns when discarding linkage group data",

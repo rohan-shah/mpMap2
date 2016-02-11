@@ -7,6 +7,7 @@ test_that("Test that not having rf data generates an error",
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
+		grouped@rf <- NULL
 		expect_that(orderCross(grouped), throws_error("did not contain recombination fraction"))
 	})
 test_that("Test that correct ordering is generated for an F2 population", 

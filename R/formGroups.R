@@ -10,6 +10,7 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 		stop("Input method must be one of 'average', 'complete' or 'single'")
 	}
 	isNewMpcrossRFArgument(mpcrossRF)
+	mpcrossRF <- as(mpcrossRF, "mpcrossRF")
 	nonNegativeIntegerArgument(groups)
 
 	if((clusterBy %in% c("combined", "lod")) && is.null(mpcrossRF@rf@lod))

@@ -47,12 +47,25 @@ checkLG <- function(object)
 				group <- object@allGroups[x]
 				imputedMarkers <- object@imputedTheta[[x]]@markers
 				groupMarkers <- names(which(object@groups == group))
-				return(length(groupMarkers) == length(imputedMarkers) && all(groupMarkers == imputedMarkers))
+				return(identical(groupMarkers, imputedMarkers))
 			})
 		if(any(!correctMarkers))
 		{
 			errors <- c(errors, "Markers in matrices contained in object@imputedTheta were inconsistent with those in slot object@groups")
 			return(errors)
+		}
+		#Check that the levels are all the same
+		if(length(object@imputedTheta) > 0)
+		{
+			levelsFirst <- object@imputedTheta[[1]]@levels
+			for(i in 1:length(object@imputedTheta))
+			{
+				if(!identical(object@imputedTheta[[i]]@levels, levelsFirst))
+				{
+					errors <- c(errors, "Slot levels must be the same for all objects contained in slot imputedTheta")
+					return(errors)
+				}
+			}
 		}
 	}
 	if(length(errors) > 0) return(errors)

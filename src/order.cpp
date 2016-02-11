@@ -12,6 +12,15 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 	{
 		throw std::runtime_error("Input mpcrossLG must be an S4 object");
 	}
+	Rcpp::Function validObject("validObject");
+	try
+	{
+		validObject(mpcrossLG);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input mpcrossLG object was invalid. Please call validObject for more details");
+	}
 
 	Rcpp::S4 lg;
 	try
@@ -133,6 +142,33 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		throw std::runtime_error("Input verbose must be a boolean");
 	}
 
+	Rcpp::RObject imputedTheta_robject;
+	try
+	{
+		imputedTheta_robject = lg.slot("imputedTheta");
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Internal error accessing slot mpcrossLG@lg@imputedTheta");
+	}
+	bool hasImputedTheta = !imputedTheta_robject.isNULL();
+	Rcpp::List imputedTheta;
+	if(hasImputedTheta)
+	{
+		imputedTheta = Rcpp::as<Rcpp::List>(imputedTheta_robject);
+		if(verbose)
+		{
+			Rcpp::Rcout << "Using previously imputed recombination fraction matrices" << std::endl;
+		}
+		if(imputedTheta.size() != allGroups.size())
+		{
+			throw std::runtime_error("Slot mpcrossLG@lg@imputedTheta had the wrong length");
+		}
+		if(imputedTheta.size() > 0)
+		{
+			levels = Rcpp::as<std::vector<double> >(Rcpp::as<Rcpp::S4>(imputedTheta(0)).slot("levels"));
+		}
+	}
 
 	//Check that groupsToOrder contains unique values, which are contained in allGroups
 	std::sort(groupsToOrder.begin(), groupsToOrder.end());
@@ -159,11 +195,13 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 	std::vector<int> markersThisGroup;
 	//This holds a copy of the raw data, for the purposes of doing imputation. We don't want to touch the original, obviously. 
 	std::vector<unsigned char> imputedRaw;
+	unsigned char* imputedRawPtr;
 	//Stuff for the verbose output case
 	Rcpp::RObject barHandle;
 	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
 	for(std::vector<int>::iterator currentGroup = allGroups.begin(); currentGroup != allGroups.end(); currentGroup++)
 	{
+		int groupCount = (int)std::distance(allGroups.begin(), currentGroup);
 		markersThisGroup.clear();
 		//linkage groups are not required to be contiguous in this case, so we have to scan through to find the number of markers in this group
 		for(std::vector<int>::iterator currentMarkerGroup = groups.begin(); currentMarkerGroup != groups.end(); currentMarkerGroup++)
@@ -176,45 +214,52 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		int nMarkersCurrentGroup = (int)markersThisGroup.size();
 		if(nMarkersCurrentGroup == 0) continue;
 		
-		//Do imputation
-		//So first make a copy of the raw data subset
-		imputedRaw.resize((nMarkersCurrentGroup * (nMarkersCurrentGroup + 1)) / 2);
-		//column
-		for(int i = 0; i < nMarkersCurrentGroup; i++)
-		{
-			//row
-			for(int j = 0; j <= i; j++)
-			{
-				int row = markersThisGroup[j], column = markersThisGroup[i];
-				if(row > column) std::swap(row, column);
-				imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
-			}
-		}
 		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
 		for(int i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = i;
 
-		
-		std::string error;
-		std::function<void(unsigned long,unsigned long)> imputationProgressFunction = [](unsigned long,unsigned long){};
-		if(verbose)
+		if(!hasImputedTheta)
 		{
-			Rcpp::Rcout << "Starting imputation for group " << *currentGroup << std::endl;
-			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
-			imputationProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
+			//Do imputation
+			//So first make a copy of the raw data subset
+			imputedRaw.resize((nMarkersCurrentGroup * (nMarkersCurrentGroup + 1)) / 2);
+			imputedRawPtr = &(imputedRaw[0]);
+			//column
+			for(int i = 0; i < nMarkersCurrentGroup; i++)
 			{
-				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
-			};
-		}
-		bool imputationResult = impute(&(imputedRaw[0]), levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
-		if(verbose)
-		{
-			close(barHandle);
-		}
+				//row
+				for(int j = 0; j <= i; j++)
+				{
+					int row = markersThisGroup[j], column = markersThisGroup[i];
+					if(row > column) std::swap(row, column);
+					imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
+				}
+			}
 
-		
-		if(!imputationResult)
+			std::string error;
+			std::function<void(unsigned long,unsigned long)> imputationProgressFunction = [](unsigned long,unsigned long){};
+			if(verbose)
+			{
+				Rcpp::Rcout << "Starting imputation for group " << *currentGroup << std::endl;
+				barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+					imputationProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
+				{
+					setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+				};
+			}
+			bool imputationResult = impute(imputedRawPtr, levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
+			if(verbose)
+			{
+				close(barHandle);
+			}
+
+			if(!imputationResult)
+			{
+				throw std::runtime_error(error.c_str());
+			}
+		}
+		else
 		{
-			throw std::runtime_error(error.c_str());
+			imputedRawPtr = &(Rcpp::as<Rcpp::RawVector>(Rcpp::as<Rcpp::S4>(imputedTheta(groupCount)).slot("data"))[0]);
 		}
 		//Unpack the data into a symmetric matrix
 		std::vector<Rbyte> distMatrix(nMarkersCurrentGroup*nMarkersCurrentGroup);
@@ -222,7 +267,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		{
 			for(std::size_t j = 0; j <= i; j++)
 			{
-				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRaw[(i*(i+1))/2 + j];
+				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRawPtr[(i*(i+1))/2 + j];
 			}
 		}
 	

@@ -37,6 +37,21 @@ test_that("Check that impute just makes copies of parts of the diagonal, if ther
 		thetaAsMatrix[(-1):(-3),1] <- thetaAsMatrix[1,(-1):(-3)] <- NA
 		groupedWithNA@rf@theta <- as(thetaAsMatrix, "rawSymmetricMatrix")
 		imputed <- impute(groupedWithNA)
-		expect_identical(imputed@lg@imputedTheta[[1]][3:11, 1, drop=TRUE], imputed@lg@imputedTheta[[1]][3:11, 2, drop=TRUE])
-		expect_identical(imputed@lg@imputedTheta[[1]][1, 3:11, drop=TRUE], imputed@lg@imputedTheta[[1]][2, 3:11, drop=TRUE])
+		expect_identical(imputed@lg@imputedTheta[[1]][4:11, 1, drop=TRUE], imputed@lg@imputedTheta[[1]][4:11, 2, drop=TRUE])
+		expect_identical(imputed@lg@imputedTheta[[1]][1, 4:11, drop=TRUE], imputed@lg@imputedTheta[[1]][2, 4:11, drop=TRUE])
+	})
+test_that("Check that imputed marker data is discarded if the linkage groups are recalculated",
+	{
+		pedigree <- f2Pedigree(10000)
+		map <- sim.map(len = rep(100, 3), n.mar = 11, anchor.tel = TRUE, include.x = FALSE, eq.spacing=TRUE)
+		#Ensure that markers 1 and 2 are the same
+		map[[1]][1:2] <- 0:1
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
+		grouped <- formGroups(rf, groups = 3, clusterBy = "theta", method = "average")
+		imputed <- impute(grouped)
+
+		grouped <- formGroups(imputed, groups = 2, clusterBy = "theta", method = "average")
+		expect_identical(length(grouped@lg@allGroups), 2L)
+		expect_null(grouped@lg@imputedTheta)
 	})
