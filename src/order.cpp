@@ -32,45 +32,6 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		throw std::runtime_error("Slot mpcrossLG@lg must be an S4 object");
 	}
 
-	Rcpp::S4 rf;
-	try
-	{
-		rf = Rcpp::as<Rcpp::S4>(mpcrossLG.slot("rf"));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("Slot mpcrossLG@rf must be an S4 object");
-	}
-
-	Rcpp::S4 theta;
-	try
-	{
-		theta = Rcpp::as<Rcpp::S4>(rf.slot("theta"));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("Slot mpcrossLG@rf@theta must be an S4 object");
-	}
-
-	Rcpp::RawVector originalRawData;
-	try
-	{
-		originalRawData = theta.slot("data");
-	}
-	catch(...)
-	{
-		throw std::runtime_error("Slot mpcrossLG@rf@theta@data must be a raw vector");
-	}
-
-	std::vector<double> levels;
-	try
-	{
-		levels = Rcpp::as<std::vector<double> >(Rcpp::as<Rcpp::NumericVector>(theta.slot("levels")));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("Slot mpcrossLG@rf@theta@levels must be a numeric vector");
-	}
 
 	std::vector<int> groups;
 	try
@@ -141,6 +102,8 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 	{
 		throw std::runtime_error("Input verbose must be a boolean");
 	}
+	std::vector<double> levels;
+
 
 	Rcpp::RObject imputedTheta_robject;
 	try
@@ -152,6 +115,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		throw std::runtime_error("Internal error accessing slot mpcrossLG@lg@imputedTheta");
 	}
 	bool hasImputedTheta = !imputedTheta_robject.isNULL();
+	Rcpp::RawVector thetaRawData;
 	Rcpp::List imputedTheta;
 	if(hasImputedTheta)
 	{
@@ -167,6 +131,46 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		if(imputedTheta.size() > 0)
 		{
 			levels = Rcpp::as<std::vector<double> >(Rcpp::as<Rcpp::S4>(imputedTheta(0)).slot("levels"));
+		}
+	}
+	else
+	{
+		Rcpp::S4 rf;
+		try
+		{
+			rf = Rcpp::as<Rcpp::S4>(mpcrossLG.slot("rf"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("If slot mpcrossLG@lg@imputedTheta is missing, mpcrossLG@rf cannot be missing and must be an S4 object");
+		}
+
+		Rcpp::S4 theta;
+		try
+		{
+			theta = Rcpp::as<Rcpp::S4>(rf.slot("theta"));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@theta must be an S4 object");
+		}
+
+		try
+		{
+			thetaRawData = theta.slot("data");
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@theta@data must be a raw vector");
+		}
+
+		try
+		{
+			levels = Rcpp::as<std::vector<double> >(Rcpp::as<Rcpp::NumericVector>(theta.slot("levels")));
+		}
+		catch(...)
+		{
+			throw std::runtime_error("Slot mpcrossLG@rf@theta@levels must be a numeric vector");
 		}
 	}
 
@@ -231,7 +235,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				{
 					int row = markersThisGroup[j], column = markersThisGroup[i];
 					if(row > column) std::swap(row, column);
-					imputedRaw[(i * (i + 1))/2 + j] = originalRawData[(column * (column + 1))/2 + row];
+					imputedRaw[(i * (i + 1))/2 + j] = thetaRawData[(column * (column + 1))/2 + row];
 				}
 			}
 

@@ -1,4 +1,15 @@
 context("Test formGroups")
+test_that("Check that formGroups can be applied multiple times", 
+	{
+		f2Pedigree <- f2Pedigree(100)
+		map <- sim.map(len = rep(100, 2), n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		rf <- estimateRF(cross)
+		formGroups <- formGroups(mpcrossRF = rf, groups = 2, method = "average", clusterBy = "theta")
+		expect_that(formGroups <- formGroups(mpcrossRF = formGroups, groups = 2, method = "average", clusterBy = "theta"), not(gives_warning()))
+		formGroups@rf <- NULL
+		expect_that(formGroups <- formGroups(mpcrossRF = formGroups, groups = 2, method = "average", clusterBy = "theta"), throws_error("cannot be automatically converted to an object of class mpcrossRF"))
+	})
 test_that("Check that formGroups requires lod entry if clusterBy is \"combined\" or \"lod\"",
 	{
 		f2Pedigree <- f2Pedigree(100)
