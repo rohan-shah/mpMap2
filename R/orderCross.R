@@ -5,7 +5,7 @@ orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, verbose = F
 	{
 		stop("Input object must have linkage groups")
 	}
-	if(is.null(mpcrossLG@rf))
+	if(is.null(mpcrossLG@rf) && is.null(mpcrossLG@lg@imputedTheta))
 	{
 		stop("Input mpcrossLG object did not contain recombination fraction information")
 	}

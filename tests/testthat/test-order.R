@@ -7,8 +7,12 @@ test_that("Test that not having rf data generates an error",
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
+		imputed <- impute(grouped)
+
 		grouped@rf <- NULL
 		expect_that(orderCross(grouped), throws_error("did not contain recombination fraction"))
+		imputed@rf <- NULL
+		orderCross(imputed)
 	})
 test_that("Test that correct ordering is generated for an F2 population", 
 	{
@@ -22,6 +26,23 @@ test_that("Test that correct ordering is generated for an F2 population",
 		correlated <- cor(match(markers(ordered), names(map[[1]])), 1:101)
 		#This isn't due to numerical accuracy. The ordering is NOT perfect, so the correlation is not 1 or -1. 
 		expect_equal(abs(correlated), 1, tolerance = 1e-3)
+	})
+test_that("Test that identical orderings are generate with and without imputedTheta slot", 
+	{
+		f2Pedigree <- f2Pedigree(10000)
+		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		cross <- subset(cross, markers = sample(1:101))
+		rf <- estimateRF(cross)
+		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
+		set.seed(1)
+		ordered <- orderCross(grouped)
+
+		imputed <- impute(grouped)
+		imputed@rf <- NULL
+		set.seed(1)
+		imputed <- orderCross(imputed)
+		expect_identical(markers(imputed), markers(ordered))
 	})
 test_that("Test that correct ordering is generated for an F2 population with two chromosomes", 
 	{
