@@ -57,9 +57,28 @@ setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 })
 setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 {
-	subsettedRF <- NULL
-	if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
-	return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...), "rf" = subsettedRF))
+	arguments <- list(...)
+	if(sum(c("groups", "markers", "lines") %in% names(arguments)) != 1)
+	{
+		stop("Exactly one of arguments markers, lines and groups is required for function subset.mpcross")
+	}
+	if("groups" %in% names(arguments))
+	{
+		if(!all(arguments$groups %in% x@lg@allGroups))
+		{
+			stop("Input groups must be a subset of the values in x@lg@allGroups")
+		}
+		markers <- names(which(x@lg@groups %in% arguments$groups))
+		subsettedRF <- NULL
+		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, markers = markers)
+		return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, markers = markers), "rf" = subsettedRF))
+	}
+	else
+	{
+		subsettedRF <- NULL
+		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
+		return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...), "rf" = subsettedRF))
+	}
 })
 setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 {
@@ -72,15 +91,24 @@ setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 	if(mode(markers) == "numeric")
 	{
 		markerIndices <- markers
+		markerNames <- markers(x)[markerIndices]
 	}
 	else if(mode(markers) == "character")
 	{
 		markerIndices <- match(markers, markers(x))
+		markerNames <- markers
 	}
 
 	groups <- x@groups[markerIndices]
 	allGroups <- sort(unique(groups))
-	return(new("lg", groups = groups, allGroups = allGroups))
+	imputedTheta <- NULL
+	if(!is.null(x@imputedTheta))
+	{
+		imputedTheta <- vector(mode = "list", length = length(allGroups))
+		names(imputedTheta) <- as.character(allGroups)
+		sapply(as.character(allGroups), function(groupCharacter) imputedTheta[[groupCharacter]] <<- subset(x@imputedTheta[[groupCharacter]], markers = intersect(markerNames, names(which(x@groups == as.integer(groupCharacter))))), simplify = FALSE)
+	}
+	return(new("lg", groups = groups, allGroups = allGroups, imputedTheta = imputedTheta))
 })
 setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 {

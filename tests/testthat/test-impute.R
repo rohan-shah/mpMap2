@@ -56,4 +56,18 @@ test_that("Check that imputed marker data is discarded if the linkage groups are
 		expect_identical(length(grouped@lg@allGroups), 2L)
 		expect_null(grouped@lg@imputedTheta)
 	})
+test_that("Check that imputed marker data is kept if we call subset",
+	{
+		grouped <- formGroups(rf, groups = 3, clusterBy = "theta", method = "average")
+		imputed <- impute(grouped)
+		expect_true(!is.null(imputed@lg@imputedTheta))
+
+		subsetted1 <- subset(imputed, markers = markers(imputed))
+		expect_identical(imputed, subsetted1)
+
+		#Reverse the orders of all the groups
+		markersForSubset <- unlist(sapply(1:3, function(x) rev(names(which(imputed@lg@groups == x))), simplify = FALSE))
+		subsetted2 <- subset(imputed, markers = markersForSubset)
+		for(i in 1:3) expect_identical(subsetted2@lg@imputedTheta[[i]], subset(imputed@lg@imputedTheta[[i]], markers = rev(imputed@lg@imputedTheta[[i]]@markers)))
+	})
 rm(pedigree, cross, rf, map)

@@ -34,6 +34,11 @@ checkLG <- function(object)
 			errors <- c(errors, "If slot imputedTheta is not null, it must be a list of rawSymmetricMatrix objects")
 			return(errors)
 		}
+		if(!identical(names(object@imputedTheta), as.character(object@allGroups)))
+		{
+			errors <- c(errors, "If slot imputedTheta is not null, its names must match the values in slot allGroups")
+			return(errors)
+		}
 		groupCounts <- sapply(object@allGroups, function(x) sum(object@groups == x))
 		imputedThetaLengths <- unlist(lapply(object@imputedTheta, function(x) length(x@data)))
 		if(any(imputedThetaLengths != groupCounts*(groupCounts + 1)/2))

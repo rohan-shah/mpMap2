@@ -17,5 +17,6 @@ impute <- function(mpcrossLG, verbose = FALSE)
 		rawData <- .Call("imputeGroup", mpcrossLG, verbose, group)$theta
 		mpcrossLG@lg@imputedTheta[[counter]] <- new("rawSymmetricMatrix", data = rawData, markers = names(which(mpcrossLG@lg@groups == group)), levels = mpcrossLG@rf@theta@levels)
 	}
+	names(mpcrossLG@lg@imputedTheta) <- as.character(mpcrossLG@lg@allGroups)
 	return(mpcrossLG)
 }
