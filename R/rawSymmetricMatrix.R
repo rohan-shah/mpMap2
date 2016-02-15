@@ -40,6 +40,28 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", dro
 		if(any(i > nMarkers) || any(j > nMarkers) || any(i < 1) || any(j < 1)) stop("Indices were out of range")
 		return(.Call("rawSymmetricMatrixSubsetIndices", x, i, j, TRUE, PACKAGE="mpMap2"))
 	})
+setMethod("[", signature(x = "rawSymmetricMatrix", i = "matrix", j = "missing", drop = "missing"), 
+	function(x, i, j, ..., drop)
+	{
+		if(ncol(i) != 2)
+		{
+			stop("Any matrix used for subsetting must have two columns")
+		}
+		nMarkers <- length(x@markers)
+		if(any(i > nMarkers | i < 1))
+		{
+			stop("Indices were out of range")
+		}
+		if(!is.numeric(i))
+		{
+			stop("Any matrix used for subsetting must be numeric")
+		}
+		if(storage.mode(i) != "integer")
+		{
+			storage.mode(i) <- "integer"
+		}
+		return(.Call("rawSymmetricMatrixSubsetByMatrix", x, i, PACKAGE="mpMap2"))
+	})
 setAs("matrix", "rawSymmetricMatrix", def = function(from, to)
 	{
 		#This is mostly for testing purposes. Haven't bothered with writing efficient C code, because I don't think it can really be made that efficient. This function is mostly for testing purposes, giving us an easy way to generate objects of class rawSymmetricMatrix. 

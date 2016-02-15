@@ -1,5 +1,60 @@
 #include "rawSymmetricMatrix.h"
 #include "matrixChunks.h"
+SEXP rawSymmetricMatrixSubsetByMatrix(SEXP object_, SEXP index_)
+{
+BEGIN_RCPP
+	Rcpp::S4 object;
+	try
+	{
+		object = object_;
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input object must be an S4 object");
+	}
+
+	Rcpp::RawVector data;
+	try
+	{
+		data = Rcpp::as<Rcpp::RawVector>(object.slot("data"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot object@data must be a raw vector");
+	}
+
+	Rcpp::NumericVector levels;
+	try
+	{
+		levels = Rcpp::as<Rcpp::NumericVector>(object.slot("levels"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot object@levels must be a numeric vector");
+	}
+
+	Rcpp::IntegerMatrix index;
+	try
+	{
+		index = index_;
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input index must be an integer matrix");
+	}
+
+	int nIndices = index.nrow();
+	Rcpp::NumericVector output(nIndices);
+	for(int row = 0; row < nIndices; row++)
+	{
+		R_xlen_t i = index(row, 0);
+		R_xlen_t j = index(row, 1);
+		if(i > j) std::swap(i, j);
+		output(row) = levels[data[(j*(j-(R_xlen_t)1))/(R_xlen_t)2 + i-(R_xlen_t)1]];
+	}
+	return output;
+END_RCPP
+}
 SEXP rawSymmetricMatrixSubsetIndices(SEXP object_, SEXP i_, SEXP j_, SEXP drop_)
 {
 BEGIN_RCPP

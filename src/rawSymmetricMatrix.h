@@ -6,4 +6,5 @@ SEXP rawSymmetricMatrixSubsetObject(SEXP object, SEXP indices);
 SEXP assignRawSymmetricMatrixFromEstimateRF(SEXP destination, SEXP rowIndices, SEXP columnIndices, SEXP source);
 SEXP assignRawSymmetricMatrixDiagonal(SEXP destination, SEXP indices, SEXP source);
 SEXP checkRawSymmetricMatrix(SEXP rawSymmetric);
+SEXP rawSymmetricMatrixSubsetByMatrix(SEXP object_, SEXP index_);
 #endif

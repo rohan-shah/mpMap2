@@ -166,6 +166,21 @@ test_that("Checking that subsetting results in objects with correct row and colu
 			}
 		}
 	})
+test_that("Check that subsetting by matrices works", 
+	{
+		f2Pedigree <- f2Pedigree(100)
+		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		rf <- estimateRF(cross)
+		for(counter in 1:10)
+		{
+			indices <- sample(1:nMarkers(cross), 200, replace=TRUE)
+			dim(indices) <- c(100, 2)
+			matrixSubset <- rf@rf@theta[indices]
+			individualSubset <- apply(indices, 1, function(x) rf@rf@theta[x[1], x[2], drop=TRUE])
+			expect_identical(matrixSubset, individualSubset)
+		}
+	})
 test_that("Checking that conversion functions work",
 	{
 		for(i in 1:10)
