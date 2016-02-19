@@ -59,3 +59,13 @@ test_that("Test that correct ordering is generated for an F2 population with two
 		expect_equal(abs(correlationChromosome1), 1, tolerance = 1e-3)
 		expect_equal(abs(correlationChromosome2), 1, tolerance = 1e-3)
 	})
+test_that("Test that we can order a single marker group",
+	{
+		pedigree <- f2Pedigree(100)
+		map <- sim.map(len = 100, n.mar = 1, anchor.tel=FALSE, include.x=FALSE, eq.spacing=TRUE)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		rf <- estimateRF(cross, verbose = TRUE)
+		grouped <- new("mpcrossLG", rf, rf = rf@rf, lg = new ("lg", groups = c("D1M1" = 1L), allGroups = 1L))
+		imputed <- impute(grouped)
+		ordered <- orderCross(imputed)
+	})

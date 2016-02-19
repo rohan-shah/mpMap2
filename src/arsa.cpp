@@ -49,6 +49,12 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input n must be an integer");
 	}
+	if(n == 1)
+	{
+		Rcpp::IntegerVector retVal(1);
+		retVal[0] = 0;
+		return retVal;
+	}
 
 	Rcpp::NumericVector dist;
 	try

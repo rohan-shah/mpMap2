@@ -128,6 +128,11 @@ END_RCPP
 void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(unsigned long, unsigned long)> progressFunction)
 {
 	permutation.resize(n);
+	if(n == 1)
+	{
+		permutation[0] = 0;
+		return;
+	}
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
 	double zbestAllReps = 0;

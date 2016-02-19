@@ -22,7 +22,14 @@ simulateMPCross <- function(map, pedigree, mapFunction, seed)
 	adjacentRecombination <- vector(mode="numeric")
 	for (i in 1:length(map))
 	{
-		adjacentRecombination <- c(adjacentRecombination, sapply(diff(map[[i]]), mapFunction), 0.5)
+		if(length(diff(map[[i]])) > 0)
+		{
+			adjacentRecombination <- c(adjacentRecombination, sapply(diff(map[[i]]), mapFunction), 0.5)
+		}
+		else
+		{
+			adjacentRecombination <- c(adjacentRecombination, 0.5)
+		}
 	}
 	nMarkers <- length(adjacentRecombination)
 	markerNames <- unlist(lapply(map, names))

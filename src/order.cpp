@@ -279,7 +279,8 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		std::function<void(unsigned long, unsigned long)> orderingProgressFunction = [](unsigned long,unsigned long){};
 		if(verbose)
 		{
-			Rcpp::Rcout << "Starting to order group " << *currentGroup << std::endl;
+			//Only output this text if there was an imputation step, or we're ordering multiple groups
+			if(!hasImputedTheta || groupsToOrder.size() > 1) Rcpp::Rcout << "Starting to order group " << *currentGroup << std::endl;
 			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			orderingProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 			{

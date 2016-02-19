@@ -35,6 +35,14 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 		subsetted <- subset(crossDominant, markers = 4)
 		testSingle(crossDominant, subsetted, 4)
 	})
+test_that("Subset refuses to duplicate markers",
+	{
+		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		f2Pedigree <- f2Pedigree(5000)
+		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+		expect_that(subset(cross, markers = rep(1:nMarkers, each = 2)), throws_error("Duplicates detected"))
+		expect_that(subset(cross, markers = rep(lines(cross), each = 2)), throws_error("Duplicates detected"))
+	})
 test_that("Subset changes the pedigree from detailedPedigree to pedigree when subsetting by lines",
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)

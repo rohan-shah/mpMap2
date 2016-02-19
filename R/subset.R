@@ -62,16 +62,29 @@ setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 	{
 		stop("Exactly one of arguments markers, lines and groups is required for function subset.mpcross")
 	}
+	if("groups" %in% names(arguments) && length(arguments$groups) != length(unique(arguments$groups)))
+	{
+		stop("Duplicates detected in argument groups of subset function")
+	}
+	if("lines" %in% names(arguments) && length(arguments$lines) != length(unique(arguments$lines)))
+	{
+		stop("Duplicates detected in argument lines of subset function")
+	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
 	if("groups" %in% names(arguments))
 	{
 		if(!all(arguments$groups %in% x@lg@allGroups))
 		{
 			stop("Input groups must be a subset of the values in x@lg@allGroups")
 		}
-		markers <- names(which(x@lg@groups %in% arguments$groups))
+		markerIndices <- which(x@lg@groups %in% arguments$groups)
+		markers <- markers(x)[markerIndices]
 		subsettedRF <- NULL
 		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, markers = markers)
-		return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, markers = markers), "rf" = subsettedRF))
+		return(new("mpcrossLG", callNextMethod(x, markers = markers), "lg" = subset(x@lg, markers = markers), "rf" = subsettedRF))
 	}
 	else
 	{
@@ -87,6 +100,11 @@ setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 	{
 		stop("Argument markers is required for function subset.lg")
 	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
+
 	markers <- arguments$markers
 	if(mode(markers) == "numeric")
 	{
@@ -117,6 +135,15 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 	{
 		stop("Exactly one of arguments markers and lines is required for function subset.geneticData")
 	}
+	if("lines" %in% names(arguments) && length(arguments$lines) != length(unique(arguments$lines)))
+	{
+		stop("Duplicates detected in argument lines of subset function")
+	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
+
 	if("markers" %in% names(arguments))
 	{
 		markers <- arguments$markers
@@ -153,6 +180,11 @@ setMethod(f = "subset", signature = "hetData", definition = function(x, ...)
 	{
 		stop("Argument markers is required for function subset.hetData")
 	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
+
 	markers <- arguments$markers
 	if(mode(markers) == "numeric")
 	{
@@ -171,6 +203,11 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	{
 		stop("Argument markers is required for function subset.rf")
 	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
+
 	markers <- arguments$markers
 	if(mode(markers) == "numeric")
 	{
@@ -209,6 +246,11 @@ setMethod(f = "subset", signature = "rawSymmetricMatrix", definition = function(
 	{
 		stop("Only argument markers is allowed for function subset.rawSymmetricMatrix")
 	}
+	if("markers" %in% names(arguments) && length(arguments$markers) != length(unique(arguments$markers)))
+	{
+		stop("Duplicates detected in argument markers of subset function")
+	}
+
 	markers <- arguments$markers
 	if(is.character(markers)) 
 	{	
