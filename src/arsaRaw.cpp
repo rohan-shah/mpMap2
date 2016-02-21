@@ -135,7 +135,7 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 	}
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
-	double zbestAllReps = 0;
+	double zbestAllReps = -std::numeric_limits<double>::infinity();
 	//A copy of the best permutation found
 	std::vector<int> bestPermutationThisRep(n);
 	//We use this to build the random permutations

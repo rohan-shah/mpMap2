@@ -35,7 +35,7 @@ orderLargeCross <- function(mpcrossLG, maxSize = 1000, cool = 0.5, tmin = 0.1, n
 		groupAsCharacter <- as.character(group)
 		currentGroupCross <- subset(mpcrossLG, groups = group)
 		currentGroupCross <- subset(currentGroupCross, markers = sample(nMarkers(currentGroupCross)))
-		if(verbose) cat("Started ordering group ", group, " which has ", nMarkers(currentGroupCross), "markers\n", sep="")
+		if(verbose) cat("Started ordering group ", group, " which has ", nMarkers(currentGroupCross), " markers\n", sep="")
 		if(nMarkers(currentGroupCross) < maxSize)
 		{
 			ordered <- orderCross(currentGroupCross)
@@ -101,12 +101,13 @@ orderLargeCross <- function(mpcrossLG, maxSize = 1000, cool = 0.5, tmin = 0.1, n
 		#So we've done the interleaving, now we need to order individual parts
 		starts <- round(seq(1, nMarkers(currentGroupCross), maxSize / 2))
 		starts <- starts[starts < nMarkers(currentGroupCross) - maxSize/2]
-		for(start in starts)
+		for(startIndex in 1:length(starts))
 		{
+			start <- starts[startIndex]
 			end <- min(start + maxSize, nMarkers(currentGroupCross))
 			originalMarkersThisChunk <- orderedMarkers[[groupAsCharacter]][start:end]
 			object <- subset(currentGroupCross, markers = originalMarkersThisChunk)
-			if(verbose) cat("Fine ordering step ", start, " / ", length(starts), "\n", sep="")
+			if(verbose) cat("Fine ordering step ", startIndex, " / ", length(starts), "\n", sep="")
 			ordered <- orderCross(object, verbose=FALSE)
 			markersThisChunk <- markers(ordered)
 			if(cor(match(markersThisChunk, originalMarkersThisChunk), 1:length(originalMarkersThisChunk)) < 0) markersThisChunk <- rev(markersThisChunk)
