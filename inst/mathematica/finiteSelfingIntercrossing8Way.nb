@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     76481,       2169]
-NotebookOptionsPosition[     74050,       2101]
-NotebookOutlinePosition[     74591,       2122]
-CellTagsIndexPosition[     74548,       2119]
+NotebookDataLength[     76748,       2180]
+NotebookOptionsPosition[     74238,       2110]
+NotebookOutlinePosition[     74779,       2131]
+CellTagsIndexPosition[     74736,       2128]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -2097,7 +2097,16 @@ Cell[BoxData[
        RowBox[{"[", "2", "]"}], "]"}]}], "}"}], ")"}], "&"}], "/@", " ", 
   RowBox[{"Range", "[", 
    RowBox[{"1", ",", " ", 
-    RowBox[{"Length", "[", "states", "]"}]}], "]"}]}]], "Input"]
+    RowBox[{"Length", "[", "states", "]"}]}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"Count", " ", "number", " ", "of", " ", "funnels"}], 
+  "*)"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"8", "!"}], "/", "128"}]], "Input"]
 },
 WindowSize->{1920, 1118},
 WindowMargins->{{-8, Automatic}, {Automatic, -8}},
@@ -2126,7 +2135,7 @@ Cell[1444, 47, 2294, 61, 152, "Input"],
 Cell[3741, 110, 71, 1, 31, "Input"],
 Cell[3815, 113, 4200, 108, 332, "Input"],
 Cell[8018, 223, 5067, 130, 392, "Input"],
-Cell[13088, 355, 8776, 228, 266, "Input"],
+Cell[13088, 355, 8776, 228, 326, "Input"],
 Cell[21867, 585, 443, 13, 52, "Input"],
 Cell[22313, 600, 134, 4, 31, "Input"],
 Cell[22450, 606, 172, 6, 31, "Input"],
@@ -2170,7 +2179,9 @@ Cell[71163, 2012, 236, 7, 31, "Input"],
 Cell[71402, 2021, 348, 10, 31, "Input"],
 Cell[71753, 2033, 1672, 45, 152, "Input"],
 Cell[73428, 2080, 195, 4, 31, "Input"],
-Cell[73626, 2086, 420, 13, 31, "Input"]
+Cell[73626, 2086, 420, 13, 31, "Input"],
+Cell[74049, 2101, 113, 3, 31, "Input"],
+Cell[74165, 2106, 69, 2, 31, "Input"]
 }
 ]
 *)

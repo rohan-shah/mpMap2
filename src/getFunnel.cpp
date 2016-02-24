@@ -36,7 +36,7 @@ void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& fath
 		funnel[7] = fffRow;
 		if(nFounders == 16)
 		{
-		  int mmmmRow = mother(mmmRow-1), mmmfRow=father(mmmRow-1), mmfmRow=mother(mmfRow)-1, mmffRow=father(mmfRow-1);
+		  int mmmmRow = mother(mmmRow-1), mmmfRow=father(mmmRow-1), mmfmRow=mother(mmfRow-1), mmffRow=father(mmfRow-1);
 		  int mfmmRow=mother(mfmRow-1), mfmfRow=father(mfmRow-1), mffmRow=mother(mffRow-1), mfffRow=father(mffRow-1);
 		  int fmmmRow=mother(fmmRow-1), fmmfRow=father(fmmRow-1), fmfmRow=mother(fmfRow-1), fmffRow=father(fmfRow-1);
 		  int ffmmRow=mother(ffmRow-1), ffmfRow=father(ffmRow-1), fffmRow=mother(fffRow-1), ffffRow=father(fffRow-1);

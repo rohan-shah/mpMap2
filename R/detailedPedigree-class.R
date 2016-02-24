@@ -47,6 +47,11 @@ checkDetailedPedigree <- function(object)
 	{
 		errors <- c(errors, "Initial lines must be at the start of the pedigree")
 	}
+	#Check that everything with mother or father zero is in the initial slot
+	if(any(object@mother[max((object@initial)+1):length(object@mother)] == 0) || any(object@father[(max(object@initial)+1):length(object@father)] == 0))
+	{
+		errors <- c(errors, "Some founder lines were not listed in slot initial")
+	}
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }

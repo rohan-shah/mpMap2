@@ -52,6 +52,28 @@ void orderFunnel8(int* funnel)
 	orderFour(funnel);
 	orderFour(funnel+4);
 }
+void orderByEight(int* funnel)
+{
+	int* minVal = std::min_element(funnel, funnel + 16);
+	//if the smallest value is in the first four, do nothing
+	if ((minVal - funnel) / 8 == 0)
+	{
+	}
+	else
+	{
+		//if the smallest value is in the second four, switch the two sets of four
+		int original[16];
+		memcpy(original, funnel, sizeof(int) * 16);
+		memcpy(funnel, original + 8, sizeof(int) * 8);
+		memcpy(funnel + 8, original, sizeof(int) * 8);
+	}
+}
+void orderFunnel16(int* funnel)
+{
+	orderByEight(funnel);
+	orderFunnel8(funnel);
+	orderFunnel8(funnel + 8);
+}
 void orderFunnel(int* funnel, int nFounders)
 {
 	if(nFounders == 2)
@@ -65,5 +87,13 @@ void orderFunnel(int* funnel, int nFounders)
 	{
 		orderFunnel4(funnel);
 	}
-	else orderFunnel8(funnel);
+	else if (nFounders == 8)
+	{
+		orderFunnel8(funnel);
+	}
+	else if (nFounders == 16)
+	{
+		orderFunnel16(funnel);
+	}
+	else throw std::runtime_error("Input nFounders must be 2, 4, 8 or 16");
 }

@@ -10,7 +10,7 @@
 template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
 	unsigned long done = 0;
-	unsigned long total = markersThisGroup.size();
+	unsigned long total = (unsigned long)markersThisGroup.size();
 	unsigned long doneThreadZero = 0;
 	bool hasError = false;
 	//This is a marker row

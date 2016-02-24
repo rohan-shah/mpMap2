@@ -18,7 +18,7 @@ typedef Unique<markerPatternID_imp, int> markerPatternID;
 
 //The funnel encoding struct represents a particular funnel, encoded as a bitfield
 struct funnelEncoding_imp;
-typedef Unique<funnelEncoding_imp, int> funnelEncoding;
+typedef Unique<funnelEncoding_imp, std::size_t> funnelEncoding;
 
 //The funnel ID struct representse a unique identifier, assigned to a particular funnel encoding
 struct funnelID_imp;

@@ -49,6 +49,11 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 	Rcpp::CharacterVector markerNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[1]);
 	int nFinals = finals.nrow(), nFounders = founders.nrow(), nMarkers = finals.ncol();
 
+	if(nFounders != 2 && nFounders != 4 && nFounders != 8 && nFounders != 16)
+	{
+		throw std::runtime_error("Number of founders must be 2, 4, 8, or 16");
+	}
+
 	xMajorMatrix<int> foundersToMarkerAlleles(nFounders, nFounders, nMarkers, -1);
 	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 	{
@@ -118,7 +123,6 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			{
 				std::stringstream ss;
 				ss << "Funnel for line " << pedigreeLineNames(*i) << " contained founders {" << funnel.val[0];
-				warnings.push_back(ss.str());
 				if(nFounders == 2)
 				{
 					ss << ", " << funnel.val[1] << "}";
@@ -127,11 +131,12 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				{
 					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << "}";
 				}
-				else
+				else if(nFounders == 8)
 				{
 					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7]<< "}";
 				}
-				ss << ". Did you intend to use all " << nFounders << " founders?";
+				ss << ". Did you intend to use all " << nFounders << " founders?\n";
+				warnings.push_back(ss.str());
 			}
 			else
 			{
@@ -178,7 +183,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 		else
 		{
 			//Add a dummy value in lineFunnel
-			for(int i = 0; i < 8; i++) funnel.val[i] = 0;
+			for(int i = 0; i < 16; i++) funnel.val[i] = 0;
 			lineFunnels.push_back(funnel);
 		}
 	}

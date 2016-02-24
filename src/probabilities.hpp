@@ -2,7 +2,7 @@
 #define PROBABILITIES_HEADER_GUARD
 #include <matrices.hpp>
 
-const int nDifferentProbs = 70;
+const int nDifferentProbs = 100;
 template<int nFounders> struct probabilityData;
 template<int nFounders> struct expandedProbabilitiesFiniteSelfing
 {

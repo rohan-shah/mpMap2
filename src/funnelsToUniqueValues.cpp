@@ -6,11 +6,11 @@ void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation
 	for(std::vector<funnelType>::iterator i = lineFunnels.begin(); i != lineFunnels.end(); i++)
 	{
 		funnelType funnel = *i;
-		int encoded = 0;
+		std::size_t encoded = 0;
 		bool isZero = true;
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			encoded += ((funnel.val[founderCounter]-1) << (3 * founderCounter));
+			encoded += ((funnel.val[founderCounter]-1) << (4 * founderCounter));
 			isZero &= (funnel.val[founderCounter] == 0);
 		}
 		//If it's a dummy value, ignore it
@@ -37,10 +37,10 @@ void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation
 	for(std::vector<funnelType>::iterator i = allFunnels.begin(); i != allFunnels.end(); i++)
 	{
 		funnelType funnel = *i;
-		int encoded = 0;
+		std::size_t encoded = 0;
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			encoded += ((funnel.val[founderCounter]-1) << (3 * founderCounter));
+			encoded += ((funnel.val[founderCounter]-1) << (4 * founderCounter));
 		}
 		if(funnelTranslation.find(encoded) == funnelTranslation.end())
 		{

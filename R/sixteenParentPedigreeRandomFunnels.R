@@ -129,5 +129,5 @@ sixteenParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, s
   {
 	  stop("Internal error")
   }
-  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:8L, observed = observed, selfing = "infinite"))
+  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:16L, observed = observed, selfing = "infinite"))
 }

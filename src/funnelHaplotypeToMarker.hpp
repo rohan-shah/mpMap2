@@ -8,13 +8,13 @@ public:
 	funnelHaplotypeToMarker(rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities)
 		: haplotypeProbabilities(haplotypeProbabilities)
 	{}
-	int funnel[8];
+	int funnel[16];
 	rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
 	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			funnel[founderCounter] = ((enc & (7 << (3*founderCounter))) >> (3*founderCounter));
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		int nPoints = haplotypeProbabilities.getNRows();
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
@@ -72,13 +72,13 @@ public:
 	funnelHaplotypeToMarker(rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities)
 		: haplotypeProbabilities(haplotypeProbabilities)
 	{}
-	int funnel[8];
+	int funnel[16];
 	rowMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
 	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, funnelEncoding enc, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			funnel[founderCounter] = ((enc & (7 << (3*founderCounter))) >> (3*founderCounter));
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		int nPoints = haplotypeProbabilities.getNRows();
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
