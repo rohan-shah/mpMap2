@@ -135,6 +135,10 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				{
 					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7]<< "}";
 				}
+				else if (nFounders == 16)
+				{
+					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7] << ", " << funnel.val[8] << ", " << funnel.val[9] << ", " << funnel.val[10] << ", " << funnel.val[11] << ", " << funnel.val[12] << ", " << funnel.val[13] << ", " << funnel.val[14] << ", " << funnel.val[15] << "}";
+				}
 				ss << ". Did you intend to use all " << nFounders << " founders?\n";
 				warnings.push_back(ss.str());
 			}
