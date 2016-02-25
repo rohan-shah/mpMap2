@@ -14,7 +14,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
-  nonNegativeIntegerArgument(nSeeds)
+  positiveIntegerArgument(nSeeds)
   intercrossingGenerations <- as.integer(intercrossingGenerations)
   initialPopulationSize <- as.integer(initialPopulationSize)
 
@@ -49,7 +49,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
       for(lineCounter in nextFree:(nextFree+initialPopulationSize-1))
       {
         mother[lineCounter] <- lineCounter - initialPopulationSize
-	father[lineCounter] <- sample(setdiff((nextFree-initialPopulationSize):(nextFree-1), lineCounter - initialPopulationSize), 1)
+	      father[lineCounter] <- sample(setdiff((nextFree-initialPopulationSize):(nextFree-1), lineCounter - initialPopulationSize), 1)
       }
       currentIndex <- currentIndex + initialPopulationSize
       nextFree <- nextFree + initialPopulationSize
@@ -84,7 +84,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
   #No selfing
   else
   {
-    observed[7:(6+initialPopulationSize)] <- TRUE
+    observed[(nextFree-initialPopulationSize):(nextFree-1)] <- TRUE
   }
   return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:4L, observed = observed, selfing = "infinite"))
 }
