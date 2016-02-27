@@ -12,7 +12,7 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 		{
 			if(length(x@geneticData) != 1)
 			{
-				stop("Argument lines cannot be a vector if indices if there is more than one data set")
+				stop("Argument lines cannot be a vector of indices if there is more than one data set")
 			}
 			arguments$lines <- rownames(x@geneticData[[1]]@finals)[arguments$lines]
 		}

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     76748,       2180]
-NotebookOptionsPosition[     74238,       2110]
-NotebookOutlinePosition[     74779,       2131]
-CellTagsIndexPosition[     74736,       2128]
+NotebookDataLength[     76788,       2181]
+NotebookOptionsPosition[     74278,       2111]
+NotebookOutlinePosition[     74819,       2132]
+CellTagsIndexPosition[     74776,       2129]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -2020,16 +2020,17 @@ Cell[BoxData[
    RowBox[{"0", ",", " ", "63", ",", " ", "8"}], "]"}]}]], "Input"],
 
 Cell[BoxData[
- RowBox[{"(*", 
-  RowBox[{
-   RowBox[{"Produces", " ", "the", " ", "table", " ", "probabilityData"}], 
-   "<", "8", ">", 
+ RowBox[{"\[Placeholder]", 
+  RowBox[{"(*", 
    RowBox[{
+    RowBox[{"Produces", " ", "the", " ", "table", " ", "probabilityData"}], 
+    "<", "8", ">", 
     RowBox[{
      RowBox[{
-      RowBox[{"::", "intermediateProbabilitiesMask"}], "[", "]"}], "[", "64", 
-     "]"}], " ", "in", " ", 
-    RowBox[{"probabilities8", ".", "hpp"}]}]}], "*)"}]], "Input"],
+      RowBox[{
+       RowBox[{"::", "intermediateProbabilitiesMask"}], "[", "]"}], "[", "64",
+       "]"}], " ", "in", " ", 
+     RowBox[{"probabilities8", ".", "hpp"}]}]}], "*)"}]}]], "Input"],
 
 Cell[BoxData[{
  RowBox[{
@@ -2147,10 +2148,10 @@ Cell[26145, 715, 147, 4, 31, "Input"],
 Cell[26295, 721, 477, 13, 31, "Input"],
 Cell[26775, 736, 295, 7, 31, "Input"],
 Cell[27073, 745, 398, 10, 31, "Input"],
-Cell[27474, 757, 4268, 106, 380, "Input"],
+Cell[27474, 757, 4268, 106, 400, "Input"],
 Cell[31745, 865, 115, 3, 31, "Input"],
 Cell[31863, 870, 647, 20, 52, "Input"],
-Cell[32513, 892, 704, 16, 52, "Input"],
+Cell[32513, 892, 704, 16, 72, "Input"],
 Cell[33220, 910, 3684, 113, 114, "Input"],
 Cell[36907, 1025, 2613, 71, 172, "Input"],
 Cell[39523, 1098, 12917, 325, 795, "Input"],
@@ -2176,12 +2177,12 @@ Cell[66819, 1875, 161, 3, 31, "Input"],
 Cell[66983, 1880, 3834, 118, 158, "Input"],
 Cell[70820, 2000, 340, 10, 31, "Input"],
 Cell[71163, 2012, 236, 7, 31, "Input"],
-Cell[71402, 2021, 348, 10, 31, "Input"],
-Cell[71753, 2033, 1672, 45, 152, "Input"],
-Cell[73428, 2080, 195, 4, 31, "Input"],
-Cell[73626, 2086, 420, 13, 31, "Input"],
-Cell[74049, 2101, 113, 3, 31, "Input"],
-Cell[74165, 2106, 69, 2, 31, "Input"]
+Cell[71402, 2021, 388, 11, 31, "Input"],
+Cell[71793, 2034, 1672, 45, 152, "Input"],
+Cell[73468, 2081, 195, 4, 31, "Input"],
+Cell[73666, 2087, 420, 13, 31, "Input"],
+Cell[74089, 2102, 113, 3, 31, "Input"],
+Cell[74205, 2107, 69, 2, 31, "Input"]
 }
 ]
 *)
