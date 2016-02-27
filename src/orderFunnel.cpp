@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <cstring>
+#include <stdexcept>
 //put the funnels into cannonical order
 //order a set of four (considered as first pair / second pair) so that the pair containing the smallest value comes first, followed by the other pair. Each pair also sorted as (smaller, larger)
 void orderFour(int* start)
