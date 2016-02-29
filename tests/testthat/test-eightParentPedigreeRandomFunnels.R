@@ -10,7 +10,7 @@ test_that("Check that the C and R versions are identical",
 				pedigreeR <- mpMap2:::eightParentPedigreeRandomFunnelsPrototype(selfingGenerations = x["selfingGenerations"], intercrossingGenerations = x["intercrossingGenerations"], initialPopulationSize = 20, nSeeds = x["nSeeds"])
 				set.seed(seed)
 				pedigreeC <- eightParentPedigreeRandomFunnels(selfingGenerations = x["selfingGenerations"], intercrossingGenerations = x["intercrossingGenerations"], initialPopulationSize = 20, nSeeds = x["nSeeds"])
-				expect_equal(pedigreeR, pedigreeC)
+				expect_identical(pedigreeR, pedigreeC)
 				seed <<- seed + 1
 			})
 	})

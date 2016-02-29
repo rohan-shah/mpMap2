@@ -11,6 +11,18 @@
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
 #' @export
 # This is written in C because otherwise it's just too damn slow (especially for generating the huge populations that we want to use to get numerically accurate results for unit testing)
+sixteenParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+{
+	nonNegativeIntegerArgument(initialPopulationSize)
+	nonNegativeIntegerArgument(selfingGenerations)
+	nonNegativeIntegerArgument(nSeeds)
+	nonNegativeIntegerArgument(intercrossingGenerations)
+	intercrossingGenerations <- as.integer(intercrossingGenerations)
+	initialPopulationSize <- as.integer(initialPopulationSize)
+	selfingGenerations <- as.integer(selfingGenerations)
+	return(.Call("sixteenParentPedigreeRandomFunnels", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
+}
+#' @export
 sixteenParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
