@@ -53,31 +53,65 @@ template<> void genotypeProbabilitiesNoIntercross<4, true>(double(&prob)[nDiffer
 }
 template<> void genotypeProbabilitiesNoIntercross<4, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t nFunnels)
 {
-	double oneMinusR = 1 - r;
-	double oneMinusRSquared = oneMinusR*oneMinusR;
-	double onePlus2R = 1 + 2 * r;
-	double powOneMinus2R = std::pow(1 - 2 * r, selfingGenerations);
-	double powD1 = std::pow(1 + 2 * (-1 + r)*r, selfingGenerations);
-	double pow2 = std::pow(2, selfingGenerations);
-	double rSquared = r*r;
-	prob[0] = (oneMinusR*(-2 + 2 * pow2 + onePlus2R*powD1 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (8 * onePlus2R*pow2);
-	prob[1] = 0;
-	prob[2] = -(oneMinusR*(-1 + powD1)) / (16 * pow2);
-	prob[3] = (r*(-2 + 2 * pow2 + onePlus2R*powD1 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (8 * onePlus2R*pow2);
-	prob[4] = -((-1 + powD1)*r) / (16 * pow2);
-	prob[5] = (-2 + onePlus2R*powD1 + powOneMinus2R - 4 * r + 4 * pow2*r - 2 * powOneMinus2R*r) / (16 * onePlus2R*pow2);
-	prob[6] = 0;
-	prob[7] = 0;
-	prob[8] = 0;
-	prob[9] = 0;
-	prob[10] = 0;
-	prob[11] = 0;
-	prob[12] = (oneMinusRSquared*(powD1 + powOneMinus2R)) / (16 * pow2);
-	prob[13] = (oneMinusR*(powD1 + powOneMinus2R)*r) / (16 * pow2);
-	prob[14] = ((powD1 + powOneMinus2R)*rSquared) / (16 * pow2);
-	prob[15] = -(oneMinusRSquared*(-powD1 + powOneMinus2R)) / (16 * pow2); 
-	prob[16] = -(oneMinusR*(-powD1 + powOneMinus2R)*r) / (16 * pow2);
-	prob[17] = ((powD1 - powOneMinus2R)*rSquared) / (16 * pow2);
+	if (nFunnels == 1)
+	{
+		double oneMinusR = 1 - r;
+		double oneMinusRSquared = oneMinusR*oneMinusR;
+		double onePlus2R = 1 + 2 * r;
+		double powOneMinus2R = std::pow(1 - 2 * r, selfingGenerations);
+		double powD1 = std::pow(1 + 2 * (-1 + r)*r, selfingGenerations);
+		double pow2 = std::pow(2, selfingGenerations);
+		double rSquared = r*r;
+		prob[0] = (oneMinusR*(-2 + 2 * pow2 + onePlus2R*powD1 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (8 * onePlus2R*pow2);
+		prob[1] = 0;
+		prob[2] = -(oneMinusR*(-1 + powD1)) / (16 * pow2);
+		prob[3] = (r*(-2 + 2 * pow2 + onePlus2R*powD1 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (8 * onePlus2R*pow2);
+		prob[4] = -((-1 + powD1)*r) / (16 * pow2);
+		prob[5] = (-2 + onePlus2R*powD1 + powOneMinus2R - 4 * r + 4 * pow2*r - 2 * powOneMinus2R*r) / (16 * onePlus2R*pow2);
+		prob[6] = 0;
+		prob[7] = 0;
+		prob[8] = 0;
+		prob[9] = 0;
+		prob[10] = 0;
+		prob[11] = 0;
+		prob[12] = (oneMinusRSquared*(powD1 + powOneMinus2R)) / (16 * pow2);
+		prob[13] = (oneMinusR*(powD1 + powOneMinus2R)*r) / (16 * pow2);
+		prob[14] = ((powD1 + powOneMinus2R)*rSquared) / (16 * pow2);
+		prob[15] = -(oneMinusRSquared*(-powD1 + powOneMinus2R)) / (16 * pow2);
+		prob[16] = -(oneMinusR*(-powD1 + powOneMinus2R)*r) / (16 * pow2);
+		prob[17] = ((powD1 - powOneMinus2R)*rSquared) / (16 * pow2);
+	}
+	else
+	{
+		double onePlus2RInverse = 1.0 / (1 + 2 * r);
+		double pow2 = std::pow(2, selfingGenerations);
+		double powOneMinus2R = std::pow(1 - 2 * r, selfingGenerations);
+		double oneMinusR = 1 - r;
+		double complex1 = std::pow(1 - 2 * oneMinusR*r, selfingGenerations);
+		double complex2 = -complex1 + powOneMinus2R;
+		double complex3 = complex1 / pow2;
+		double oneMinusRSquared = oneMinusR*oneMinusR;
+		double complex4 = -2 + powOneMinus2R - 6 * r + 6 * pow2*r - 3 * powOneMinus2R*r - 4 * r * r + 2 * powOneMinus2R * r * r + complex1*(1 + r)*(1 + 2 * r);
+		double onePlus2R = 1 + 2 * r;
+		prob[0] = (oneMinusR*onePlus2RInverse*(-2 + complex1*onePlus2R + 2 * pow2 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (8 * pow2);
+		prob[1] = -((-1 + complex1)*oneMinusR) / (24 * pow2);
+		prob[2] = -((-1 + complex1)*oneMinusR) / (24 * pow2);
+		prob[3] = (complex4*onePlus2RInverse) / (24 * pow2);
+		prob[4] = -((-1 + complex1)*r) / (24 * pow2);
+		prob[5] = (complex4*onePlus2RInverse) / (24 * pow2);
+		prob[6] = -((-1 + complex1)*r) / (24 * pow2);
+		prob[7] = (oneMinusRSquared*(complex1 + powOneMinus2R)) / (24 * pow2);
+		prob[8] = (oneMinusR*(complex1 + powOneMinus2R)*r) / (48 * pow2);
+		prob[9] = -(complex2*oneMinusRSquared) / (24 * pow2);
+		prob[10] = -(complex2*oneMinusR*r) / (48 * pow2);
+		prob[11] = (complex3*r*r) / 24;
+		prob[12] = (oneMinusRSquared*(complex1 + powOneMinus2R)) / (24 * pow2);
+		prob[13] = (oneMinusR*(complex1 + powOneMinus2R)*r) / (48 * pow2);
+		prob[14] = (complex1*r*r) / (24 * pow2);
+		prob[15] = -(complex2*oneMinusRSquared) / (24 * pow2);
+		prob[16] = -(complex2*oneMinusR*r) / (48 * pow2);
+		prob[17] = (complex1*r*r) / (24 * pow2);
+	}
 }
 template<> void genotypeProbabilitiesWithIntercross<4, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t nFunnels)
 {

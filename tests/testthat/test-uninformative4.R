@@ -103,13 +103,13 @@ test_that("Check that the four-parent uninformative marker combination gives an 
 		rf <- testFiniteSelfing(pedigree)
 		expect_true(!is.na(rf@rf@theta[1,2]))
 
-		#Both selfing and intercrossing, the result is uninformative
-		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
+		#Both selfing and intercrossing, the result is informative
+		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 1, intercrossingGenerations = 1, nSeeds = 1)
 		rf <- testFiniteSelfing(pedigree)
-		expect_true(is.na(rf@rf@theta[1,2]))
-		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
+		expect_true(!is.na(rf@rf@theta[1,2]))
+		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 1, intercrossingGenerations = 1, nSeeds = 1)
 		rf <- testFiniteSelfing(pedigree)
-		expect_true(is.na(rf@rf@theta[1,2]))
+		expect_true(!is.na(rf@rf@theta[1,2]))
 		
 		#Selfing without intercrossing, the result is informative
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = 1)
