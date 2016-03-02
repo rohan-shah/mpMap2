@@ -1,4 +1,4 @@
-context("uninformative markers")
+context("uninformative 4-parent markers")
 test_that("Check that the four-parent uninformative marker combination gives an RF estimate of NA in the right cases",
 	{
 		testInfiniteSelfing <- function(pedigree)

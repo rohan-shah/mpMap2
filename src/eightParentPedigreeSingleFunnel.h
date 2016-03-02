@@ -1,0 +1,5 @@
+#ifndef EIGHT_PARENT_PEDIGREE_SINGLE_FUNNEL_HEADER_GUARD
+#define EIGHT_PARENT_PEDIGREE_SINGLE_FUNNEL_HEADER_GUARD
+#include <Rcpp.h>
+SEXP eightParentPedigreeSingleFunnel(SEXP initialPopulationSize_sexp, SEXP selfingGenerations_sexp, SEXP nSeeds_sexp, SEXP intercrossingGenerations_sexp);
+#endif

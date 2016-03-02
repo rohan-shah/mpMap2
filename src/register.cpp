@@ -10,6 +10,7 @@
 #include "fourParentPedigreeRandomFunnels.h"
 #include "fourParentPedigreeSingleFunnel.h"
 #include "eightParentPedigreeRandomFunnels.h"
+#include "eightParentPedigreeSingleFunnel.h"
 #include "sixteenParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"
@@ -34,6 +35,7 @@ extern "C"
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
 		{"fourParentPedigreeSingleFunnel", (DL_FUNC)&fourParentPedigreeSingleFunnel, 4},
 		{"eightParentPedigreeRandomFunnels", (DL_FUNC)&eightParentPedigreeRandomFunnels, 4},
+		{"eightParentPedigreeSingleFunnel", (DL_FUNC)&eightParentPedigreeSingleFunnel, 4},
 		{"sixteenParentPedigreeRandomFunnels", (DL_FUNC)&sixteenParentPedigreeRandomFunnels, 4},
 		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 2},
 		{"singleIndexToPair", (DL_FUNC)&singleIndexToPairExported, 3},
