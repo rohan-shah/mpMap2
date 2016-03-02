@@ -90,10 +90,10 @@ test_that("Check that the eight-parent uninformative marker combination gives an
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
 		rf <- testFiniteSelfing(pedigree)
 		expect_true(is.na(rf@rf@theta[1,2]))
-		#1 generation of intercrossing and 0 generations of selfing is informative for the random funnel design
+		#1 generation of intercrossing and 0 generations of selfing is uninformative for the random funnel design
 		pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
 		rf <- testFiniteSelfing(pedigree)
-		expect_true(!is.na(rf@rf@theta[1,2]))
+		expect_true(is.na(rf@rf@theta[1,2]))
 
 		#Zero generations of intercrossing and zero generations of selfing, the result is uninformative for the single funnel design
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)

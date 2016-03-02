@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     92117,       2595]
-NotebookOptionsPosition[     89356,       2519]
-NotebookOutlinePosition[     89895,       2540]
-CellTagsIndexPosition[     89852,       2537]
+NotebookDataLength[     92103,       2595]
+NotebookOptionsPosition[     89358,       2519]
+NotebookOutlinePosition[     89881,       2540]
+CellTagsIndexPosition[     89838,       2537]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -152,8 +152,8 @@ Cell[BoxData[
       RowBox[{
        RowBox[{"{", 
         RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], ",", " ", "4"}], 
-      "]"}]}], ";"}], "\n", 
-   RowBox[{"(*", "Symmetries", "*)"}], "\[IndentingNewLine]", 
+      "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", "Symmetries", "*)"}], "\n", 
    RowBox[{
     RowBox[{"standardiseUsingPermutation", "[", 
      RowBox[{"{", 
@@ -2304,7 +2304,7 @@ Cell[BoxData[{
    RowBox[{"Tuples", "[", 
     RowBox[{
      RowBox[{"Range", "[", 
-      RowBox[{"1", ",", " ", "4"}], "]"}], ",", " ", "4"}], 
+      RowBox[{"1", ",", " ", "8"}], "]"}], ",", " ", "4"}], 
     "]"}]}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"contributionsToMarkerValueNoIntercross", "[", 
@@ -2374,7 +2374,7 @@ Cell[BoxData[{
    RowBox[{"Tuples", "[", 
     RowBox[{
      RowBox[{"Range", "[", 
-      RowBox[{"1", ",", " ", "4"}], "]"}], ",", " ", "4"}], 
+      RowBox[{"1", ",", " ", "8"}], "]"}], ",", " ", "4"}], 
     "]"}]}]}]}], "Input"],
 
 Cell[BoxData[
@@ -2383,7 +2383,7 @@ Cell[BoxData[
    RowBox[{
    "One", " ", "generation", " ", "of", " ", "intercrossing", " ", "and", " ",
      "zero", " ", "generations", " ", "of", " ", "selfing", " ", "is", " ", 
-    "informative"}], "*)"}], "\n", 
+    "uninformative"}], "*)"}], "\n", 
   RowBox[{
    RowBox[{
     RowBox[{"(", 
@@ -2523,7 +2523,7 @@ PrintingCopies->1,
 PrintingPageRange->{32000, 32000},
 PrintingOptions->{"Magnification"->1.,
 "PaperOrientation"->"Portrait",
-"PaperSize"->{595.1999999999999, 841.8}},
+"PaperSize"->{612, 792}},
 TrackCellChangeTimes->False,
 FrontEndVersion->"10.1 for Microsoft Windows (64-bit) (March 23, 2015)",
 StyleDefinitions->"Default.nb"
@@ -2593,10 +2593,10 @@ Cell[78240, 2213, 420, 13, 31, "Input"],
 Cell[78663, 2228, 113, 3, 31, "Input"],
 Cell[78779, 2233, 69, 2, 31, "Input"],
 Cell[78851, 2237, 5579, 140, 372, "Input"],
-Cell[84433, 2379, 1266, 34, 72, "Input"],
-Cell[85702, 2415, 1191, 32, 72, "Input"],
-Cell[86896, 2449, 1189, 32, 72, "Input"],
-Cell[88088, 2483, 1264, 34, 72, "Input"]
+Cell[84433, 2379, 1268, 34, 72, "Input"],
+Cell[85704, 2415, 1191, 32, 72, "Input"],
+Cell[86898, 2449, 1189, 32, 72, "Input"],
+Cell[88090, 2483, 1264, 34, 72, "Input"]
 }
 ]
 *)
