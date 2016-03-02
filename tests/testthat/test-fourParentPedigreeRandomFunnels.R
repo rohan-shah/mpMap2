@@ -16,5 +16,5 @@ test_that("Check that the C and R versions are identical",
 	})
 test_that("Input nSeeds must be positive",
 	{
-			expect_that(fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0, nSeeds = 0), throws_error("positive integer"))
+			expect_that(fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0, nSeeds = 0), throws_error("positive integer"))
 	})

@@ -8,6 +8,7 @@
 #include "internal.h"
 #endif
 #include "fourParentPedigreeRandomFunnels.h"
+#include "fourParentPedigreeSingleFunnel.h"
 #include "eightParentPedigreeRandomFunnels.h"
 #include "sixteenParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
@@ -31,6 +32,7 @@ extern "C"
 		{"listCodingErrors", (DL_FUNC)&listCodingErrors, 3},
 		{"estimateRF", (DL_FUNC)&estimateRF, 9},
 		{"fourParentPedigreeRandomFunnels", (DL_FUNC)&fourParentPedigreeRandomFunnels, 4},
+		{"fourParentPedigreeSingleFunnel", (DL_FUNC)&fourParentPedigreeSingleFunnel, 4},
 		{"eightParentPedigreeRandomFunnels", (DL_FUNC)&eightParentPedigreeRandomFunnels, 4},
 		{"sixteenParentPedigreeRandomFunnels", (DL_FUNC)&sixteenParentPedigreeRandomFunnels, 4},
 		{"countValuesToEstimate", (DL_FUNC)&countValuesToEstimateExported, 2},

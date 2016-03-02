@@ -15,6 +15,20 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
   positiveIntegerArgument(nSeeds)
+  nonNegativeIntegerArgument(intercrossingGenerations)
+
+  if(initialPopulationSize <= 2 && intercrossingGenerations > 0)
+  {
+    stop("Random mating is impossible with only two lines per generation")
+    #....and more importantly it means that the sample command below gets screwed up, because we're calling sample(x) where length(x) == 1, which samples from 1:x
+  }
+  return(.Call("fourParentPedigreeSingleFunnel", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
+}
+fourParentPedigreeSingleFunnelPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+{
+  nonNegativeIntegerArgument(initialPopulationSize)
+  nonNegativeIntegerArgument(selfingGenerations)
+  positiveIntegerArgument(nSeeds)
   intercrossingGenerations <- as.integer(intercrossingGenerations)
   initialPopulationSize <- as.integer(initialPopulationSize)
 
@@ -49,7 +63,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
       for(lineCounter in nextFree:(nextFree+initialPopulationSize-1))
       {
         mother[lineCounter] <- lineCounter - initialPopulationSize
-	      father[lineCounter] <- sample(setdiff((nextFree-initialPopulationSize):(nextFree-1), lineCounter - initialPopulationSize), 1)
+        father[lineCounter] <- sample(setdiff((nextFree-initialPopulationSize):(nextFree-1), lineCounter - initialPopulationSize), 1)
       }
       currentIndex <- currentIndex + initialPopulationSize
       nextFree <- nextFree + initialPopulationSize
