@@ -308,7 +308,7 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDiffe
 		double onePlus2R = 1 + 2 * r;
 		double rSquared = r*r;
 		double rMinus1Pow3 = rMinus1Squared*(r - 1);
-		double rMinus1Pow4 = rMinus1Pow4*(r - 1);
+		double rMinus1Pow4 = rMinus1Pow3*(r - 1);
 		double complex1 = std::pow(1 + 2 * (-1 + r)*r, selfingGenerations);
 		prob[0] = ((-2 + complex1*onePlus2R + 2 * pow2 - powOneMinus2R1 - 4 * r + 2 * powOneMinus2R1*r)*rMinus1Squared) / (2 * onePlus2R*pow2);
 		prob[1] = 0;
@@ -356,6 +356,53 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDiffe
 		prob[43] = -((-complex1 + powOneMinus2R1)*rMinus1Squared*rSquared) / (2 * pow2);
 		prob[44] = ((-complex1 + powOneMinus2R1)*(-1 + r)*rSquared) / pow2;
 		prob[45] = -((-complex1 + powOneMinus2R1)*rSquared) / (2 * pow2);
+		//This is because we combined some states (see mathematica code)
+		prob[0] /= 8;
+		prob[1] /= 32;
+		prob[2] /= 64;
+		prob[3] /= 128;
+		prob[4] /= 8;
+		prob[5] /= 64;
+		prob[6] /= 128;
+		prob[7] /= 16;
+		prob[8] /= 32;
+		prob[9] /= 256;
+		prob[10] /= 32;
+		prob[11] /= 64;
+		prob[12] /= 128;
+		prob[13] /= 8;
+		prob[14] /= 64;
+		prob[15] /= 128;
+		prob[16] /= 8;
+		prob[17] /= 64;
+		prob[18] /= 128;
+		prob[19] /= 16;
+		prob[20] /= 256;
+		prob[21] /= 32;
+		prob[22] /= 128;
+		prob[23] /= 16;
+		prob[24] /= 32;
+		prob[25] /= 256;
+		prob[26] /= 16;
+		prob[27] /= 256;
+		prob[28] /= 16;
+		prob[29] /= 32;
+		prob[30] /= 256;
+		prob[31] /= 16;
+		prob[32] /= 256;
+		prob[33] /= 128;
+		prob[34] /= 32;
+		prob[35] /= 64;
+		prob[36] /= 128;
+		prob[37] /= 32;
+		prob[38] /= 128;
+		prob[39] /= 128;
+		prob[40] /= 32;
+		prob[41] /= 64;
+		prob[42] /= 128;
+		prob[43] /= 32;
+		prob[44] /= 128;
+		prob[45] /= 128;
 	}
 	else
 	{
@@ -369,7 +416,7 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDiffe
 		double oneMinusR = 1 - r;
 		double pow2 = std::pow(2, selfingGenerations);
 
-		double complex1 = std::pow(0.5 + oneMinusR*r, selfingGenerations);
+		double complex1 = std::pow(0.5 - oneMinusR*r, selfingGenerations);
 		double complex2 = (-1 + powD1)*(-2 + r)*r;
 		double complex3 = powD1*(4 + (3 - 2 * r)*r) + 4 * rSquared - 2 * powOneMinus2R*rSquared;
 		double rMinus2Squared = (r - 2)*(r - 2);
@@ -424,8 +471,8 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDiffe
 		prob[45] = (powD1*rMinus2Squared*rSquared) / (1680 * pow2);
 	}
 #ifndef NDEBUG
-	        double sum = 0;
-	        for(int i = 0; i < 18; i++) sum += prob[i];
+        double sum = 0;
+        for(int i = 0; i < 46; i++) sum += prob[i];
 #endif
 }
 template<> void genotypeProbabilitiesWithIntercross<8, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t nFunnels)
@@ -459,7 +506,7 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDif
 		double complex3 = -16 * r * (5 + r * (-5 + 2 * r));
 
 		tmp = (complex1 + powOneMinus2R1) * (-1 + powOneMinusR1 * oneMinus2R);
-		double complex4 = tmp * tmp;
+		double complex4 = (complex1 + powOneMinus2R1) * (-1 + powOneMinusR1 * oneMinus2R) * (-1 + powOneMinusR1 * oneMinus2R);
 
 		tmp = 1 - oneMinus2R * powOneMinusR1;
 		double complex5 = complex1 * tmp * tmp;
@@ -635,7 +682,7 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDif
 	}
 #ifndef NDEBUG
 	double sum = 0;
-	for(int i = 0; i < 18; i++) sum += prob[i];
+	for(int i = 0; i < 46; i++) sum += prob[i];
 #endif
 	//This is because we combined some states (see mathematica code)
 	prob[0] /= 8;
