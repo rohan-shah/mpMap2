@@ -10,14 +10,19 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     92103,       2595]
-NotebookOptionsPosition[     89358,       2519]
-NotebookOutlinePosition[     89881,       2540]
-CellTagsIndexPosition[     89838,       2537]
+NotebookDataLength[    104405,       2922]
+NotebookOptionsPosition[    101369,       2839]
+NotebookOutlinePosition[    101892,       2860]
+CellTagsIndexPosition[    101849,       2857]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetDirectory", "[", 
+   RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}]], "Input"],
+
 Cell[BoxData[{
  RowBox[{
   RowBox[{
@@ -2515,7 +2520,322 @@ Cell[BoxData[
     RowBox[{
      RowBox[{"{", 
       RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], 
-    "]"}]}]}]], "Input"]
+    "]"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Approximately", " ", "uninformative", " ", "case", " ", "with", " ", 
+    "zero", " ", "generations", " ", "of", " ", "intercrossing"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"uninformative", " ", "=", " ", 
+   RowBox[{"Limit", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Plus", " ", "@@", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"contributionsToMarkerValue", "[", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{
+               "1", ",", " ", "0", ",", " ", "0", ",", " ", "1", ",", " ", 
+                "1", ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], 
+              ",", " ", 
+              RowBox[{"{", 
+               RowBox[{
+               "0", ",", "0", ",", " ", "1", ",", " ", "0", ",", " ", "0", 
+                ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], ",", 
+              " ", 
+              RowBox[{"Sequence", "@@", "#1"}]}], "]"}], "/.", 
+            RowBox[{"{", 
+             RowBox[{"nIntercrossing", "\[Rule]", "0"}], "}"}]}], ")"}]}], "//",
+          "Simplify"}], ")"}], "&"}], "/@", 
+      RowBox[{"Tuples", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], ",", 
+     " ", 
+     RowBox[{"d", "\[Rule]", " ", "\[Infinity]"}], ",", " ", 
+     RowBox[{"Assumptions", "\[Rule]", 
+      RowBox[{"0", " ", "<", " ", "r", " ", "<", " ", 
+       RowBox[{"1", "/", "2"}]}]}]}], "]"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Module", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"tuples", " ", "=", " ", 
+     RowBox[{"Tuples", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], "}"}], 
+   ",", " ", "\[IndentingNewLine]", 
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+     RowBox[{"i", " ", "\[LessEqual]", " ", 
+      RowBox[{"Length", "[", "tuples", "]"}]}], ",", " ", 
+     RowBox[{"i", "++"}], ",", " ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"UnsameQ", "[", 
+        RowBox[{
+         RowBox[{"uninformative", "[", 
+          RowBox[{"[", "i", "]"}], "]"}], ",", " ", "0"}], "]"}], ",", " ", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{
+         RowBox[{"\"\<approximatelyFlatRandomFunnelZeroIntercrossing\>\"", "<>", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", " ", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "3", "]"}], "]"}], "]"}], "<>", "\"\<.pdf\>\""}], 
+         ",", 
+         RowBox[{"Plot", "[", 
+          RowBox[{
+           RowBox[{"uninformative", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"r", ",", " ", "0", ",", " ", 
+             FractionBox["1", "2"]}], "}"}], ",", " ", 
+           RowBox[{"AxesLabel", "\[Rule]", 
+            RowBox[{"{", 
+             RowBox[{"r", ",", " ", 
+              RowBox[{"\"\<Probability of \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", 
+               "\"\<, \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "3", "]"}], "]"}], "]"}]}]}], "}"}]}]}], 
+          "]"}]}], "]"}]}], "\[IndentingNewLine]", "]"}]}], "]"}]}], 
+  "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Approximately", " ", "uninformative", " ", "case", " ", "with", " ", 
+    "one", " ", "generation", " ", "of", " ", "intercrossing"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"uninformative", " ", "=", " ", 
+   RowBox[{"Limit", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Plus", " ", "@@", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"contributionsToMarkerValue", "[", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{
+               "1", ",", " ", "0", ",", " ", "0", ",", " ", "1", ",", " ", 
+                "1", ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], 
+              ",", " ", 
+              RowBox[{"{", 
+               RowBox[{
+               "0", ",", "0", ",", " ", "1", ",", " ", "0", ",", " ", "0", 
+                ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], ",", 
+              " ", 
+              RowBox[{"Sequence", "@@", "#1"}]}], "]"}], "/.", 
+            RowBox[{"{", 
+             RowBox[{"nIntercrossing", "\[Rule]", "1"}], "}"}]}], ")"}]}], "//",
+          "Simplify"}], ")"}], "&"}], "/@", 
+      RowBox[{"Tuples", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], ",", 
+     " ", 
+     RowBox[{"d", "\[Rule]", " ", "\[Infinity]"}], ",", " ", 
+     RowBox[{"Assumptions", "\[Rule]", 
+      RowBox[{"0", " ", "<", " ", "r", " ", "<", " ", 
+       RowBox[{"1", "/", "2"}]}]}]}], "]"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Module", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"tuples", " ", "=", " ", 
+     RowBox[{"Tuples", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], "}"}], 
+   ",", " ", "\[IndentingNewLine]", 
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+     RowBox[{"i", " ", "\[LessEqual]", " ", 
+      RowBox[{"Length", "[", "tuples", "]"}]}], ",", " ", 
+     RowBox[{"i", "++"}], ",", " ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"UnsameQ", "[", 
+        RowBox[{
+         RowBox[{"uninformative", "[", 
+          RowBox[{"[", "i", "]"}], "]"}], ",", " ", "0"}], "]"}], ",", " ", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{
+         RowBox[{"\"\<approximatelyFlatRandomFunnelOneIntercrossing\>\"", "<>", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", " ", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "3", "]"}], "]"}], "]"}], "<>", "\"\<.pdf\>\""}], 
+         ",", 
+         RowBox[{"Plot", "[", 
+          RowBox[{
+           RowBox[{"uninformative", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"r", ",", " ", "0", ",", " ", 
+             FractionBox["1", "2"]}], "}"}], ",", " ", 
+           RowBox[{"AxesLabel", "\[Rule]", 
+            RowBox[{"{", 
+             RowBox[{"r", ",", " ", 
+              RowBox[{"\"\<Probability of \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", 
+               "\"\<, \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "3", "]"}], "]"}], "]"}]}]}], "}"}]}]}], 
+          "]"}]}], "]"}]}], "\[IndentingNewLine]", "]"}]}], "]"}]}], 
+  "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Approximately", " ", "uninformative", " ", "case", " ", "with", " ", 
+    "ten", " ", "generations", " ", "of", " ", "intercrossing"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"uninformative", " ", "=", " ", 
+   RowBox[{"Limit", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Plus", " ", "@@", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"contributionsToMarkerValue", "[", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{
+               "1", ",", " ", "0", ",", " ", "0", ",", " ", "1", ",", " ", 
+                "1", ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], 
+              ",", " ", 
+              RowBox[{"{", 
+               RowBox[{
+               "0", ",", "0", ",", " ", "1", ",", " ", "0", ",", " ", "0", 
+                ",", " ", "0", ",", " ", "1", ",", " ", "1"}], "}"}], ",", 
+              " ", 
+              RowBox[{"Sequence", "@@", "#1"}]}], "]"}], "/.", 
+            RowBox[{"{", 
+             RowBox[{"nIntercrossing", "\[Rule]", "10"}], "}"}]}], ")"}]}], "//",
+          "Simplify"}], ")"}], "&"}], "/@", 
+      RowBox[{"Tuples", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], ",", 
+     " ", 
+     RowBox[{"d", "\[Rule]", " ", "\[Infinity]"}], ",", " ", 
+     RowBox[{"Assumptions", "\[Rule]", 
+      RowBox[{"0", " ", "<", " ", "r", " ", "<", " ", 
+       RowBox[{"1", "/", "2"}]}]}]}], "]"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Module", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"tuples", " ", "=", " ", 
+     RowBox[{"Tuples", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], "]"}]}], "}"}], 
+   ",", " ", "\[IndentingNewLine]", 
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+     RowBox[{"i", " ", "\[LessEqual]", " ", 
+      RowBox[{"Length", "[", "tuples", "]"}]}], ",", " ", 
+     RowBox[{"i", "++"}], ",", " ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"UnsameQ", "[", 
+        RowBox[{
+         RowBox[{"uninformative", "[", 
+          RowBox[{"[", "i", "]"}], "]"}], ",", " ", "0"}], "]"}], ",", " ", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{
+         RowBox[{"\"\<approximatelyFlatRandomFunnelTenIntercrossing\>\"", "<>", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", " ", 
+          RowBox[{"ToString", "[", 
+           RowBox[{
+            RowBox[{"tuples", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "[", 
+            RowBox[{"[", "3", "]"}], "]"}], "]"}], "<>", "\"\<.pdf\>\""}], 
+         ",", 
+         RowBox[{"Plot", "[", 
+          RowBox[{
+           RowBox[{"uninformative", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"r", ",", " ", "0", ",", " ", 
+             FractionBox["1", "2"]}], "}"}], ",", " ", 
+           RowBox[{"AxesLabel", "\[Rule]", 
+            RowBox[{"{", 
+             RowBox[{"r", ",", " ", 
+              RowBox[{"\"\<Probability of \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "]"}], " ", "<>", 
+               "\"\<, \>\"", " ", "<>", " ", 
+               RowBox[{"ToString", "[", 
+                RowBox[{
+                 RowBox[{"tuples", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "[", 
+                 RowBox[{"[", "3", "]"}], "]"}], "]"}]}]}], "}"}]}]}], 
+          "]"}]}], "]"}]}], "\[IndentingNewLine]", "]"}]}], "]"}]}], 
+  "]"}]], "Input"]
 },
 WindowSize->{1348, 710},
 WindowMargins->{{-8, Automatic}, {Automatic, 0}},
@@ -2539,64 +2859,71 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 883, 25, 72, "Input"],
-Cell[1444, 47, 2294, 61, 152, "Input"],
-Cell[3741, 110, 71, 1, 31, "Input"],
-Cell[3815, 113, 4200, 108, 332, "Input"],
-Cell[8018, 223, 5067, 130, 392, "Input"],
-Cell[13088, 355, 8776, 228, 326, "Input"],
-Cell[21867, 585, 443, 13, 52, "Input"],
-Cell[22313, 600, 134, 4, 31, "Input"],
-Cell[22450, 606, 172, 6, 31, "Input"],
-Cell[22625, 614, 264, 8, 31, "Input"],
-Cell[22892, 624, 2377, 61, 232, "Input"],
-Cell[25272, 687, 151, 4, 31, "Input"],
-Cell[25426, 693, 716, 20, 52, "Input"],
-Cell[26145, 715, 147, 4, 31, "Input"],
-Cell[26295, 721, 477, 13, 31, "Input"],
-Cell[26775, 736, 295, 7, 31, "Input"],
-Cell[27073, 745, 398, 10, 31, "Input"],
-Cell[27474, 757, 6854, 174, 586, "Input"],
-Cell[34331, 933, 115, 3, 31, "Input"],
-Cell[34449, 938, 647, 20, 52, "Input"],
-Cell[35099, 960, 704, 16, 72, "Input"],
-Cell[35806, 978, 3684, 113, 114, "Input"],
-Cell[39493, 1093, 2613, 71, 172, "Input"],
-Cell[42109, 1166, 12917, 325, 795, "Input"],
-Cell[55029, 1493, 173, 4, 31, "Input"],
-Cell[55205, 1499, 194, 6, 31, "Input"],
-Cell[55402, 1507, 167, 4, 31, "Input"],
-Cell[55572, 1513, 115, 3, 31, "Input"],
-Cell[55690, 1518, 176, 4, 31, "Input"],
-Cell[55869, 1524, 545, 16, 31, "Input"],
-Cell[56417, 1542, 400, 8, 31, "Input"],
-Cell[56820, 1552, 772, 24, 121, "Input"],
-Cell[57595, 1578, 1240, 37, 72, "Input"],
-Cell[58838, 1617, 215, 6, 31, "Input"],
-Cell[59056, 1625, 606, 16, 31, "Input"],
-Cell[59665, 1643, 195, 5, 31, "Input"],
-Cell[59863, 1650, 732, 24, 53, "Input"],
-Cell[60598, 1676, 920, 28, 53, "Input"],
-Cell[61521, 1706, 153, 3, 31, "Input"],
-Cell[61677, 1711, 279, 6, 31, "Input"],
-Cell[61959, 1719, 7370, 219, 258, "Input"],
-Cell[69332, 1940, 70, 1, 31, "Input"],
-Cell[69405, 1943, 161, 3, 31, "Input"],
-Cell[69569, 1948, 389, 12, 31, "Input"],
-Cell[69961, 1962, 5430, 162, 218, "Input"],
-Cell[75394, 2126, 340, 10, 31, "Input"],
-Cell[75737, 2138, 236, 7, 31, "Input"],
-Cell[75976, 2147, 388, 11, 31, "Input"],
-Cell[76367, 2160, 1672, 45, 152, "Input"],
-Cell[78042, 2207, 195, 4, 31, "Input"],
-Cell[78240, 2213, 420, 13, 31, "Input"],
-Cell[78663, 2228, 113, 3, 31, "Input"],
-Cell[78779, 2233, 69, 2, 31, "Input"],
-Cell[78851, 2237, 5579, 140, 372, "Input"],
-Cell[84433, 2379, 1268, 34, 72, "Input"],
-Cell[85704, 2415, 1191, 32, 72, "Input"],
-Cell[86898, 2449, 1189, 32, 72, "Input"],
-Cell[88090, 2483, 1264, 34, 72, "Input"]
+Cell[558, 20, 123, 3, 31, "Input"],
+Cell[684, 25, 883, 25, 72, "Input"],
+Cell[1570, 52, 2294, 61, 152, "Input"],
+Cell[3867, 115, 71, 1, 31, "Input"],
+Cell[3941, 118, 4200, 108, 332, "Input"],
+Cell[8144, 228, 5067, 130, 392, "Input"],
+Cell[13214, 360, 8776, 228, 326, "Input"],
+Cell[21993, 590, 443, 13, 52, "Input"],
+Cell[22439, 605, 134, 4, 31, "Input"],
+Cell[22576, 611, 172, 6, 31, "Input"],
+Cell[22751, 619, 264, 8, 31, "Input"],
+Cell[23018, 629, 2377, 61, 232, "Input"],
+Cell[25398, 692, 151, 4, 31, "Input"],
+Cell[25552, 698, 716, 20, 52, "Input"],
+Cell[26271, 720, 147, 4, 31, "Input"],
+Cell[26421, 726, 477, 13, 31, "Input"],
+Cell[26901, 741, 295, 7, 31, "Input"],
+Cell[27199, 750, 398, 10, 31, "Input"],
+Cell[27600, 762, 6854, 174, 586, "Input"],
+Cell[34457, 938, 115, 3, 31, "Input"],
+Cell[34575, 943, 647, 20, 52, "Input"],
+Cell[35225, 965, 704, 16, 72, "Input"],
+Cell[35932, 983, 3684, 113, 114, "Input"],
+Cell[39619, 1098, 2613, 71, 172, "Input"],
+Cell[42235, 1171, 12917, 325, 795, "Input"],
+Cell[55155, 1498, 173, 4, 31, "Input"],
+Cell[55331, 1504, 194, 6, 31, "Input"],
+Cell[55528, 1512, 167, 4, 31, "Input"],
+Cell[55698, 1518, 115, 3, 31, "Input"],
+Cell[55816, 1523, 176, 4, 31, "Input"],
+Cell[55995, 1529, 545, 16, 31, "Input"],
+Cell[56543, 1547, 400, 8, 31, "Input"],
+Cell[56946, 1557, 772, 24, 121, "Input"],
+Cell[57721, 1583, 1240, 37, 72, "Input"],
+Cell[58964, 1622, 215, 6, 31, "Input"],
+Cell[59182, 1630, 606, 16, 31, "Input"],
+Cell[59791, 1648, 195, 5, 31, "Input"],
+Cell[59989, 1655, 732, 24, 53, "Input"],
+Cell[60724, 1681, 920, 28, 53, "Input"],
+Cell[61647, 1711, 153, 3, 31, "Input"],
+Cell[61803, 1716, 279, 6, 31, "Input"],
+Cell[62085, 1724, 7370, 219, 258, "Input"],
+Cell[69458, 1945, 70, 1, 31, "Input"],
+Cell[69531, 1948, 161, 3, 31, "Input"],
+Cell[69695, 1953, 389, 12, 31, "Input"],
+Cell[70087, 1967, 5430, 162, 218, "Input"],
+Cell[75520, 2131, 340, 10, 31, "Input"],
+Cell[75863, 2143, 236, 7, 31, "Input"],
+Cell[76102, 2152, 388, 11, 31, "Input"],
+Cell[76493, 2165, 1672, 45, 152, "Input"],
+Cell[78168, 2212, 195, 4, 31, "Input"],
+Cell[78366, 2218, 420, 13, 31, "Input"],
+Cell[78789, 2233, 113, 3, 31, "Input"],
+Cell[78905, 2238, 69, 2, 31, "Input"],
+Cell[78977, 2242, 5579, 140, 372, "Input"],
+Cell[84559, 2384, 1268, 34, 72, "Input"],
+Cell[85830, 2420, 1191, 32, 72, "Input"],
+Cell[87024, 2454, 1189, 32, 72, "Input"],
+Cell[88216, 2488, 1264, 34, 72, "Input"],
+Cell[89483, 2524, 1578, 41, 92, "Input"],
+Cell[91064, 2567, 2379, 60, 159, "Input"],
+Cell[93446, 2629, 1576, 41, 92, "Input"],
+Cell[95025, 2672, 2378, 60, 159, "Input"],
+Cell[97406, 2734, 1578, 41, 92, "Input"],
+Cell[98987, 2777, 2378, 60, 159, "Input"]
 }
 ]
 *)

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    120330,       3430]
-NotebookOptionsPosition[    117835,       3361]
-NotebookOutlinePosition[    118373,       3382]
-CellTagsIndexPosition[    118330,       3379]
+NotebookDataLength[    120342,       3430]
+NotebookOptionsPosition[    117847,       3361]
+NotebookOutlinePosition[    118385,       3382]
+CellTagsIndexPosition[    118342,       3379]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -3322,7 +3322,7 @@ Cell[BoxData[
        "\[IndentingNewLine]", 
        RowBox[{"Export", "[", 
         RowBox[{
-         RowBox[{"\"\<approximatelyFlat\>\"", "<>", 
+         RowBox[{"\"\<approximatelyFlatSingleFunnel\>\"", "<>", 
           RowBox[{"ToString", "[", 
            RowBox[{
             RowBox[{"tuples", "[", 
@@ -3381,7 +3381,7 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 123, 3, 88, "Input"],
+Cell[558, 20, 123, 3, 31, "Input"],
 Cell[684, 25, 883, 25, 72, "Input"],
 Cell[1570, 52, 2294, 61, 152, "Input"],
 Cell[3867, 115, 5067, 130, 392, "Input"],
@@ -3424,14 +3424,14 @@ Cell[79576, 2275, 219, 7, 31, "Input"],
 Cell[79798, 2284, 279, 6, 31, "Input"],
 Cell[80080, 2292, 18645, 533, 626, "Input"],
 Cell[98728, 2827, 262, 8, 31, "Input"],
-Cell[98993, 2837, 4484, 137, 196, "Input"],
+Cell[98993, 2837, 4484, 137, 168, "Input"],
 Cell[103480, 2976, 5579, 140, 372, "Input"],
 Cell[109062, 3118, 1268, 34, 72, "Input"],
 Cell[110333, 3154, 1193, 32, 72, "Input"],
 Cell[111529, 3188, 1189, 32, 72, "Input"],
 Cell[112721, 3222, 1264, 34, 72, "Input"],
 Cell[113988, 3258, 1490, 39, 92, "Input"],
-Cell[115481, 3299, 2350, 60, 159, "Input"]
+Cell[115481, 3299, 2362, 60, 159, "Input"]
 }
 ]
 *)
