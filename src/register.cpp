@@ -22,6 +22,7 @@
 #include "arsa.h"
 #include "impute.h"
 #include "multiparentSNP.h"
+#include "imputeFounders.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
