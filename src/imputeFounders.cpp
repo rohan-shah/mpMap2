@@ -29,6 +29,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	int maxSelfing = *std::max_element(selfingGenerations.begin(), selfingGenerations.end());
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
+	int minAIGenerations = *std::min_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
 	int nMarkers = founders.ncol();
 	int nFinals = finals.nrow();
 
@@ -91,9 +92,16 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		for(int markerCounter = 0; markerCounter < nMarkers - 1; markerCounter++)
 		{
 			double recombination = recombinationFractions(markerCounter);
-			for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)
+			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerations - minSelfing), recombination, selfingGenerations, allFunnelEncodings.size());
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, allFunnelEncodings.size());
+			}
+			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
+			{
+				for(int intercrossingGenerations = std::max(1, minAIGenerations); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+				{
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
+				}
 			}
 		}
 		//Convert this haplotype data to marker data
