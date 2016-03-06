@@ -23,6 +23,7 @@
 #include "impute.h"
 #include "multiparentSNP.h"
 #include "imputeFounders.h"
+#include "checkImputedBounds.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -59,6 +60,7 @@ extern "C"
 		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
 		{"rawSymmetricMatrixSubsetByMatrix", (DL_FUNC)&rawSymmetricMatrixSubsetByMatrix, 2},
 		{"imputeFounders", (DL_FUNC)&imputeFounders, 2},
+		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

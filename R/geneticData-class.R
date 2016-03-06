@@ -127,6 +127,28 @@ checkGeneticData <- function(object)
 		errors <- c(errors, alleleDataErrors)
 	}
 	if(length(errors) > 0) return(errors)
+
+	#Check imputed slot
+	if(!is.null(object@imputed))
+	{
+		if(!is.numeric(object@imputed))
+		{
+			return("If slot imputed is not NULL, it must be an integer matrix")
+		}
+		if(!identical(dim(object@imputed), dim(object@finals)))
+		{
+			return("Dimensions of slot imputed must be the same as those of slot finals")
+		}
+		if(!identical(dimnames(object@imputed), dimnames(object@finals)))
+		{
+			return("Row and column names of slot imputed must be the same as those of slot finals")
+		}
+		if(!.Call("checkImputedBounds", object@imputed, nFounders(object), PACKAGE="mpMap2"))
+		{
+			return("Slot imputed must contain values between 1 and nFounders inculsive")
+		}
+	}
 	return(TRUE)
 }
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree"), validity = checkGeneticData)
+setClassUnion("matrixOrNULL", c("matrix", "NULL"))
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "matrixOrNULL"), validity = checkGeneticData)
