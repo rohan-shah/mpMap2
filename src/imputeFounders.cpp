@@ -9,6 +9,10 @@
 #include "probabilities16.h"
 #include "funnelsToUniqueValues.h"
 #include "estimateRFCheckFunnels.h"
+#include "markerPatternsToUniqueValues.h"
+#include "intercrossingHaplotypeToMarker.hpp"
+#include "funnelHaplotypeToMarker.hpp"
+#include "viterbi.hpp"
 template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results)
 {
 	//Work out maximum number of markers per chromosome
@@ -20,6 +24,8 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	}
 
 	typedef typename expandedProbabilities<nFounders, infiniteSelfing>::type expandedProbabilitiesType;
+	expandedProbabilitiesType haplotypeProbabilities;
+
 	Rcpp::Function diff("diff"), haldaneToRf("haldaneToRf");
 
 	//Get out generations of selfing and intercrossing
@@ -69,6 +75,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	//vector giving the encoded value for each value in allFunnels
 	std::vector<funnelEncoding> allFunnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, lineFunnelIDs, lineFunnelEncodings, allFunnelEncodings, lineFunnels, allFunnels, nFounders);
+	int nDifferentFunnels = lineFunnelEncodings.size();
 	
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 64)
@@ -76,42 +83,71 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		throw std::runtime_error("Internal error - Cannot have more than 64 alleles per marker");
 	}
 
+	markerPatternsToUniqueValuesArgs markerPatternData;
+	markerPatternData.nFounders = nFounders;
+	markerPatternData.nMarkers = nMarkers;
+	markerPatternData.recodedFounders = recodedFounders;
+	markerPatternData.recodedHetData = recodedHetData;
+	markerPatternsToUniqueValues(markerPatternData);
+
 	//Intermediate results. These give the most likely paths from the start of the chromosome to a marker, assuming some value for the underlying founder at the marker
 	Rcpp::IntegerMatrix intermediate(nFounders, maxChromosomeMarkers);
 	int cumulativeMarkerCounter = 0;
 
-	//The underlying haplotype probabilities, for consecutiveMarkers
-	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
-	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing+1);
+	//The underlying marker probabilities, for consecutive markers
+	xMajorMatrix<array2<16> > intercrossingMarkerProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
+	xMajorMatrix<array2<16> > funnelMarkerProbabilities(maxChromosomeMarkers-1, nDifferentFunnels, maxSelfing - minSelfing + 1);
 
+	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
+	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(intercrossingMarkerProbabilities, funnelMarkerProbabilities, maxChromosomeMarkers);
+	viterbi.recodedHetData = recodedHetData;
+	viterbi.recodedFounders = recodedFounders;
+	viterbi.recodedFinals = recodedFinals;
+	viterbi.lineFunnelIDs = &lineFunnelIDs;
+	viterbi.lineFunnelEncodings = &lineFunnelEncodings;
+	viterbi.intercrossingGenerations = &intercrossingGenerations;
+	viterbi.selfingGenerations = &selfingGenerations;
+	viterbi.results = results;
+
+	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)
 	{
+		//Generate haplotype probability data. 
 		Rcpp::NumericVector positions = Rcpp::as<Rcpp::NumericVector>(map(chromosomeCounter));
 		Rcpp::NumericVector recombinationFractions = haldaneToRf(diff(positions));
-		//Generate haplotype probability data
-		for(int markerCounter = 0; markerCounter < nMarkers - 1; markerCounter++)
+		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
+			int markerPattern1 = markerPatternData.markerPatternIDs[markerCounter];
+			int markerPattern2 = markerPatternData.markerPatternIDs[markerCounter + 1];
+			markerData& markerPattern1Data = markerPatternData.allMarkerPatterns[markerPattern1];
+			markerData& markerPattern2Data = markerPatternData.allMarkerPatterns[markerPattern2];
 			double recombination = recombinationFractions(markerCounter);
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, allFunnelEncodings.size());
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(haplotypeProbabilities, recombination, selfingGenerationCounter, allFunnelEncodings.size());
+				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
+				{
+					int funnel[16];
+					funnelEncoding enc = lineFunnelEncodings[funnelCounter];
+					for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+					{
+						funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+					}
+					funnelHaplotypeToMarker<nFounders, 1, infiniteSelfing>::template convert16MarkerAlleles<true>(funnelMarkerProbabilities(markerCounter, funnelCounter, selfingGenerationCounter - minSelfing), haplotypeProbabilities, funnel, markerPattern1Data, markerPattern2Data, selfingGenerationCounter);
+				}
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
 				for(int intercrossingGenerations = std::max(1, minAIGenerations); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(haplotypeProbabilities, intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
+					intercrossingHaplotypeToMarker<nFounders, 1, infiniteSelfing>::template convert16MarkerAlleles<true>(intercrossingMarkerProbabilities(markerCounter, intercrossingGenerations, selfingGenerationCounter - minSelfing), haplotypeProbabilities, intercrossingGenerations, markerPattern1Data, markerPattern2Data, selfingGenerationCounter);
 				}
 			}
+
 		}
-		//Convert this haplotype data to marker data
-		for(int markerCounter = 0; markerCounter < nMarkers - 1; markerCounter++)
-		{
-		}
-		//Now actually run the Viterbi algorithm
-		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
-		{
-		}
+		//dispatch based on whether we have infinite generations of selfing or not. 
+		viterbi.apply(cumulativeMarkerCounter, cumulativeMarkerCounter+positions.size());
 		cumulativeMarkerCounter += positions.size();
 	}
 }
