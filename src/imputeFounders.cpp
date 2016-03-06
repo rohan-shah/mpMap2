@@ -24,7 +24,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	}
 
 	typedef typename expandedProbabilities<nFounders, infiniteSelfing>::type expandedProbabilitiesType;
-	expandedProbabilitiesType haplotypeProbabilities;
+	//expandedProbabilitiesType haplotypeProbabilities;
 
 	Rcpp::Function diff("diff"), haldaneToRf("haldaneToRf");
 
@@ -94,12 +94,11 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	Rcpp::IntegerMatrix intermediate(nFounders, maxChromosomeMarkers);
 	int cumulativeMarkerCounter = 0;
 
-	//The underlying marker probabilities, for consecutive markers
-	xMajorMatrix<array2<16> > intercrossingMarkerProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
-	xMajorMatrix<array2<16> > funnelMarkerProbabilities(maxChromosomeMarkers-1, nDifferentFunnels, maxSelfing - minSelfing + 1);
+	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
+	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
 
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
-	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(intercrossingMarkerProbabilities, funnelMarkerProbabilities, maxChromosomeMarkers);
+	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
 	viterbi.recodedHetData = recodedHetData;
 	viterbi.recodedFounders = recodedFounders;
 	viterbi.recodedFinals = recodedFinals;
@@ -124,24 +123,13 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			double recombination = recombinationFractions(markerCounter);
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(haplotypeProbabilities, recombination, selfingGenerationCounter, allFunnelEncodings.size());
-				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
-				{
-					int funnel[16];
-					funnelEncoding enc = lineFunnelEncodings[funnelCounter];
-					for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-					{
-						funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
-					}
-					funnelHaplotypeToMarker<nFounders, 1, infiniteSelfing>::template convert16MarkerAlleles<true>(funnelMarkerProbabilities(markerCounter, funnelCounter, selfingGenerationCounter - minSelfing), haplotypeProbabilities, funnel, markerPattern1Data, markerPattern2Data, selfingGenerationCounter);
-				}
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, allFunnelEncodings.size());
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
 				for(int intercrossingGenerations = std::max(1, minAIGenerations); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(haplotypeProbabilities, intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
-					intercrossingHaplotypeToMarker<nFounders, 1, infiniteSelfing>::template convert16MarkerAlleles<true>(intercrossingMarkerProbabilities(markerCounter, intercrossingGenerations, selfingGenerationCounter - minSelfing), haplotypeProbabilities, intercrossingGenerations, markerPattern1Data, markerPattern2Data, selfingGenerationCounter);
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
 				}
 			}
 
