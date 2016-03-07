@@ -10,13 +10,10 @@ bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix 
 	{
 		Rcpp::IntegerMatrix currentMarkerHetData = recodedHetData(markerCounter);
 		int nAlleles = 0;
+		std::fill(isHet.begin(), isHet.end(), true);
 		for(int hetDataRowCounter = 0; hetDataRowCounter < currentMarkerHetData.nrow(); hetDataRowCounter++)
 		{
-			if(currentMarkerHetData(hetDataRowCounter, 0) != currentMarkerHetData(hetDataRowCounter, 1))
-			{
-				isHet[currentMarkerHetData(hetDataRowCounter, 2)] = true;
-			}
-			else
+			if(currentMarkerHetData(hetDataRowCounter, 0) == currentMarkerHetData(hetDataRowCounter, 1))
 			{
 				isHet[currentMarkerHetData(hetDataRowCounter, 2)] = false;
 			}

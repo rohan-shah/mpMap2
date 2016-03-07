@@ -87,7 +87,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	{
 		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		int markerValue = recodedFinals(finalCounter, start);
-		funnelEncoding enc = (*lineFunnelEncodings)[finalCounter];
+		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
 		int funnel[16];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
@@ -97,7 +97,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		{
 			intermediate1(founderCounter, 0) = founderCounter+1;
 			pathLengths1[founderCounter] = 0;
-			if(recodedFounders(founderCounter, start) != markerValue)
+			if(recodedFounders(founderCounter, start) != markerValue && markerValue != NA_INTEGER)
 			{
 				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
 			}
@@ -109,13 +109,13 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(recodedFounders(funnel[founderCounter], markerCounter+1) == markerValue)
+				if(recodedFounders(funnel[founderCounter], markerCounter+1) == markerValue || markerValue == NA_INTEGER)
 				{
 					//Founder at the previous marker. 
 					std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
-						if(recodedFounders(funnel[founderCounter2], markerCounter) == previousMarkerValue)
+						if(recodedFounders(funnel[founderCounter2], markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
 							working[funnel[founderCounter2]] = pathLengths1[funnel[founderCounter2]] + funnelHaplotypeProbabilities(markerCounter, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
 						}
@@ -125,13 +125,13 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
-					memcpy(&(intermediate2(founderCounter, 0)), &(intermediate1(bestPrevious, 0)), sizeof(int)*(markerCounter - start + 1));
-					intermediate2(founderCounter, markerCounter-start+1) = founderCounter+1;
-					pathLengths2[founderCounter] = *longest;
+					memcpy(&(intermediate2(funnel[founderCounter], 0)), &(intermediate1(bestPrevious, 0)), sizeof(int)*(markerCounter - start + 1));
+					intermediate2(funnel[founderCounter], markerCounter-start+1) = funnel[founderCounter]+1;
+					pathLengths2[funnel[founderCounter]] = *longest;
 				}
 				else
 				{
-					pathLengths2[founderCounter] = -std::numeric_limits<double>::infinity();
+					pathLengths2[funnel[founderCounter]] = -std::numeric_limits<double>::infinity();
 				}
 			}
 			intermediate1.swap(intermediate2);
@@ -146,7 +146,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		{
 			intermediate1(founderCounter, 0) = founderCounter+1;
 			pathLengths1[founderCounter] = 0;
-			if(recodedFounders(founderCounter, start) != markerValue)
+			if(recodedFounders(founderCounter, start) != markerValue && markerValue != NA_INTEGER)
 			{
 				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
 			}
@@ -158,13 +158,15 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(recodedFounders(founderCounter, markerCounter+1) == markerValue)
+				//NA corresponds to no restriction from the marker value
+				if(recodedFounders(founderCounter, markerCounter+1) == markerValue || markerValue == NA_INTEGER)
 				{
 					//Founder at the previous marker. 
 					std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
-						if(recodedFounders(founderCounter2, markerCounter) == previousMarkerValue)
+						//NA corresponds to no restriction
+						if(recodedFounders(founderCounter2, markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
 							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
 						}

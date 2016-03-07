@@ -13,6 +13,7 @@
 #include "intercrossingHaplotypeToMarker.hpp"
 #include "funnelHaplotypeToMarker.hpp"
 #include "viterbi.hpp"
+#include "recodeHetsAsNA.h"
 template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results)
 {
 	//Work out maximum number of markers per chromosome
@@ -54,6 +55,23 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	recoded.hetData = hetData;
 	recoded.recodedHetData = recodedHetData;
 	recodeFoundersFinalsHets(recoded);
+
+	if(infiniteSelfing)
+	{
+		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
+		if(foundHets)
+		{
+			Rcpp::Function warning("warning");
+			//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
+			try
+			{
+				warning("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+			}
+			catch(...)
+			{}
+		}
+		std::fill(selfingGenerations.begin(), selfingGenerations.end(), 0);
+	}
 
 	//Get out the number of unique funnels. This is only needed because in the case of one funnel we assume a single funnel design and in the case of multiple funnels we assume a random funnels design
 	std::vector<std::string> errors, warnings;
