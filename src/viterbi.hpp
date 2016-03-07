@@ -79,7 +79,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			int longestIndex = std::distance(pathLengths1.begin(), longestPath);
 			for(int i = 0; i < end - start; i++)
 			{
-				results(finalCounter, i) = intermediate1(longestIndex, i);
+				results(finalCounter, i+start) = intermediate1(longestIndex, i);
 			}
 		}
 	}
@@ -117,7 +117,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					{
 						if(recodedFounders(funnel[founderCounter2], markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
-							working[funnel[founderCounter2]] = pathLengths1[funnel[founderCounter2]] + funnelHaplotypeProbabilities(markerCounter, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
+							working[funnel[founderCounter2]] = pathLengths1[funnel[founderCounter2]] + funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
 						}
 					}
 					//Get the shortest one, and check that it's not negative infinity.
@@ -168,7 +168,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 						//NA corresponds to no restriction
 						if(recodedFounders(founderCounter2, markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
-							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
+							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
 						}
 					}
 					//Get the longest one, and check that it's not negative infinity.

@@ -1,5 +1,5 @@
-context("Founder imputation, four parents, infinite selfing")
-test_that("Test zero generations of intercrossing, single chromosome",
+context("Founder imputation, eight parents, infinite selfing")
+test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -8,7 +8,7 @@ test_that("Test zero generations of intercrossing, single chromosome",
 			suppressWarnings(result <- imputeFounders(mapped))
 
 			#Hetrozygotes will be discarded in imputation, which means that the imputed version won't be EXACTLY the same as the original data
-			naIndices <- result@geneticData[[1]]@finals > 4
+			naIndices <- result@geneticData[[1]]@finals > 8
 			result@geneticData[[1]]@finals[naIndices] <- NA
 			result@geneticData[[1]]@imputed[naIndices] <- NA
 			expect_identical(result@geneticData[[1]]@imputed, result@geneticData[[1]]@finals)
@@ -17,14 +17,14 @@ test_that("Test zero generations of intercrossing, single chromosome",
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			result <- imputeFounders(mapped)
 			tmp <- table(result@geneticData[[1]]@imputed, cross@geneticData[[1]]@finals)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.96)
+			expect_true(sum(diag(tmp)) / sum(tmp) > 0.9)
 		}
-		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map1 <- sim.map(len = 100, n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map2 <- sim.map(len = c(100, 100), n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
-		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree1 <- eightParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree2 <- eightParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		pedigrees <- list(pedigree1, pedigree2)
 		for(map in maps)
 		{
@@ -33,5 +33,4 @@ test_that("Test zero generations of intercrossing, single chromosome",
 				testFunc(pedigree, map)
 			}
 		}
-
 	})
