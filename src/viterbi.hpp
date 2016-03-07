@@ -102,6 +102,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
 			}
 		}
+		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
 			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
@@ -125,7 +126,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
-					memcpy(&(intermediate2(funnel[founderCounter], 0)), &(intermediate1(bestPrevious, 0)), sizeof(int)*(markerCounter - start + 1));
+					memcpy(&(intermediate2(funnel[founderCounter], identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
 					intermediate2(funnel[founderCounter], markerCounter-start+1) = funnel[founderCounter]+1;
 					pathLengths2[funnel[founderCounter]] = *longest;
 				}
@@ -136,6 +137,21 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			}
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
+			while(identicalIndex != markerCounter-start + 1)
+			{
+				int value = intermediate1(0, identicalIndex);
+				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
+				{
+					if(value != intermediate1(founderCounter, identicalIndex)) goto stopIdenticalSearch;
+				}
+				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+				{
+					intermediate2(founderCounter, identicalIndex) = value;
+				}
+				identicalIndex++;
+			}
+stopIdenticalSearch:
+			;
 		}
 	}
 	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
@@ -151,6 +167,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
 			}
 		}
+		//The index, before which all the paths are identical
+		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
 			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
@@ -176,7 +194,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
-					memcpy(&(intermediate2(founderCounter, 0)), &(intermediate1(bestPrevious, 0)), sizeof(int)*(markerCounter - start + 1));
+					memcpy(&(intermediate2(founderCounter, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
 					intermediate2(founderCounter, markerCounter-start+1) = founderCounter+1;
 					pathLengths2[founderCounter] = *longest;
 				}
@@ -187,6 +205,21 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			}
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
+			while(identicalIndex != markerCounter-start + 1)
+			{
+				int value = intermediate1(0, identicalIndex);
+				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
+				{
+					if(value != intermediate1(founderCounter, identicalIndex)) goto stopIdenticalSearch;
+				}
+				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+				{
+					intermediate2(founderCounter, identicalIndex) = value;
+				}
+				identicalIndex++;
+			}
+stopIdenticalSearch:
+			;
 		}
 	}
 };
