@@ -1,5 +1,5 @@
 context("Founder imputation, two parents, infinite selfing")
-test_that("Test zero generations of intercrossing, single chromosome",
+test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(map)
 		{

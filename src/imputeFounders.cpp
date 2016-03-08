@@ -115,8 +115,24 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
 	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
 
+	//Construct the key that takes pairs of founder values and turns them into encodings
+	Rcpp::IntegerMatrix key(nFounders, nFounders);
+	for(int i = 0; i < nFounders; i++)
+	{
+		key(i, i) = i + 1;
+	}
+	int counter = nFounders+1;
+	for(int i = 0; i < nFounders; i++)
+	{
+		for(int j = i+1; j < nFounders; j++)
+		{
+			key(j, i) = key(i, j) = counter;
+			counter++;
+		}
+	}
+
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
-	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
+	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
 	viterbi.recodedHetData = recodedHetData;
 	viterbi.recodedFounders = recodedFounders;
 	viterbi.recodedFinals = recodedFinals;
@@ -125,6 +141,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.intercrossingGenerations = &intercrossingGenerations;
 	viterbi.selfingGenerations = &selfingGenerations;
 	viterbi.results = results;
+	viterbi.key = key;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)
