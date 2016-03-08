@@ -30,12 +30,13 @@ const int probabilityData<4>::infiniteMask[][4] =
 			{2, 2, 0, 1},
 			{2, 2, 1, 0}
 		};
-template<> void genotypeProbabilitiesNoIntercross<4, true>(double(&prob)[nDifferentProbs], double r, int, std::size_t)
+template<> void genotypeProbabilitiesNoIntercross<4, true>(double(&prob)[nDifferentProbs], double r, int, std::size_t, int& nValues)
 {
 	prob[0] = (1-r)/(4*(1 + 2*r));
 	prob[1] = prob[2] = r/(4*(1 + 2 * r));
+	nValues = 2;
 }
-template<> void genotypeProbabilitiesNoIntercross<4, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t nFunnels)
+template<> void genotypeProbabilitiesNoIntercross<4, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
 {
 	if (nFunnels == 1)
 	{
@@ -96,14 +97,16 @@ template<> void genotypeProbabilitiesNoIntercross<4, false>(double(&prob)[nDiffe
 		prob[16] = -(complex2*oneMinusR*r) / (48 * pow2);
 		prob[17] = (complex1*r*r) / (24 * pow2);
 	}
+	nValues = 18;
 }
-template<> void genotypeProbabilitiesWithIntercross<4, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t nFunnels)
+template<> void genotypeProbabilitiesWithIntercross<4, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t nFunnels, int& nValues)
 {
 	double powOneMinusR = std::pow(1 - r, nAIGenerations-1);
 	prob[0] = (powOneMinusR*(1-r)*(1-r)/4 + (2 * r + 1 - powOneMinusR)/16)/(1 + 2 * r);
 	prob[1] = prob[2] = (1 - 4*prob[0])/12;
+	nValues = 2;
 }
-template<> void genotypeProbabilitiesWithIntercross<4, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
+template<> void genotypeProbabilitiesWithIntercross<4, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
 {
 	if (nFunnels == 1)
 	{
@@ -194,6 +197,7 @@ template<> void genotypeProbabilitiesWithIntercross<4, false>(double(&prob)[nDif
 		prob[16] = (2 * oneMinusR*powOneMinus2R*powOneMinusR2*quadratic1*(-3 * oneMinusR + oneMinusR*powOneMinusR2*quadratic1) + (9 * oneMinusRSquared - powOneMinusR3*quadratic1Squared)*quadraticPower) / (144 * oneMinusRSquared*pow2);
 		prob[17] = (cubicPower*quadraticPower) / (288 * oneMinusRSquared*pow2);
 	}
+	nValues = 18;
 #ifndef NDEBUG
 	double sum = 0;
 	for (int i = 0; i < 18; i++) sum += prob[i];

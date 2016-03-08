@@ -3,6 +3,7 @@
 #include <matrices.hpp>
 #include <cmath>
 #include <stdexcept>
+#include <limits>
 const int nDifferentProbs = 100;
 template<int nFounders> struct probabilityData;
 template<int nFounders> struct expandedProbabilitiesFiniteSelfing
@@ -23,16 +24,25 @@ template<int nFounders> struct expandedProbabilities<nFounders, false>
 };
 
 //Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
-	template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(double(&prob)[nDifferentProbs], double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
-	template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double(&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
-template<int nFounders, bool infiniteSelfing> struct expandedGenotypeProbabilities;
-template<int nFounders> struct expandedGenotypeProbabilities<nFounders, true>
+template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(double(&prob)[nDifferentProbs], double recombinationFraction, int selfingGenerations, std::size_t nFunnels, int& nValues);
+template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double(&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels, int& nValues);
+template<int nFounders, bool infiniteSelfing, bool takeLogs> struct expandedGenotypeProbabilities;
+template<int nFounders, bool takeLogs> struct expandedGenotypeProbabilities<nFounders, true, takeLogs>
 {
 public:
 	static void noIntercross(array2<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations, nFunnels);
+		int nValues;
+		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations, nFunnels, nValues);
+		if(takeLogs)
+		{
+			for(int i = 0; i < nValues; i++)
+			{
+				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
+				else probabilities[i] = log(probabilities[i]);
+			}
+		}
 		for(int i = 0; i < nFounders; i++)
 		{
 			for(int j = 0; j < nFounders; j++)
@@ -44,7 +54,16 @@ public:
 	static void withIntercross(array2<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
+		int nValues;
+		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels, nValues);
+		if(takeLogs)
+		{
+			for(int i = 0; i < nValues; i++)
+			{
+				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
+				else probabilities[i] = log(probabilities[i]);
+			}
+		}
 		for(int i = 0; i < nFounders; i++)
 		{
 			for(int j = 0; j < nFounders; j++)
@@ -54,14 +73,23 @@ public:
 		}
 	}
 };
-template<int nFounders> struct expandedGenotypeProbabilities<nFounders, false>
+template<int nFounders, bool takeLogs> struct expandedGenotypeProbabilities<nFounders, false, takeLogs>
 {
 public:
 	static void noIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels);
+		int nValues;
+		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels, nValues);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		if(takeLogs)
+		{
+			for(int i = 0; i < nValues; i++)
+			{
+				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
+				else probabilities[i] = log(probabilities[i]);
+			}
+		}
 #ifndef NDEBUG
 		double sum = 0;
 #endif
@@ -84,14 +112,23 @@ public:
 			}
 		}
 #ifndef NDEBUG
-		if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
+		if(!takeLogs && fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
 #endif
 	}
 	static void withIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 	{	
 		double probabilities[nDifferentProbs];
-		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
+		int nValues;
+		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels, nValues);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		if(takeLogs)
+		{
+			for(int i = 0; i < nValues; i++)
+			{
+				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
+				else probabilities[i] = log(probabilities[i]);
+			}
+		}
 #ifndef NDEBUG
 		double sum = 0;
 #endif
@@ -114,7 +151,7 @@ public:
 			}
 		}
 #ifndef NDEBUG
-		if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
+		if(!takeLogs && fabs(sum - 1) > 1e-6) throw std::runtime_error("Haplotype probabilities did not sum to 1");
 #endif
 	}
 };
