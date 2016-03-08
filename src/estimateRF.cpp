@@ -121,14 +121,22 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw std::runtime_error("Input keepLkhd must be a boolean");
 		}
+		Rcpp::List verboseList;
 		bool verbose;
+		int progressStyle;
 		try
 		{
-			verbose = Rcpp::as<bool>(verbose_);
+			verboseList = Rcpp::as<Rcpp::List>(verbose_);
+			verbose = Rcpp::as<bool>(verboseList("verbose"));
+			progressStyle = Rcpp::as<int>(verboseList("progressStyle"));
 		}
 		catch(...)
 		{
-			throw std::runtime_error("Input verbose must be a boolean");
+			throw std::runtime_error("Input verbose must be a list with entries verbose and progressStyle");
+		}
+		if (progressStyle < 1 || progressStyle > 3)
+		{
+			throw std::runtime_error("Input verbose$progressStyle must be 1, 2 or 3");
 		}
 		if(nDesigns <= 0) throw std::runtime_error("There must be at least one design");
 		if(markerRows.size() == 0) throw std::runtime_error("Input markerRows must have at least one entry");
@@ -261,7 +269,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
 		if(verbose)
 		{
-			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			barHandle = txtProgressBar(Rcpp::Named("style") = progressStyle, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			updateProgress = [barHandle,nDesigns,nValuesToEstimate,setTxtProgressBar](unsigned long long value)
 				{
 					try

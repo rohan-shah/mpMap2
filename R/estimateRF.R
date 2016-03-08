@@ -21,6 +21,34 @@ estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod 
 	{
 		lineWeights <- lapply(object@geneticData, function(x) rep(1, nLines(x)))
 	}
+	if(is.logical(verbose))
+	{
+		if(is.na(verbose))
+		{
+			stop("Input verbose cannot be NA")
+		}
+		else if(verbose)
+		{
+			verbose <- list(verbose = TRUE, progressStyle = 3L)
+		}
+		else verbose <- list(verbose = FALSE, progressStyle = 3L)
+	}
+	else
+	{
+		if(!is.list(verbose) || !("progressStyle" %in% names(verbose)) || !("verbose" %in% names(verbose)))
+		{
+			stop("Input verbose must be TRUE, FALSE, or a list with entries named progressStyle and verbose")
+		}
+		if(length(verbose$progressStyle) != 1L || !(verbose$progressStyle %in% 0:3))
+		{
+			stop("Input verbose$progressStyle must have value 0, 1, 2 or 3")
+		}
+		if(!is.logical(verbose$verbose) || length(verbose$verbose) != 1L)
+		{
+			stop("Input verbose$verbose must have value 0, 1, 2 or 3")
+		}
+	}
+
 	if(class(lineWeights) == "numeric") lineWeights <- list(lineWeights)
 	isNumericVectorListArgument(lineWeights)
 	for(i in 1:length(object@geneticData))
