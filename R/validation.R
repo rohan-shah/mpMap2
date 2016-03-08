@@ -104,6 +104,15 @@ isNewMpcrossLGArgument <- function(x)
 		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " must be an mpcrossLG object"))
 	}
 }
+isNewMpcrossMappedArgument <- function(x)
+{
+	call <- sys.call(sys.parent(0))
+	parentCall <- sys.call(sys.parent(1))
+	if(missing(x) || !inherits(x, "mpcrossMapped"))
+	{
+		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " must be an mpcrossMapped object"))
+	}
+}
 isNewMpcrossRFArgument <- function(x)
 {
 	call <- sys.call(sys.parent(0))

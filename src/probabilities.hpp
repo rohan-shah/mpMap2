@@ -1,7 +1,8 @@
 #ifndef PROBABILITIES_HEADER_GUARD
 #define PROBABILITIES_HEADER_GUARD
 #include <matrices.hpp>
-
+#include <cmath>
+#include <stdexcept>
 const int nDifferentProbs = 100;
 template<int nFounders> struct probabilityData;
 template<int nFounders> struct expandedProbabilitiesFiniteSelfing
