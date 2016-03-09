@@ -59,36 +59,53 @@ BEGIN_RCPP
 	Rcpp::IntegerMatrix newHetData(2, 3);
 	newHetData(0, 0) = newHetData(0, 1) = newHetData(0, 2) = 0;
 	newHetData(1, 0) = newHetData(1, 1) = newHetData(1, 2) = 1;
+
+	std::vector<int> oneAllelesFounderValues, zeroAllelesFounderValues;
+	std::vector<int> oneAllelesFinalValues, zeroAllelesFinalValues;
 	for(int i = 0; i < nMarkers; i++)
 	{
 		int numberOfOnes = Rcpp::as<int>(sample(nFounders-1, 1));
 		Rcpp::IntegerVector oneAlleles = Rcpp::as<Rcpp::IntegerVector>(sample(foundersRange, numberOfOnes));
 		std::sort(oneAlleles.begin(), oneAlleles.end());
-		Rcpp::IntegerVector oneAllelesOldValues(numberOfOnes);
-		Rcpp::IntegerVector zeroAllelesOldValues(nFounders - numberOfOnes);
+		oneAllelesFounderValues.resize(numberOfOnes);
+		zeroAllelesFounderValues.resize(nFounders - numberOfOnes);
+
+		Rcpp::IntegerMatrix relevantHetData = hetData(i);
 
 		//Get out all the old alleles which are going to be converted to ones
-		for(int j = 0; j < numberOfOnes; j++) oneAllelesOldValues[j] = founders(oneAlleles(j)-1, i);
+		for(int j = 0; j < numberOfOnes; j++) oneAllelesFounderValues[j] = founders(oneAlleles(j)-1, i);
 		//Get out all the old alleles which are going to be converted to zeros
 		int counter = 0;
 		for(int k = 1; k != oneAlleles(0); k++)
 		{
-			zeroAllelesOldValues(counter) = k;
+			zeroAllelesFounderValues[counter] = k;
 			counter++;
 		}
 		for(int j = 0; j < numberOfOnes-1; j++)
 		{
 			for(int k = oneAlleles(j) + 1; k != oneAlleles(j+1); k++)
 			{
-				zeroAllelesOldValues(counter) = k;
+				zeroAllelesFounderValues[counter] = k;
 				counter++;
 			}
 		}
 		for(int k = oneAlleles(numberOfOnes-1)+1; k <= nFounders; k++)
 		{
-			zeroAllelesOldValues(counter) = k;
+			zeroAllelesFounderValues[counter] = k;
 			counter++;
 		}
+		oneAllelesFinalValues.clear();
+		zeroAllelesFinalValues.clear();
+		//hetValues.clear();
+		for(int j = 0; j < relevantHetData.nrow(); j++)
+		{
+			bool firstZero = std::find(zeroAllelesFounderValues.begin(), zeroAllelesFounderValues.end(), relevantHetData(j, 0)) != zeroAllelesFounderValues.end();
+			bool secondZero = std::find(zeroAllelesFounderValues.begin(), zeroAllelesFounderValues.end(), relevantHetData(j, 1)) != zeroAllelesFounderValues.end();
+			if(firstZero && secondZero) zeroAllelesFinalValues.push_back(relevantHetData(j, 2));
+			//else if(firstZero ^ secondZero) hetValues.push_back(relevantHetData(j, 2));
+			else if(!(firstZero ^ secondZero)) oneAllelesFinalValues.push_back(relevantHetData(j, 2));
+		}
+
 		std::fill(becomesOne.begin(), becomesOne.end(), false);
 		std::fill(becomesZero.begin(), becomesZero.end(), false);
 		std::fill(isNA.begin(), isNA.end(), false);
@@ -98,22 +115,22 @@ BEGIN_RCPP
 			if(finals(k, i) == NA_INTEGER) isNA[k] = true;
 		}
 		//Work out which of the finals become 1
-		for(int j = 0; j < oneAllelesOldValues.size(); j++)
+		for(int j = 0; j < oneAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{
-				if(finals(k, i) == oneAllelesOldValues(j))
+				if(finals(k, i) == oneAllelesFinalValues[j])
 				{
 					becomesOne[k] = true;
 				}
 			}
 		}
 		//..and which become 0
-		for(int j = 0; j < zeroAllelesOldValues.size(); j++)
+		for(int j = 0; j < zeroAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{
-				if(finals(k, i) == zeroAllelesOldValues(j))
+				if(finals(k, i) == zeroAllelesFinalValues[j])
 				{
 					becomesZero[k] = true;
 				}
