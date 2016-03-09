@@ -55,7 +55,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter], (*selfingGenerations)[finalCounter]);
 			}
 			std::vector<double>::iterator longestPath = std::max_element(pathLengths1.begin(), pathLengths1.end());
-			int longestIndex = std::distance(pathLengths1.begin(), longestPath);
+			int longestIndex = (int)std::distance(pathLengths1.begin(), longestPath);
 			for(int i = 0; i < end - start; i++)
 			{
 				results(finalCounter, i+start) = intermediate1(longestIndex, i);
