@@ -1,6 +1,6 @@
 #include "markerPatternsToUniqueValues.h"
 markerData::markerData(int nFounders)
-	: hetData(nFounders, nFounders, -1), hashed(false), hash(0)
+	: hetData(nFounders, nFounders, NA_INTEGER), hashed(false), hash(0)
 {}
 
 bool markerData::operator<(const markerData& other) const

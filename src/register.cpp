@@ -59,7 +59,7 @@ extern "C"
 		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
 		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
 		{"rawSymmetricMatrixSubsetByMatrix", (DL_FUNC)&rawSymmetricMatrixSubsetByMatrix, 2},
-		{"imputeFounders", (DL_FUNC)&imputeFounders, 2},
+		{"imputeFounders", (DL_FUNC)&imputeFounders, 4},
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 2},
 		{NULL, NULL, 0}
 	};

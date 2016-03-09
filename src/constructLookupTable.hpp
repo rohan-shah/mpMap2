@@ -106,11 +106,11 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 	{
 		for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 		{
-			expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(funnelHaplotypeProbabilities(recombCounter, selfingGenerations - minSelfing), (*args.recombinationFractions)[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
+			expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(recombCounter, selfingGenerations - minSelfing), (*args.recombinationFractions)[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
 		}
 		for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
 		{
-			expandedGenotypeProbabilities<nFounders, infiniteSelfing>::noIntercross(finerFunnelHaplotypeProbabilities(recombCounter, selfingGenerations - minSelfing), finerRecombLevels[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
+			expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(finerFunnelHaplotypeProbabilities(recombCounter, selfingGenerations - minSelfing), finerRecombLevels[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
 		}
 	}
 	//Similarly for the intercrossing generation haplotype probabilities
@@ -122,11 +122,11 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 		{
 			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(intercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations-minSelfing), aiCounter, (*args.recombinationFractions)[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(recombCounter, aiCounter-1, selfingGenerations-minSelfing), aiCounter, (*args.recombinationFractions)[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
 			}
 			for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing>::withIntercross(finerIntercrossingHaplotypeProbabilities(recombCounter, aiCounter - 1, selfingGenerations - minSelfing), aiCounter, finerRecombLevels[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(finerIntercrossingHaplotypeProbabilities(recombCounter, aiCounter - 1, selfingGenerations - minSelfing), aiCounter, finerRecombLevels[recombCounter], selfingGenerations, args.allFunnelEncodings->size());
 			}
 		}
 	}

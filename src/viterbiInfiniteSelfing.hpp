@@ -33,6 +33,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	int minSelfingGenerations;
 	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
+	double hetrozygoteMissingProb, homozygoteMissingProb;
 	Rcpp::IntegerMatrix key;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
 		: markerData(markerData), intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities)

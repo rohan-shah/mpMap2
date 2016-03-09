@@ -35,6 +35,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	int minAIGenerations;
 	int maxAIGenerations;
 	Rcpp::IntegerMatrix key;
+	double hetrozygoteMissingProb, homozygoteMissingProb;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
 		: markerData(markerData), intermediate1(nFounders*nFounders, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1(nFounders*nFounders), pathLengths2(nFounders*nFounders), working(nFounders*nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities)
 	{}
@@ -45,6 +46,21 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		int nFinals = recodedFinals.nrow(), nMarkers = recodedFinals.ncol();
+
+		//If there's not meant to be any missing values, check that first
+		if(homozygoteMissingProb == 0 && hetrozygoteMissingProb == 0)
+		{
+			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+			{
+				for(int markerCounter = start; markerCounter < end; markerCounter++)
+				{
+					if(recodedFinals(finalCounter, markerCounter) == NA_INTEGER)
+					{
+						throw std::runtime_error("Inputs hetrozygoteMissingProb and homozygoteMissingProb imply that missing values are not allowed");
+					}
+				}
+			}
+		}
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)
@@ -65,6 +81,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	}
 	void applyFunnel(int start, int end, int finalCounter, int funnelID, int selfingGenerations)
 	{
+		double logHomozygoteMissingProb = log(homozygoteMissingProb);
+		double logHetrozygoteMissingProb = log(hetrozygoteMissingProb);
 		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
 		int funnel[16];
@@ -74,6 +92,10 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		}
 		int startMarkerValue = recodedFinals(finalCounter, start);
 		::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
+		
+		//Some values are never touched, so just mark those as negative infinity
+		std::fill(pathLengths1.begin(), pathLengths1.end(), -std::numeric_limits<double>::infinity());
+		std::fill(pathLengths2.begin(), pathLengths2.end(), -std::numeric_limits<double>::infinity());
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
 			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -81,8 +103,11 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
 				int encodingTheseFounders = key(founderCounter, founderCounter2);
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-				pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = 0;
-				if(markerEncodingTheseFounders != startMarkerValue && startMarkerValue != NA_INTEGER)
+				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && hetrozygoteMissingProb != 0))))
+				{
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = 0;
+				}
+				else
 				{
 					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
 				}
@@ -102,7 +127,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				{
 					int encodingMarker = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
-					if(encodingMarker == markerValue || markerValue == NA_INTEGER)
+					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter) && hetrozygoteMissingProb != 0))))
 					{
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
@@ -112,18 +137,30 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 							{
 								int encodingPreviousMarker = previousMarkerData.hetData(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
-								if(encodingPreviousMarker == previousMarkerValue || previousMarkerValue == NA_INTEGER)
+								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(founderPreviousCounter2, markerCounter) == recodedFounders(founderPreviousCounter , markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderPreviousCounter2, markerCounter) != recodedFounders(founderPreviousCounter, markerCounter) && hetrozygoteMissingProb != 0))))
 								{
 									double multiple = 1;
 									if(founderCounter != founderCounter2) multiple *= 2;
 									if(founderPreviousCounter != founderPreviousCounter2) multiple *= 2;
 									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple*funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									if(markerValue == NA_INTEGER)
+									{
+										if(founderPreviousCounter2 == founderPreviousCounter)
+										{
+											working[encodingPreviousTheseFounders] += logHomozygoteMissingProb;
+										}
+										else
+										{
+											working[encodingPreviousTheseFounders] += logHetrozygoteMissingProb;
+										}
+									}
 								}
 							}
 						}
 						//Get the shortest one, and check that it's not negative infinity.
 						std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
-						if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
+						//This error is no longer valid, because some states are impossible to ever be in - E.g. hetrozygote {1,2} with funnel {1,2,3,4} and no intercrossing. In this case all the probabilities are zero and all the log probabilities are -inf. So *longest == -std::numeric_limits<double>::infinity() doesn't indicate that there is no valid next state. It indicates that the state for the previous marker is impossible. 
+						//if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 						int bestPrevious = (int)std::distance(working.begin(), longest);
 						
 						memcpy(&(intermediate2(encodingTheseFounders, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
