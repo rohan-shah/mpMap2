@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     75550,       2139]
-NotebookOptionsPosition[     73159,       2072]
-NotebookOutlinePosition[     73697,       2093]
-CellTagsIndexPosition[     73654,       2090]
+NotebookDataLength[     82173,       2341]
+NotebookOptionsPosition[     79372,       2264]
+NotebookOutlinePosition[     79910,       2285]
+CellTagsIndexPosition[     79867,       2282]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -149,8 +149,8 @@ Cell[BoxData[
       RowBox[{
        RowBox[{"{", 
         RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], ",", " ", "4"}], 
-      "]"}]}], ";"}], "\n", 
-   RowBox[{"(*", "Symmetries", "*)"}], "\[IndentingNewLine]", 
+      "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", "Symmetries", "*)"}], "\n", 
    RowBox[{
     RowBox[{"standardiseUsingPermutation", "[", 
      RowBox[{"{", 
@@ -2068,7 +2068,199 @@ Cell[BoxData[
     RowBox[{
      RowBox[{"{", 
       RowBox[{"0", ",", " ", "1"}], "}"}], ",", " ", "4"}], 
-    "]"}]}]}]], "Input"]
+    "]"}]}]}]], "Input"],
+
+Cell[BoxData["statesWithCounts"], "Input"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{"Single", " ", "locus", " ", "homozygote", " ", "probability"}], 
+   ",", " ", 
+   RowBox[{"if", " ", 
+    RowBox[{"there", "'"}], "s", " ", "intercrossing"}]}], "*)"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"combinedProbabilities", "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "/", "4"}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"combinedProbabilities", "[", 
+      RowBox[{"[", "2", "]"}], "]"}], "/", "16"}]}], " ", "+", " ", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"combinedProbabilities", "[", 
+      RowBox[{"[", "3", "]"}], "]"}], "/", "32"}]}], " ", "+", " ", 
+   RowBox[{
+    RowBox[{"combinedProbabilities", "[", 
+     RowBox[{"[", "4", "]"}], "]"}], "/", "4"}], " ", "+", " ", 
+   RowBox[{
+    RowBox[{"combinedProbabilities", "[", 
+     RowBox[{"[", "5", "]"}], "]"}], "*", 
+    RowBox[{"4", "/", "32"}]}], " ", "+", " ", 
+   RowBox[{
+    RowBox[{"combinedProbabilities", "[", 
+     RowBox[{"[", "6", "]"}], "]"}], "*", 
+    RowBox[{"2", "/", "8"}]}], "+", 
+   RowBox[{
+    RowBox[{"combinedProbabilities", "[", 
+     RowBox[{"[", "7", "]"}], "]"}], "*", 
+    RowBox[{"2", "/", "16"}]}]}], "//", "FullSimplify"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Single", " ", "locus", " ", "hetrozygote", " ", "probability", " ", "if", 
+    " ", 
+    RowBox[{"there", "'"}], "s", " ", "intercrossing"}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"1", "-", " ", 
+      RowBox[{"4", "*", "%"}]}], ")"}], "/", "12"}], "//", 
+   "FullSimplify"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{"Single", " ", "locus", " ", "homozygote", " ", "probability"}], 
+   ",", " ", 
+   RowBox[{"without", " ", "intercrossing"}]}], "*)"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"expected4wayFiniteSelfing", "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "/", "4"}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "2", "]"}], "]"}], "/", "16"}]}], " ", "+", " ", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "3", "]"}], "]"}], "/", "32"}]}], " ", "+", " ", 
+   RowBox[{
+    RowBox[{"expected4wayFiniteSelfing", "[", 
+     RowBox[{"[", "4", "]"}], "]"}], "/", "4"}], " ", "+", " ", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "5", "]"}], "]"}], "/", "32"}]}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "6", "]"}], "]"}], "/", "8"}]}], "+", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "7", "]"}], "]"}], "/", "16"}]}]}], "//", 
+  "FullSimplify"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"1", ",", "2"}], "}"}], " ", "or", " ", 
+   RowBox[{"{", 
+    RowBox[{"2", ",", " ", "1"}], "}"}], " ", "hetrozygote", " ", "without", 
+   " ", "intercrossing"}], "*)"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "2", "]"}], "]"}], "/", "16"}]}], "+", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "8", "]"}], "]"}], "/", "4"}]}], "+", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "7", "]"}], "]"}], "/", "16"}]}], " ", "+", " ", 
+   RowBox[{"8", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "9", "]"}], "]"}], "/", "32"}]}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "10", "]"}], "]"}], "/", "4"}]}], " ", "+", " ", 
+   RowBox[{"8", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "11", "]"}], "]"}], "/", "32"}]}], " ", "+", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "12", "]"}], "]"}], "/", "8"}]}]}], "//", 
+  "FullSimplify"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "3"}], "}"}], " ", "or", " ", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", " ", "1"}], "}"}], " ", "hetrozygote", " ", "has", 
+     " ", "non"}], "-", 
+    RowBox[{"zero", " ", "probability"}]}], ",", " ", 
+   RowBox[{"without", " ", "intercrossing"}]}], "*)"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "3", "]"}], "]"}], "/", "32"}]}], "+", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "5", "]"}], "]"}], "/", "32"}]}], "+", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "9", "]"}], "]"}], "/", "32"}]}], " ", "+", " ", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "11", "]"}], "]"}], "/", "32"}]}], "+", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "13", "]"}], "]"}], "/", "8"}]}], " ", "+", " ", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "14", "]"}], "]"}], "/", "16"}]}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "15", "]"}], "]"}], "/", "8"}]}], " ", "+", " ", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "16", "]"}], "]"}], "/", "8"}]}], " ", "+", 
+   RowBox[{"4", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "17", "]"}], "]"}], "/", "16"}]}], "+", 
+   RowBox[{"2", "*", 
+    RowBox[{
+     RowBox[{"expected4wayFiniteSelfing", "[", 
+      RowBox[{"[", "18", "]"}], "]"}], "/", "8"}]}]}], "//", 
+  "FullSimplify"}]], "Input"]
 },
 WindowSize->{1009, 670},
 WindowMargins->{{0, Automatic}, {Automatic, 0}},
@@ -2125,8 +2317,8 @@ Cell[47317, 1310, 215, 6, 31, "Input"],
 Cell[47535, 1318, 606, 16, 52, "Input"],
 Cell[48144, 1336, 195, 5, 31, "Input"],
 Cell[48342, 1343, 732, 24, 53, "Input"],
-Cell[49077, 1369, 920, 28, 76, "Input"],
-Cell[50000, 1399, 920, 28, 76, "Input"],
+Cell[49077, 1369, 920, 28, 53, "Input"],
+Cell[50000, 1399, 920, 28, 53, "Input"],
 Cell[50923, 1429, 188, 4, 31, "Input"],
 Cell[51114, 1435, 7155, 204, 296, "Input"],
 Cell[58272, 1641, 70, 1, 31, "Input"],
@@ -2140,7 +2332,17 @@ Cell[63252, 1798, 5579, 140, 452, "Input"],
 Cell[68834, 1940, 1118, 32, 72, "Input"],
 Cell[69955, 1974, 1041, 30, 72, "Input"],
 Cell[70999, 2006, 1039, 30, 72, "Input"],
-Cell[72041, 2038, 1114, 32, 72, "Input"]
+Cell[72041, 2038, 1114, 32, 72, "Input"],
+Cell[73158, 2072, 42, 0, 31, "Input"],
+Cell[73203, 2074, 231, 6, 31, "Input"],
+Cell[73437, 2082, 1017, 28, 72, "Input"],
+Cell[74457, 2112, 376, 12, 52, "Input"],
+Cell[74836, 2126, 197, 5, 31, "Input"],
+Cell[75036, 2133, 1054, 29, 92, "Input"],
+Cell[76093, 2164, 250, 7, 31, "Input"],
+Cell[76346, 2173, 1096, 31, 92, "Input"],
+Cell[77445, 2206, 385, 11, 31, "Input"],
+Cell[77833, 2219, 1535, 43, 112, "Input"]
 }
 ]
 *)

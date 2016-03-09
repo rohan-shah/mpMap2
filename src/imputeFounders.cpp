@@ -93,7 +93,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	//vector giving the encoded value for each value in allFunnels
 	std::vector<funnelEncoding> allFunnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, lineFunnelIDs, lineFunnelEncodings, allFunnelEncodings, lineFunnels, allFunnels, nFounders);
-	int nDifferentFunnels = lineFunnelEncodings.size();
+	int nDifferentFunnels = (int)lineFunnelEncodings.size();
 	
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 64)
@@ -328,7 +328,7 @@ BEGIN_RCPP
 	Rcpp::Function nFoundersFunc("nFounders");
 	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
 	int nFinals = finals.nrow();
-	Rcpp::IntegerMatrix results(nFinals, mapMarkers.size());
+	Rcpp::IntegerMatrix results(nFinals, (int)mapMarkers.size());
 	if(nFounders == 2)
 	{
 		imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb);
