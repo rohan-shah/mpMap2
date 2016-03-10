@@ -177,7 +177,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				}
 			}
 #ifndef NDEBUG
-			std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
+			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
 			if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 #endif
 			intermediate1.swap(intermediate2);
