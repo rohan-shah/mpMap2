@@ -720,17 +720,39 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDif
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<8, false>(array2<8>&data, int selfingGenerations, std::size_t nFunnels)
 {
-	throw std::runtime_error("Single locus probabilities not implemented");
+	memset(data.values, 0, sizeof(double) * 8 * 8);
+	double pow2 = std::pow(0.5, selfingGenerations);
+	for (int i = 0; i < 8; i++) data.values[i][i] = 0.125 - pow2 / 8;
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if(i != j && i / 4 != j / 4) data.values[i][j] = data.values[j][i] = pow2 / 32;
+		}
+	}
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<8, true>(array2<8>&data, int selfingGenerations, std::size_t nFunnels)
 {
-	throw std::runtime_error("Single locus probabilities not implemented");
+	memset(data.values, 0, sizeof(double) * 8 * 8);
+	for(int i = 0; i < 8; i++) data.values[i][i] = 0.125;
 }
 template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, false>(array2<8>& data, int selfingGenerations, std::size_t nFunnels)
 {
-	throw std::runtime_error("Single locus probabilities not implemented");
+	memset(data.values, 0, sizeof(double) * 8 * 8);
+	double pow2 = std::pow(0.5, selfingGenerations);
+	double pow2On64 = pow2 / 64;
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < i; j++)
+		{
+			if (i == j) data.values[i][j] = 0.125*(0.125 + 0.875 * (1 - pow2));
+			else data.values[i][j] = pow2On64;
+		}
+	}
+
 }
 template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, true>(array2<8>& data, int selfingGenerations, std::size_t nFunnels)
 {
-	throw std::runtime_error("Single locus probabilities not implemented");
+	memset(data.values, 0, sizeof(double) * 8 * 8);
+	for (int i = 0; i < 8; i++) data.values[i][i] = 0.125;
 }
