@@ -182,19 +182,21 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 #endif
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
-/*			while(identicalIndex != markerCounter-start + 1)
+			while(identicalIndex != markerCounter-start + 1)
 			{
-				int value = intermediate1(0, identicalIndex);
+				int value = intermediate1(key(funnel[0], funnel[0]), identicalIndex);
 				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
 				{
 					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 					{
-						if(value != intermediate1(founderCounter*nFounders + founderCounter2, identicalIndex)) goto stopIdenticalSearch;
+						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
+						if(value != intermediate1(encodingTheseFounders, identicalIndex)) goto stopIdenticalSearch;
 					}
 				}
+				//We don't care about the correct indexing here. Put the correct value in every row. 
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
 						intermediate2(founderCounter*nFounders + founderCounter2, identicalIndex) = value;
 					}
@@ -202,7 +204,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				identicalIndex++;
 			}
 stopIdenticalSearch:
-			;*/
+			;
 		}
 	}
 	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
