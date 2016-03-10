@@ -726,11 +726,11 @@ template<> void singleLocusGenotypeProbabilitiesNoIntercross<8, true>(array2<8>&
 {
 	throw std::runtime_error("Single locus probabilities not implemented");
 }
-template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, false>(array2<8>& data, int nAIGenarations, int selfingGenerations, std::size_t nFunnels)
+template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, false>(array2<8>& data, int selfingGenerations, std::size_t nFunnels)
 {
 	throw std::runtime_error("Single locus probabilities not implemented");
 }
-template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, true>(array2<8>& data, int nAIGenarations, int selfingGenerations, std::size_t nFunnels)
+template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, true>(array2<8>& data, int selfingGenerations, std::size_t nFunnels)
 {
 	throw std::runtime_error("Single locus probabilities not implemented");
 }

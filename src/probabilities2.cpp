@@ -105,12 +105,12 @@ template<> void singleLocusGenotypeProbabilitiesNoIntercross<2, false>(array2<2>
 	//Hetrozygote probabilities are multiplied by two
 	data.values[1][0] = data.values[0][1] = pow2;
 }
-template<> void singleLocusGenotypeProbabilitiesWithIntercross<2, true>(array2<2>& data, int nAIGenarations, int selfingGenerations, std::size_t nFunnels)
+template<> void singleLocusGenotypeProbabilitiesWithIntercross<2, true>(array2<2>& data, int selfingGenerations, std::size_t nFunnels)
 {
 	data.values[0][0] = data.values[1][1] = 0.5;
 	data.values[1][0] = data.values[0][1] = 0;
 }
-template<> void singleLocusGenotypeProbabilitiesWithIntercross<2, false>(array2<2>& data, int nAIGenarations, int selfingGenerations, std::size_t nFunnels)
+template<> void singleLocusGenotypeProbabilitiesWithIntercross<2, false>(array2<2>& data, int selfingGenerations, std::size_t nFunnels)
 {
 	double pow2 = std::pow(0.5, selfingGenerations);
 	data.values[0][0] = data.values[1][1] = 0.25 * (2 - pow2);

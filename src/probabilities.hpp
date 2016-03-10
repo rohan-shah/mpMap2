@@ -28,7 +28,7 @@ template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoInterc
 template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double(&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels, int& nValues);
 //Templated function to work out the single locus probabilities. This is needed for imputation / the Viterbi algorithm
 template<int nFounders, bool infiniteSelfing> void singleLocusGenotypeProbabilitiesNoIntercross(array2<nFounders>& data, int selfingGenerations, std::size_t nFunnels);
-template<int nFounders, bool infiniteSelfing> void singleLocusGenotypeProbabilitiesWithIntercross(array2<nFounders>& data, int nAIGenarations, int selfingGenerations, std::size_t nFunnels);
+template<int nFounders, bool infiniteSelfing> void singleLocusGenotypeProbabilitiesWithIntercross(array2<nFounders>& data, int selfingGenerations, std::size_t nFunnels);
 template<int nFounders, bool infiniteSelfing, bool takeLogs> struct expandedGenotypeProbabilities;
 template<int nFounders, bool takeLogs> struct expandedGenotypeProbabilities<nFounders, true, takeLogs>
 {
