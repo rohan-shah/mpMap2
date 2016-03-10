@@ -36,6 +36,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	int maxAIGenerations;
 	Rcpp::IntegerMatrix key;
 	double hetrozygoteMissingProb, homozygoteMissingProb;
+	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
 		: markerData(markerData), intermediate1(nFounders*nFounders, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1(nFounders*nFounders), pathLengths2(nFounders*nFounders), working(nFounders*nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities)
 	{}
@@ -45,6 +47,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
+		minAIGenerations = std::max(minAIGenerations, 1);
 		int nFinals = recodedFinals.nrow(), nMarkers = recodedFinals.ncol();
 
 		//If there's not meant to be any missing values, check that first
@@ -100,12 +103,12 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		{
 			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 			{
-				int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
-				int encodingTheseFounders = key(founderCounter, founderCounter2);
+				int markerEncodingTheseFounders = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
+				int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && hetrozygoteMissingProb != 0))))
+				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && hetrozygoteMissingProb != 0))))
 				{
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = 0;
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 				else
 				{
@@ -127,7 +130,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				{
 					int encodingMarker = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
-					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter) && hetrozygoteMissingProb != 0))))
+					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], markerCounter) == recodedFounders(funnel[founderCounter], markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], markerCounter) != recodedFounders(funnel[founderCounter], markerCounter) && hetrozygoteMissingProb != 0))))
 					{
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
@@ -137,15 +140,15 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 							{
 								int encodingPreviousMarker = previousMarkerData.hetData(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
-								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(founderPreviousCounter2, markerCounter) == recodedFounders(founderPreviousCounter , markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderPreviousCounter2, markerCounter) != recodedFounders(founderPreviousCounter, markerCounter) && hetrozygoteMissingProb != 0))))
+								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(funnel[founderPreviousCounter2], markerCounter) == recodedFounders(funnel[founderPreviousCounter], markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderPreviousCounter2], markerCounter) != recodedFounders(funnel[founderPreviousCounter], markerCounter) && hetrozygoteMissingProb != 0))))
 								{
-									double multiple = 1;
-									if(founderCounter != founderCounter2) multiple *= 2;
-									if(founderPreviousCounter != founderPreviousCounter2) multiple *= 2;
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple*funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									double multiple = 0;
+									if(founderCounter != founderCounter2) multiple += log(2);
+									if(founderPreviousCounter != founderPreviousCounter2) multiple += log(2);
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
 									if(markerValue == NA_INTEGER)
 									{
-										if(founderPreviousCounter2 == founderPreviousCounter)
+										if(founderCounter2 == founderCounter)
 										{
 											working[encodingPreviousTheseFounders] += logHomozygoteMissingProb;
 										}
@@ -173,6 +176,10 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 					}
 				}
 			}
+#ifndef NDEBUG
+			std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
+			if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
+#endif
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 /*			while(identicalIndex != markerCounter-start + 1)

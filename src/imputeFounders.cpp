@@ -37,6 +37,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
 	int minAIGenerations = *std::min_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
+	minAIGenerations = std::max(minAIGenerations, 1);
 	int nMarkers = founders.ncol();
 	int nFinals = finals.nrow();
 
@@ -112,8 +113,12 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	Rcpp::IntegerMatrix intermediate(nFounders, maxChromosomeMarkers);
 	int cumulativeMarkerCounter = 0;
 
-	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations, maxSelfing - minSelfing+1);
+	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
 	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
+
+	//The single loci probabilities are different depending on whether there are zero or one generations of intercrossing. But once you have non-zero generations, it doesn't matter how many
+	std::vector<array2<nFounders> > intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
+	std::vector<array2<nFounders> > funnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
 
 	//Construct the key that takes pairs of founder values and turns them into encodings
 	Rcpp::IntegerMatrix key(nFounders, nFounders);
@@ -130,6 +135,26 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			counter++;
 		}
 	}
+	int nFunnels = (int)allFunnelEncodings.size();
+	//Generate single loci genetic data
+	for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
+	{
+		array2<nFounders>& funnelArray = funnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& intercrossingArray = intercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		singleLocusGenotypeProbabilitiesNoIntercross<nFounders, infiniteSelfing>(funnelArray, selfingGenerationCounter, nFunnels);
+		singleLocusGenotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingArray, selfingGenerationCounter, nFunnels);
+		//Take logarithms
+		for(int i = 0; i < nFounders; i++)
+		{
+			for(int j = 0; j < nFounders; j++)
+			{
+				if(funnelArray.values[i][j] == 0) funnelArray.values[i][j] = -std::numeric_limits<double>::infinity();
+				else funnelArray.values[i][j] = log(funnelArray.values[i][j]);
+				if(intercrossingArray.values[i][j] == 0) intercrossingArray.values[i][j] = -std::numeric_limits<double>::infinity();
+				else intercrossingArray.values[i][j] = log(intercrossingArray.values[i][j]);
+			}
+		}
+	}
 
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
 	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
@@ -144,13 +169,15 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.key = key;
 	viterbi.homozygoteMissingProb = homozygoteMissingProb;
 	viterbi.hetrozygoteMissingProb = hetrozygoteMissingProb;
+	viterbi.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
+	viterbi.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)
 	{
-		//Generate haplotype probability data. 
 		Rcpp::NumericVector positions = Rcpp::as<Rcpp::NumericVector>(map(chromosomeCounter));
 		Rcpp::NumericVector recombinationFractions = haldaneToRf(diff(positions));
+		//Generate haplotype probability data. 
 		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
 			int markerPattern1 = markerPatternData.markerPatternIDs[markerCounter];
@@ -160,13 +187,13 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			double recombination = recombinationFractions(markerCounter);
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, allFunnelEncodings.size());
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				for(int intercrossingGenerations = std::max(1, minAIGenerations); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, allFunnelEncodings.size());
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}
 			}
 

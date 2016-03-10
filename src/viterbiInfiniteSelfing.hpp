@@ -35,6 +35,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	int minAIGenerations, maxAIGenerations;
 	double hetrozygoteMissingProb, homozygoteMissingProb;
 	Rcpp::IntegerMatrix key;
+	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
 		: markerData(markerData), intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities)
 	{}
@@ -44,6 +46,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
+		minAIGenerations = std::max(minAIGenerations, 1);
 		int nFinals = recodedFinals.nrow(), nMarkers = recodedFinals.ncol();
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
