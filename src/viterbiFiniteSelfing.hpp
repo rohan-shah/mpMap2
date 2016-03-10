@@ -86,7 +86,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	{
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHetrozygoteMissingProb = log(hetrozygoteMissingProb);
-		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
+		//Initialise the algorithm
 		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
 		int funnel[16];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
@@ -209,71 +209,120 @@ stopIdenticalSearch:
 	}
 	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
-		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
-		/*int markerValue = recodedFinals(finalCounter, start);
+		double logHomozygoteMissingProb = log(homozygoteMissingProb);
+		double logHetrozygoteMissingProb = log(hetrozygoteMissingProb);
+		//Initialise the algorithm
+		int startMarkerValue = recodedFinals(finalCounter, start);
+		::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
+		
+		//Some values are never touched, so just mark those as negative infinity
+		std::fill(pathLengths1.begin(), pathLengths1.end(), -std::numeric_limits<double>::infinity());
+		std::fill(pathLengths2.begin(), pathLengths2.end(), -std::numeric_limits<double>::infinity());
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			intermediate1(founderCounter, 0) = founderCounter+1;
-			pathLengths1[founderCounter] = 0;
-			if(recodedFounders(founderCounter, start) != markerValue && markerValue != NA_INTEGER)
+			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 			{
-				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
+				int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
+				int encodingTheseFounders = key(founderCounter, founderCounter2);
+				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
+				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && hetrozygoteMissingProb != 0))))
+				{
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+				}
+				else
+				{
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+				}
 			}
 		}
-		//The index, before which all the paths are identical
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
 			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
-			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			int markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& previousMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter + 1]];
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				//NA corresponds to no restriction from the marker value
-				if(recodedFounders(founderCounter, markerCounter+1) == markerValue || markerValue == NA_INTEGER)
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
-					//Founder at the previous marker. 
-					std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
-					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+					int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
+					int encodingTheseFounders = key(founderCounter, founderCounter2);
+					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter) && hetrozygoteMissingProb != 0))))
 					{
-						//NA corresponds to no restriction
-						if(recodedFounders(founderCounter2, markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
+						//Founder at the previous marker. 
+						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
+						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
 						{
-							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
+							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
+							{
+								int encodingPreviousMarker = previousMarkerData.hetData(founderPreviousCounter, founderPreviousCounter2);
+								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2);
+								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(founderPreviousCounter2, markerCounter) == recodedFounders(founderPreviousCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderPreviousCounter2, markerCounter) != recodedFounders(founderPreviousCounter, markerCounter) && hetrozygoteMissingProb != 0))))
+								{
+									double multiple = 0;
+									if(founderCounter != founderCounter2) multiple += log(2);
+									if(founderPreviousCounter != founderPreviousCounter2) multiple += log(2);
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									if(markerValue == NA_INTEGER)
+									{
+										if(founderCounter2 == founderCounter)
+										{
+											working[encodingPreviousTheseFounders] += logHomozygoteMissingProb;
+										}
+										else
+										{
+											working[encodingPreviousTheseFounders] += logHetrozygoteMissingProb;
+										}
+									}
+								}
+							}
 						}
+						//Get the shortest one, and check that it's not negative infinity.
+						std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
+						int bestPrevious = (int)std::distance(working.begin(), longest);
+						
+						memcpy(&(intermediate2(encodingTheseFounders, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
+						intermediate2(encodingTheseFounders, markerCounter-start+1) = encodingTheseFounders;
+						pathLengths2[encodingTheseFounders] = *longest;
 					}
-					//Get the longest one, and check that it's not negative infinity.
-					std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
-					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
-					int bestPrevious = (int)std::distance(working.begin(), longest);
-					
-					memcpy(&(intermediate2(founderCounter, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
-					intermediate2(founderCounter, markerCounter-start+1) = founderCounter+1;
-					pathLengths2[founderCounter] = *longest;
-				}
-				else
-				{
-					pathLengths2[founderCounter] = -std::numeric_limits<double>::infinity();
+					else
+					{
+						pathLengths2[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+					}
 				}
 			}
+#ifndef NDEBUG
+			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
+			if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
+#endif
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)
 			{
-				int value = intermediate1(0, identicalIndex);
+				int value = intermediate1(key(0,0), identicalIndex);
 				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
 				{
-					if(value != intermediate1(founderCounter, identicalIndex)) goto stopIdenticalSearch;
+					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+					{
+						int encodingTheseFounders = key(founderCounter, founderCounter2);
+						if(value != intermediate1(encodingTheseFounders, identicalIndex)) goto stopIdenticalSearch;
+					}
 				}
+				//We don't care about the correct indexing here. Put the correct value in every row. 
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					intermediate2(founderCounter, identicalIndex) = value;
+					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+					{
+						intermediate2(founderCounter*nFounders + founderCounter2, identicalIndex) = value;
+					}
 				}
 				identicalIndex++;
 			}
 stopIdenticalSearch:
 			;
-		}*/
+		}
 	}
 };
 #endif
