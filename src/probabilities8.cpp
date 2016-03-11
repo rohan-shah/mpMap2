@@ -1,6 +1,7 @@
 #include "probabilities8.h"
 #include <cmath>
 #include <stdexcept>
+#include <cstring>
 const int probabilityData<8>::intermediateProbabilitiesMask[][64] = 
 {{0, 1, 2, 2, 3, 3, 3, 3, 1, 4, 5, 5, 6, 6, 6, 6, 2, 5, 7, 8, 9, 9, 9,
    9, 2, 5, 8, 7, 9, 9, 9, 9, 3, 6, 9, 9, 10, 11, 12, 12, 3, 6, 9, 9, 

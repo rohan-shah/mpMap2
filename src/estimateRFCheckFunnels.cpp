@@ -27,6 +27,7 @@ void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father,
 		{
 			nextGenerationToCheck.push_back(mother(*i)-1);
 			nextGenerationToCheck.push_back(father(*i)-1);
+			if(mother(*i) == 0 || father(*i) == 0) throw std::runtime_error("Inconsistent number of generations of intercrossing?");
 		}
 		//swap vectors
 		individualsToCheckFunnels.swap(nextGenerationToCheck);
@@ -88,17 +89,27 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			throw std::runtime_error(ss.str().c_str());
 		}
 		int pedigreeRow = findLineName->index;
+		//This vector lists all the founders that are ancestors of the current line. This may comprise any number - E.g. if we have an AIC line descended from funnels 1,2,1,2 and 2,3,2,3 then this vector is going it contain 1,2,3
+		std::vector<int> representedFounders;
 		if(intercrossingGenerations[finalCounter] == 0)
 		{
 			individualsToCheckFunnels.push_back(pedigreeRow);
 		}
 		else
 		{
-			getAICParentLines(mother, father, pedigreeRow, intercrossingGenerations[finalCounter], individualsToCheckFunnels);
+			try
+			{
+				getAICParentLines(mother, father, pedigreeRow, intercrossingGenerations[finalCounter], individualsToCheckFunnels);
+			}
+			catch(...)
+			{
+				std::stringstream ss;
+				ss << "Error while attempting to trace intercrossing lines for line " << finalNames(finalCounter);
+				errors.push_back(ss.str());
+				goto nextLine;
+			}
 		}
 		//Now we know the lines for which we need to check the funnels from the pedigree (note: We don't necessarily have genotype data for all of these, it's purely a pedigree check)
-		//This vector lists all the founders that are ancestors of the current line. This may comprise any number - E.g. if we have an AIC line descended from funnels 1,2,1,2 and 2,3,2,3 then this vector is going it contain 1,2,3
-		std::vector<int> representedFounders;
 		//Fixed length arrays to store funnels. If we have less than 16 founders then part of this is garbage and we don't use that bit....
 		funnelType funnel, copiedFunnel;
 		for(std::vector<long>::iterator i = individualsToCheckFunnels.begin(); i != individualsToCheckFunnels.end(); i++)
@@ -112,7 +123,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				std::stringstream ss;
 				ss << "Attempting to trace pedigree for line " << finalNames(finalCounter) << ": Unable to get funnel for line " << pedigreeLineNames(*i);
 				errors.push_back(ss.str());
-				continue;
+				goto nextLine;
 			}
 			//insert these founders into the vector containing all the represented founders
 			representedFounders.insert(representedFounders.end(), &(funnel.val[0]), &(funnel.val[0]) + nFounders);
@@ -139,7 +150,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 				{
 					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7] << ", " << funnel.val[8] << ", " << funnel.val[9] << ", " << funnel.val[10] << ", " << funnel.val[11] << ", " << funnel.val[12] << ", " << funnel.val[13] << ", " << funnel.val[14] << ", " << funnel.val[15] << "}";
 				}
-				ss << ". Did you intend to use all " << nFounders << " founders?\n";
+				ss << ". Did you intend to use all " << nFounders << " founders?";
 				warnings.push_back(ss.str());
 			}
 			else
@@ -150,6 +161,17 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 		//remove duplicates in representedFounders
 		std::sort(representedFounders.begin(), representedFounders.end());
 		representedFounders.erase(std::unique(representedFounders.begin(), representedFounders.end()), representedFounders.end());
+		//Try and check for inconsistent generations of selfing
+		for(std::vector<int>::iterator i = representedFounders.begin(); i != representedFounders.end(); i++)
+		{
+			if(*i > nFounders)
+			{
+				std::stringstream ss;
+				ss << "Error in pedigree for line number " << finalCounter << " named " << finalNames(finalCounter) << ". Inconsistent number of generations of intercrossing";
+				errors.push_back(ss.str());
+				goto nextLine;
+			}
+		}
 		//Not having all the founders in the input funnels is more serious if it causes the observed marker data to be impossible. So check for this.
 		for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 		{
@@ -173,9 +195,10 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			if(!okMarker)
 			{
 				std::stringstream ss;
-				ss << "Error: Data for marker " << markerNames(markerCounter) << " is impossible for individual " << finalNames(finalCounter) << " with given pedigree\n";
+				ss << "Data for marker " << markerNames(markerCounter) << " is impossible for individual " << finalNames(finalCounter) << " with given pedigree";
 				errors.push_back(ss.str());
 				if(errors.size() > 1000) return;
+				goto nextLine;
 			}
 		}
 		//In this case individualsToCheckFunnels contains one element => getFunnel was only called once => we can reuse the funnel variable
@@ -190,5 +213,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			for(int i = 0; i < 16; i++) funnel.val[i] = 0;
 			lineFunnels.push_back(funnel);
 		}
+	nextLine:
+		;
 	}
 }

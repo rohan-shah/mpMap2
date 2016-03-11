@@ -81,7 +81,12 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		estimateRFCheckFunnels(recodedFinals, recodedFounders, recodedHetData, pedigree, intercrossingGenerations, warnings, errors, allFunnels, lineFunnels);
 		if(errors.size() > 0)
 		{
-			throw std::runtime_error(errors[0].c_str());
+			std::stringstream ss;
+			for(int i = 0; i < errors.size(); i++)
+			{
+				ss << errors[i] << std::endl;
+			}
+			throw std::runtime_error(ss.str().c_str());
 		}
 		//Don't bother outputting warnings here
 	}
