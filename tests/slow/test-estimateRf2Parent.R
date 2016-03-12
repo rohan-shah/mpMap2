@@ -51,7 +51,7 @@ test_that("Numerically accurate for a RIL design",
 			map <- getMap(distance)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			#There is a warning that we're analysing a population with hetrozygotes as if hetrozygotes were impossible. 
-			suppressWarnings(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE))
+			capture.output(suppressWarnings(rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), (0:100)/200), keepLod = TRUE, keepLkhd=TRUE)))
 			expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance=tolerances[index])
 			expect_identical(rf@rf@theta[1,2], rf@rf@theta[2,1])
 			expect_identical(rf@rf@theta[1,1], 0)
