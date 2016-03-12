@@ -37,28 +37,28 @@ test_that("Arguments must have correct types",
 		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = list(), gbLimit = -1, verbose = NULL), throws_error("keepLkhd must be a boolean"))
 
 		#verbose must be a boolean
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list()), throws_error("verbose must be a boolean"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list()), throws_error("verbose must be a list"))
 
 		#There must be at least one design
 		copiedCross <- cross
-		copiedCross@geneticData <- list()
-		expect_that(estimateRFInternal(object = copiedCross, recombValues = c(0.0, 0.5), lineWeights = list(), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("There must be at least one design"))
+		copiedCross@geneticData <- new("geneticDataList")
+		expect_that(estimateRFInternal(object = copiedCross, recombValues = c(0.0, 0.5), lineWeights = list(), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("There must be at least one design"))
 
 		#Must be at least one markerRow value
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = as.integer(c()), markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("markerRows must have at least one entry"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = as.integer(c()), markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("markerRows must have at least one entry"))
 
 		#Must be at least one markerCloumn value
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = as.integer(c()), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("markerColumns must have at least one entry"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = as.integer(c()), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("markerColumns must have at least one entry"))
 
 		#Cannot have negative values for markerRows
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = -(1:2), markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("Invalid values for input markerRows"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = -(1:2), markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid values for input markerRows"))
 
 		#Cannot have negative values for markerColumns
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("Invalid value for input markerColumns"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid value for input markerColumns"))
 
 		#Number of values to estimate cannot be zero
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1000, markerColumns = 1, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("give a region that is contained in the lower triangular part"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1000, markerColumns = 1, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("give a region that is contained in the lower triangular part"))
 
 		#Entry of lineWeights has the wrong lengthi
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:10, markerColumns = 1:10, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = FALSE), throws_error("lineWeights had the wrong length"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:10, markerColumns = 1:10, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("lineWeights had the wrong length"))
 	})

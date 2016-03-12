@@ -465,7 +465,7 @@ template<> void genotypeProbabilitiesWithIntercross<8, true>(double(&prob)[nDiff
 	double powOneMinusR = std::pow(1 - r, nAIGenerations-1);
 	prob[0] = (powOneMinusR*(1-r)*(1-r)*(1-r)/8 + (2 * r + 1 - powOneMinusR)/64)/(1 + 2 * r);
 	prob[1] = prob[2] = (1 - 8*prob[0])/56;
-	nValues = 2;
+	nValues = 3;
 }
 template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
 {

@@ -78,11 +78,11 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		}
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			intermediate1(founderCounter, 0) = founderCounter+1;
-			pathLengths1[founderCounter] = 0;
+			intermediate1(founderCounter, 0) = intermediate2(founderCounter, 0) = founderCounter+1;
+			pathLengths2[founderCounter] = pathLengths1[founderCounter] = 0;
 			if(recodedFounders(founderCounter, start) != markerValue && markerValue != NA_INTEGER)
 			{
-				pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
+				pathLengths2[founderCounter] = pathLengths1[founderCounter] = -std::numeric_limits<double>::infinity();
 			}
 		}
 		int identicalIndex = 0;

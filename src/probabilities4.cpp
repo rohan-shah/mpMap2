@@ -34,7 +34,7 @@ template<> void genotypeProbabilitiesNoIntercross<4, true>(double(&prob)[nDiffer
 {
 	prob[0] = (1-r)/(4*(1 + 2*r));
 	prob[1] = prob[2] = r/(4*(1 + 2 * r));
-	nValues = 2;
+	nValues = 3;
 }
 template<> void genotypeProbabilitiesNoIntercross<4, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
 {
@@ -104,7 +104,7 @@ template<> void genotypeProbabilitiesWithIntercross<4, true>(double(&prob)[nDiff
 	double powOneMinusR = std::pow(1 - r, nAIGenerations-1);
 	prob[0] = (powOneMinusR*(1-r)*(1-r)/4 + (2 * r + 1 - powOneMinusR)/16)/(1 + 2 * r);
 	prob[1] = prob[2] = (1 - 4*prob[0])/12;
-	nValues = 2;
+	nValues = 3;
 }
 template<> void genotypeProbabilitiesWithIntercross<4, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
 {

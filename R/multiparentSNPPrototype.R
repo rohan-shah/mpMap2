@@ -33,12 +33,17 @@ multiparentSNPPrototypeRemoveHets <- function(e1)
 	{
 		numberOfOnes <- sample(nFounders-1, 1)
 		oneAlleles <- sample(1:nFounders, numberOfOnes)
-		oneAllelesOldValues <- copied@founders[oneAlleles, x]
+		oneAllelesOldValues <- copied@founders[oneAlleles, x] 
 		zeroAllelesOldValues <- copied@founders[-oneAlleles, x]
+
+		currentHetData <- e1@hetData[[x]]
+		oneAllelesOldValues <- currentHetData[currentHetData[,1] %in% oneAllelesOldValues & currentHetData[,2] %in% oneAllelesOldValues,3]
+		zeroAllelesOldValues <- currentHetData[currentHetData[,1] %in% zeroAllelesOldValues & currentHetData[,2] %in% zeroAllelesOldValues,3]
 
 		becomesOne <- copied@finals[,x] %in% oneAllelesOldValues
 		becomesZero <- copied@finals[,x] %in% zeroAllelesOldValues
-		isHet <- !(copied@finals[,x] %in% copied@founders[,x])
+		hetValues <- currentHetData[xor(currentHetData[,1] %in% oneAllelesOldValues, currentHetData[,2] %in% oneAllelesOldValues), 3]
+		isHet <- copied@finals[,x] %in% hetValues
 
 		copied@finals[becomesOne, x] <<- 1L
 		copied@finals[becomesZero, x] <<- 0L

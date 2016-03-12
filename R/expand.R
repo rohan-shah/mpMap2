@@ -50,5 +50,5 @@ expand <- function(mpcross, newMarkers)
 
 		return(new("geneticData", finals = newFinals, founders = newFounders, pedigree = x@pedigree, hetData = new("hetData", newHetData)))
 	})
-	return(new("mpcross", geneticData = newGeneticData))
+	return(new("mpcross", geneticData = new("geneticDataList", newGeneticData)))
 }

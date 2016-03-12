@@ -43,7 +43,7 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 		{
 			do.call(subset, c(arguments, x = geneticData))
 		})
-	return(new("mpcross", geneticData = newGeneticData))
+	return(new("mpcross", geneticData = new("geneticDataList", newGeneticData)))
 })
 setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
 {

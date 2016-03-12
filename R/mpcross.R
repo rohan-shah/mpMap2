@@ -12,19 +12,19 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
   #If e1 and e2 have exactly the same markers, this is trivial. 
   if(nMarkers(e1) == nMarkers(e1) && all(markers(e1) == markers(e2)))
   {
-    return(new("mpcross", geneticData = c(e1@geneticData, e2@geneticData)))
+    return(new("mpcross", geneticData = new("geneticDataList", c(e1@geneticData, e2@geneticData))))
   }
   #If all the markers are already in e1, then use that order and only expand e2
   else if(nMarkers(e1) == length(allMarkers) && all(allMarkers == sort(markers(e1))))
   {
     e2ExpandedGeneticData <- expand(e2, newMarkers = allMarkers)
-    return(new("mpcross", geneticData = c(e1@geneticData, e2ExpandedGeneticData@geneticData)))
+    return(new("mpcross", geneticData = new("geneticDataList", c(e1@geneticData, e2ExpandedGeneticData@geneticData))))
   }
   #If all the markers are already in e2, then use that order and only expand e1
   else if(nMarkers(e2) == length(allMarkers) && all(allMarkers == sort(markers(e2))))
   {
     e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
-    return(new("mpcross", geneticData = c(e1ExpandedGeneticData@geneticData, e2@geneticData)))
+    return(new("mpcross", geneticData = new("geneticDataList", c(e1ExpandedGeneticData@geneticData, e2@geneticData))))
   }
   else
   {
@@ -32,7 +32,7 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
     allMarkers <- c(markers(e1), setdiff(allMarkers, markers(e1)))
     e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
     e2ExpandedGeneticData <- expand(e2, newMarkers = allMarkers)
-    return(new("mpcross", geneticData = c(e1ExpandedGeneticData@geneticData, e2ExpandedGeneticData@geneticData))) 
+    return(new("mpcross", geneticData = new("geneticDataList", c(e1ExpandedGeneticData@geneticData, e2ExpandedGeneticData@geneticData))))
   }
 })
 setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = function(e1, e2)
@@ -79,12 +79,12 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   complementIntersectionIndices <- setdiff(1:nMarkers(combined), intersectionIndices)
   if(length(intersectionIndices) > 0)
   {
-    reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices, gbLimit = newGbLimit, verbose = FALSE)
+    reEstimatedPart1 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = 1:nMarkers(combined), markerColumns = intersectionIndices, gbLimit = newGbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
     .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, 1:nMarkers(combined), intersectionIndices, reEstimatedPart1$theta)
 
     if(length(complementIntersectionIndices) > 0)
     {
-      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = complementIntersectionIndices, gbLimit = newGbLimit, verbose = FALSE)
+      reEstimatedPart2 <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = intersectionIndices, markerColumns = complementIntersectionIndices, gbLimit = newGbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
       .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, intersectionIndices, complementIntersectionIndices, reEstimatedPart2$theta)
     }
 
@@ -103,7 +103,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = functio
   rectangularColumns <- setdiff(marker2Indices, intersectionIndices)
   if(length(rectangularRows) > 0 && length(rectangularColumns) > 0)
   {
-    rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns, gbLimit = newGbLimit, verbose = FALSE)
+    rectangularPart <- estimateRFInternal(object = combined, recombValues = levels, lineWeights = lineWeights, keepLod = keepLod, keepLkhd = keepLkhd, markerRows = rectangularRows, markerColumns = rectangularColumns, gbLimit = newGbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
     .Call("assignRawSymmetricMatrixFromEstimateRF", newTheta, rectangularRows, rectangularColumns, rectangularPart$theta)
     if(keepLod)
     {
@@ -134,7 +134,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(
       stop("Internal error: Markers should have been combined as two blocks")
     }
     marker2Range <- range(match(markers(e2), markers(combined)))
-    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = e1@rf@gbLimit, verbose = FALSE)
+    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = e1@rf@gbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
     stop("Need to check this section")
   }
   #If the markers are all the same, keep them in the same order

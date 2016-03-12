@@ -29,18 +29,19 @@ test_that("Marker of cross object must agree with markers of map",
 	})
 test_that("Check of imputed founders matrix works",
 	{
+		key <- cbind(1:2, 1:2, 1:2)
 		copied <- mapped
-		copied@geneticData[[1]]@imputed <- matrix(1L, nrow = nLines(copied), ncol = nMarkers(copied))
-		dimnames(copied@geneticData[[1]]@imputed) <- dimnames(copied@geneticData[[1]]@finals)
+		copied@geneticData[[1]]@imputed <- new("imputed", data = matrix(1L, nrow = nLines(copied), ncol = nMarkers(copied)), key = key)
+		dimnames(copied@geneticData[[1]]@imputed@data) <- dimnames(copied@geneticData[[1]]@finals)
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
 
-		copied@geneticData[[1]]@imputed[1,1] <- 0L
+		copied@geneticData[[1]]@imputed@data[1,1] <- 0L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		copied@geneticData[[1]]@imputed[1,1] <- 3L
+		copied@geneticData[[1]]@imputed@data[1,1] <- 3L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 
-		copied@geneticData[[1]]@imputed[1,1] <- 2L
+		copied@geneticData[[1]]@imputed@data[1,1] <- 2L
 		validObject(copied, complete=TRUE)
 	})
 rm(pedigree, map, cross, rf, mapped)

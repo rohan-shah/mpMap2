@@ -1,29 +1,58 @@
 #include "checkImputedBounds.h"
-SEXP checkImputedBounds(SEXP matrix_sexp, SEXP upperBound_sexp)
+SEXP checkImputedBounds(SEXP imputed_sexp)
 {
 BEGIN_RCPP
-	Rcpp::IntegerVector matrix;
+	Rcpp::S4 imputed;
 	try
 	{
-		matrix = Rcpp::as<Rcpp::IntegerVector>(matrix_sexp);
+		imputed = Rcpp::as<Rcpp::S4>(imputed_sexp);
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input matrix must be an integer matrix");
+		throw std::runtime_error("Input imputed must be an S4 object");
 	}
 
-	int upperBound;
+	Rcpp::IntegerVector dataMatrix;
 	try
 	{
-		upperBound = Rcpp::as<int>(upperBound_sexp);
+		dataMatrix = Rcpp::as<Rcpp::IntegerVector>(imputed.slot("data"));
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input upperBound must be an integer");
+		throw std::runtime_error("Input imputed@data must be an integer matrix");
 	}
-	for(int i = 0; i < matrix.size(); i++)
+
+	Rcpp::IntegerMatrix keyMatrix;
+	try
 	{
-		if(matrix(i) < 1 || matrix(i) > upperBound)
+		keyMatrix = Rcpp::as<Rcpp::IntegerMatrix>(imputed.slot("key"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input imputed@key must be an integer matrix");
+	}
+
+	if(keyMatrix.ncol() != 3)
+	{
+		throw std::runtime_error("Input imputed@key must have three columns");
+	}
+
+	std::vector<int> encodings;
+	for(int i = 0; i < keyMatrix.nrow(); i++)
+	{
+		encodings.push_back(keyMatrix(i, 2));
+	}
+	std::sort(encodings.begin(), encodings.end());
+	encodings.erase(std::unique(encodings.begin(), encodings.end()), encodings.end());
+	if(encodings[0] != 1 || *encodings.rbegin() != encodings.size())
+	{
+		throw std::runtime_error("Encodings in imputed@key must be consecutive integers");
+	}
+
+	int upperBound = encodings.size();
+	for(int i = 0; i < dataMatrix.size(); i++)
+	{
+		if(dataMatrix(i) < 1 || dataMatrix(i) > upperBound)
 		{
 			return Rcpp::wrap(false);
 		}

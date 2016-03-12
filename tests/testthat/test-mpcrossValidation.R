@@ -11,18 +11,16 @@ test_that("Simulated cross passes validation",
 test_that("At least one set of geneticData is required",
 	{
 		copied <- cross
-		copied@geneticData <- list()
+		copied@geneticData <- new("geneticDataList", list())
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 test_that("All elements of geneticData must have correct class",
 	{
 		copied <- cross
-		copied@geneticData <- c(copied@geneticData, 1)
-		expect_that(validObject(copied, complete=TRUE), throws_error())
+		expect_that(copied@geneticData <- new("geneticDataList", c(copied@geneticData, 1)), throws_error())
 
 		copied <- cross
-		copied@geneticData <- c(copied@geneticData, cross)
-		expect_that(validObject(copied, complete=TRUE), throws_error())
+		expect_that(copied@geneticData <- new("geneticDataList", c(copied@geneticData, cross)), throws_error())
 	})
 test_that("If there are multiple genetic data sets, founder line names can be repeated",
 	{
@@ -58,7 +56,7 @@ test_that("All geneticData entries must have the same markers",
 	{
 		#Having two sets of genetic data is fine
 		copied <- cross
-		copied@geneticData <- c(copied@geneticData, copied@geneticData)
+		copied@geneticData <- new("geneticDataList", c(copied@geneticData, copied@geneticData))
 		expect_identical(validObject(cross, complete=TRUE), TRUE)
 
 		#Removing a marker is fine
@@ -75,7 +73,7 @@ test_that("All geneticData entries must have the same markers",
 
 		#Having different numbers of markers is an error
 		copied <- cross
-		copied@geneticData <- c(copied@geneticData, copied@geneticData)
+		copied@geneticData <- new("geneticDataList", c(copied@geneticData, copied@geneticData))
 		copied@geneticData[[1]]@founders <- copied@geneticData[[1]]@founders[,-1]
 		copied@geneticData[[1]]@finals <- copied@geneticData[[1]]@finals[,-1]
 		copied@geneticData[[1]]@hetData[[1]] <- NULL
@@ -83,7 +81,7 @@ test_that("All geneticData entries must have the same markers",
 
 		#Having different marker names is an error
 		copied <- cross
-		copied@geneticData <- c(copied@geneticData, copied@geneticData)
+		copied@geneticData <- new("geneticDataList", c(copied@geneticData, copied@geneticData))
 		colnames(copied@geneticData[[1]]@founders)[1] <- colnames(copied@geneticData[[1]]@finals)[1] <- names(copied@geneticData[[1]]@hetData)[1] <- "newMarker"
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})

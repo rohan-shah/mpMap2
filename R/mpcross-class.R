@@ -1,6 +1,7 @@
 #' @include rf-class.R
 #' @include lg-class.R
 #' @include map-class.R
+#' @include geneticData-class.R
 checkCompatibleGeneticData <- function(objects)
 {
 	expectedMarkers <- markers(objects[[1]])
@@ -56,7 +57,7 @@ checkMpcross <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.mpcross <- setClass("mpcross", slots = list(geneticData = "list"), validity=checkMpcross)
+.mpcross <- setClass("mpcross", slots = list(geneticData = "geneticDataList"), validity=checkMpcross)
 
 checkMpcrossRF <- function(object)
 {

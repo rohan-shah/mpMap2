@@ -14,7 +14,7 @@
 #include "funnelHaplotypeToMarker.hpp"
 #include "viterbi.hpp"
 #include "recodeHetsAsNA.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double hetrozygoteMissingProb)
+template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double hetrozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomeMarkers = 0;
@@ -125,21 +125,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	std::vector<array2<nFounders> > intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
 	std::vector<array2<nFounders> > funnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
 
-	//Construct the key that takes pairs of founder values and turns them into encodings
-	Rcpp::IntegerMatrix key(nFounders, nFounders);
-	for(int i = 0; i < nFounders; i++)
-	{
-		key(i, i) = i + 1;
-	}
-	int counter = nFounders+1;
-	for(int i = 0; i < nFounders; i++)
-	{
-		for(int j = i+1; j < nFounders; j++)
-		{
-			key(j, i) = key(i, j) = counter;
-			counter++;
-		}
-	}
 	int nFunnels = (int)allFunnelEncodings.size();
 	//Generate single loci genetic data
 	for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
@@ -208,15 +193,15 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		cumulativeMarkerCounter += positions.size();
 	}
 }
-template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double hetrozygoteMissingProb)
+template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double hetrozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 }
 SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP hetrozygoteMissingProb_sexp)
@@ -330,6 +315,40 @@ BEGIN_RCPP
 	std::vector<std::string> foundersMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(founders));
 	std::vector<std::string> finalsMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(finals));
 
+	Rcpp::Function nFoundersFunc("nFounders");
+	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
+
+	//Construct the key that takes pairs of founder values and turns them into encodings
+	Rcpp::IntegerMatrix key(nFounders, nFounders);
+	for(int i = 0; i < nFounders; i++)
+	{
+		key(i, i) = i + 1;
+	}
+	int counter = nFounders+1;
+	for(int i = 0; i < nFounders; i++)
+	{
+		for(int j = i+1; j < nFounders; j++)
+		{
+			key(j, i) = key(i, j) = counter;
+			counter++;
+		}
+	}
+	//We also want a version closer to the hetData format
+	Rcpp::IntegerMatrix outputKey(nFounders*nFounders, 3);
+	{
+		int counter = 0;
+		for(int i = 0; i < nFounders; i++)
+		{
+			for(int j = 0; j < nFounders; j++)
+			{
+				outputKey(counter, 0) = i;
+				outputKey(counter, 1) = j;
+				outputKey(counter, 2) = key(i, j);
+				counter++;
+			}
+		}
+	}
+
 	std::vector<std::string> mapMarkers;
 	mapMarkers.reserve(foundersMarkers.size());
 	int maxChromosomeMarkers = 0;
@@ -357,31 +376,29 @@ BEGIN_RCPP
 		throw std::runtime_error("Map was inconsistent with the markers in the geneticData object");
 	}
 
-	Rcpp::Function nFoundersFunc("nFounders");
-	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
 	int nFinals = finals.nrow();
 	Rcpp::IntegerMatrix results(nFinals, (int)mapMarkers.size());
 	if(nFounders == 2)
 	{
-		imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 	else if(nFounders == 4)
 	{
-		imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 	else if(nFounders == 8)
 	{
-		imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 	else if(nFounders == 16)
 	{
-		imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb);
+		imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
 	}
 	else
 	{
 		throw std::runtime_error("Number of founders must be 2, 4, 8 or 16");
 	}
-	return results;
+	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey);
 END_RCPP
 }
 

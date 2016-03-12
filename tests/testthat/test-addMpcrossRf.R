@@ -17,7 +17,7 @@ test_that("Checking f2 pedigree split into 10 different datasets gives the same 
 		combinedRf <- estimateRF(cross)
 		for(i in 2:10)
 		{
-			suppressWarnings(separateRf <- separateRf + estimateRF(subset(cross, lines = 1:50 + (i-1)*50)))
+			suppressWarnings(capture.output(separateRf <- separateRf + estimateRF(subset(cross, lines = 1:50 + (i-1)*50))))
 		}
 		expect_identical(combinedRf@rf@theta, separateRf@rf@theta)
 		expect_equal(combinedRf@rf@lod, separateRf@rf@lod, tolerance = 0.001)
@@ -40,7 +40,7 @@ test_that("Checking that f2 experiment split into two different subsets gives th
 		rf2 <- estimateRF(cross2, keepLod = TRUE, keepLkhd = TRUE)
 
 		#Two different recombination fraction calculations
-		combinedRf <- suppressWarnings(rf1 + rf2)
+		suppressWarnings(capture.output(combinedRf <- rf1 + rf2))
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
 		#After we give them the same marker orderings, they should have identical data, or close to it.
 		combinedRf <- subset(combinedRf, markers = markers(rf))

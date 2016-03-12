@@ -49,5 +49,5 @@ simulateMPCross <- function(map, pedigree, mapFunction, seed)
 	finals <- combineGenotypes(finals, hetData)
 	colnames(finals) <- finalsColNames
 	rownames(finals) <- finalsRowNames
-	return(new("mpcross", geneticData = list(new("geneticData", founders = founders, finals = finals, hetData = hetData, pedigree = pedigree))))
+	return(new("mpcross", geneticData = new("geneticDataList", list(new("geneticData", founders = founders, finals = finals, hetData = hetData, pedigree = pedigree)))))
 }

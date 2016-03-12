@@ -27,8 +27,8 @@ test_that("Checking that a ril design, when split into 100 different datasets, g
 		{
 			crosses <- crosses + subset(cross, lines = 1:5 + (i-1)*5)
 		}
-		suppressWarnings(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
-		suppressWarnings(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
 		expect_identical(multipleDatasetsRf@rf@theta, singleDatasetRf@rf@theta)
 		expect_equal(multipleDatasetsRf@rf@lod, singleDatasetRf@rf@lod)
 		expect_equal(multipleDatasetsRf@rf@lkhd, singleDatasetRf@rf@lkhd)
@@ -58,8 +58,8 @@ test_that("Checking that a 4-way ril design with a single funnel, when split int
 		{
 			crosses <- crosses + subset(cross, lines = 1:5 + (i-1)*5)
 		}
-		suppressWarnings(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
-		suppressWarnings(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
 		expect_identical(multipleDatasetsRf@rf@theta, singleDatasetRf@rf@theta)
 		expect_equal(multipleDatasetsRf@rf@lod, singleDatasetRf@rf@lod)
 		expect_equal(multipleDatasetsRf@rf@lkhd, singleDatasetRf@rf@lkhd)
@@ -92,8 +92,8 @@ test_that("Checking that a 4-way ril design with random funnels and two generati
 		{
 			crosses <- crosses + subset(cross, lines = 1:5 + (i-1)*5)
 		}
-		suppressWarnings(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
-		suppressWarnings(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(multipleDatasetsRf <- estimateRF(crosses, keepLod = TRUE, keepLkhd = TRUE))
+		capture.output(singleDatasetRf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
 		expect_identical(multipleDatasetsRf@rf@theta, singleDatasetRf@rf@theta)
 		expect_equal(multipleDatasetsRf@rf@lod, singleDatasetRf@rf@lod)
 		expect_equal(multipleDatasetsRf@rf@lkhd, singleDatasetRf@rf@lkhd)

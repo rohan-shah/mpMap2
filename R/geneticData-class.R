@@ -131,24 +131,53 @@ checkGeneticData <- function(object)
 	#Check imputed slot
 	if(!is.null(object@imputed))
 	{
-		if(!is.numeric(object@imputed))
+		if(!identical(dim(object@imputed@data), dim(object@finals)))
 		{
-			return("If slot imputed is not NULL, it must be an integer matrix")
+			return("Dimensions of slot imputed@data must be the same as those of slot finals")
 		}
-		if(!identical(dim(object@imputed), dim(object@finals)))
+		if(!identical(dimnames(object@imputed@data), dimnames(object@finals)))
 		{
-			return("Dimensions of slot imputed must be the same as those of slot finals")
+			return("Row and column names of slot imputed@data must be the same as those of slot finals")
 		}
-		if(!identical(dimnames(object@imputed), dimnames(object@finals)))
-		{
-			return("Row and column names of slot imputed must be the same as those of slot finals")
-		}
-		if(!.Call("checkImputedBounds", object@imputed, nFounders(object), PACKAGE="mpMap2"))
-		{
-			return("Slot imputed must contain values between 1 and nFounders inculsive")
-		}
+		errors <- validObject(object@imputed)
+		if(length(errors) > 0) return(errors)
 	}
 	return(TRUE)
 }
-setClassUnion("matrixOrNULL", c("matrix", "NULL"))
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "matrixOrNULL"), validity = checkGeneticData)
+checkImputedData <- function(object)
+{
+	if(!is.numeric(object@data))
+	{
+		return("Slot data must be an integer matrix")
+	}
+	if(!is.numeric(object@key))
+	{
+		return("Slot key must be an integer matrix")
+	}
+	if(ncol(object@key) != 3L)
+	{
+		return("Slot key must have three columns")
+	}
+	if(!.Call("checkImputedBounds", object, PACKAGE="mpMap2"))
+	{
+		return("Slot imputed@data must contain values in imputed@key")
+	}
+}
+.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix"), validity = checkImputedData)
+setClassUnion("imputedOrNULL", c("imputed", "NULL"))
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL"), validity = checkGeneticData)
+checkGeneticDataList <- function(object)
+{
+	if(any(unlist(lapply(object, class)) != "geneticData"))
+	{
+		return("An object of class geneticDataList must contain objects of class geneticData")
+	}
+	errors <- lapply(object, validObject)
+	if(sum(unlist(lapply(errors, is.logical))) == length(object))
+	{
+		return(TRUE)
+	}
+	sapply(1:length(object), function(x) errors[[x]] <<- paste0("Error in geneticData object ", x, ": ", errors[[x]]))
+	return(unlist(errors))
+}
+.geneticDataList <- setClass("geneticDataList", "list", validity = checkGeneticDataList)
