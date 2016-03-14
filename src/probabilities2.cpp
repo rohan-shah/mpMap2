@@ -17,13 +17,12 @@ const int probabilityData<2>::infiniteMask[][2] =
 			{0, 1},
 			{1, 0}
 		};
-template<> void genotypeProbabilitiesNoIntercross<2, true>(double (&prob)[nDifferentProbs], double r, int, std::size_t, int& nValues)
+template<> void genotypeProbabilitiesNoIntercross<2, true>(std::array<double, 2>& prob, double r, int, std::size_t)
 {
 	prob[0] = 1/(2*(1 + 2*r));
 	prob[1] = r/(1 + 2 * r);
-	nValues = 2;
 }
-template<> void genotypeProbabilitiesNoIntercross<2, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t, int& nValues)
+template<> void genotypeProbabilitiesNoIntercross<2, false>(std::array<double, 5>& prob, double r, int selfingGenerations, std::size_t)
 {
 	double quadraticPower = std::pow(1 - 2*r+ 2 * r * r, selfingGenerations);
 	double oneMinusTwoRPower = std::pow(1 - 2 * r, selfingGenerations);
@@ -42,17 +41,15 @@ template<> void genotypeProbabilitiesNoIntercross<2, false>(double(&prob)[nDiffe
 	prob[2] /= 2;
 	prob[3] /= 4;
 	prob[4] /= 4;
-	nValues = 5;
 }
-template<> void genotypeProbabilitiesWithIntercross<2, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t, int& nValues)
+template<> void genotypeProbabilitiesWithIntercross<2, true>(std::array<double, 2>& prob, int nAIGenerations, double r, int, std::size_t)
 {
 	double tmp = pow(1-r, nAIGenerations - 1);
 	//calculated by taking the 4-way case and setting both pairs of founders to be identical
 	prob[0] = (1/(1 + 2 * r)) * ((1-r)*tmp/2 + (2*r + 1 - tmp) /4);
 	prob[1] = (1 - prob[0]*2)/2;
-	nValues = 2;
 }
-template<> void genotypeProbabilitiesWithIntercross<2, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t, int& nValues)
+template<> void genotypeProbabilitiesWithIntercross<2, false>(std::array<double, 5>& prob, int nAIGenerations, double r, int selfingGenerations, std::size_t)
 {
 	double pow2 = std::pow(2, selfingGenerations);
 	double powOneMinusR = std::pow(1 - r, 1 + nAIGenerations);
@@ -91,7 +88,6 @@ template<> void genotypeProbabilitiesWithIntercross<2, false>(double(&prob)[nDif
    	)/(8*pow2*oneMinusRSquared);
 	//We don't distinguish between the two hetrozygote combinations
    	prob[3] += prob[4];
-	nValues = 5;
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<2, true>(array2<2>&data, int selfingGenerations, std::size_t nFunnels)
 {

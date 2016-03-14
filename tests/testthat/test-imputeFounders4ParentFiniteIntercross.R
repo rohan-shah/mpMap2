@@ -1,4 +1,4 @@
-context("Founder imputation, four parents, finite selfing")
+context("Founder imputation, four parents, finite selfing, with intercrossing")
 test_that("Test non-zero generations of intercrossing, with marker hetrozygotes",
 	{
 		testFunc <- function(pedigree, map)

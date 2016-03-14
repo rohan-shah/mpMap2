@@ -239,24 +239,6 @@ const int probabilityData<8>::intermediateProbabilitiesMask[][64] =
    3, 11, 10, 12, 12, 9, 9, 6, 3, 12, 12, 10, 11, 9, 9, 6, 3, 12, 12, 
   11, 10, 9, 9, 6, 3, 9, 9, 9, 9, 7, 8, 5, 2, 9, 9, 9, 9, 8, 7, 5, 2, 
   6, 6, 6, 6, 5, 5, 4, 1, 3, 3, 3, 3, 2, 2, 1, 0}};
-		/* 0 = AA
-		   1 = AB
-		   2 = AC
-		   3 = AD
-		   4 = AE
-		   5 = AF
-		   6 = AG
-		   7 = AH
-		   8 = BA
-		   9 = BB
-		   10 = BC
-		   11 = BD
-		   12 = BE
-		   13 = BF
-		   14 = BG
-		   15 = BH
-		   etc
-		   */
 const int probabilityData<8>::intermediateAllelesMask[][8] = 
 			/*Range[#1, #1 + 7] & /@ Range[0, 63, 8]*/
 			{ { 0, 1, 2, 3, 4, 5, 6, 7 }, { 8, 9, 10, 11, 12, 13, 14, 15 }, { 16, 17,
@@ -275,14 +257,13 @@ const int probabilityData<8>::infiniteMask[][8] =
 			{2, 2, 2, 2, 2, 2, 0, 1},
 			{2, 2, 2, 2, 2, 2, 1, 0}
 		};
-template<> void genotypeProbabilitiesNoIntercross<8, true>(double(&prob)[nDifferentProbs], double r, int, std::size_t, int& nValues)
+template<> void genotypeProbabilitiesNoIntercross<8, true>(std::array<double, 3>& prob, double r, int, std::size_t)
 {
 	prob[0] = (1-r)*(1-r)/(8*(1 + 2*r));
 	prob[1] = (1-r)*r/(8+16*r);
 	prob[2] = r/(16+32*r);
-	nValues = 3;
 }
-template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDifferentProbs], double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
+template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 46>& prob, double r, int selfingGenerations, std::size_t nFunnels)
 {
 	if (nFunnels == 1)
 	{
@@ -454,20 +435,18 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(double(&prob)[nDiffe
 		prob[44] = (powD1*rMinus2Squared*rSquared) / (1680 * pow2);
 		prob[45] = (powD1*rMinus2Squared*rSquared) / (1680 * pow2);
 	}
-	nValues = 46;
 #ifndef NDEBUG
         double sum = 0;
         for(int i = 0; i < 46; i++) sum += prob[i];
 #endif
 }
-template<> void genotypeProbabilitiesWithIntercross<8, true>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int, std::size_t nFunnels, int& nValues)
+template<> void genotypeProbabilitiesWithIntercross<8, true>(std::array<double, 3>& prob, int nAIGenerations, double r, int, std::size_t nFunnels)
 {
 	double powOneMinusR = std::pow(1 - r, nAIGenerations-1);
 	prob[0] = (powOneMinusR*(1-r)*(1-r)*(1-r)/8 + (2 * r + 1 - powOneMinusR)/64)/(1 + 2 * r);
 	prob[1] = prob[2] = (1 - 8*prob[0])/56;
-	nValues = 3;
 }
-template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDifferentProbs], int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels, int& nValues)
+template<> void genotypeProbabilitiesWithIntercross<8, false>(std::array<double, 46>& prob, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 {
 	if (nFunnels == 1)
 	{
@@ -666,7 +645,6 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(double(&prob)[nDif
 		prob[44] = (quadratic4*toPowD1) / (1568 * oneMinusRSquared*pow2);
 		prob[45] = (quadratic4*toPowD1) / (1568 * oneMinusRSquared*pow2);
 	}
-	nValues = 46;
 #ifndef NDEBUG
 	double sum = 0;
 	for(int i = 0; i < 46; i++) sum += prob[i];

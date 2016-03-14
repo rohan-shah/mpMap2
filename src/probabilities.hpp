@@ -4,8 +4,14 @@
 #include <cmath>
 #include <stdexcept>
 #include <limits>
-const int nDifferentProbs = 100;
+#include <array>
+/*
+ * Struct that will contain arrays relevant for probability calculations
+ */
 template<int nFounders> struct probabilityData;
+/*
+ * The type for the expanded probability data, in the case of infinite selfing
+ */
 template<int nFounders> struct expandedProbabilitiesFiniteSelfing
 {
 public:
@@ -13,34 +19,53 @@ public:
 	{}
 	double values[nFounders][nFounders][nFounders][nFounders];
 };
+/*
+ * Type with a typedef, giving the type for the expanded probability data, both infinite generations of selfing and finite generations of selfing
+ */
 template<int nFounders, bool infiniteSelfing> struct expandedProbabilities;
+/*
+ * In the case of infinite selfing it's just a two-dimensional array
+ */
 template<int nFounders> struct expandedProbabilities<nFounders, true>
 {
 	typedef array2<nFounders> type;
 };
+/*
+ * In the finite selfing case we use the struct specially define above
+ */
 template<int nFounders> struct expandedProbabilities<nFounders, false>
 {
 	typedef expandedProbabilitiesFiniteSelfing<nFounders> type;
 };
-
-//Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
-template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(double(&prob)[nDifferentProbs], double recombinationFraction, int selfingGenerations, std::size_t nFunnels, int& nValues);
-template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(double(&prob)[nDifferentProbs], int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels, int& nValues);
-//Templated function to work out the single locus probabilities. This is needed for imputation / the Viterbi algorithm
+#include "compressedProbabilities.hpp"
+/*
+ * Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
+ */
+template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs>& prob, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
+template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs>& prob, int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
+/*
+ * Templated function to work out the single locus probabilities. This is needed for imputation / the Viterbi algorithm
+ */
 template<int nFounders, bool infiniteSelfing> void singleLocusGenotypeProbabilitiesNoIntercross(array2<nFounders>& data, int selfingGenerations, std::size_t nFunnels);
 template<int nFounders, bool infiniteSelfing> void singleLocusGenotypeProbabilitiesWithIntercross(array2<nFounders>& data, int selfingGenerations, std::size_t nFunnels);
+/*
+ * This struct has a static function that computes the compressed probabilities and immediately exands them to the right type
+ */ 
 template<int nFounders, bool infiniteSelfing, bool takeLogs> struct expandedGenotypeProbabilities;
+/*
+ * First the infinite generations of selfing case
+ */
 template<int nFounders, bool takeLogs> struct expandedGenotypeProbabilities<nFounders, true, takeLogs>
 {
 public:
 	static void noIntercross(array2<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
-		double probabilities[nDifferentProbs];
-		int nValues;
-		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations, nFunnels, nValues);
+		const int nDifferentProbs = compressedProbabilities<nFounders, true>::nDifferentProbs;
+		std::array<double, nDifferentProbs> probabilities;
+		genotypeProbabilitiesNoIntercross<nFounders, true>(probabilities, r, selfingGenerations, nFunnels);
 		if(takeLogs)
 		{
-			for(int i = 0; i < nValues; i++)
+			for(int i = 0; i < nDifferentProbs; i++)
 			{
 				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
 				else probabilities[i] = log(probabilities[i]);
@@ -56,12 +81,12 @@ public:
 	}
 	static void withIntercross(array2<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
 	{
-		double probabilities[nDifferentProbs];
-		int nValues;
-		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels, nValues);
+		const int nDifferentProbs = compressedProbabilities<nFounders, true>::nDifferentProbs;
+		std::array<double, nDifferentProbs> probabilities;
+		genotypeProbabilitiesWithIntercross<nFounders, true>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
 		if(takeLogs)
 		{
-			for(int i = 0; i < nValues; i++)
+			for(int i = 0; i < nDifferentProbs; i++)
 			{
 				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
 				else probabilities[i] = log(probabilities[i]);
@@ -76,18 +101,21 @@ public:
 		}
 	}
 };
+/*
+ * Now the finite generations of selfing case
+ */
 template<int nFounders, bool takeLogs> struct expandedGenotypeProbabilities<nFounders, false, takeLogs>
 {
 public:
 	static void noIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, double r, int selfingGenerations, std::size_t nFunnels)
 	{
-		double probabilities[nDifferentProbs];
-		int nValues;
-		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels, nValues);
+		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
+		std::array<double, nDifferentProbs> probabilities;
+		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
 		if(takeLogs)
 		{
-			for(int i = 0; i < nValues; i++)
+			for(int i = 0; i < nDifferentProbs; i++)
 			{
 				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
 				else probabilities[i] = log(probabilities[i]);
@@ -119,14 +147,14 @@ public:
 #endif
 	}
 	static void withIntercross(expandedProbabilitiesFiniteSelfing<nFounders>& expandedProbabilities, int nAIGenerations, double r, int selfingGenerations, std::size_t nFunnels)
-	{	
-		double probabilities[nDifferentProbs];
-		int nValues;
-		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels, nValues);
+	{
+		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
+		std::array<double, nDifferentProbs> probabilities;
+		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
 		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
 		if(takeLogs)
 		{
-			for(int i = 0; i < nValues; i++)
+			for(int i = 0; i < nDifferentProbs; i++)
 			{
 				if(probabilities[i] == 0) probabilities[i] = -std::numeric_limits<double>::infinity();
 				else probabilities[i] = log(probabilities[i]);
