@@ -24,6 +24,7 @@
 #include "multiparentSNP.h"
 #include "imputeFounders.h"
 #include "checkImputedBounds.h"
+#include "generateDesignMatrix.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -61,6 +62,7 @@ extern "C"
 		{"rawSymmetricMatrixSubsetByMatrix", (DL_FUNC)&rawSymmetricMatrixSubsetByMatrix, 2},
 		{"imputeFounders", (DL_FUNC)&imputeFounders, 4},
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 1},
+		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
