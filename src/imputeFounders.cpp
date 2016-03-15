@@ -341,8 +341,8 @@ BEGIN_RCPP
 		{
 			for(int j = 0; j < nFounders; j++)
 			{
-				outputKey(counter, 0) = i;
-				outputKey(counter, 1) = j;
+				outputKey(counter, 0) = i+1;
+				outputKey(counter, 1) = j+1;
 				outputKey(counter, 2) = key(i, j);
 				counter++;
 			}
