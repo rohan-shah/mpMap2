@@ -2,74 +2,81 @@
 #define INTERCROSSING_HAPLOTYPE_TO_MARKER_FINITE_SELFING_HEADER_GUARD
 template<int nFounders, int maxAlleles> struct intercrossingHaplotypeToMarker<nFounders, maxAlleles, false>
 {
-public:
-	typedef typename expandedProbabilities<nFounders, false>::type expandedProbabilitiesType;
-	intercrossingHaplotypeToMarker(xMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities)
-		: haplotypeProbabilities(haplotypeProbabilities)
+private:
+	intercrossingHaplotypeToMarker()
 	{}
-	xMajorMatrix<expandedProbabilitiesType>& haplotypeProbabilities;
-	template<bool takeLogs> void convert(array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
+public:
+	static const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
+	typedef typename std::array<double, nDifferentProbs> compressedProbabilitiesType;
+	template<bool takeLogs> static void convert(xMajorMatrix<compressedProbabilitiesType>& haplotypeProbabilities, array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
 	{
-		int nPoints = haplotypeProbabilities.getSizeX();
-		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
+		/*The funnel input only makes a difference to the result if there is a single funnel - If there was more than one funnel we assumed random funnels, in which case every choice of funnel here gives the same result. */
+		int funnel[nFounders];
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
-			convert<takeLogs>(markerProbabilitiesThisRecomb, haplotypeProbabilitiesThisRecomb, intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingGenerationsIndex);
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
 		}
-	}
-	template<bool takeLogs> static void convert(array2<maxAlleles>& markerProbabilitiesThisRecomb, expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
-	{
-		memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
+		int nPoints = haplotypeProbabilities.getSizeX();
+		int table[maxAlleles][maxAlleles][nDifferentProbs];
+		memset(table, 0, sizeof(int)*maxAlleles*maxAlleles*nDifferentProbs);
 		for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 		{
 			for(int firstFounder1 = 0; firstFounder1 < nFounders; firstFounder1++)
 			{
 				for(int firstFounder2 = 0; firstFounder2 < nFounders; firstFounder2++)
 				{
-					if(firstMarkerPatternData.hetData(firstFounder1, firstFounder2) == firstMarkerValue)
+					if(firstMarkerPatternData.hetData(funnel[firstFounder1], funnel[firstFounder2]) == firstMarkerValue)
 					{
+						int index1 = probabilityData<nFounders>::intermediateAllelesMask[firstFounder1][firstFounder2];
 						for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 						{
 							for(int secondFounder1 = 0; secondFounder1 < nFounders; secondFounder1++)
 							{
 								for(int secondFounder2 = 0; secondFounder2 < nFounders; secondFounder2++)
 								{
-									if(secondMarkerPatternData.hetData(secondFounder1, secondFounder2) == secondMarkerValue)
+									if(secondMarkerPatternData.hetData(funnel[secondFounder1], funnel[secondFounder2]) == secondMarkerValue)
 									{
-										markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] += haplotypeProbabilitiesThisRecomb.values[firstFounder1][firstFounder2][secondFounder1][secondFounder2];
+										int index2 = probabilityData<nFounders>::intermediateAllelesMask[secondFounder1][secondFounder2];
+										table[firstMarkerValue][secondMarkerValue][probabilityData<nFounders>::intermediateProbabilitiesMask[index1][index2]]++;
 									}
 								}
-							 }
+							}
 						}
 					}
 				}
 			}
 		}
-		if(takeLogs)
+
+		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
-#ifndef NDEBUG
-			double sum = 0;
-#endif
-			//now take logs of every value in markerProbabilities
+			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
+			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 				{
-#ifndef NDEBUG
-					sum += markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue];
-#endif
-					if(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] == 0) markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = -std::numeric_limits<double>::infinity();
-					else markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue]);
+					double currentMarkerProb = 0;
+					for(int differentProbCounter = 0; differentProbCounter < nDifferentProbs; differentProbCounter++)
+					{
+						if(table[firstMarkerValue][secondMarkerValue][differentProbCounter] > 0) currentMarkerProb += table[firstMarkerValue][secondMarkerValue][differentProbCounter]*haplotypeProbabilitiesThisRecomb[differentProbCounter];
+					}
+					if(takeLogs)
+					{
+						if(currentMarkerProb == 0) currentMarkerProb = -std::numeric_limits<double>::infinity();
+						else currentMarkerProb = log10(currentMarkerProb);
+					}
+					markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = currentMarkerProb;
 				}
 			}
-#ifndef NDEBUG
-			if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
-#endif
 		}
 	}
-	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, expandedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
+	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
 	{
+		int funnel[nFounders];
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+		}
 		memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<16>));
 		for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 		{
@@ -77,7 +84,8 @@ public:
 			{
 				for(int firstFounder2 = 0; firstFounder2 < nFounders; firstFounder2++)
 				{
-					if(firstMarkerPatternData.hetData(firstFounder1, firstFounder2) == firstMarkerValue)
+					int index1 = probabilityData<nFounders>::intermediateAllelesMask[firstFounder1][firstFounder2];
+					if(firstMarkerPatternData.hetData(funnel[firstFounder1], funnel[firstFounder2]) == firstMarkerValue)
 					{
 						for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 						{
@@ -85,9 +93,10 @@ public:
 							{
 								for(int secondFounder2 = 0; secondFounder2 < nFounders; secondFounder2++)
 								{
-									if(secondMarkerPatternData.hetData(secondFounder1, secondFounder2) == secondMarkerValue)
+									int index2 = probabilityData<nFounders>::intermediateAllelesMask[secondFounder1][secondFounder2];
+									if(secondMarkerPatternData.hetData(funnel[secondFounder1], funnel[secondFounder2]) == secondMarkerValue)
 									{
-										markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] += haplotypeProbabilitiesThisRecomb.values[firstFounder1][firstFounder2][secondFounder1][secondFounder2];
+										markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] += haplotypeProbabilitiesThisRecomb[probabilityData<nFounders>::intermediateProbabilitiesMask[index1][index2]];
 									}
 								}
 							 }
