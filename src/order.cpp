@@ -247,7 +247,11 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 					imputationProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 				{
+#ifdef CUSTOM_STATIC_RCPP
 					setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#else
+					setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#endif
 				};
 			}
 			bool imputationResult = impute(imputedRawPtr, levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
@@ -284,7 +288,11 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			orderingProgressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 			{
+#ifdef CUSTOM_STATIC_RCPP
 				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#else
+				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#endif
 			};
 		}
 		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, orderingProgressFunction);

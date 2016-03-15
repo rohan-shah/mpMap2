@@ -320,7 +320,11 @@ BEGIN_RCPP
 			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 			{
+#ifdef CUSTOM_STATIC_RCPP
 				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#else
+				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#endif
 			};
 		}
 
@@ -519,7 +523,11 @@ BEGIN_RCPP
 		barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 		progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 		{
+#ifdef CUSTOM_STATIC_RCPP
 			setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#else
+			setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
+#endif
 		};
 	}
 	//Now overwrite the markersCurrentGroup vector with consecutive numbers. Because we've extracted a subset of the matrix into its own memory. 

@@ -274,7 +274,11 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 				{
 					try
 					{
+#ifdef CUSTOM_STATIC_RCPP
 						setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
+#else
+						setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)(nDesigns*nValuesToEstimate)));
+#endif
 					}
 					catch(...)
 					{
