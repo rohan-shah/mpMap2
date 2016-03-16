@@ -1,10 +1,23 @@
 ## mpMap2
 
-This is an updated version of the mpMap package for map construction and QTL mapping in RIL designs. This includes the F2, RIL, and 4- and 8- parent versions of those designs.
+This is an updated version of the mpMap package for map construction in multi-parent experimental designs. The goals of this package are
+
+1. To write functionality in C++ where required for acceptable performance. 
+2. To make use of the S4 object system, to enable easier integration of C++ code and more rigid validation.
+3. To extend the package to biparental and 16-parent populations. 
+4. To allow for finite generations of selfing, and therefore incorporate hetrozygous lines into the map construction process. 
+5. To allow the user to asses the computational resources required for an analysis. 
+6. To allow map construction to be performed visually and interactively. 
+7. To allow the simultaneous use of multiple experiments in the construction of a single map. 
+8. To use unit testing to speed up development. 
+
+For further details see the package vignette. 
+
+##Package compilation
 
 This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. The CMake build files allow compilation using Visual Studio on Windows.
 
-##Compilation on Windows using CMake and Visual Studio
+###Compilation on Windows using CMake and Visual Studio
 
 1. Download and compile the customized version of Rcpp from github repository rohan-shah/Rcpp. See the associated Readme file for details on compiling that code. 
 2. Run the cmake gui. 
