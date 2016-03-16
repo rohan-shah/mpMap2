@@ -132,7 +132,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		}
 		catch(...)
 		{
-			throw std::runtime_error("Input verbose must be a list with entries verbose and progressStyle");
+			throw std::runtime_error("Input verbose must be a boolean or a list with entries verbose and progressStyle");
 		}
 		if (progressStyle < 1 || progressStyle > 3)
 		{

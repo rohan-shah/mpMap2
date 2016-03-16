@@ -314,6 +314,7 @@ BEGIN_RCPP
 
 	std::vector<std::string> foundersMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(founders));
 	std::vector<std::string> finalsMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(finals));
+	std::vector<std::string> lineNames = Rcpp::as<std::vector<std::string> >(Rcpp::rownames(finals));
 
 	Rcpp::Function nFoundersFunc("nFounders");
 	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
@@ -378,25 +379,34 @@ BEGIN_RCPP
 
 	int nFinals = finals.nrow();
 	Rcpp::IntegerMatrix results(nFinals, (int)mapMarkers.size());
-	if(nFounders == 2)
+	try
 	{
-		imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		if(nFounders == 2)
+		{
+			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		}
+		else if(nFounders == 4)
+		{
+			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		}
+		else if(nFounders == 8)
+		{
+			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		}
+		else if(nFounders == 16)
+		{
+			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		}
+		else
+		{
+			throw std::runtime_error("Number of founders must be 2, 4, 8 or 16");
+		}
 	}
-	else if(nFounders == 4)
+	catch(impossibleDataException err)
 	{
-		imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
-	}
-	else if(nFounders == 8)
-	{
-		imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
-	}
-	else if(nFounders == 16)
-	{
-		imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
-	}
-	else
-	{
-		throw std::runtime_error("Number of founders must be 2, 4, 8 or 16");
+		std::stringstream ss;
+		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 
+		throw std::runtime_error(ss.str().c_str());
 	}
 	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey);
 END_RCPP

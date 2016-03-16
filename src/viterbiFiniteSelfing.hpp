@@ -176,10 +176,10 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 					}
 				}
 			}
-#ifndef NDEBUG
+			//If this condition throws, it's almost guaranteed to be because the map contains two markers at the same location, but the data implies a non-zero distance because recombinations are observed to occur between them. 
 			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
-			if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
-#endif
+			if(*longest == -std::numeric_limits<double>::infinity()) throw impossibleDataException(markerCounter, finalCounter);
+
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)
@@ -293,10 +293,10 @@ stopIdenticalSearch:
 					}
 				}
 			}
-#ifndef NDEBUG
+			//If this condition throws, it's almost guaranteed to be because the map contains two markers at the same location, but the data implies a non-zero distance because recombinations are observed to occur between them.
 			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
-			if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
-#endif
+			if(*longest == -std::numeric_limits<double>::infinity()) throw impossibleDataException(markerCounter, finalCounter);
+
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)

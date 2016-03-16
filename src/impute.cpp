@@ -280,14 +280,18 @@ BEGIN_RCPP
 		throw std::runtime_error("Slot mpcross@lg@allGroups must be an integer vector");
 	}
 
+	Rcpp::List verboseList;
 	bool verbose;
+	int progressStyle;
 	try
 	{
-		verbose = Rcpp::as<bool>(verbose_sexp);
+		verboseList = Rcpp::as<Rcpp::List>(verbose_sexp);
+		verbose = Rcpp::as<bool>(verboseList("verbose"));
+		progressStyle = Rcpp::as<int>(verboseList("progressStyle"));
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input verbose must be a boolean");
+		throw std::runtime_error("Input verbose must be a boolean or a list with entries verbose and progressStyle");
 	}
 
 	std::vector<int> markersCurrentGroup;
@@ -317,7 +321,7 @@ BEGIN_RCPP
 		if(verbose)
 		{
 			Rcpp::Rcout << "Starting imputation for group " << *group << std::endl;
-			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+			barHandle = txtProgressBar(Rcpp::Named("style") = progressStyle, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 			progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 			{
 #ifdef CUSTOM_STATIC_RCPP
@@ -491,14 +495,18 @@ BEGIN_RCPP
 		throw std::runtime_error("No markers belonged to the specified group");
 	}
 
+	Rcpp::List verboseList;
 	bool verbose;
+	int progressStyle;
 	try
 	{
-		verbose = Rcpp::as<bool>(verbose_sexp);
+		verboseList = Rcpp::as<Rcpp::List>(verbose_sexp);
+		verbose = Rcpp::as<bool>(verboseList("verbose"));
+		progressStyle = Rcpp::as<int>(verboseList("progressStyle"));
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input verbose must be a boolean");
+		throw std::runtime_error("Input verbose must be a boolean or a list with entries verbose and progressStyle");
 	}
 
 	Rcpp::RawVector copiedTheta(((unsigned long long)markersCurrentGroup.size()*((unsigned long long)markersCurrentGroup.size() + 1ULL))/2ULL);
@@ -520,7 +528,7 @@ BEGIN_RCPP
 	if(verbose)
 	{
 		Rcpp::Rcout << "Starting imputation for group " << group << std::endl;
-		barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+		barHandle = txtProgressBar(Rcpp::Named("style") = progressStyle, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 		progressFunction = [barHandle, setTxtProgressBar](unsigned long done, unsigned long totalSteps)
 		{
 #ifdef CUSTOM_STATIC_RCPP

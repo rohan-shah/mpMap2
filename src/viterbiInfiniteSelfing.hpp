@@ -106,7 +106,6 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					}
 					//Get the shortest one, and check that it's not negative infinity.
 					std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
-					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(funnel[founderCounter], identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
@@ -118,6 +117,10 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					pathLengths2[funnel[founderCounter]] = -std::numeric_limits<double>::infinity();
 				}
 			}
+			//If this condition throws, it's almost guaranteed to be because the map contains two markers at the same location, but the data implies a non-zero distance because recombinations are observed to occur between them.
+			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
+			if(*longest == -std::numeric_limits<double>::infinity()) throw impossibleDataException(markerCounter, finalCounter);
+
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)
@@ -174,7 +177,6 @@ stopIdenticalSearch:
 					}
 					//Get the longest one, and check that it's not negative infinity.
 					std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
-					if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(founderCounter, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(markerCounter - start + 1 - identicalIndex));
@@ -186,6 +188,10 @@ stopIdenticalSearch:
 					pathLengths2[founderCounter] = -std::numeric_limits<double>::infinity();
 				}
 			}
+			//If this condition throws, it's almost guaranteed to be because the map contains two markers at the same location, but the data implies a non-zero distance because recombinations are observed to occur between them.
+			std::vector<double>::iterator longest = std::max_element(pathLengths2.begin(), pathLengths2.end());
+			if(*longest == -std::numeric_limits<double>::infinity()) throw impossibleDataException(markerCounter, finalCounter);
+
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)

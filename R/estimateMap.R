@@ -40,6 +40,7 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1)
 		map[[as.character(group)]] <- c(0, cumsum(result$x[which(indices[,1] == indices[,2]+1)]))
 		names(map[[as.character(group)]]) <- rfData@markers
 	}
+	class(map) <- "map"
 	return(map)
 }
 designMat <- function(n, maxOffset)

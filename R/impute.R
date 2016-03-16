@@ -10,6 +10,34 @@ impute <- function(mpcrossLG, verbose = FALSE)
 	{
 		stop("Input mpcrossLG object did not contain recombination fraction information")
 	}
+	if(is.logical(verbose))
+	{
+		if(is.na(verbose))
+		{
+			stop("Input verbose cannot be NA")
+		}
+		else if(verbose)
+		{
+			verbose <- list(verbose = TRUE, progressStyle = 3L)
+		}
+		else verbose <- list(verbose = FALSE, progressStyle = 3L)
+	}
+	else
+	{
+		if(!is.list(verbose) || !("progressStyle" %in% names(verbose)) || !("verbose" %in% names(verbose)))
+		{
+			stop("Input verbose must be TRUE, FALSE, or a list with entries named progressStyle and verbose")
+		}
+		if(length(verbose$progressStyle) != 1L || !(verbose$progressStyle %in% 0:3))
+		{
+			stop("Input verbose$progressStyle must have value 0, 1, 2 or 3")
+		}
+		if(!is.logical(verbose$verbose) || length(verbose$verbose) != 1L)
+		{
+			stop("Input verbose$verbose must have value 0, 1, 2 or 3")
+		}
+	}
+
 	mpcrossLG@lg@imputedTheta <- list()
 	for(counter in 1:length(mpcrossLG@lg@allGroups))
 	{
