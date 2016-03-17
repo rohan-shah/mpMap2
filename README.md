@@ -1,15 +1,23 @@
-## mpMap2
+## mpMap2: Map construction for multi-parent crosses
 
-This is an updated version of the mpMap package for map construction in multi-parent experimental designs. The goals of this package are
+**Authors**: Rohan Shah, Emma Huang
 
-1. To write functionality in C++ where required for acceptable performance. 
-2. To make use of the S4 object system, to enable easier integration of C++ code and more rigid validation.
-3. To extend the package to biparental and 16-parent populations. 
-4. To allow for finite generations of selfing, and therefore incorporate hetrozygous lines into the map construction process. 
-5. To allow the user to asses the computational resources required for an analysis. 
-6. To allow map construction to be performed visually and interactively. 
-7. To allow the simultaneous use of multiple experiments in the construction of a single map. 
-8. To use unit testing to speed up development. 
+R/mpMap2 is a software package for constructing genetic linkage maps from a family of experimental designs known as **multi-parent crosses**. These types of designs begin with 2^n inbred founder lines, and may incorporate random intermating and inbreeding by selfing. These designs have found recent application in Arabadopsis, barley, rice, maize, tomatoes and wheat. However there do not appear to be appropriate computational tools to perform map construction using data generated from current experimental populations, which may include thousands of lines and over 100,000 markers.
+
+From a statistical point of view R/mpMap2 is extremely flexible. It can handle 2-, 4-, 8- and 16- parent designs, and allows for the explicit modelling of hetrozygotes in every design. It will also impute underlying hetrozygote genotypes, allowing the identification of residual hetrozygosity for future experiments. 
+
+From a computational point of view, R/mpMap2 aims to allow the user to analyse these types of large populations using the minimum possible computational resources. It outputs diagnostic information about the amount of memory used and the progress of operations, and can be instructed to use a limited amount of working memory for some calculations. Unlike the previous version of this package, R/mpMap2 uses only simple OpenMP multi-threading, making it simpler to compile and run.
+
+R/mpMap2 also has an associated visualisation tool R/mpMapInteractive2, which uses the Qt graphics framework. This tool can be used to visually inspect and alter the data during the mapping process.
+
+This package builds on R/mpMap by Emma Huang. Compared to that previous version, the following significant improvements have been made:
+1. R/mpMap2 now uses the S4 object system, and enforces stricter checks on the data. 
+2. R/mpMap2 supports designs with finite generations of selfing, so that the genotyped lines do not have to be inbred. 
+3. As well as the 4-parent and 8-parent designs, R/mpMap2 now supports biparental designs and 16-parent designs.
+4. R/mpMap2 outputs diagnostics about the amount of memory required, and can output the progress of most operations. 
+5. When the number of markers and lines is large R/mpMap2 will use significantly less memory and run computations significantly faster. This allows the analysis of data-sets which were previously infeasible. 
+6. R/mpMap2 allows the use of multiple data-sets to construct a single genetic map.
+7. R/mpMap2 uses only simple OpenMP parallelisation and is therefore simpler to compile and run than R/mpMap, which made use of GPUs and MPI. 
 
 For further details see the package vignette. 
 
