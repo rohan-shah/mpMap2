@@ -11,6 +11,7 @@ From a computational point of view, R/mpMap2 aims to allow the user to analyse t
 R/mpMap2 also has an associated visualisation tool R/mpMapInteractive2, which uses the Qt graphics framework. This tool can be used to visually inspect and alter the data during the mapping process.
 
 This package builds on R/mpMap by Emma Huang. Compared to that previous version, the following significant improvements have been made:
+
 1. R/mpMap2 now uses the S4 object system, and enforces stricter checks on the data. 
 2. R/mpMap2 supports designs with finite generations of selfing, so that the genotyped lines do not have to be inbred. 
 3. As well as the 4-parent and 8-parent designs, R/mpMap2 now supports biparental designs and 16-parent designs.
