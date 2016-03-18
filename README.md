@@ -24,7 +24,9 @@ For further details see the package vignette.
 
 ##Package compilation
 
-This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
+This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. On windows, compilation using the standard toolset **requires Rtools 3.3**.
+
+The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
 
 ###Compilation on Windows using CMake and Visual Studio
 
