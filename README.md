@@ -4,7 +4,7 @@
 
 R/mpMap2 is a software package for constructing genetic linkage maps from a family of experimental designs known as **multi-parent crosses**. These types of designs begin with 2^n inbred founder lines, and may incorporate random intermating and inbreeding by selfing. These designs have found recent application in Arabadopsis, barley, rice, maize, tomatoes and wheat. However there do not appear to be appropriate computational tools to perform map construction using data generated from current experimental populations, which may include thousands of lines and over 100,000 markers.
 
-From a statistical point of view R/mpMap2 is extremely flexible. It can handle 2-, 4-, 8- and 16- parent designs, and allows for the explicit modelling of hetrozygotes in every design. It will also impute underlying hetrozygote genotypes, allowing the identification of residual hetrozygosity for future experiments. 
+R/mpMap2 aims to allow the construction of genetic maps using these populations. From a statistical point of view R/mpMap2 is extremely flexible. It can handle 2-, 4-, 8- and 16- parent designs, and allows for the explicit modelling of heterozygotes in every design. It will also impute underlying heterozygote genotypes, allowing the identification of residual heterozygosity for future experiments. 
 
 From a computational point of view, R/mpMap2 aims to allow the user to analyse these types of large populations using the minimum possible computational resources. It outputs diagnostic information about the amount of memory used and the progress of operations, and can be instructed to use a limited amount of working memory for some calculations. Unlike the previous version of this package, R/mpMap2 uses only simple OpenMP multi-threading, making it simpler to compile and run.
 
@@ -24,7 +24,7 @@ For further details see the package vignette.
 
 ##Package compilation
 
-This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. On windows, compilation using the standard toolset **requires Rtools 3.3**.
+This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. On Windows, compilation using the standard toolset **requires Rtools 3.3**.
 
 The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
 
