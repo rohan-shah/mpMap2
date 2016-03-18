@@ -19,9 +19,9 @@ test_that("Test zero generations of intercrossing",
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 		pedigree1 <- f2Pedigree(1000)
-		pedigree1@selfing <- "auto"
+		pedigree1@selfing <- "finite"
 		pedigree2 <- rilPedigree(populationSize = 1000, selfingGenerations = 2)
-		pedigree2@selfing <- "auto"
+		pedigree2@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(map in maps)
 		{
@@ -51,13 +51,13 @@ test_that("Test non-zero generations of intercrossing",
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 1)
-		pedigree1@selfing <- "auto"
+		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 2)
-		pedigree2@selfing <- "auto"
+		pedigree2@selfing <- "finite"
 		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
-		pedigree3@selfing <- "auto"
+		pedigree3@selfing <- "finite"
 		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
-		pedigree4@selfing <- "auto"
+		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(map in maps)

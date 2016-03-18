@@ -14,7 +14,7 @@ test_that("Numerically accurate with selfing and intercrossing and randomly chos
 			for(selfingGenerations in 0:3)
 			{
 				pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize=100000, selfingGenerations = selfingGenerations, intercrossingGenerations = intercrossingGenerations, nSeeds = 1)
-				pedigree@selfing <- "auto"
+				pedigree@selfing <- "finite"
 				for(distance in distances)
 				{
 					map <- getMap(distance)

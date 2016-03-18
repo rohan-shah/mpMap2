@@ -32,7 +32,7 @@ test_that("Check that the eight-parent uninformative marker combination gives an
 		}
 		testFiniteSelfing <- function(pedigree)
 		{
-			pedigree@selfing <- "auto"
+			pedigree@selfing <- "finite"
 			map <- sim.map(len = 10, n.mar = 2, anchor.tel=TRUE, include.x=FALSE, sex.sp=FALSE, eq.spacing=TRUE)
 			cross <- simulateMPCross(pedigree = pedigree, map = map, mapFunction = haldane)
 			firstHetData <- cross@geneticData[[1]]@hetData[[1]]

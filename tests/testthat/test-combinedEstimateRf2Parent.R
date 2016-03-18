@@ -34,7 +34,7 @@ test_that("Checking that a ril design, when split into 100 different datasets, g
 		expect_equal(multipleDatasetsRf@rf@lkhd, singleDatasetRf@rf@lkhd)
 
 		#Now with only finite generations of selfing assumed.
-		rilPedigree@selfing <- "auto"
+		rilPedigree@selfing <- "finite"
 		cross <- simulateMPCross(map=map, pedigree=rilPedigree, mapFunction = haldane)
 		crosses <- subset(cross, lines = 1:5)
 		for(i in 2:100)
@@ -68,7 +68,7 @@ test_that("Checking that a 4-way design without selfing and with a single funnel
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		fourParentPedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
-		fourParentPedigree@selfing <- "auto"
+		fourParentPedigree@selfing <- "finite"
 		cross <- simulateMPCross(map=map, pedigree=fourParentPedigree, mapFunction = haldane)
 		crosses <- subset(cross, lines = 1:5)
 		for(i in 2:100)
@@ -102,7 +102,7 @@ test_that("Checking that a 4-way design without selfing, with random funnels and
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		fourParentPedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
-		fourParentPedigree@selfing <- "auto"
+		fourParentPedigree@selfing <- "finite"
 		cross <- simulateMPCross(map=map, pedigree=fourParentPedigree, mapFunction = haldane)
 		crosses <- subset(cross, lines = 1:5)
 		for(i in 2:100)

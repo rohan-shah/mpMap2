@@ -86,7 +86,7 @@ test_that("Father and mother must come before offspring in pedigree",
 		copied@father[10] <- 11L
 		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
-test_that("Attribute selfing must be either \"infinite\" or \"auto\"",
+test_that("Attribute selfing must be either \"infinite\" or \"finite\"",
 	{
 		copied <- pedigree
 		copied@selfing <- "other"
@@ -101,7 +101,7 @@ test_that("lineNames must be unique",
 test_that("Number of founders must be at least 2",
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree@selfing <- "auto"
+		pedigree@selfing <- "finite"
 		pedigree@initial <- 1L
 		pedigree@mother <- pedigree@father <- 0:1005
 		expect_that(validObject(pedigree, complete=TRUE), throws_error())

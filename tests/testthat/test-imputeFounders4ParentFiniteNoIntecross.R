@@ -32,13 +32,13 @@ test_that("Test zero generations of intercrossing, with marker hetrozygotes",
 		maps <- list(map1, map2)
 
 		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree1@selfing <- "auto"
+		pedigree1@selfing <- "finite"
 		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree2@selfing <- "auto"
+		pedigree2@selfing <- "finite"
 		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree3@selfing <- "auto"
+		pedigree3@selfing <- "finite"
 		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree4@selfing <- "auto"
+		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(map in maps)
@@ -79,13 +79,13 @@ test_that("Test zero generations of intercrossing, without marker hetrozygotes",
 		maps <- list(map1, map2)
 
 		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree1@selfing <- "auto"
+		pedigree1@selfing <- "finite"
 		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree2@selfing <- "auto"
+		pedigree2@selfing <- "finite"
 		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree3@selfing <- "auto"
+		pedigree3@selfing <- "finite"
 		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 0)
-		pedigree4@selfing <- "auto"
+		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(map in maps)

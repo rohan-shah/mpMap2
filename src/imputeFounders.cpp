@@ -256,13 +256,13 @@ BEGIN_RCPP
 	{
 		infiniteSelfing = true;
 	}
-	else if(pedigreeSelfingSlot == "auto")
+	else if(pedigreeSelfingSlot == "finite")
 	{
 		infiniteSelfing = false;
 	}
 	else
 	{
-		throw std::runtime_error("Input geneticData@pedigree@selfing must be \"infinite\" or \"auto\"");
+		throw std::runtime_error("Input geneticData@pedigree@selfing must be \"infinite\" or \"finite\"");
 	}
 
 	Rcpp::List hetData;

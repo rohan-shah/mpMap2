@@ -1,4 +1,12 @@
+#' Pedigree for simulation
+#' 
+#' Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows us to simulate a data set with the given pedigree. 
+#' @slot initial The indices of the inbred founder lines in the pedigree. These founders lines must be the first lines in the pedigree. 
+#' @slot observed A logical vector with one value per line in the pedigree. A value of \code{TRUE} indicates that this line will be genotyped. 
+#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
 #' @include pedigree-class.R
+#' @example
+#' 
 checkDetailedPedigree <- function(object)
 {
 	nTotalLines <- length(object@lineNames)

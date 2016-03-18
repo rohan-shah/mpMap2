@@ -1,4 +1,4 @@
- #' Simulate data from multi-parent designs
+#' Simulate data from multi-parent designs
 #' 
 #' Data is simulated according to a pedigree, map and QTL model
 #' @export
