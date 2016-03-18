@@ -49,7 +49,7 @@ BEGIN_RCPP
 		throw std::runtime_error("Encodings in imputed@key must be consecutive integers");
 	}
 
-	int upperBound = encodings.size();
+	int upperBound = (int)encodings.size();
 	for(int i = 0; i < dataMatrix.size(); i++)
 	{
 		if(dataMatrix(i) < 1 || dataMatrix(i) > upperBound)

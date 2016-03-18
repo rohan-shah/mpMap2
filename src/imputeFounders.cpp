@@ -184,8 +184,8 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 
 		}
 		//dispatch based on whether we have infinite generations of selfing or not. 
-		viterbi.apply(cumulativeMarkerCounter, cumulativeMarkerCounter+positions.size());
-		cumulativeMarkerCounter += positions.size();
+		viterbi.apply(cumulativeMarkerCounter, cumulativeMarkerCounter+(int)positions.size());
+		cumulativeMarkerCounter += (int)positions.size();
 	}
 }
 template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double hetrozygoteMissingProb, Rcpp::IntegerMatrix key)
