@@ -16,7 +16,8 @@ Depends:
     methods,
     igraph,
     Rcpp,
-    fastcluster
+    fastcluster,
+    pryr
 Suggests:
     asreml,
     happy.hbrem

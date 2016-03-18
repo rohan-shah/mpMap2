@@ -14,7 +14,8 @@ Depends:
     qtl,
     methods,
     igraph,
-    fastcluster
+    fastcluster,
+    pryr
 Suggests: 
     asreml,
     happy.hbrem
