@@ -51,15 +51,15 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 #endif
 	{
 		triangularIterator indexIterator = args.startPosition;
-		int previousCounter = 0;
+		unsigned long long previousCounter = 0;
 #ifdef USE_OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
-		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
+		for(unsigned long long counter = 0; counter < args.valuesToEstimateInChunk; counter++)
 		{
-			int difference = counter - previousCounter;
-			if(difference < 0) throw std::runtime_error("Internal error");
-			while(difference > 0) 
+			signed long long difference = counter - previousCounter;
+			if(difference < 0LL) throw std::runtime_error("Internal error");
+			while(difference > 0LL) 
 			{
 				indexIterator.next();
 				difference--;
@@ -75,7 +75,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
 			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			bool swap = markerPatternID1 > markerPatternID2;
-			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+			for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
 			{
 				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
@@ -135,7 +135,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
 	std::size_t nDifferentFunnels = args.lineFunnelEncodings.size();
-	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
 
@@ -204,7 +203,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 				if(swap) std::swap(marker1Value, marker2Value);
 				if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 				{
-					bool allowable = false;
 					int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
 					int selfingGenerations = args.selfingGenerations[finalCounter];
 					if(intercrossingGenerations == 0)
@@ -238,7 +236,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 									contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
 								}
 							}
-							for(int funnelID = 0; funnelID < nDifferentFunnels; funnelID++)
+							for(int funnelID = 0; funnelID < (int)nDifferentFunnels; funnelID++)
 							{
 								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
 								if(count == 0) continue;

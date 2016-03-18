@@ -21,7 +21,7 @@ inline void getPairForSwap(R_xlen_t n, R_xlen_t& swap1, R_xlen_t& swap2)
 inline double deltaFromComponents(std::vector<double>& levels, std::vector<int>& deltaComponents)
 {
 	double delta = 0;
-	for(int i = 0; i < levels.size(); i++)
+	for(int i = 0; i < (int)levels.size(); i++)
 	{
 		delta += deltaComponents[i]*levels[i];
 	}

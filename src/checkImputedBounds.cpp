@@ -44,7 +44,7 @@ BEGIN_RCPP
 	}
 	std::sort(encodings.begin(), encodings.end());
 	encodings.erase(std::unique(encodings.begin(), encodings.end()), encodings.end());
-	if(encodings[0] != 1 || *encodings.rbegin() != encodings.size())
+	if(encodings[0] != 1 || *encodings.rbegin() != (int)encodings.size())
 	{
 		throw std::runtime_error("Encodings in imputed@key must be consecutive integers");
 	}

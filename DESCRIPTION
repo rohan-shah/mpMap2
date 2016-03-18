@@ -13,20 +13,17 @@ LazyLoad: yes
 SystemRequirements: C++11
 Depends:
     qtl,
-    seriation,
     methods,
     igraph,
     Rcpp,
     fastcluster
 Suggests:
-    Rmpi,
     asreml,
     happy.hbrem
 Imports:
-    wgaim,
     ggplot2,
     Matrix
-LinkingTo: Rcpp, qtl
+LinkingTo: Rcpp
 Collate:
     'Rcpp_exceptions.R'
     'combineGenotypes.R'

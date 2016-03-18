@@ -25,7 +25,6 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	for(R_xlen_t i = 0; i < n; i++)
 	{
 		if(i == swap1 || i == swap2) continue;
-		R_xlen_t permutationI = randomPermutation[i];
 		R_xlen_t permutationI_1 = randomPermutation[i], copiedPermutationSwap1 = permutationSwap1, copiedPermutationSwap2 = permutationSwap2;
 		R_xlen_t permutationI_2 = permutationI_1;
 		if(copiedPermutationSwap1 < permutationI_1) std::swap(copiedPermutationSwap1, permutationI_1);

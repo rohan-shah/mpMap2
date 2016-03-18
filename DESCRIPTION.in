@@ -12,16 +12,12 @@ License: GPL-2
 LazyLoad: yes
 Depends: 
     qtl,
-    seriation,
     methods,
     igraph,
     fastcluster
 Suggests: 
-    Rmpi,
     asreml,
     happy.hbrem
 Imports: 
-    wgaim,
     ggplot2,
     Matrix
-LinkingTo: qtl
