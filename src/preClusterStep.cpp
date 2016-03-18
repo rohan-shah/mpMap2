@@ -85,7 +85,7 @@ BEGIN_RCPP
 		newContinuingGroups.clear();
 	}
 	Rcpp::List result(finalisedGroups.size());
-	for(int i = 0; i < finalisedGroups.size(); i++)
+	for(std::size_t i = 0; i < finalisedGroups.size(); i++)
 	{
 		Rcpp::IntegerVector currentGroup = Rcpp::wrap(finalisedGroups[i].data);
 		//Add 1, because these are going to be R indices

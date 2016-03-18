@@ -115,7 +115,7 @@ BEGIN_RCPP
 			if(finals(k, i) == NA_INTEGER) isNA[k] = true;
 		}
 		//Work out which of the finals become 1
-		for(int j = 0; j < oneAllelesFinalValues.size(); j++)
+		for(int j = 0; j < (int)oneAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{
@@ -126,7 +126,7 @@ BEGIN_RCPP
 			}
 		}
 		//..and which become 0
-		for(int j = 0; j < zeroAllelesFinalValues.size(); j++)
+		for(int j = 0; j < (int)zeroAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{
@@ -273,7 +273,7 @@ BEGIN_RCPP
 			if(finals(k, i) == NA_INTEGER) isNA[k] = true;
 		}
 		//Work out which of the finals become 1
-		for(int j = 0; j < oneAllelesFinalValues.size(); j++)
+		for(int j = 0; j < (int)oneAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{
@@ -284,7 +284,7 @@ BEGIN_RCPP
 			}
 		}
 		//..and which become 0
-		for(int j = 0; j < zeroAllelesFinalValues.size(); j++)
+		for(int j = 0; j < (int)zeroAllelesFinalValues.size(); j++)
 		{
 			for(int k = 0; k < nLines; k++)
 			{

@@ -539,7 +539,7 @@ BEGIN_RCPP
 		};
 	}
 	//Now overwrite the markersCurrentGroup vector with consecutive numbers. Because we've extracted a subset of the matrix into its own memory. 
-	for(int i = 0; i < markersCurrentGroup.size(); i++)
+	for(int i = 0; i < (int)markersCurrentGroup.size(); i++)
 	{
 		markersCurrentGroup[i] = i;
 	}

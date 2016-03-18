@@ -1,6 +1,5 @@
 #' @import qtl
 #' @import igraph
-#' @import seriation
 #' @importFrom pryr address
 #' @exportClass pedigreeGraph
 #' @exportMethod subset 

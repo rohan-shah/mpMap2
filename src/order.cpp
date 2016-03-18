@@ -124,7 +124,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		{
 			Rcpp::Rcout << "Using previously imputed recombination fraction matrices" << std::endl;
 		}
-		if(imputedTheta.size() != allGroups.size())
+		if((int)imputedTheta.size() != (int)allGroups.size())
 		{
 			throw std::runtime_error("Slot mpcrossLG@lg@imputedTheta had the wrong length");
 		}
@@ -215,27 +215,27 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 				markersThisGroup.push_back((int)std::distance(groups.begin(), currentMarkerGroup));
 			}
 		}
-		int nMarkersCurrentGroup = (int)markersThisGroup.size();
+		std::size_t nMarkersCurrentGroup = (int)markersThisGroup.size();
 		if(nMarkersCurrentGroup == 0) continue;
 		
 		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
-		for(int i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = i;
+		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = (int)i;
 
 		if(!hasImputedTheta)
 		{
 			//Do imputation
 			//So first make a copy of the raw data subset
-			imputedRaw.resize((nMarkersCurrentGroup * (nMarkersCurrentGroup + 1)) / 2);
+			imputedRaw.resize((nMarkersCurrentGroup * (nMarkersCurrentGroup + 1ULL)) / 2ULL);
 			imputedRawPtr = &(imputedRaw[0]);
 			//column
-			for(int i = 0; i < nMarkersCurrentGroup; i++)
+			for(std::size_t i = 0; i < nMarkersCurrentGroup; i++)
 			{
 				//row
-				for(int j = 0; j <= i; j++)
+				for(std::size_t j = 0; j <= i; j++)
 				{
-					int row = markersThisGroup[j], column = markersThisGroup[i];
+					std::size_t row = (std::size_t)markersThisGroup[j], column = (std::size_t)markersThisGroup[i];
 					if(row > column) std::swap(row, column);
-					imputedRaw[(i * (i + 1))/2 + j] = thetaRawData[(column * (column + 1))/2 + row];
+					imputedRaw[(i * (i + 1ULL))/2ULL + j] = thetaRawData[(column * (column + 1ULL))/2ULL + row];
 				}
 			}
 
@@ -275,7 +275,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		{
 			for(std::size_t j = 0; j <= i; j++)
 			{
-				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRawPtr[(i*(i+1))/2 + j];
+				distMatrix[i * nMarkersCurrentGroup + j] = distMatrix[j * nMarkersCurrentGroup + i] = imputedRawPtr[(i*(i+1ULL))/2ULL + j];
 			}
 		}
 	
@@ -300,7 +300,7 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		{
 			close(barHandle);
 		}
-		for(int i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
+		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
 	}
 	return Rcpp::wrap(permutation);
 }

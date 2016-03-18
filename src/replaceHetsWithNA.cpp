@@ -1,7 +1,6 @@
 #include "recodeHetsAsNA.h"
 bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix recodedFinals, Rcpp::List recodedHetData)
 {
-	int nFounders = recodedFounders.nrow();
 	int nMarkers = recodedFounders.ncol();
 	int nFinals = recodedFinals.nrow();
 	bool retValue = false;
@@ -9,7 +8,6 @@ bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix 
 	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 	{
 		Rcpp::IntegerMatrix currentMarkerHetData = recodedHetData(markerCounter);
-		int nAlleles = 0;
 		std::fill(isHet.begin(), isHet.end(), true);
 		for(int hetDataRowCounter = 0; hetDataRowCounter < currentMarkerHetData.nrow(); hetDataRowCounter++)
 		{

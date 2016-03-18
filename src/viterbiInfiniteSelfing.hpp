@@ -38,7 +38,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
-		: markerData(markerData), intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities)
+		: intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData)
 	{}
 	void apply(int start, int end)
 	{
@@ -47,7 +47,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		minAIGenerations = std::max(minAIGenerations, 1);
-		int nFinals = recodedFinals.nrow(), nMarkers = recodedFinals.ncol();
+		int nFinals = recodedFinals.nrow();
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)

@@ -377,7 +377,6 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 4
 		double powOneMinus2R = std::pow(1 - 2 * r, selfingGenerations);
 		double powD1 = std::pow(1 + 2 * (-1 + r)*r, selfingGenerations);
 		double oneMinusRPow4 = oneMinusRSquared*oneMinusRSquared;
-		double oneMinusRCubed = (1 - r)*oneMinusRSquared;
 		double oneMinusR = 1 - r;
 		double pow2 = std::pow(2, selfingGenerations);
 
@@ -386,7 +385,6 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 4
 		double complex3 = powD1*(4 + (3 - 2 * r)*r) + 4 * rSquared - 2 * powOneMinus2R*rSquared;
 		double rMinus2Squared = (r - 2)*(r - 2);
 		double complex4 = (-powD1 + powOneMinus2R)*(-2 + r)*r;
-		double complex5 = (-8 + complex3 + 8 * pow2 - 4 * powOneMinus2R - 6 * r - 2 * pow2*r + 5 * powOneMinus2R*r);
 
 		prob[0] = (oneMinusRSquared*(-2 + 2 * pow2 + onePlus2R*powD1 - powOneMinus2R - 4 * r + 2 * powOneMinus2R*r)) / (16 * onePlus2R*pow2);
 		prob[1] = -(oneMinusRSquared*(-1 + powD1)) / (112 * pow2);
@@ -488,9 +486,6 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(std::array<double,
 		double pow2 = std::pow(2, selfingGenerations);
 		double oneMinus2RCubed = oneMinus2RSquared * oneMinus2R;
 		double oneMinus2RPow4 = oneMinus2RCubed * oneMinus2R;
-
-		tmp = -1 + oneMinus2RSquared * powOneMinusR1;
-		double complex12 = tmp * tmp;
 
 		tmp = -1 + powOneMinusR1 * oneMinus2R;
 		double complex13 = tmp * tmp;

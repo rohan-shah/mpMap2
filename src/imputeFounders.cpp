@@ -82,7 +82,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		if(errors.size() > 0)
 		{
 			std::stringstream ss;
-			for(int i = 0; i < errors.size(); i++)
+			for(std::size_t i = 0; i < errors.size(); i++)
 			{
 				ss << errors[i] << std::endl;
 			}
@@ -99,7 +99,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	//vector giving the encoded value for each value in allFunnels
 	std::vector<funnelEncoding> allFunnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, lineFunnelIDs, lineFunnelEncodings, allFunnelEncodings, lineFunnels, allFunnels, nFounders);
-	int nDifferentFunnels = (int)lineFunnelEncodings.size();
 	
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 64)
@@ -170,10 +169,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		//Generate haplotype probability data. 
 		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
-			int markerPattern1 = markerPatternData.markerPatternIDs[markerCounter];
-			int markerPattern2 = markerPatternData.markerPatternIDs[markerCounter + 1];
-			markerData& markerPattern1Data = markerPatternData.allMarkerPatterns[markerPattern1];
-			markerData& markerPattern2Data = markerPatternData.allMarkerPatterns[markerPattern2];
 			double recombination = recombinationFractions(markerCounter);
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{

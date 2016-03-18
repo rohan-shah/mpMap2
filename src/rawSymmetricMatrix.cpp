@@ -60,7 +60,6 @@ SEXP rawSymmetricMatrixSubsetIndices(SEXP object_, SEXP i_, SEXP j_, SEXP drop_)
 BEGIN_RCPP
 	Rcpp::S4 object = object_;
 	Rcpp::CharacterVector markers = object.slot("markers");
-	R_xlen_t nMarkers = markers.size();
 	Rcpp::NumericVector levels = object.slot("levels");
 	Rcpp::RawVector data = object.slot("data");
 	Rcpp::IntegerVector i = i_;
@@ -141,7 +140,6 @@ SEXP rawSymmetricMatrixSubsetObject(SEXP object_, SEXP indices_)
 BEGIN_RCPP
 	Rcpp::S4 object = object_;
 	Rcpp::RawVector oldData = object.slot("data");
-	R_xlen_t oldNMarkers = Rcpp::as<Rcpp::CharacterVector>(object.slot("markers")).size();
 	Rcpp::IntegerVector indices = indices_;
 	R_xlen_t newNMarkers = indices.size();
 	Rcpp::RawVector newData((indices.size() * (indices.size() + (R_xlen_t)1))/(R_xlen_t)2);
@@ -178,7 +176,7 @@ BEGIN_RCPP
 	std::vector<int> markerRows, markerColumns;
 	markerRows = Rcpp::as<std::vector<int> >(rowIndices);
 	markerColumns = Rcpp::as<std::vector<int> >(columnIndices);
-	if(countValuesToEstimate(markerRows, markerColumns) != source.size())
+	if(countValuesToEstimate(markerRows, markerColumns) != (unsigned long long)source.size())
 	{
 		throw std::runtime_error("Mismatch between index length and source object size");
 	}
