@@ -22,15 +22,12 @@
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
-	std::size_t nDifferentFunnels = args.lineFunnelEncodings.size();
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
 
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
-	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
-	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
@@ -77,7 +74,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			bool swap = markerPatternID1 > markerPatternID2;
 			for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
 			{
-				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+				for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
 				{
 					int marker1Value = args.finals(finalCounter, markerCounterRow);
 					int marker2Value = args.finals(finalCounter, markerCounterColumn);
@@ -174,7 +171,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 #ifdef USE_OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
-		for(int counter = 0; counter < args.valuesToEstimateInChunk; counter++)
+		for(int counter = 0; counter < (int)args.valuesToEstimateInChunk; counter++)
 		{
 			std::fill(table.begin(), table.end(), 0);
 			int difference = counter - previousCounter;
@@ -195,7 +192,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
 			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			bool swap = markerPatternID1 > markerPatternID2;
-			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+			for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
 			{
 				int marker1Value = args.finals(finalCounter, markerCounterRow);
 				int marker2Value = args.finals(finalCounter, markerCounterColumn);
@@ -216,7 +213,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 					}
 				}
 			}
-			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+			for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
 			{
 				double contribution = 0;
 				for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)

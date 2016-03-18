@@ -17,7 +17,7 @@ BEGIN_RCPP
 	std::vector<int> markerRows, markerColumns;
 	markerRows = Rcpp::as<std::vector<int> >(rowIndices);
 	markerColumns = Rcpp::as<std::vector<int> >(columnIndices);
-	if(countValuesToEstimate(markerRows, markerColumns) != (int)source.size())
+	if(countValuesToEstimate(markerRows, markerColumns) != (unsigned long long)source.size())
 	{
 		throw std::runtime_error("Mismatch between index length and source object size");
 	}
