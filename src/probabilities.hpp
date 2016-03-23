@@ -42,7 +42,7 @@ template<int nFounders> struct expandedProbabilities<nFounders, false>
  * Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
  */
 template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesNoIntercross(std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs>& prob, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
-template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs>& prob, int nAIGenarations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
+template<int nFounders, bool infiniteSelfing> void genotypeProbabilitiesWithIntercross(std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs>& prob, int nAIGenerations, double recombinationFraction, int selfingGenerations, std::size_t nFunnels);
 /*
  * Templated function to work out the single locus probabilities. This is needed for imputation / the Viterbi algorithm
  */

@@ -49,6 +49,9 @@ public:
 
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
+#ifndef NDEBUG
+			double sum = 0;
+#endif
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
 			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
@@ -60,6 +63,9 @@ public:
 					{
 						if(table[firstMarkerValue][secondMarkerValue][differentProbCounter] > 0) currentMarkerProb += table[firstMarkerValue][secondMarkerValue][differentProbCounter]*haplotypeProbabilitiesThisRecomb[differentProbCounter];
 					}
+#ifndef NDEBUG
+					sum += currentMarkerProb;
+#endif
 					if(takeLogs)
 					{
 						if(currentMarkerProb == 0) currentMarkerProb = -std::numeric_limits<double>::infinity();
@@ -68,6 +74,9 @@ public:
 					markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = currentMarkerProb;
 				}
 			}
+#ifndef NDEBUG
+			if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
+#endif
 		}
 	}
 	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)

@@ -25,6 +25,7 @@
 #include "imputeFounders.h"
 #include "checkImputedBounds.h"
 #include "generateDesignMatrix.h"
+#include "compressedProbabilities_RInterface.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -63,6 +64,7 @@ extern "C"
 		{"imputeFounders", (DL_FUNC)&imputeFounders, 4},
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 1},
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
+		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
