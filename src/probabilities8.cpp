@@ -448,6 +448,8 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(std::array<double,
 {
 	if (nFunnels == 1)
 	{
+		//There's a mistake in the mathematica derivation, so this is off by 1. I'll come back and fix it later. 
+		nAIGenerations = nAIGenerations - 1;
 		double onePlus2RInverse = 1.0 / (1 + 2 * r);
 		double oneMinusR = 1 - r;
 		double oneMinusRSquared = oneMinusR * oneMinusR;
