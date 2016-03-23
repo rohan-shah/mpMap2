@@ -1,4 +1,6 @@
 #' Computes map distances
+#' 
+#' Use the non-linear least squares function to estimate a map
 #' @export
 estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1)
 {

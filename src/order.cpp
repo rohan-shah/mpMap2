@@ -191,7 +191,6 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 	}
 
 
-	Rcpp::Function asDist("as.dist"), seriate("seriate"), getOrder("get_order"), criterion("criterion");
 	R_xlen_t nMarkers = groups.size();
 
 	std::vector<int> permutation, currentGroupPermutation;

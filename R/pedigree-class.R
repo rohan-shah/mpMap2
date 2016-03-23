@@ -1,12 +1,3 @@
-#' Pedigree class
-#' 
-#' This class describes a pedigree for an experimental design. Although package mpMap2 only allows for the analysis of pedigrees corresponding to multi-parent crosses, this pedigree class can describe arbitrary experimental designs. 
-#' @slot mother The index within the pedigree of the mother of this individual
-#' @slot father The index within the pedigree of the father of this individual
-#' @slot lineName The name of this individual
-#' @slot selfing A value indicating whether analysis of an experiment using this pedigree should assume infinite generations of selfing. A value of \code{"infinite"} indicates infinite generations of selfing, and a value of \code{"finite"} indicates finite generations of selfing. 
-#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}, \code{\link[mpMap2]{detailedPedigree-class}}, \code{\link[mpMap2]{rilPedigree}}, \code{\link[mpMap2]{f2Pedigree}}, \code{\link[mpMap2]{fourParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{fourParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{eightParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{eightParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{sixteenParentPedigreeRandomFunnels}}
-#' @include pedigree-class.R
 checkPedigree <- function(object)
 {
 	nTotalLines <- length(object@lineNames)
@@ -62,4 +53,16 @@ checkPedigree <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+#' Pedigree class
+#' 
+#' This class describes a pedigree for an experimental design. Although package mpMap2 only allows for the analysis of pedigrees corresponding to multi-parent crosses, this pedigree class can describe arbitrary experimental designs. 
+#' @slot mother The index within the pedigree of the mother of this individual
+#' @slot father The index within the pedigree of the father of this individual
+#' @slot lineName The name of this individual
+#' @slot selfing A value indicating whether analysis of an experiment using this pedigree should assume infinite generations of selfing. A value of \code{"infinite"} indicates infinite generations of selfing, and a value of \code{"finite"} indicates finite generations of selfing. 
+#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}, \code{\link[mpMap2]{detailedPedigree-class}}, \code{\link[mpMap2]{rilPedigree}}, \code{\link[mpMap2]{f2Pedigree}}, \code{\link[mpMap2]{fourParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{fourParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{eightParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{eightParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{sixteenParentPedigreeRandomFunnels}}
+#' @include pedigree-class.R
+#' @rdname pedigree-class
+#' @name pedigree-class
+NULL
 .pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer", selfing = "character"), validity = checkPedigree)

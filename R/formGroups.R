@@ -1,3 +1,4 @@
+#' Form linkage groups
 #' @export
 formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average", preCluster = FALSE)
 {

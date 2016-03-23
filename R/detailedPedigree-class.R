@@ -1,12 +1,3 @@
-#' Pedigree for simulation
-#' 
-#' Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows us to simulate a data set with the given pedigree. 
-#' @slot initial The indices of the inbred founder lines in the pedigree. These founders lines must be the first lines in the pedigree. 
-#' @slot observed A logical vector with one value per line in the pedigree. A value of \code{TRUE} indicates that this line will be genotyped. 
-#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
-#' @include pedigree-class.R
-#' @example
-#' 
 checkDetailedPedigree <- function(object)
 {
 	nTotalLines <- length(object@lineNames)
@@ -63,4 +54,31 @@ checkDetailedPedigree <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+#' Pedigree for simulation
+#' 
+#' Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows us to simulate a data set with the given pedigree. 
+#' @slot initial The indices of the inbred founder lines in the pedigree. These founders lines must be the first lines in the pedigree. 
+#' @slot observed A logical vector with one value per line in the pedigree. A value of \code{TRUE} indicates that this line will be genotyped. 
+#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
+#' @include pedigree-class.R
+#' @rdname detailedPedigree-class
+#' @name  detailedPedigree-class
+#' @examples lineNames <- paste0("L", 1:10)
+#' mother <- c(0, 0, 1, rep(3, 7))
+#' father <- c(0, 0, 2, rep(2, 7))
+#' initial <- 1:2
+#' lineNames <- paste0("L", 1:10)
+#' observed <- c(rep(FALSE, 3), rep(TRUE, 7))
+#' detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initial = initial, observed = observed, lineNames = lineNames, selfing = "finite")
+NULL
 .detailedPedigree <- setClass("detailedPedigree", contains = "pedigree", slots = list(initial = "integer", observed = "logical"), validity = checkDetailedPedigree)
+#' @export
+#' @describeIn detailedPedigree-class Construct object of class detailedPedigree
+detailedPedigree <- function(lineNames, mother, father, initial, observed, selfing)
+{
+	mother <- as.integer(mother)
+	father <- as.integer(father)
+	initial <- as.integer(initial)
+	lineNames <- as.character(lineNames)
+	return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = initial, observed = observed, selfing = selfing))
+}
