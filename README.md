@@ -20,7 +20,9 @@ This package builds on R/mpMap by Emma Huang. Compared to that previous version,
 6. R/mpMap2 allows the use of multiple data-sets to construct a single genetic map.
 7. R/mpMap2 uses only simple OpenMP parallelisation and is therefore simpler to compile and run than R/mpMap, which made use of GPUs and MPI. 
 
-For further details see the package vignette. 
+##Using this package
+
+Releases of mpMap2 are available under [the releases section](https://github.com/rohan-shah/mpMap2/releases). Binaries are available for windows, other platforms will need to compile from source. For information on how to use this package, see the [package vignette](https://github.com/rohan-shah/mpMap2Paper/releases). The source for the vignette is available [here](https://github.com/rohan-shah/mpMap2Paper). 
 
 ##Package compilation
 
