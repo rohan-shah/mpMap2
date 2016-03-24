@@ -18,9 +18,6 @@ Depends:
     Rcpp,
     fastcluster,
     pryr
-Suggests:
-    asreml,
-    happy.hbrem
 Imports:
     ggplot2,
     Matrix

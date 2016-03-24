@@ -16,9 +16,6 @@ Depends:
     igraph,
     fastcluster,
     pryr
-Suggests: 
-    asreml,
-    happy.hbrem
 Imports: 
     ggplot2,
     Matrix
