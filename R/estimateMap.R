@@ -36,8 +36,6 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1)
 		b <- rfData[indices]
 		#Values of 0.5 result in infinite estimated distance, which doesn't really work. 
 		b[b == 0.5] <- 0.49
-		if (!requireNamespace("nnls", quietly=TRUE))
-			stop("nnls needed for computemap to work. Please install it.\n", call.=FALSE) 
 		result <- nnls::nnls(d, mapFunction(b)) 
 		map[[as.character(group)]] <- c(0, cumsum(result$x[which(indices[,1] == indices[,2]+1)]))
 		names(map[[as.character(group)]]) <- rfData@markers

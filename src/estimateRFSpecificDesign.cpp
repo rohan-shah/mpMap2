@@ -733,7 +733,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 		{
 			try
 			{
-				Rcpp::Rcout << "Input data had hetrozygotes but was analysed assuming infinite selfing. " << std::endl << "    All hetrozygotes were ignored." << std::endl;
+				Rcpp::Rcout << "Input data had heterozygotes but was analysed assuming infinite selfing. " << std::endl << "    All hetrozygotes were ignored." << std::endl;
 			}
 			catch(...)
 			{}

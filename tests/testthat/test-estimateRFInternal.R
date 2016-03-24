@@ -37,7 +37,7 @@ test_that("Arguments must have correct types",
 		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = list(), gbLimit = -1, verbose = NULL), throws_error("keepLkhd must be a boolean"))
 
 		#verbose must be a boolean
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list()), throws_error("verbose must be a list"))
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = 1:2, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list()), throws_error("verbose must be a"))
 
 		#There must be at least one design
 		copiedCross <- cross

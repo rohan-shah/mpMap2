@@ -30,14 +30,14 @@ template<> void genotypeProbabilitiesNoIntercross<2, false>(std::array<double, 5
 	prob[0] = (1/(2*(1 + 2*r))) -std::pow(0.5, selfingGenerations+2)*(2 - quadraticPower + oneMinusTwoRPower*(1 - 2 *r)/ ( 1 + 2*r));
 	//Different homozygotes at both
 	prob[1] = (r/(1 + 2*r)) -std::pow(0.5, selfingGenerations+2)*(2 - quadraticPower - oneMinusTwoRPower*(1 - 2 *r)/ ( 1 + 2*r));
-	//One homozygote, one hetrozygote
+	//One homozygote, one heterozygote
 	prob[2] = std::pow(0.5, selfingGenerations+1) * (1 - quadraticPower);
-	//Two hetrozygotes. We don't distinguish between the two different hetrozygote combinations
+	//Two heterozygotes. We don't distinguish between the two different heterozygote combinations
 	prob[3] = std::pow(0.5, selfingGenerations) * quadraticPower;
 	//But we might want to allow us to get back to the seperate probabilities in code that calls this function, so compute the probability for state 4 by itself. 
 	prob[4] = std::pow(0.5, selfingGenerations-1) * (quadraticPower - oneMinusTwoRPower);
 
-	//The hetrozygotes will be counted twice, so divide by two (or four if there are two hetrozygotes). 
+	//The heterozygotes will be counted twice, so divide by two (or four if there are two heterozygotes). 
 	prob[2] /= 2;
 	prob[3] /= 4;
 	prob[4] /= 4;
@@ -86,7 +86,7 @@ template<> void genotypeProbabilitiesWithIntercross<2, false>(std::array<double,
 	0.25*(-2*powOneMinus2R*powOneMinusR 
    		+ (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
    	)/(8*pow2*oneMinusRSquared);
-	//We don't distinguish between the two hetrozygote combinations
+	//We don't distinguish between the two heterozygote combinations
    	prob[3] += prob[4];
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<2, true>(array2<2>&data, int selfingGenerations, std::size_t nFunnels)

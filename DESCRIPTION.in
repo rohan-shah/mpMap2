@@ -15,7 +15,9 @@ Depends:
     methods,
     igraph,
     fastcluster,
-    pryr
+    pryr,
+    nnls
 Imports: 
     ggplot2,
-    Matrix
+    Matrix,
+    methods

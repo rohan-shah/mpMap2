@@ -6,7 +6,7 @@ template<> struct probabilityData<16>
 public:
 	/*See Karl Bromans paper on intermediate generations. This mask converts allele encodings (0 - 2) into indices into 
 	the array of 4 different probabilities. In terms of indices, 
-	Zero = homozygote, One = other homozygote, Two = hetrozygote
+	Zero = homozygote, One = other homozygote, Two = heterozygote
 	In terms of values, see Table one of the paper. Zero = first equation of table, one = second equation, etc. Note that
 	we combine equations 4 and 5 into a single state. 
 	*/

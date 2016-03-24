@@ -14,7 +14,7 @@
 #include "funnelHaplotypeToMarker.hpp"
 #include "viterbi.hpp"
 #include "recodeHetsAsNA.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double hetrozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomeMarkers = 0;
@@ -66,7 +66,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
 			try
 			{
-				warning("Input data had hetrozygotes but was analysed assuming infinite selfing. All hetrozygotes were ignored. \n");
+				warning("Input data had heterozygotes but was analysed assuming infinite selfing. All heterozygotes were ignored. \n");
 			}
 			catch(...)
 			{}
@@ -157,7 +157,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.results = results;
 	viterbi.key = key;
 	viterbi.homozygoteMissingProb = homozygoteMissingProb;
-	viterbi.hetrozygoteMissingProb = hetrozygoteMissingProb;
+	viterbi.heterozygoteMissingProb = heterozygoteMissingProb;
 	viterbi.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
 	viterbi.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 
@@ -188,18 +188,18 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		cumulativeMarkerCounter += (int)positions.size();
 	}
 }
-template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double hetrozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, hetrozygoteMissingProb, key);
+		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
 	}
 }
-SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP hetrozygoteMissingProb_sexp)
+SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -296,16 +296,16 @@ BEGIN_RCPP
 	}
 	if(homozygoteMissingProb < 0 || homozygoteMissingProb > 1) throw std::runtime_error("Input homozygoteMissingProb must be a number between 0 and 1");
 
-	double hetrozygoteMissingProb;
+	double heterozygoteMissingProb;
 	try
 	{
-		hetrozygoteMissingProb = Rcpp::as<double>(hetrozygoteMissingProb_sexp);
+		heterozygoteMissingProb = Rcpp::as<double>(heterozygoteMissingProb_sexp);
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input hetrozygoteMissingProb must be a number between 0 and 1");
+		throw std::runtime_error("Input heterozygoteMissingProb must be a number between 0 and 1");
 	}
-	if(hetrozygoteMissingProb < 0 || hetrozygoteMissingProb > 1) throw std::runtime_error("Input hetrozygoteMissingProb must be a number between 0 and 1");
+	if(heterozygoteMissingProb < 0 || heterozygoteMissingProb > 1) throw std::runtime_error("Input heterozygoteMissingProb must be a number between 0 and 1");
 
 	std::vector<std::string> foundersMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(founders));
 	std::vector<std::string> finalsMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(finals));
@@ -378,19 +378,19 @@ BEGIN_RCPP
 	{
 		if(nFounders == 2)
 		{
-			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
 		}
 		else if(nFounders == 4)
 		{
-			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
 		}
 		else if(nFounders == 8)
 		{
-			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
 		}
 		else if(nFounders == 16)
 		{
-			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, hetrozygoteMissingProb, key);
+			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
 		}
 		else
 		{

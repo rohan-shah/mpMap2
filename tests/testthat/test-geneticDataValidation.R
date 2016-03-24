@@ -250,7 +250,7 @@ test_that("Values in first two columns of hetData matrix must be founder alleles
 	})
 test_that("Values in finals must be valid according to hetData", 
 	{
-		#Remove hetrozygotes from hetData
+		#Remove heterozygotes from hetData
 		copied <- geneticData
 		indices <- copied@hetData[[1]][,1] == copied@hetData[[1]][,2]
 		copied@hetData[[1]] <- copied@hetData[[1]][indices,]

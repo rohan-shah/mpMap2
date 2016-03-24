@@ -52,7 +52,7 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 				recodedCurrentMarkerHetData(i, 2) = recodedCurrentMarkerHetData(i, 0);
 			}
 		}
-		//The homozygotes get translated as-is, the hetrozygotes are given sequential labels afterwards. 
+		//The homozygotes get translated as-is, the heterozygotes are given sequential labels afterwards. 
 		std::sort(hetValues.begin(), hetValues.end());
 		hetValues.erase(std::unique(hetValues.begin(), hetValues.end()), hetValues.end());
 		inputs.maxAlleles = std::max(inputs.maxAlleles, (unsigned int)(nFounderAlleles + hetValues.size()));

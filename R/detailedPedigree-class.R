@@ -74,6 +74,12 @@ NULL
 .detailedPedigree <- setClass("detailedPedigree", contains = "pedigree", slots = list(initial = "integer", observed = "logical"), validity = checkDetailedPedigree)
 #' @export
 #' @describeIn detailedPedigree-class Construct object of class detailedPedigree
+#' @param lineNames The names assigned to the lines
+#' @param mother The female parent of this line
+#' @param father The male parent of this line
+#' @param initial The indices of the founder lines in the pedigree
+#' @param observed A logical vector determining which lines are observed in the final population
+#' @param selfing Value determining whether or not subsequent analysis of populations generated from this pedigree should assume infinite generations of selfing. Possible values are \code{"finite"} and \code{"infinite"}.
 detailedPedigree <- function(lineNames, mother, father, initial, observed, selfing)
 {
 	mother <- as.integer(mother)

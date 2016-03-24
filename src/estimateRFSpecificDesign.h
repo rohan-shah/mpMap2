@@ -62,7 +62,7 @@ bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long
  * 3. Check that the data is consistent with the input funnels.
  * 4. Recode the founders and finals data in a normalised form, also working out the maximum number of alleles per marker, across the dataset
  * 5. Assign a unique value to each marker pattern and funnel. 
- * 6. In the case of infinite generations of selfing, replace hetrozygote values with NA. 
+ * 6. In the case of infinite generations of selfing, replace heterozygote values with NA. 
  * @param args Input arguments
  * @param internalArgs preprocessed arguments
  * @return A boolean value, with true indicating success. False indicates an error.

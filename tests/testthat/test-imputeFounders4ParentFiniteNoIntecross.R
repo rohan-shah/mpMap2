@@ -1,5 +1,5 @@
 context("Founder imputation, four parents, finite selfing, no intercrossing")
-test_that("Test zero generations of intercrossing, with marker hetrozygotes",
+test_that("Test zero generations of intercrossing, with marker heterozygotes",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -50,7 +50,7 @@ test_that("Test zero generations of intercrossing, with marker hetrozygotes",
 		}
 
 	})
-test_that("Test zero generations of intercrossing, without marker hetrozygotes",
+test_that("Test zero generations of intercrossing, without marker heterozygotes",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -63,7 +63,7 @@ test_that("Test zero generations of intercrossing, without marker hetrozygotes",
 
 			cross2 <- cross + multiparentSNP(keepHets=FALSE)
 			mapped <- new("mpcrossMapped", cross2, map = map)
-			result <- imputeFounders(mapped, hetrozygoteMissingProb = 1, homozygoteMissingProb = 0.01)
+			result <- imputeFounders(mapped, heterozygoteMissingProb = 1, homozygoteMissingProb = 0.01)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			#Correct imputation rate should be 0.925
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.925)

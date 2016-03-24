@@ -11,7 +11,7 @@ setClass("biparentalDominant", contains="NULL")
 #' cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
 #' founders(cross)
 #' finals(cross)[1:10,]
-#' The heterozygotes are initially coded as 3
+#' #The heterozygotes are initially coded as 3
 #' hetData(cross)[[1]]
 #' #Make all markers dominant
 #' dominantCross <- cross + biparentalDominant()

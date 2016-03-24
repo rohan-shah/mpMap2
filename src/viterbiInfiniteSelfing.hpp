@@ -33,7 +33,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	int minSelfingGenerations;
 	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
-	double hetrozygoteMissingProb, homozygoteMissingProb;
+	double heterozygoteMissingProb, homozygoteMissingProb;
 	Rcpp::IntegerMatrix key;
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;

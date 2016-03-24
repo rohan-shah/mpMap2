@@ -17,10 +17,12 @@ Depends:
     igraph,
     Rcpp,
     fastcluster,
-    pryr
+    pryr,
+    nnls
 Imports:
     ggplot2,
-    Matrix
+    Matrix,
+    methods
 LinkingTo: Rcpp
 Collate:
     'Rcpp_exceptions.R'
@@ -34,6 +36,7 @@ Collate:
     'mpcross-class.R'
     'biparentalDominant.R'
     'combineGenotypes.R'
+    'compressedProbabilities.R'
     'detailedPedigree-class.R'
     'eightWayPedigreeRandomFunnels.R'
     'eightWayPedigreeSingleFunnel.R'
@@ -42,6 +45,7 @@ Collate:
     'expand.R'
     'f2Pedigree.R'
     'finals.R'
+    'fixedNumberOfFounderAlleles.R'
     'formGroups.R'
     'founders.R'
     'fourParentPedigreeRandomFunnels.R'
@@ -50,6 +54,7 @@ Collate:
     'hetData.R'
     'impute.R'
     'imputeFounders.R'
+    'jitterMap.R'
     'mapFunctions.R'
     'markers.R'
     'mpcross.R'

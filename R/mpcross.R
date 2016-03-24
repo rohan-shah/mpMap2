@@ -134,7 +134,7 @@ setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(
       stop("Internal error: Markers should have been combined as two blocks")
     }
     marker2Range <- range(match(markers(e2), markers(combined)))
-    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), marker1Range = marker1Range, marker2Range = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = e1@rf@gbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
+    extraRFData <- estimateRFInternal(object = combined, recombValues = e1@rf@r, lineWeights = rep(1, nLines(e2)), markerRows = marker1Range, markerColumns = marker2Range, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = e1@rf@gbLimit, verbose = list(verbose = FALSE, progressStyle = 1L))
     stop("Need to check this section")
   }
   #If the markers are all the same, keep them in the same order
