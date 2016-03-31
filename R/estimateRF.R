@@ -14,7 +14,7 @@
 #' cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
 #' rf <- estimateRF(cross)
 #' #Print the estimated recombination fraction values
-#' rf@rf@theta[1:11, 1:11]
+#' rf@@rf@@theta[1:11, 1:11]
 estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE)
 {
 	inheritsNewMpcrossArgument(object)
