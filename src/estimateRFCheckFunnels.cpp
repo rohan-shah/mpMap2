@@ -45,6 +45,7 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 
 	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));
 	Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
+	bool warnImproperFunnels = Rcpp::as<bool>(pedigree.slot("warnImproperFunnels"));
 
 	Rcpp::CharacterVector finalNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[0]);
 	Rcpp::CharacterVector markerNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[1]);
@@ -132,31 +133,42 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 			std::sort(&(copiedFunnel.val[0]), &(copiedFunnel.val[0]) + nFounders);
 			if(std::unique(&(copiedFunnel.val[0]), &(copiedFunnel.val[0]) + nFounders) != &(copiedFunnel.val[0]) + nFounders)
 			{
-				std::stringstream ss;
-				ss << "Funnel for line " << pedigreeLineNames(*i) << " contained founders {" << funnel.val[0];
-				if(nFounders == 2)
+				//If we have intercrossing generations then having repeated founders is an error. Otherwise if warnImproperFunnels is true it's still a warning.
+				if(intercrossingGenerations[finalCounter] != 0 || warnImproperFunnels)
 				{
-					ss << ", " << funnel.val[1] << "}";
+					std::stringstream ss;
+					ss << "Funnel for line " << pedigreeLineNames(*i) << " contained founders {" << funnel.val[0];
+					if(nFounders == 2)
+					{
+						ss << ", " << funnel.val[1] << "}";
+					}
+					else if(nFounders == 4)
+					{
+						ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << "}";
+					}
+					else if(nFounders == 8)
+					{
+						ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7]<< "}";
+					}
+					else if (nFounders == 16)
+					{
+						ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7] << ", " << funnel.val[8] << ", " << funnel.val[9] << ", " << funnel.val[10] << ", " << funnel.val[11] << ", " << funnel.val[12] << ", " << funnel.val[13] << ", " << funnel.val[14] << ", " << funnel.val[15] << "}";
+					}
+					//In this case it's an error
+					if(intercrossingGenerations[finalCounter] != 0)
+					{
+						ss << ". Repeated founders are only allowed with zero generations of intercrossing";
+						errors.push_back(ss.str());
+					}
+					//But if we have zero intercrossing generations then it's only a warning
+					else
+					{
+						ss << ". Did you intend to use all " << nFounders << " founders?";
+						warnings.push_back(ss.str());
+					}
 				}
-				else if(nFounders == 4)
-				{
-					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << "}";
-				}
-				else if(nFounders == 8)
-				{
-					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7]<< "}";
-				}
-				else if (nFounders == 16)
-				{
-					ss << ", " << funnel.val[1] << ", " << funnel.val[2] << ", " << funnel.val[3] << ", " << funnel.val[4] << ", " << funnel.val[5] << ", " << funnel.val[6] << ", " << funnel.val[7] << ", " << funnel.val[8] << ", " << funnel.val[9] << ", " << funnel.val[10] << ", " << funnel.val[11] << ", " << funnel.val[12] << ", " << funnel.val[13] << ", " << funnel.val[14] << ", " << funnel.val[15] << "}";
-				}
-				ss << ". Did you intend to use all " << nFounders << " founders?";
-				warnings.push_back(ss.str());
 			}
-			else
-			{
-				allFunnels.push_back(funnel);
-			}
+			allFunnels.push_back(funnel);
 		}
 		//remove duplicates in representedFounders
 		std::sort(representedFounders.begin(), representedFounders.end());

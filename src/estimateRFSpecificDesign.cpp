@@ -674,11 +674,11 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 		}
 		for(std::size_t warningIndex = 0; warningIndex < warnings.size() && warningIndex < 6; warningIndex++)
 		{
-			Rprintf(warnings[warningIndex].c_str());
+			Rcpp::Rcout << warnings[warningIndex] << std::endl;
 		}
 		if(warnings.size() > 6)
 		{
-			Rprintf("Supressing further funnel warnings");
+			Rcpp::Rcout << "Supressing further funnel warnings" << std::endl;
 		}
 	}
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles

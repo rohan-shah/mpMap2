@@ -86,5 +86,5 @@ detailedPedigree <- function(lineNames, mother, father, initial, observed, selfi
 	father <- as.integer(father)
 	initial <- as.integer(initial)
 	lineNames <- as.character(lineNames)
-	return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = initial, observed = observed, selfing = selfing))
+	return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = initial, observed = observed, selfing = selfing, warnImproperFunnels = TRUE))
 }

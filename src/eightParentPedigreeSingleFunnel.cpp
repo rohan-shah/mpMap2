@@ -129,6 +129,6 @@ SEXP eightParentPedigreeSingleFunnel(SEXP initialPopulationSize_sexp, SEXP selfi
 		}
 	}
 	Rcpp::Function newCall("new");
-	Rcpp::S4 result = newCall("detailedPedigree", Rcpp::Named("lineNames") = lineNames, Rcpp::Named("mother") = mother, Rcpp::Named("father") = father, Rcpp::Named("initial") = Rcpp::Range(1, 8), Rcpp::Named("observed") = observed, Rcpp::Named("selfing") = "infinite");
+	Rcpp::S4 result = newCall("detailedPedigree", Rcpp::Named("lineNames") = lineNames, Rcpp::Named("mother") = mother, Rcpp::Named("father") = father, Rcpp::Named("initial") = Rcpp::Range(1, 8), Rcpp::Named("observed") = observed, Rcpp::Named("selfing") = "infinite", Rcpp::Named("warnImproperFunnels") = true);
 	return result;
 }
