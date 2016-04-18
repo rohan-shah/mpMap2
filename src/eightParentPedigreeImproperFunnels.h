@@ -1,0 +1,5 @@
+#ifndef EIGHT_PARENT_PEDIGREE_IMPROPER_FUNNELS_HEADER_GUARD
+#define EIGHT_PARENT_PEDIGREE_IMPROPER_FUNNELS_HEADER_GUARD
+#include <Rcpp.h>
+SEXP eightParentPedigreeImproperFunnels(SEXP initialPopulationSize_sexp, SEXP selfingGenerations_sexp, SEXP nSeeds_sexp);
+#endif

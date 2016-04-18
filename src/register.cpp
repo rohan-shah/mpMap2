@@ -11,6 +11,7 @@
 #include "fourParentPedigreeSingleFunnel.h"
 #include "eightParentPedigreeRandomFunnels.h"
 #include "eightParentPedigreeSingleFunnel.h"
+#include "eightParentPedigreeImproperFunnels.h"
 #include "sixteenParentPedigreeRandomFunnels.h"
 #include "matrixChunks.h"
 #include "rawSymmetricMatrix.h"
@@ -65,6 +66,7 @@ extern "C"
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 1},
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},
+		{"eightParentPedigreeImproperFunnels", (DL_FUNC)&eightParentPedigreeImproperFunnels, 3},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
