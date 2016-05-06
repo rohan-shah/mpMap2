@@ -35,7 +35,11 @@ checkPedigree <- function(object)
 		errors <- c(errors, "Mother and father must preceed offspring in the pedigree")
 	}
 	#Entry selfing must be either "finite" of "infinite"
-	if(object@selfing != "finite" && object@selfing != "infinite")
+	if(is.null(object@selfing) || length(object@selfing) != 1)
+	{
+		errors <- c(errors, "Slot selfing must be either \"infinite\" or \"finite\"")
+	}
+	else if(object@selfing != "finite" && object@selfing != "infinite")
 	{
 		errors <- c(errors, "Slot selfing must be either \"infinite\" or \"finite\"")
 	}
@@ -49,7 +53,10 @@ checkPedigree <- function(object)
 	{
 		errors <- c(errors, "Number of founders must be at least 2")
 	}
-
+	if(is.null(object@warnImproperFunnels) || length(object@warnImproperFunnels) == 0)
+	{
+		object@warnImproperFunnels <- TRUE
+	}
 	if(length(object@warnImproperFunnels) != 1)
 	{
 		errors <- c(errors, "Slot warnImproperFunnels must be a single logical value")
