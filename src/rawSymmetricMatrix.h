@@ -7,4 +7,6 @@ SEXP assignRawSymmetricMatrixFromEstimateRF(SEXP destination, SEXP rowIndices, S
 SEXP assignRawSymmetricMatrixDiagonal(SEXP destination, SEXP indices, SEXP source);
 SEXP checkRawSymmetricMatrix(SEXP rawSymmetric);
 SEXP rawSymmetricMatrixSubsetByMatrix(SEXP object_, SEXP index_);
+SEXP rawSymmetricMatrixToDist(SEXP object);
+SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters);
 #endif
