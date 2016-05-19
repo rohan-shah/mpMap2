@@ -83,7 +83,3 @@ setAs("rawSymmetricMatrix", "matrix", def = function(from, to)
 	{
 		return(from[1:length(from@markers), 1:length(from@markers)])
 	})
-setAs("rawSymmetricMatrix", "dist", def = function(from, to)
-	{
-		return(.Call("rawSymmetricMatrixToDist", from, PACKAGE="mpMap2"))
-	})
