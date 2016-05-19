@@ -8,6 +8,6 @@ SEXP assignRawSymmetricMatrixDiagonal(SEXP destination, SEXP indices, SEXP sourc
 SEXP checkRawSymmetricMatrix(SEXP rawSymmetric);
 SEXP rawSymmetricMatrixSubsetByMatrix(SEXP object_, SEXP index_);
 SEXP rawSymmetricMatrixToDist(SEXP object);
-SEXP constructDissimilarityMatrixInternal(SEXP data_sexp, SEXP levels_sexp, SEXP markers_sexp, SEXP clusters_);
+SEXP constructDissimilarityMatrixInternal(unsigned char* data, std::vector<double>& levels, int size, SEXP clusters_, int start, const std::vector<int>& permutation);
 SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters);
 #endif

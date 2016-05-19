@@ -269,14 +269,8 @@ BEGIN_RCPP
 	return result;
 END_RCPP
 }
-SEXP constructDissimilarityMatrixInternal(SEXP data_sexp, SEXP levels_sexp, SEXP markers_sexp, SEXP clusters_)
+SEXP constructDissimilarityMatrixInternal(unsigned char* data, std::vector<double>& levels, int size, SEXP clusters_, int start, const std::vector<int>& currentPermutation)
 {
-BEGIN_RCPP
-	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(levels_sexp);
-	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(markers_sexp);
-	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(data_sexp);
-	R_xlen_t size = markers.size(), levelsSize = levels.size();
-
 	Rcpp::IntegerVector clusters = Rcpp::as<Rcpp::IntegerVector>(clusters_);
 	int minCluster = *std::min_element(clusters.begin(), clusters.end()), maxCluster = *std::max_element(clusters.begin(), clusters.end());
 	if(minCluster != 1)
@@ -286,7 +280,7 @@ BEGIN_RCPP
 	std::vector<std::vector<int> > groupIndices(maxCluster);
 	for(int i = 0; i < clusters.size(); i++)
 	{
-		groupIndices[clusters[i]-1].push_back(i);
+		groupIndices[clusters[i]-1].push_back(currentPermutation[i + start]);
 	}
 
 	std::vector<int> table(levels.size());
@@ -305,7 +299,7 @@ BEGIN_RCPP
 				{
 					int x = *rowMarker, y = *columnMarker;
 					if(x < y) std::swap(x, y);
-					int byte = data(x *(x + (R_xlen_t)1)/(R_xlen_t)2 + y);
+					int byte = data[x *(x + (R_xlen_t)1)/(R_xlen_t)2 + y];
 					if(byte == 255) throw std::runtime_error("Values of NA not allowed");
 					table[byte]++;
 				}
@@ -316,7 +310,6 @@ BEGIN_RCPP
 		}
 	}
 	return result;
-END_RCPP
 }
 SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters_)
 {
@@ -325,6 +318,11 @@ BEGIN_RCPP
 	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
 	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
 	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
-	return constructDissimilarityMatrixInternal(data, levels, markers, clusters_);
+	int nMarkers = markers.size();
+	std::vector<double> levelsCopied = Rcpp::as<std::vector<double> >(levels);
+	
+	std::vector<int> permutation(nMarkers);
+	for(int i = 0; i < nMarkers; i++) permutation[i] = i;
+	return constructDissimilarityMatrixInternal(&(data(0, 0)), levelsCopied, nMarkers, clusters_, 0, permutation);
 END_RCPP
 }
