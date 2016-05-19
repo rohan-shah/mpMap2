@@ -47,6 +47,7 @@ extern "C"
 		{"rawSymmetricMatrixSubsetIndices", (DL_FUNC)&rawSymmetricMatrixSubsetIndices, 4},
 		{"rawSymmetricMatrixSubsetObject", (DL_FUNC)&rawSymmetricMatrixSubsetObject, 2},
 		{"rawSymmetricMatrixToDist", (DL_FUNC)&rawSymmetricMatrixToDist, 1},
+		{"constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal, 4},
 		{"constructDissimilarityMatrix", (DL_FUNC)&constructDissimilarityMatrix, 2},
 		{"assignRawSymmetricMatrixFromEstimateRF", (DL_FUNC)&assignRawSymmetricMatrixFromEstimateRF, 4},
 		{"assignRawSymmetricMatrixDiagonal", (DL_FUNC)&assignRawSymmetricMatrixDiagonal, 3},

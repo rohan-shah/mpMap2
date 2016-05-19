@@ -269,13 +269,12 @@ BEGIN_RCPP
 	return result;
 END_RCPP
 }
-SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters_)
+SEXP constructDissimilarityMatrixInternal(SEXP data_sexp, SEXP levels_sexp, SEXP markers_sexp, SEXP clusters_)
 {
 BEGIN_RCPP
-	Rcpp::S4 rawSymmetric = object;
-	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
-	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
-	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(levels_sexp);
+	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(markers_sexp);
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(data_sexp);
 	R_xlen_t size = markers.size(), levelsSize = levels.size();
 
 	Rcpp::IntegerVector clusters = Rcpp::as<Rcpp::IntegerVector>(clusters_);
@@ -317,5 +316,15 @@ BEGIN_RCPP
 		}
 	}
 	return result;
+END_RCPP
+}
+SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters_)
+{
+BEGIN_RCPP
+	Rcpp::S4 rawSymmetric = object;
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
+	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	return constructDissimilarityMatrixInternal(data, levels, markers, clusters_);
 END_RCPP
 }
