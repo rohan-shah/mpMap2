@@ -64,7 +64,7 @@ test_that("Test that we can order a single marker group",
 		pedigree <- f2Pedigree(100)
 		map <- sim.map(len = 100, n.mar = 1, anchor.tel=FALSE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		rf <- estimateRF(cross, verbose = TRUE)
+		rf <- estimateRF(cross, verbose = FALSE)
 		grouped <- new("mpcrossLG", rf, rf = rf@rf, lg = new ("lg", groups = c("D1M1" = 1L), allGroups = 1L))
 		imputed <- impute(grouped)
 		ordered <- orderCross(imputed)

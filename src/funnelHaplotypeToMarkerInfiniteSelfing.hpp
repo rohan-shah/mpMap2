@@ -13,7 +13,7 @@ public:
 		int funnel[16];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+			funnel[founderCounter] = ((enc & ((std::size_t)15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		int nPoints = haplotypeProbabilities.getNRows();
 		int table[maxAlleles][maxAlleles][nDifferentProbs];

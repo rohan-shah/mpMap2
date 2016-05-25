@@ -10,4 +10,4 @@ test_that("Test that estimation of recombination fractions is accurate",
 		rf <- estimateRF(cross, recombValues = c(haldaneToRf(distance), seq(0, 0.5, length.out = 200)))
 		expect_equal(rfToHaldane(rf@rf@theta[1,2]), distance, tolerance = 0.03)
 	}
-}
+})
