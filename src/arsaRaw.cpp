@@ -142,12 +142,34 @@ BEGIN_RCPP
 	}
 	std::vector<int> permutation;
 	std::function<void(long,long)> progressFunction = [](long,long){};
-	arsaRaw((long)n, &(distMatrix[0]), levels, cool, temperatureMin, nReps, permutation, progressFunction, true, 0);
+	arsaRawArgs args(levels, permutation);
+	args.n = n;
+	args.rawDist = &(distMatrix[0]);
+	args.cool = cool;
+	args.temperatureMin = temperatureMin;
+	args.nReps = nReps;
+	args.progressFunction = progressFunction;
+	args.randomStart = true;
+	args.maxMove = 0;
+	args.effortMultiplier = 1;
+	arsaRaw(args);
 	return Rcpp::wrap(permutation);
 END_RCPP
 }
-void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(unsigned long, unsigned long)> progressFunction, bool randomStart, int maxMove)
+void arsaRaw(arsaRawArgs& args)
 {
+	long n = args.n;
+	Rbyte* rawDist = args.rawDist;
+	std::vector<double>& levels = args.levels;
+	double cool = args.cool;
+	double temperatureMin = args.temperatureMin;
+	long nReps = args.nReps;
+	std::vector<int>& permutation = args.permutation;
+	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
+	bool randomStart = args.randomStart;
+	int maxMove = args.maxMove;
+	double effortMultiplier = args.effortMultiplier;
+
 	permutation.resize(n);
 	if(n == 1)
 	{
@@ -201,7 +223,7 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 		double zbestThisRep = z;
 		double temperatureMax = 0;
 		//Now try 5000 random swaps
-		for(R_xlen_t swapCounter = 0; swapCounter < 5000; swapCounter++)
+		for(R_xlen_t swapCounter = 0; swapCounter < (R_xlen_t)(5000*effortMultiplier); swapCounter++)
 		{
 			R_xlen_t swap1, swap2;
 			getPairForSwap(n, swap1, swap2);
@@ -214,14 +236,14 @@ void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, d
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
 		int nloop = (int)((log(temperatureMin) - log(temperatureMax)) / log(cool));
-		long totalSteps = nloop * 100 * n;
+		long totalSteps = (long)(nloop * 100 * n * effortMultiplier);
 		long done = 0;
 		long threadZeroCounter = 0;
 		//Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
 			//Rcpp::Rcout << "Temp = " << temperature << std::endl;
-			for(R_xlen_t k = 0; k < 100*n; k++)
+			for(R_xlen_t k = 0; k < (R_xlen_t)(100*n*effortMultiplier); k++)
 			{
 				R_xlen_t swap1, swap2;
 				//swap

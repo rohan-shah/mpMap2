@@ -3,6 +3,24 @@
 #include "Rcpp.h"
 #include <functional>
 SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_);
-void arsaRaw(long n, Rbyte* rawDist, std::vector<double>& levels, double cool, double temperatureMin, long nReps, std::vector<int>& permutation, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove);
+struct arsaRawArgs
+{
+public:
+	arsaRawArgs(std::vector<double>& levels, std::vector<int>& permutation)
+		:n(-1), rawDist(NULL), cool(0.5), temperatureMin(0.1), nReps(1), randomStart(true), maxMove(0), effortMultiplier(1), levels(levels), permutation(permutation)
+	{}
+	long n;
+	Rbyte* rawDist;
+	double cool;
+	double temperatureMin;
+	long nReps;
+	std::function<void(unsigned long,unsigned long)> progressFunction;
+	bool randomStart;
+	int maxMove;
+	double effortMultiplier;
+	std::vector<double>& levels;
+	std::vector<int>& permutation;
+};
+void arsaRaw(arsaRawArgs& args);
 #endif
 

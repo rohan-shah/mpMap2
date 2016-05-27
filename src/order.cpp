@@ -294,7 +294,18 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 #endif
 			};
 		}
-		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, orderingProgressFunction, true, 0);
+		arsaRawArgs args(levels, currentGroupPermutation);
+		args.n = nMarkersCurrentGroup;
+		args.rawDist = &(distMatrix[0]);
+		args.cool = cool;
+		args.temperatureMin = temperatureMin;
+		args.nReps = nReps;
+		args.progressFunction = orderingProgressFunction;
+		args.randomStart = true;
+		args.maxMove = 0;
+		args.effortMultiplier = 1;
+		arsaRaw(args);
+
 		if(verbose)
 		{
 			close(barHandle);
