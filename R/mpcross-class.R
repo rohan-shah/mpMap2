@@ -145,6 +145,7 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 		}
 		else return(new(to, as(from, "mpcross"), rf = from@rf))
 	})
+#' @export
 mpcrossMapped <- function(cross, map, rf=NULL)
 {
 	if(inherits(cross, "mpcrossRF"))

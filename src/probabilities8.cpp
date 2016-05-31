@@ -719,7 +719,7 @@ template<> void singleLocusGenotypeProbabilitiesWithIntercross<8, false>(array2<
 	double pow2On64 = pow2 / 64;
 	for (int i = 0; i < 8; i++)
 	{
-		for (int j = 0; j < i; j++)
+		for (int j = 0; j < 8; j++)
 		{
 			if (i == j) data.values[i][j] = 0.125*(0.125 + 0.875 * (1 - pow2));
 			else data.values[i][j] = pow2On64;
