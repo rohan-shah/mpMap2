@@ -3,6 +3,21 @@
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
+void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier)
+{
+	arsaRawArgs args(levels, permutation);
+	args.n = n;
+	args.rawDist = rawDist;
+	args.cool = cool;
+	args.temperatureMin = temperatureMin;
+	args.nReps = nReps;
+	args.progressFunction = progressFunction;
+	args.randomStart = randomStart;
+	args.maxMove = maxMove;
+	args.effortMultiplier = effortMultiplier;
+	arsaRaw(args);
+}
+
 inline bool descendingComparer(double i, double j)
 {
 	return i > j;

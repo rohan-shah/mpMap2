@@ -1,5 +1,5 @@
-#ifndef MPMAP2_ARSA_HEADER_GUARD
-#define MPMAP2_ARSA_HEADER_GUARD
+#ifndef MPMAP2_ARSA_RAW_HEADER_GUARD
+#define MPMAP2_ARSA_RAW_HEADER_GUARD
 #include "Rcpp.h"
 #include <functional>
 SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_);
@@ -22,5 +22,6 @@ public:
 	std::vector<int>& permutation;
 };
 void arsaRaw(arsaRawArgs& args);
+void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier);
 #endif
 

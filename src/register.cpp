@@ -21,12 +21,16 @@
 #include "mpMap2_openmp.h"
 #include "order.h"
 #include "arsa.h"
+#include "arsaRaw.h"
 #include "impute.h"
 #include "multiparentSNP.h"
 #include "imputeFounders.h"
 #include "checkImputedBounds.h"
 #include "generateDesignMatrix.h"
 #include "compressedProbabilities_RInterface.h"
+#ifdef HAS_BOOST
+	#include "reorderPedigree.h"
+#endif
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -69,6 +73,9 @@ extern "C"
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},
 		{"eightParentPedigreeImproperFunnels", (DL_FUNC)&eightParentPedigreeImproperFunnels, 3},
+#ifdef HAS_BOOST
+		{"reorderPedigree", (DL_FUNC)&reorderPedigree, 3},
+#endif
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
@@ -93,5 +100,7 @@ extern "C"
 #endif
 		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
 		R_RegisterCCallable(package_name, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
+		R_RegisterCCallable(package_name, "arsaRawExported", (DL_FUNC)&arsaRawExported);
+
 	}
 }
