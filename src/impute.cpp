@@ -15,7 +15,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 	bool hasError = false;
 	//This is a marker row
 #ifdef USE_OPENMP
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic)
 #endif
 	for(std::vector<int>::iterator marker1 = markersThisGroup.begin(); marker1 < markersThisGroup.end(); marker1++)
 	{

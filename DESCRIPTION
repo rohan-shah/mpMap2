@@ -26,6 +26,7 @@ Imports:
 LinkingTo: Rcpp
 Collate:
     'Rcpp_exceptions.R'
+    'backcrossPedigree.R'
     'pedigree-class.R'
     'hetData-class.R'
     'geneticData-class.R'
@@ -38,6 +39,7 @@ Collate:
     'combineGenotypes.R'
     'compressedProbabilities.R'
     'detailedPedigree-class.R'
+    'eightWayPedigreeImproperFunnels.R'
     'eightWayPedigreeRandomFunnels.R'
     'eightWayPedigreeSingleFunnel.R'
     'estimateMap.R'
@@ -70,12 +72,14 @@ Collate:
     'pedigreeToGraph.R'
     'print.R'
     'removeHets.R'
+    'reorderPedigree.R'
     'rilPedigree.R'
     'roxygen.R'
     'show.R'
     'simulateMPCross.R'
     'sixteenParentPedigreeRandomFunnels.R'
     'subset.R'
+    'testDistortion.R'
     'twoParentPedigree.R'
     'validation.R'
 RoxygenNote: 5.0.1

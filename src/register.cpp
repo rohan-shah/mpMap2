@@ -28,6 +28,8 @@
 #include "checkImputedBounds.h"
 #include "generateDesignMatrix.h"
 #include "compressedProbabilities_RInterface.h"
+#include "testDistortion.h"
+#include "removeHets.h"
 #ifdef HAS_BOOST
 	#include "reorderPedigree.h"
 #endif
@@ -76,6 +78,8 @@ extern "C"
 #ifdef HAS_BOOST
 		{"reorderPedigree", (DL_FUNC)&reorderPedigree, 3},
 #endif
+		{"testDistortion", (DL_FUNC)&testDistortion, 1},
+		{"removeHets", (DL_FUNC)&removeHets, 3},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
