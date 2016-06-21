@@ -104,6 +104,7 @@ BEGIN_RCPP
 	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = (int)i;
 	//We're doing lots of simulation, so we use the old-fashioned approach to dealing with Rs random number generation
 	GetRNGstate();
+	bool diagnostics = false;
 
 	for(int repCounter = 0; repCounter < nReps; repCounter++)
 	{
@@ -145,10 +146,10 @@ BEGIN_RCPP
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
 		int nloop = (int)((log(temperatureMin) - log(temperatureMax)) / log(cool));
-		Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
+		if(diagnostics) Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
-			Rcpp::Rcout << "Temp = " << temperature << std::endl;
+			if(diagnostics) Rcpp::Rcout << "Temp = " << temperature << std::endl;
 			for(R_xlen_t k = 0; k < 100*n; k++)
 			{
 				R_xlen_t swap1, swap2;
