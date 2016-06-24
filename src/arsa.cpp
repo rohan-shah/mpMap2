@@ -15,7 +15,7 @@ inline void getPairForSwap(R_xlen_t n, R_xlen_t& swap1, R_xlen_t& swap2)
 	}
 	while(swap1 == swap2);
 }
-inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, R_xlen_t swap2, Rcpp::NumericVector& dist)
+inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, R_xlen_t swap2, double* dist)
 {
 	double delta = 0;
 	R_xlen_t permutationSwap1 = randomPermutation[swap1];
@@ -36,7 +36,18 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	//delta += abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
 	return delta;
 }
-SEXP arsa(SEXP n_, SEXP dist_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_)
+void arsaExported(R_xlen_t n, double* dist, int nReps, double temperatureMin, double cool, std::vector<int>& bestPermutationAllReps)
+{
+	arsaArgs args;
+	args.n = n;
+	args.dist = dist;
+	args.nReps = nReps;
+	args.temperatureMin = temperatureMin;
+	args.cool = cool;
+	arsa(args);
+	bestPermutationAllReps.swap(args.bestPermutationAllReps);
+}
+SEXP arsaExportedR(SEXP n_, SEXP dist_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_)
 {
 BEGIN_RCPP
 	R_xlen_t n;
@@ -94,11 +105,31 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input cool must be a number");
 	}
+	arsaArgs args;
+	args.n = n;
+	args.dist = &(dist(0));
+	args.nReps = nReps;
+	args.temperatureMin = temperatureMin;
+	args.cool = cool;
+	arsa(args);
+	return Rcpp::wrap(args.bestPermutationAllReps);
+END_RCPP
+}
+void arsa(arsaArgs& args)
+{
+	R_xlen_t n = args.n;
+	double* dist = args.dist;
+	int nReps = args.nReps;
+	double temperatureMin = args.temperatureMin;
+	double cool = args.cool;
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
 	double zbestAllReps = 0;
 	//A copy of the best permutation found
-	std::vector<int> bestPermutationThisRep(n), bestPermutationAllReps(n);
+	std::vector<int> bestPermutationThisRep(n);
+	std::vector<int>& bestPermutationAllReps = args.bestPermutationAllReps;
+	bestPermutationAllReps.resize(n);
+
 	//We use this to build the random permutations
 	std::vector<int> consecutive(n);
 	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = (int)i;
@@ -127,7 +158,7 @@ BEGIN_RCPP
 				R_xlen_t l = bestPermutationThisRep[j];
 				R_xlen_t kCopied = k;
 				if(l < k) std::swap(l, kCopied);
-				z += (j-i) * dist((l*(l+1))/2 + kCopied);
+				z += (j-i) * dist[(l*(l+1))/2 + kCopied];
 			}
 		}
 		double zbestThisRep = z;
@@ -195,14 +226,14 @@ BEGIN_RCPP
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
 								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
 								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+								delta1 += dist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1];
 							}
 							for(R_xlen_t counter2 = 0; counter2 < swap1; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
 								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
 								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+								delta1 -= dist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1];
 							}
 						}
 						//compute delta2
@@ -211,14 +242,14 @@ BEGIN_RCPP
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta2 += dist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 						for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
 						{
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta2 -= dist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 						//compute delta3
 						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
@@ -227,7 +258,7 @@ BEGIN_RCPP
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//permutedCounter1 = row, copiedPermutedSwap1 = column
-							delta3 += span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta3 += span2 * dist[(copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 					}
 					else
@@ -240,14 +271,14 @@ BEGIN_RCPP
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
 								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
 								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 -= dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+								delta1 -= dist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1];
 							}
 							for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
 							{
 								R_xlen_t permutedCounter2 = currentPermutation[counter2], permutedCounter1 = currentPermutation[counter1];
 								if(permutedCounter1 > permutedCounter2) std::swap(permutedCounter1, permutedCounter2);
 								//permutedCounter1 = row, permutedCounter2 = column
-								delta1 += dist((permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1);
+								delta1 += dist[(permutedCounter2*(permutedCounter2+1))/2 + permutedCounter1];
 							}
 						}
 						//compute delta2
@@ -256,14 +287,14 @@ BEGIN_RCPP
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 -= dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta2 -= dist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 						for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
 						{
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(permutedCounter1 > copiedPermutedSwap1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//copiedPermutedSwap1 = column,  permutedCounter1 = row
-							delta2 += dist((copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta2 += dist[(copiedPermutedSwap1*(copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 						//compute delta3
 						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
@@ -272,7 +303,7 @@ BEGIN_RCPP
 							R_xlen_t copiedPermutedSwap1 = permutedSwap1, permutedCounter1 = currentPermutation[counter1];
 							if(copiedPermutedSwap1 < permutedCounter1) std::swap(copiedPermutedSwap1, permutedCounter1);
 							//permutedCounter1 = row, copiedPermutedSwap1 = column
-							delta3 -= span2 * dist((copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1);
+							delta3 -= span2 * dist[(copiedPermutedSwap1 * (copiedPermutedSwap1 + 1))/2 + permutedCounter1];
 						}
 					}
 					double delta = delta1 + span * delta2 + delta3;
@@ -312,6 +343,4 @@ BEGIN_RCPP
 		}
 	}
 	PutRNGstate();
-	return Rcpp::wrap(bestPermutationAllReps);
-END_RCPP
 }
