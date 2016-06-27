@@ -36,7 +36,7 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	//delta += abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
 	return delta;
 }
-void arsaExported(R_xlen_t n, double* dist, int nReps, double temperatureMin, double cool, std::vector<int>& bestPermutationAllReps)
+void arsaExported(R_xlen_t n, double* dist, int nReps, double temperatureMin, double cool, double effortMultiplier, std::vector<int>& bestPermutationAllReps, std::function<void(unsigned long,unsigned long)> progressFunction)
 {
 	arsaArgs args;
 	args.n = n;
@@ -44,6 +44,8 @@ void arsaExported(R_xlen_t n, double* dist, int nReps, double temperatureMin, do
 	args.nReps = nReps;
 	args.temperatureMin = temperatureMin;
 	args.cool = cool;
+	args.effortMultiplier = effortMultiplier;
+	args.progressFunction = progressFunction;
 	arsa(args);
 	bestPermutationAllReps.swap(args.bestPermutationAllReps);
 }
@@ -111,6 +113,9 @@ BEGIN_RCPP
 	args.nReps = nReps;
 	args.temperatureMin = temperatureMin;
 	args.cool = cool;
+	args.effortMultiplier = 1;
+	std::function<void(unsigned long,unsigned long)> noProgress = [](unsigned long,unsigned long){};
+	args.progressFunction = noProgress;
 	arsa(args);
 	return Rcpp::wrap(args.bestPermutationAllReps);
 END_RCPP
@@ -122,6 +127,8 @@ void arsa(arsaArgs& args)
 	int nReps = args.nReps;
 	double temperatureMin = args.temperatureMin;
 	double cool = args.cool;
+	double effortMultiplier = args.effortMultiplier;
+	std::function<void(unsigned long,unsigned long)> progressFunction = args.progressFunction;
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
 	double zbestAllReps = 0;
@@ -164,7 +171,7 @@ void arsa(arsaArgs& args)
 		double zbestThisRep = z;
 		double temperatureMax = 0;
 		//Now try 5000 random swaps
-		for(R_xlen_t swapCounter = 0; swapCounter < 5000; swapCounter++)
+		for(R_xlen_t swapCounter = 0; swapCounter < (R_xlen_t)(5000*effortMultiplier); swapCounter++)
 		{
 			R_xlen_t swap1, swap2;
 			getPairForSwap(n, swap1, swap2);
@@ -177,11 +184,14 @@ void arsa(arsaArgs& args)
 		double temperature = temperatureMax;
 		std::vector<int> currentPermutation = bestPermutationThisRep;
 		int nloop = (int)((log(temperatureMin) - log(temperatureMax)) / log(cool));
+		long totalSteps = (long)(nloop * 100 * n * effortMultiplier);
+		long done = 0;
+		long threadZeroCounter = 0;
 		if(diagnostics) Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
 		for(R_xlen_t idk = 0; idk < nloop; idk++)
 		{
 			if(diagnostics) Rcpp::Rcout << "Temp = " << temperature << std::endl;
-			for(R_xlen_t k = 0; k < 100*n; k++)
+			for(R_xlen_t k = 0; k < (R_xlen_t)(100*n*effortMultiplier); k++)
 			{
 				R_xlen_t swap1, swap2;
 				getPairForSwap(n, swap1, swap2);
@@ -332,6 +342,12 @@ void arsa(arsaArgs& args)
 						bestPermutationThisRep = currentPermutation;
 						zbestThisRep = z;
 					}
+				}
+				done++;
+				threadZeroCounter++;
+				if(threadZeroCounter % 100 == 0)
+				{
+					progressFunction(done, totalSteps);
 				}
 			}
 			temperature *= cool;

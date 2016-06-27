@@ -393,21 +393,12 @@ void arsaRaw(arsaRawArgs& args)
 						zbestThisRep = z;
 					}
 				}
-#ifdef USE_OPENMP
-				#pragma omp atomic
-#endif
 				done++;
-#ifdef USE_OPENMP
-				if(omp_get_thread_num() == 0)
-#endif
+				threadZeroCounter++;
+				if(threadZeroCounter % 100 == 0)
 				{
-					threadZeroCounter++;
-					if(threadZeroCounter % 100 == 0)
-					{
-						progressFunction(done, totalSteps);
-					}
+					progressFunction(done, totalSteps);
 				}
-
 			}
 			temperature *= cool;
 		}
