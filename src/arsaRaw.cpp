@@ -83,6 +83,87 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	//delta += abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
 	return deltaFromComponents(levels, deltaComponents);
 }
+inline double computeMoveDelta(std::vector<int>& deltaComponents, int swap1, int swap2, std::vector<int>& currentPermutation, Rbyte* rawDist, R_xlen_t n, std::vector<double>& levels)
+{
+	//three different parts of delta
+	std::fill(deltaComponents.begin(), deltaComponents.end(), 0);
+	int span = (int)abs(swap1 - swap2);
+	int span2 = span + 1;
+	int permutedSwap1 = currentPermutation[swap1];
+	if(swap2 > swap1)
+	{
+		//compute delta1
+		for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			for(R_xlen_t counter2 = swap2+1; counter2 < n; counter2++)
+			{
+				R_xlen_t permutedCounter2 = currentPermutation[counter2];
+				deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]++;
+			}
+			for(R_xlen_t counter2 = 0; counter2 < swap1; counter2++)
+			{
+				R_xlen_t permutedCounter2 = currentPermutation[counter2];
+				deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]--;
+			}
+		}
+		//compute delta2
+		for(R_xlen_t counter1 = 0; counter1 < swap1; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span;
+		}
+		for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span;
+		}
+		//compute delta3
+		for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
+		{
+			span2 -= 2;
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span2;;
+		}
+	}
+	else
+	{
+		//compute delta1
+		for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			for(R_xlen_t counter2 = swap1+1; counter2 < n; counter2++)
+			{
+				R_xlen_t permutedCounter2 = currentPermutation[counter2];
+				deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]--;
+			}
+			for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
+			{
+				R_xlen_t permutedCounter2 = currentPermutation[counter2];
+				deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]++;
+			}
+		}
+		//compute delta2
+		for(R_xlen_t counter1 = 0; counter1 < swap2; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span;
+		}
+		for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
+		{
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span;
+		}
+		//compute delta3
+		for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
+		{
+			span2 -= 2;
+			R_xlen_t permutedCounter1 = currentPermutation[counter1];
+			deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span2;
+		}
+	}
+	return deltaFromComponents(levels, deltaComponents);
+}
 SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_)
 {
 BEGIN_RCPP
@@ -289,84 +370,8 @@ void arsaRaw(arsaRawArgs& args)
 				else
 				{
 					getPairForMove(n, swap1, swap2, maxMove);
-					//three different patrs of delta
-					std::fill(deltaComponents.begin(), deltaComponents.end(), 0);
-					int span = (int)abs(swap1 - swap2);
-					int span2 = span + 1;
+					double delta = computeMoveDelta(deltaComponents, swap1, swap2, currentPermutation, rawDist, n, levels);
 					int permutedSwap1 = currentPermutation[swap1];
-					if(swap2 > swap1)
-					{
-						//compute delta1
-						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							for(R_xlen_t counter2 = swap2+1; counter2 < n; counter2++)
-							{
-								R_xlen_t permutedCounter2 = currentPermutation[counter2];
-								deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]++;
-							}
-							for(R_xlen_t counter2 = 0; counter2 < swap1; counter2++)
-							{
-								R_xlen_t permutedCounter2 = currentPermutation[counter2];
-								deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]--;
-							}
-						}
-						//compute delta2
-						for(R_xlen_t counter1 = 0; counter1 < swap1; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span;
-						}
-						for(R_xlen_t counter1 = swap2+1; counter1 < n; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span;
-						}
-						//compute delta3
-						for(R_xlen_t counter1 = swap1+1; counter1 <= swap2; counter1++)
-						{
-							span2 -= 2;
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span2;;
-						}
-					}
-					else
-					{
-						//compute delta1
-						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							for(R_xlen_t counter2 = swap1+1; counter2 < n; counter2++)
-							{
-								R_xlen_t permutedCounter2 = currentPermutation[counter2];
-								deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]--;
-							}
-							for(R_xlen_t counter2 = 0; counter2 < swap2; counter2++)
-							{
-								R_xlen_t permutedCounter2 = currentPermutation[counter2];
-								deltaComponents[rawDist[permutedCounter2*n + permutedCounter1]]++;
-							}
-						}
-						//compute delta2
-						for(R_xlen_t counter1 = 0; counter1 < swap2; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span;
-						}
-						for(R_xlen_t counter1 = swap1+1; counter1 < n; counter1++)
-						{
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] += span;
-						}
-						//compute delta3
-						for(R_xlen_t counter1 = swap2; counter1 < swap1; counter1++)
-						{
-							span2 -= 2;
-							R_xlen_t permutedCounter1 = currentPermutation[counter1];
-							deltaComponents[rawDist[permutedSwap1*n + permutedCounter1]] -= span2;
-						}
-					}
-					double delta = deltaFromComponents(levels, deltaComponents);
 					if(delta > -1e-8 || unif_rand() <= exp(delta / temperature))
 					{
 						z += delta;
