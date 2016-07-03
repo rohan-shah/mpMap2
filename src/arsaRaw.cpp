@@ -15,7 +15,16 @@ void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation,
 	args.randomStart = randomStart;
 	args.maxMove = maxMove;
 	args.effortMultiplier = effortMultiplier;
-	arsaRaw(args);
+#ifdef USE_OPENMP
+	if(omp_get_max_threads() > 1)
+	{
+		arsaRawParallel(args);
+	}
+	else
+#endif
+	{
+		arsaRaw(args);
+	}
 }
 
 inline bool descendingComparer(double i, double j)
@@ -54,7 +63,7 @@ inline void getPairForMove(R_xlen_t n, R_xlen_t& swap1, R_xlen_t& swap2, int max
 	while(swap1 == swap2);
 }
 
-inline double deltaFromComponents(std::vector<double>& levels, std::vector<int>& deltaComponents)
+inline double deltaFromComponents(const std::vector<double>& levels, std::vector<int>& deltaComponents)
 {
 	double delta = 0;
 	for(int i = 0; i < (int)levels.size(); i++)
@@ -63,7 +72,7 @@ inline double deltaFromComponents(std::vector<double>& levels, std::vector<int>&
 	}
 	return delta;
 }
-inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, R_xlen_t swap2, Rbyte* rawDist, std::vector<double>& levels, std::vector<int>& deltaComponents)
+inline double computeDelta(const std::vector<int>& randomPermutation, R_xlen_t swap1, R_xlen_t swap2, const Rbyte* rawDist, const std::vector<double>& levels, std::vector<int>& deltaComponents)
 {
 	R_xlen_t permutationSwap1 = randomPermutation[swap1];
 	R_xlen_t permutationSwap2 = randomPermutation[swap2];
@@ -83,7 +92,7 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 	//delta += abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
 	return deltaFromComponents(levels, deltaComponents);
 }
-inline double computeMoveDelta(std::vector<int>& deltaComponents, int swap1, int swap2, std::vector<int>& currentPermutation, Rbyte* rawDist, R_xlen_t n, std::vector<double>& levels)
+inline double computeMoveDelta(std::vector<int>& deltaComponents, int swap1, int swap2, const std::vector<int>& currentPermutation, const Rbyte* rawDist, R_xlen_t n, const std::vector<double>& levels)
 {
 	//three different parts of delta
 	std::fill(deltaComponents.begin(), deltaComponents.end(), 0);
@@ -248,7 +257,16 @@ BEGIN_RCPP
 	args.randomStart = true;
 	args.maxMove = 0;
 	args.effortMultiplier = 1;
-	arsaRaw(args);
+#ifdef USE_OPENMP
+	if(omp_get_max_threads() > 1)
+	{
+		arsaRawParallel(args);
+	}
+	else
+#endif
+	{
+		arsaRaw(args);
+	}
 	return Rcpp::wrap(permutation);
 END_RCPP
 }
@@ -415,4 +433,258 @@ void arsaRaw(arsaRawArgs& args)
 	}
 	PutRNGstate();
 }
+#ifdef USE_OPENMP
+//Related to parallel version
+struct change
+{
+	bool isMove;
+	int swap1, swap2;
+	double delta;
+};
+void deltaForChange(change& possibleChange, const std::vector<int>& currentPermutation, const Rbyte* rawDist, const std::vector<double>& levels)
+{
+	R_xlen_t swap1 = possibleChange.swap1, swap2 = possibleChange.swap2;
+	std::vector<int> deltaComponents(levels.size());
+	R_xlen_t n = currentPermutation.size();
+	if(possibleChange.isMove)
+	{
+		possibleChange.delta = computeMoveDelta(deltaComponents, swap1, swap2, currentPermutation, rawDist, n, levels);
+	}
+	else
+	{
+		possibleChange.delta = computeDelta(currentPermutation, swap1, swap2, rawDist, levels, deltaComponents);
+	}
+}
+void makeChange(change& possibleChange, std::vector<int>& currentPermutation, const Rbyte* rawDist, const std::vector<double>& levels, double z, double zbestThisRep, std::vector<int>& bestPermutationThisRep, double temperature)
+{
+	R_xlen_t swap1 = possibleChange.swap1, swap2 = possibleChange.swap2;
+	R_xlen_t n = currentPermutation.size();
+	double delta = possibleChange.delta;
+	if(possibleChange.isMove)
+	{
+		int permutedSwap1 = currentPermutation[swap1];
+		if(delta > -1e-8 || unif_rand() <= exp(delta / temperature))
+		{
+			z += delta;
+			if(swap2 > swap1)
+			{
+				for(R_xlen_t i = swap1; i < swap2; i++)
+				{
+					currentPermutation[i] = currentPermutation[i+1];
+				}
+				currentPermutation[swap2] = (int)permutedSwap1;
+			}
+			else
+			{
+				for(R_xlen_t i = swap1; i > swap2; i--)
+				{
+					currentPermutation[i] = currentPermutation[i-1];
+				}
+				currentPermutation[swap2] = (int)permutedSwap1; 
+			}
+		}
+		if(delta > -1e-8 && z > zbestThisRep)
+		{
+			bestPermutationThisRep = currentPermutation;
+			zbestThisRep = z;
+		}
+	}
+	else
+	{
+		if(delta > -1e-8)
+		{
+			z += delta;
+			std::swap(currentPermutation[swap1], currentPermutation[swap2]);
+			if(z > zbestThisRep)
+			{
+				zbestThisRep = z;
+				bestPermutationThisRep = currentPermutation;
+			}
+		}
+		else
+		{
+			if(unif_rand() <= exp(delta / temperature))
+			{
+				z += delta;
+				std::swap(currentPermutation[swap1], currentPermutation[swap2]);
+			}
+		}
+	}
+}
+void arsaRawParallel(arsaRawArgs& args)
+{
+	long n = args.n;
+	Rbyte* rawDist = args.rawDist;
+	std::vector<double>& levels = args.levels;
+	double cool = args.cool;
+	double temperatureMin = args.temperatureMin;
+	long nReps = args.nReps;
+	std::vector<int>& permutation = args.permutation;
+	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
+	bool randomStart = args.randomStart;
+	int maxMove = args.maxMove;
+	double effortMultiplier = args.effortMultiplier;
 
+	permutation.resize(n);
+	if(n == 1)
+	{
+		permutation[0] = 0;
+		return;
+	}
+	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
+	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
+	double zbestAllReps = -std::numeric_limits<double>::infinity();
+	//A copy of the best permutation found
+	std::vector<int> bestPermutationThisRep(n);
+	//We use this to build the random permutations
+	std::vector<int> consecutive(n);
+	for(R_xlen_t i = 0; i < n; i++) consecutive[i] = (int)i;
+	std::vector<int> deltaComponents(levels.size());
+	//We're doing lots of simulation, so we use the old-fashioned approach to dealing with Rs random number generation
+	GetRNGstate();
+
+	std::vector<change> stackOfChanges;
+	std::vector<bool> dirty(n, false);
+	for(int repCounter = 0; repCounter < nReps; repCounter++)
+	{
+		//create the random permutation, if we decided to use a random initial permutation
+		if(randomStart)
+		{
+			for(R_xlen_t i = 0; i < n; i++)
+			{
+				double rand = unif_rand();
+				R_xlen_t index = (R_xlen_t)(rand*(n-i));
+				if(index == n-i) index--;
+				bestPermutationThisRep[i] = consecutive[index];
+				std::swap(consecutive[index], *(consecutive.rbegin()+i));
+			}
+		}
+		else
+		{
+			for(R_xlen_t i = 0; i < n; i++)
+			{
+				bestPermutationThisRep[i] = consecutive[i];
+			}
+		}
+		//calculate value of z
+		double z = 0;
+		for(R_xlen_t i = 0; i < n-1; i++)
+		{
+			R_xlen_t k = bestPermutationThisRep[i];
+			for(R_xlen_t j = i+1; j < n; j++)
+			{
+				R_xlen_t l = bestPermutationThisRep[j];
+				z += (j-i) * levels[rawDist[l*n + k]];
+			}
+		}
+		double zbestThisRep = z;
+		double temperatureMax = 0;
+		//Now try 5000 random swaps
+		for(R_xlen_t swapCounter = 0; swapCounter < (R_xlen_t)(5000*effortMultiplier); swapCounter++)
+		{
+			R_xlen_t swap1, swap2;
+			getPairForSwap(n, swap1, swap2);
+			double delta = computeDelta(bestPermutationThisRep, swap1, swap2, rawDist, levels, deltaComponents);
+			if(delta < 0)
+			{
+				if(fabs(delta) > temperatureMax) temperatureMax = fabs(delta);
+			}
+		}
+		double temperature = temperatureMax;
+		std::vector<int> currentPermutation = bestPermutationThisRep;
+		int nloop = (int)((log(temperatureMin) - log(temperatureMax)) / log(cool));
+		long totalSteps = (long)(nloop * 100 * n * effortMultiplier);
+		long done = 0;
+		//Rcpp::Rcout << "Steps needed: " << nloop << std::endl;
+		for(R_xlen_t idk = 0; idk < nloop; idk++)
+		{
+			//Rcpp::Rcout << "Temp = " << temperature << std::endl;
+			for(R_xlen_t k = 0; k < (R_xlen_t)(100*n*effortMultiplier); k++)
+			{
+				R_xlen_t swap1, swap2;
+				//swap
+				if(unif_rand() <= 0.5)
+				{
+					getPairForSwap(n, swap1, swap2);
+					change newChange;
+					newChange.isMove = false;
+					newChange.swap1 = swap1; newChange.swap2 = swap2;
+
+					if(dirty[swap1] || dirty[swap2])
+					{
+						#pragma omp parallel for
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						{
+							deltaForChange(*i, currentPermutation, rawDist, levels);
+						}
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						{
+							makeChange(*i, currentPermutation, rawDist, levels, z, zbestThisRep, bestPermutationThisRep, temperature);
+						}
+						done += stackOfChanges.size();
+						progressFunction(done, totalSteps);
+						stackOfChanges.clear();
+						std::fill(dirty.begin(), dirty.end(), false);
+					}
+					else dirty[swap1] = dirty[swap2] = true;
+					stackOfChanges.push_back(newChange);
+				}
+				//insertion
+				else
+				{
+					getPairForMove(n, swap1, swap2, maxMove);
+					bool canDefer = true;
+					for(R_xlen_t i = std::min(swap1, swap2); i != std::max(swap1, swap2)+1; i++) canDefer &= !dirty[i];
+					change newChange;
+					newChange.isMove = true;
+					newChange.swap1 = swap1; 
+					newChange.swap2 = swap2;
+					if(canDefer)
+					{
+						std::fill(dirty.begin() + std::min(swap1, swap2), dirty.begin() + std::max(swap1, swap2)+1, true);
+					}
+					else
+					{
+						#pragma omp parallel for
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						{
+							deltaForChange(*i, currentPermutation, rawDist, levels);
+						}
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						{
+							makeChange(*i, currentPermutation, rawDist, levels, z, zbestThisRep, bestPermutationThisRep, temperature);
+						}
+
+						done += stackOfChanges.size();
+						progressFunction(done, totalSteps);
+						stackOfChanges.clear();
+						std::fill(dirty.begin(), dirty.end(), false);
+					}
+					stackOfChanges.push_back(newChange);
+				}
+			}
+			#pragma omp parallel for
+			for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+			{
+				deltaForChange(*i, currentPermutation, rawDist, levels);
+			}
+			for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+			{
+				makeChange(*i, currentPermutation, rawDist, levels, z, zbestThisRep, bestPermutationThisRep, temperature);
+			}
+
+			done += stackOfChanges.size();
+			progressFunction(done, totalSteps);
+			stackOfChanges.clear();
+			std::fill(dirty.begin(), dirty.end(), false);
+			temperature *= cool;
+		}
+		if(zbestThisRep > zbestAllReps)
+		{
+			zbestAllReps = zbestThisRep;
+			permutation.swap(bestPermutationThisRep);
+		}
+	}
+	PutRNGstate();
+}
+#endif

@@ -23,5 +23,8 @@ public:
 };
 void arsaRaw(arsaRawArgs& args);
 void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier);
+#ifdef USE_OPENMP
+void arsaRawParallel(arsaRawArgs& args);
+#endif
 #endif
 
