@@ -46,14 +46,10 @@ setMethod(f = "+", signature = c("mpcross", "multiparentSNP"), definition = func
 		warning("Assigning SNP marker patterns will remove all data except genetic data")
 	}
 	e1 <- as(e1, "mpcross")
-	if(length(e1@geneticData) > 1)
-	{
-		stop("Attempting to change an object containing multiple data sets. Please change each dataset individually")
-	}
-	if(nFounders(e1) == 2)
+	if(any(nFounders(e1) == 2))
 	{
 		stop("multiparentSNP cannot be applied to a biparental design. Did you mean to use biparentDominant?")
 	}
-	e1@geneticData[[1]] <- e1@geneticData[[1]]+e2
+	e1@geneticData <- new("geneticDataList", lapply(e1@geneticData, function(x) x+e2))
 	return(e1)
 })
