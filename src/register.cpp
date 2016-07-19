@@ -62,7 +62,7 @@ extern "C"
 		{"hclustCombinedMatrix", (DL_FUNC)&hclustCombinedMatrix, 2},
 		{"hclustLodMatrix", (DL_FUNC)&hclustLodMatrix, 2},
 		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
-		{"order", (DL_FUNC)&order, 6},
+		{"order", (DL_FUNC)&order, 9},
 		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
 		{"arsa", (DL_FUNC)&arsaExportedR, 5},
 		{"imputeWholeObject", (DL_FUNC)&imputeWholeObject, 2},

@@ -1,5 +1,5 @@
 #' @export
-orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, verbose = FALSE)
+orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0, effortMultiplier = 1, randomStart = TRUE, verbose = FALSE)
 {
 	if(!is(mpcrossLG, "mpcrossLG"))
 	{
@@ -14,11 +14,11 @@ orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, verbose = F
 		return(mpcrossLG)
 	}
 	mpcrossLG <- as(mpcrossLG, "mpcrossLG")
-	permutation <- .Call("order", mpcrossLG, mpcrossLG@lg@allGroups, cool, tmin, nReps, verbose, PACKAGE="mpMap2")
+	permutation <- .Call("order", mpcrossLG, mpcrossLG@lg@allGroups, cool, tmin, nReps, maxMove, effortMultiplier, randomStart, verbose, PACKAGE="mpMap2")
 	return(subset(mpcrossLG, markers = permutation))
 }
 #' @export
-orderLargeCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, markersPerGroup)
+clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, markersPerGroup)
 {
 	if(!is(mpcrossLG, "mpcrossLG"))
 	{

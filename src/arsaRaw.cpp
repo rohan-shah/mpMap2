@@ -6,6 +6,18 @@
 void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier)
 {
 	arsaRawArgs args(levels, permutation);
+	if(n < 1)
+	{
+		throw std::runtime_error("Input n must be positive");
+	}
+	if(temperatureMin <= 0)
+	{
+		throw std::runtime_error("Input temperatureMin must be positive");
+	}
+	if(maxMove < 0)
+	{
+		throw std::runtime_error("Input maxMove must be non-negative");
+	}
 	args.n = n;
 	args.rawDist = rawDist;
 	args.cool = cool;
@@ -185,6 +197,10 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input n must be an integer");
 	}
+	if(n < 1)
+	{
+		throw std::runtime_error("Input n must be positive");
+	}
 
 	Rcpp::RawVector rawDist;
 	try
@@ -224,6 +240,10 @@ BEGIN_RCPP
 	catch(...)
 	{
 		throw std::runtime_error("Input temperatureMin must be a number");
+	}
+	if(temperatureMin <= 0)
+	{
+		throw std::runtime_error("Input temperatureMin must be positive");
 	}
 
 	double cool;
@@ -277,18 +297,37 @@ void arsaRaw(arsaRawArgs& args)
 	std::vector<double>& levels = args.levels;
 	double cool = args.cool;
 	double temperatureMin = args.temperatureMin;
+	if(temperatureMin <= 0)
+	{
+		throw std::runtime_error("Input temperatureMin must be positive");
+	}
+	
 	long nReps = args.nReps;
 	std::vector<int>& permutation = args.permutation;
 	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
 	bool randomStart = args.randomStart;
+
 	int maxMove = args.maxMove;
+	if(maxMove < 0)
+	{
+		throw std::runtime_error("Input maxMove must be non-negative");
+	}
+
 	double effortMultiplier = args.effortMultiplier;
+	if(effortMultiplier <= 0)
+	{
+		throw std::runtime_error("Input effortMultiplier must be positive");
+	}
 
 	permutation.resize(n);
 	if(n == 1)
 	{
 		permutation[0] = 0;
 		return;
+	}
+	else if(n < 1)
+	{
+		throw std::runtime_error("Input n must be positive");
 	}
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
@@ -518,12 +557,27 @@ void arsaRawParallel(arsaRawArgs& args)
 	std::vector<double>& levels = args.levels;
 	double cool = args.cool;
 	double temperatureMin = args.temperatureMin;
+	if(temperatureMin <= 0)
+	{
+		throw std::runtime_error("Input temperatureMin must be positive");
+	}
+	
 	long nReps = args.nReps;
 	std::vector<int>& permutation = args.permutation;
 	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
 	bool randomStart = args.randomStart;
+
 	int maxMove = args.maxMove;
+	if(maxMove < 0)
+	{
+		throw std::runtime_error("Input maxMove must be non-negative");
+	}
+
 	double effortMultiplier = args.effortMultiplier;
+	if(effortMultiplier <= 0)
+	{
+		throw std::runtime_error("Input effortMultiplier must be positive");
+	}
 
 	permutation.resize(n);
 	if(n == 1)
@@ -531,6 +585,11 @@ void arsaRawParallel(arsaRawArgs& args)
 		permutation[0] = 0;
 		return;
 	}
+	else if(n < 1)
+	{
+		throw std::runtime_error("Input n must be positive");
+	}
+
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
 	double zbestAllReps = -std::numeric_limits<double>::infinity();

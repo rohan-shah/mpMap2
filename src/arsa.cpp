@@ -67,6 +67,10 @@ BEGIN_RCPP
 		retVal[0] = 0;
 		return retVal;
 	}
+	else if(n < 1)
+	{
+		throw std::runtime_error("Input n must be positive. Is this a zero dimension matrix?");
+	}
 
 	Rcpp::NumericVector dist;
 	try
@@ -123,11 +127,27 @@ END_RCPP
 void arsa(arsaArgs& args)
 {
 	R_xlen_t n = args.n;
+	if(n <= 0)
+	{
+		throw std::runtime_error("Input n must be positive. Is this a zero dimension matrix?");
+	}
 	double* dist = args.dist;
 	int nReps = args.nReps;
+	if(nReps <= 0)
+	{
+		throw std::runtime_error("Input nReps must be positive");
+	}
 	double temperatureMin = args.temperatureMin;
+	if(temperatureMin <= 0)
+	{
+		throw std::runtime_error("Input temperatureMin must be positive");
+	}
 	double cool = args.cool;
 	double effortMultiplier = args.effortMultiplier;
+	if(effortMultiplier <= 0)
+	{
+		throw std::runtime_error("Input effortMultiplier must be positive");
+	}
 	std::function<void(unsigned long,unsigned long)> progressFunction = args.progressFunction;
 	//We skip the initialisation of D, R1 and R2 from arsa.f, and the computation of asum. 
 	//Next the original arsa.f code creates nReps random permutations, and holds them all at once. This doesn't seem necessary, we create them one at a time and discard them
