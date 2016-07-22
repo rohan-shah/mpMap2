@@ -18,7 +18,7 @@ orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0
 	return(subset(mpcrossLG, markers = permutation))
 }
 #' @export
-clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, markersPerGroup)
+clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0, effortMultiplier = 1, randomStart = TRUE, nGroups)
 {
 	if(!is(mpcrossLG, "mpcrossLG"))
 	{
@@ -28,9 +28,9 @@ clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, mark
 	{
 		stop("Input mpcrossLG object did not contain recombination fraction information")
 	}
-	if(missing(markersPerGroup) || markersPerGroup < 1)
+	if(missing(nGroups) || nGroups < 1)
 	{
-		stop("Input markersPerGroup must be a positive integer")
+		stop("Input nGroups must be a positive integer")
 	}
 	mpcrossLG <- as(mpcrossLG, "mpcrossLG")
 	orderedMarkers <- vector(mode = "list")
@@ -47,7 +47,7 @@ clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, mark
 			currentGroupCross <- impute(currentGroupCross)
 			underlying <- currentGroupCross@lg@imputedTheta[[1]]
 		}
-		if(markersPerGroup >= length(underlying@markers))
+		if(nGroups >= length(underlying@markers))
 		{
 			orderedMarkers[[groupAsCharacter]] <- underlying@markers
 		}
@@ -55,12 +55,11 @@ clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, mark
 		{
 			distMatrix <- .Call("rawSymmetricMatrixToDist", underlying, PACKAGE="mpMap2")
 			clustered <- fastcluster::hclust(distMatrix, method = "average")
-			nGroups <- ceiling(length(underlying@markers) / markersPerGroup)
 			groupings <- cutree(clustered, nGroups)
 			dissimilarityMatrix <- .Call("constructDissimilarityMatrix", underlying, groupings, PACKAGE="mpMap2")
 	
 			diag(dissimilarityMatrix) <- 0
-			orderingOfGroups <- .Call("arsa", nGroups, dissimilarityMatrix[upper.tri(dissimilarityMatrix, diag = TRUE)], cool, tmin, nReps, PACKAGE="mpMap2")
+			orderingOfGroups <- .Call("arsa", nGroups, dissimilarityMatrix[upper.tri(dissimilarityMatrix, diag = TRUE)], cool, tmin, nReps, maxMove, effortMultiplier, randomStart, PACKAGE="mpMap2")
 			ordering <- unlist(lapply(1:orderingOfGroups, function(x) which(groupings == orderingOfGroups[x]+1)))
 			orderedMarkers[[groupAsCharacter]] <- underlying@markers[ordering]
 		}

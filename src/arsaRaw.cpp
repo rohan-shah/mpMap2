@@ -3,30 +3,8 @@
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
-void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier)
+void arsaRawExported(arsaRawArgs& args)
 {
-	arsaRawArgs args(levels, permutation);
-	if(n < 1)
-	{
-		throw std::runtime_error("Input n must be positive");
-	}
-	if(temperatureMin <= 0)
-	{
-		throw std::runtime_error("Input temperatureMin must be positive");
-	}
-	if(maxMove < 0)
-	{
-		throw std::runtime_error("Input maxMove must be non-negative");
-	}
-	args.n = n;
-	args.rawDist = rawDist;
-	args.cool = cool;
-	args.temperatureMin = temperatureMin;
-	args.nReps = nReps;
-	args.progressFunction = progressFunction;
-	args.randomStart = randomStart;
-	args.maxMove = maxMove;
-	args.effortMultiplier = effortMultiplier;
 #ifdef USE_OPENMP
 	if(omp_get_max_threads() > 1)
 	{
@@ -185,7 +163,7 @@ inline double computeMoveDelta(std::vector<int>& deltaComponents, int swap1, int
 	}
 	return deltaFromComponents(levels, deltaComponents);
 }
-SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_)
+SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp)
 {
 BEGIN_RCPP
 	R_xlen_t n;
@@ -232,6 +210,44 @@ BEGIN_RCPP
 		throw std::runtime_error("Input nReps must be an integer");
 	}
 
+	int maxMove;
+	try
+	{
+		maxMove = Rcpp::as<int>(maxMove_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input maxMove must be an integer");
+	}
+	if(maxMove < 0)
+	{
+		throw std::runtime_error("Input maxMove must be non-negative");
+	}
+
+	bool randomStart;
+	try
+	{
+		randomStart = Rcpp::as<bool>(randomStart_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input randomStart must be a logical");
+	}
+
+	double effortMultiplier;
+	try
+	{
+		effortMultiplier = Rcpp::as<double>(effortMultiplier_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input effortMultiplier must be numeric");
+	}
+	if(effortMultiplier <= 0)
+	{
+		throw std::runtime_error("Input effortMultiplier must be positive");
+	}
+
 	double temperatureMin;
 	try
 	{
@@ -274,9 +290,9 @@ BEGIN_RCPP
 	args.temperatureMin = temperatureMin;
 	args.nReps = nReps;
 	args.progressFunction = progressFunction;
-	args.randomStart = true;
-	args.maxMove = 0;
-	args.effortMultiplier = 1;
+	args.randomStart = randomStart;
+	args.maxMove = maxMove;
+	args.effortMultiplier = effortMultiplier;
 #ifdef USE_OPENMP
 	if(omp_get_max_threads() > 1)
 	{

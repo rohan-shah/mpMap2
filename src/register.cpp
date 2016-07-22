@@ -64,7 +64,7 @@ extern "C"
 		{"omp_set_num_threads", (DL_FUNC)&mpMap2_omp_set_num_threads, 1},
 		{"order", (DL_FUNC)&order, 9},
 		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
-		{"arsa", (DL_FUNC)&arsaExportedR, 5},
+		{"arsa", (DL_FUNC)&arsaExportedR, 8},
 		{"imputeWholeObject", (DL_FUNC)&imputeWholeObject, 2},
 		{"imputeGroup", (DL_FUNC)&imputeGroup, 3},
 		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
@@ -104,7 +104,7 @@ extern "C"
 #endif
 		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
 		R_RegisterCCallable(package_name, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
-		R_RegisterCCallable(package_name, "arsaRawExported", (DL_FUNC)&arsaRawExported);
-		R_RegisterCCallable(package_name, "arsaExported", (DL_FUNC)&arsaExported);
+		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRawExported);
+		R_RegisterCCallable(package_name, "arsa", (DL_FUNC)&arsa);
 	}
 }

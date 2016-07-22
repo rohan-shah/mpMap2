@@ -2,7 +2,7 @@
 #define MPMAP2_ARSA_RAW_HEADER_GUARD
 #include "Rcpp.h"
 #include <functional>
-SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_);
+SEXP arsaRaw(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp);
 struct arsaRawArgs
 {
 public:
@@ -22,7 +22,7 @@ public:
 	std::vector<int>& permutation;
 };
 void arsaRaw(arsaRawArgs& args);
-void arsaRawExported(std::vector<double>& levels, std::vector<int>& permutation, long n, Rbyte* rawDist, double cool, double temperatureMin, long nReps, std::function<void(unsigned long,unsigned long)> progressFunction, bool randomStart, int maxMove, double effortMultiplier);
+void arsaRawExported(arsaRawArgs& args);
 #ifdef USE_OPENMP
 void arsaRawParallel(arsaRawArgs& args);
 #endif
