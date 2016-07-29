@@ -323,6 +323,6 @@ BEGIN_RCPP
 	
 	std::vector<int> permutation(nMarkers);
 	for(int i = 0; i < nMarkers; i++) permutation[i] = i;
-	return constructDissimilarityMatrixInternal(&(data(0, 0)), levelsCopied, nMarkers, clusters_, 0, permutation);
+	return constructDissimilarityMatrixInternal(&(data(0)), levelsCopied, nMarkers, clusters_, 0, permutation);
 END_RCPP
 }

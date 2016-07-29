@@ -60,7 +60,7 @@ clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxM
 	
 			diag(dissimilarityMatrix) <- 0
 			orderingOfGroups <- .Call("arsa", nGroups, dissimilarityMatrix[upper.tri(dissimilarityMatrix, diag = TRUE)], cool, tmin, nReps, maxMove, effortMultiplier, randomStart, PACKAGE="mpMap2")
-			ordering <- unlist(lapply(1:orderingOfGroups, function(x) which(groupings == orderingOfGroups[x]+1)))
+			ordering <- unlist(lapply(1:length(orderingOfGroups), function(x) which(groupings == orderingOfGroups[x]+1)))
 			orderedMarkers[[groupAsCharacter]] <- underlying@markers[ordering]
 		}
 	}
