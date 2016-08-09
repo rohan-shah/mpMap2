@@ -53,11 +53,7 @@ checkPedigree <- function(object)
 	{
 		errors <- c(errors, "Number of founders must be at least 2")
 	}
-	if(is.null(object@warnImproperFunnels) || length(object@warnImproperFunnels) == 0)
-	{
-		object@warnImproperFunnels <- TRUE
-	}
-	if(length(object@warnImproperFunnels) != 1)
+	if(is.null(object@warnImproperFunnels) || length(object@warnImproperFunnels) != 1)
 	{
 		errors <- c(errors, "Slot warnImproperFunnels must be a single logical value")
 	}
@@ -78,3 +74,14 @@ checkPedigree <- function(object)
 #' @name pedigree-class
 NULL
 .pedigree <- setClass("pedigree", slots = list(lineNames = "character", mother = "integer", father = "integer", selfing = "character", warnImproperFunnels = "logical"), validity = checkPedigree)
+#' @export
+pedigree <- function(lineNames, mother, father, selfing, warnImproperFunnels)
+{
+	mother <- as.integer(mother)
+	father <- as.integer(father)
+	if(missing(warnImproperFunnels) || length(warnImproperFunnels) == 0)
+	{
+		warnImproperFunnels <- TRUE
+	}
+	return(new("pedigree", lineNames = lineNames, mother = mother, father = father, selfing = selfing, warnImproperFunnels = warnImproperFunnels))
+}
