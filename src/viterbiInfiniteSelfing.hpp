@@ -42,8 +42,6 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	{}
 	void apply(int start, int end)
 	{
-		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
-		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		minAIGenerations = std::max(minAIGenerations, 1);
@@ -52,11 +50,11 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)
 			{
-				applyFunnel(start, end, finalCounter, (*lineFunnelIDs)[finalCounter], (*selfingGenerations)[finalCounter]);
+				applyFunnel(start, end, finalCounter, (*lineFunnelIDs)[finalCounter]);
 			}
 			else
 			{
-				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter], (*selfingGenerations)[finalCounter]);
+				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter]);
 			}
 			std::vector<double>::iterator longestPath = std::max_element(pathLengths1.begin(), pathLengths1.end());
 			int longestIndex = (int)std::distance(pathLengths1.begin(), longestPath);
@@ -66,7 +64,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 			}
 		}
 	}
-	void applyFunnel(int start, int end, int finalCounter, int funnelID, int selfingGenerations)
+	void applyFunnel(int start, int end, int finalCounter, int funnelID)
 	{
 		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		int markerValue = recodedFinals(finalCounter, start);
@@ -101,7 +99,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 					{
 						if(recodedFounders(funnel[founderCounter2], markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
-							working[funnel[founderCounter2]] = pathLengths1[funnel[founderCounter2]] + funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
+							working[funnel[founderCounter2]] = pathLengths1[funnel[founderCounter2]] + funnelHaplotypeProbabilities(markerCounter-start, 0).values[founderCounter2][founderCounter];
 						}
 					}
 					//Get the shortest one, and check that it's not negative infinity.
@@ -140,7 +138,7 @@ stopIdenticalSearch:
 			;
 		}
 	}
-	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
+	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration)
 	{
 		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		int markerValue = recodedFinals(finalCounter, start);
@@ -172,7 +170,7 @@ stopIdenticalSearch:
 						//NA corresponds to no restriction
 						if(recodedFounders(founderCounter2, markerCounter) == previousMarkerValue || previousMarkerValue == NA_INTEGER)
 						{
-							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter2][founderCounter];
+							working[founderCounter2] = pathLengths1[founderCounter2] + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
 						}
 					}
 					//Get the longest one, and check that it's not negative infinity.
