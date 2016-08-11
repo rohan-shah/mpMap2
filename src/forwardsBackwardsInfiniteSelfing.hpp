@@ -139,32 +139,26 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			double sum = 0;
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				results(4*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
-				sum += results(4*finalCounter + founderCounter, markerCounter);
+				results(nFounders*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
+				sum += results(nFounders*finalCounter + founderCounter, markerCounter);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				results(4*finalCounter + founderCounter, markerCounter) /= sum;
+				results(nFounders*finalCounter + founderCounter, markerCounter) /= sum;
 			}
 		}
 	}
 	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration)
 	{
-		//Compute forward probabilities
 		int markerValue = recodedFinals(finalCounter, start);
-		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
-		int funnel[16];
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
-		}
+		//Compute forward probabilities
 		{
 			int validInitial = 0;
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(recodedFounders(funnel[founderCounter], start) == markerValue || markerValue == NA_INTEGER)
+				if(recodedFounders(founderCounter, start) == markerValue || markerValue == NA_INTEGER)
 				{
-					forwardProbabilities(funnel[founderCounter], 0) = 1;
+					forwardProbabilities(founderCounter, 0) = 1;
 					validInitial++;
 				}
 				else forwardProbabilities(founderCounter, 0) = 0;
@@ -182,19 +176,19 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
 				forwardProbabilities(founderCounter, markerCounter - start + 1) = 0;
-				if(recodedFounders(funnel[founderCounter], markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+				if(recodedFounders(founderCounter, markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
 				{
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
-						forwardProbabilities(funnel[founderCounter], markerCounter - start + 1) += forwardProbabilities(funnel[founderCounter2], markerCounter - start) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
+						forwardProbabilities(founderCounter, markerCounter - start + 1) += forwardProbabilities(founderCounter2, markerCounter - start) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
 					}
 				}
-				sum += forwardProbabilities(funnel[founderCounter], markerCounter - start + 1);
+				sum += forwardProbabilities(founderCounter, markerCounter - start + 1);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				forwardProbabilities(funnel[founderCounter], markerCounter - start + 1) /= sum;
+				forwardProbabilities(founderCounter, markerCounter - start + 1) /= sum;
 			}
 		}
 		//Now the backwards probabilities
@@ -209,20 +203,20 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			//The founder at the current marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				backwardProbabilities(funnel[founderCounter], markerCounter - start) = 0;
+				backwardProbabilities(founderCounter, markerCounter - start) = 0;
 				//The founder at the previous marker
 				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 				{
-					if(recodedFounders(funnel[founderCounter2], markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+					if(recodedFounders(founderCounter2, markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
 					{
-						backwardProbabilities(funnel[founderCounter], markerCounter - start) += backwardProbabilities(funnel[founderCounter2], markerCounter - start + 1) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
+						backwardProbabilities(founderCounter, markerCounter - start) += backwardProbabilities(founderCounter2, markerCounter - start + 1) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
 					}
 				}
-				sum += backwardProbabilities(funnel[founderCounter], markerCounter - start);
+				sum += backwardProbabilities(founderCounter, markerCounter - start);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				backwardProbabilities(funnel[founderCounter], markerCounter - start) /= sum;
+				backwardProbabilities(founderCounter, markerCounter - start) /= sum;
 			}
 		}
 		//Now we can compute the marginal probabilities
@@ -231,12 +225,12 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			double sum = 0;
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				results(4*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
-				sum += results(4*finalCounter + founderCounter, markerCounter);
+				results(nFounders*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
+				sum += results(nFounders*finalCounter + founderCounter, markerCounter);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				results(4*finalCounter + founderCounter, markerCounter) /= sum;
+				results(nFounders*finalCounter + founderCounter, markerCounter) /= sum;
 			}
 		}
 	}

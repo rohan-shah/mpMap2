@@ -115,7 +115,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	markerPatternsToUniqueValues(markerPatternData);
 
 	//Intermediate results. These give the most likely paths from the start of the chromosome to a marker, assuming some value for the underlying founder at the marker
-	Rcpp::IntegerMatrix intermediate(nFounders, maxChromosomeMarkers);
 	int cumulativeMarkerCounter = 0;
 
 	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
