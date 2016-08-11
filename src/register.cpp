@@ -30,6 +30,7 @@
 #include "compressedProbabilities_RInterface.h"
 #include "testDistortion.h"
 #include "removeHets.h"
+#include "computeGenotypeProbabilities.h"
 #ifdef HAS_BOOST
 	#include "reorderPedigree.h"
 #endif
@@ -80,6 +81,7 @@ extern "C"
 #endif
 		{"testDistortion", (DL_FUNC)&testDistortion, 1},
 		{"removeHets", (DL_FUNC)&removeHets, 3},
+		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 4},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

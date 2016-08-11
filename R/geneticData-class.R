@@ -165,7 +165,9 @@ checkImputedData <- function(object)
 }
 .imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix"), validity = checkImputedData)
 setClassUnion("imputedOrNULL", c("imputed", "NULL"))
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL"), validity = checkGeneticData)
+.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix"))
+setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
 checkGeneticDataList <- function(object)
 {
 	if(any(unlist(lapply(object, class)) != "geneticData"))
