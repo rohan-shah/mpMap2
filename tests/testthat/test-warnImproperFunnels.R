@@ -13,6 +13,7 @@ test_that("Test warnImproperFunnels with four-parent single funnel design",
 		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), prints_text("Did you intend to use all"))
 
 		pedigree@warnImproperFunnels <- FALSE
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), not(gives_warning()))
 
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)

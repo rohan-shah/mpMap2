@@ -27,8 +27,6 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 	std::vector<funnelEncoding>* lineFunnelEncodings;
 	std::vector<int>* intercrossingGenerations;
 	std::vector<int>* selfingGenerations;
-	int minSelfingGenerations;
-	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
 	double heterozygoteMissingProb, homozygoteMissingProb;
 	Rcpp::IntegerMatrix key;

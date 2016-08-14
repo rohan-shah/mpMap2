@@ -15,7 +15,7 @@
 #include "forwardsBackwards.hpp"
 #include "recodeHetsAsNA.h"
 #include "impossibleDataException.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomeMarkers = 0;
@@ -132,17 +132,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		array2<nFounders>& intercrossingArray = intercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
 		singleLocusGenotypeProbabilitiesNoIntercross<nFounders, infiniteSelfing>(funnelArray, selfingGenerationCounter, nFunnels);
 		singleLocusGenotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingArray, selfingGenerationCounter, nFunnels);
-		//Take logarithms
-		for(int i = 0; i < nFounders; i++)
-		{
-			for(int j = 0; j < nFounders; j++)
-			{
-				if(funnelArray.values[i][j] == 0) funnelArray.values[i][j] = -std::numeric_limits<double>::infinity();
-				else funnelArray.values[i][j] = log(funnelArray.values[i][j]);
-				if(intercrossingArray.values[i][j] == 0) intercrossingArray.values[i][j] = -std::numeric_limits<double>::infinity();
-				else intercrossingArray.values[i][j] = log(intercrossingArray.values[i][j]);
-			}
-		}
 	}
 
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
@@ -192,11 +181,11 @@ template<int nFounders> void computeGenotypeProbabilitiesInternal1(Rcpp::Integer
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		computeFounderGenotypesInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		computeFounderGenotypesInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
 	}
 }
 SEXP computeGenotypeProbabilities(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp)
@@ -373,7 +362,15 @@ BEGIN_RCPP
 	}
 
 	int nFinals = finals.nrow();
-	Rcpp::NumericMatrix results(nFinals*nFounders, (int)mapMarkers.size());
+	Rcpp::NumericMatrix results;
+	if(!infiniteSelfing)
+	{
+		results = Rcpp::NumericMatrix(nFinals*nFounders*(nFounders+1)/2, (int)mapMarkers.size());
+	}
+	else
+	{
+		results = Rcpp::NumericMatrix(nFinals*nFounders, (int)mapMarkers.size());
+	}
 	try
 	{
 		if(nFounders == 2)

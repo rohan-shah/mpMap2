@@ -39,7 +39,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
-		: intermediate1(nFounders*nFounders, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1(nFounders*nFounders), pathLengths2(nFounders*nFounders), working(nFounders*nFounders), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData)
+		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData)
 	{}
 	void apply(int start, int end)
 	{
@@ -78,7 +78,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 			int longestIndex = (int)std::distance(pathLengths1.begin(), longestPath);
 			for(int i = 0; i < end - start; i++)
 			{
-				results(finalCounter, i+start) = intermediate1(longestIndex, i);
+				results(finalCounter, i+start) = intermediate1(longestIndex, i) + 1;
 			}
 		}
 	}
@@ -104,7 +104,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 			{
 				int markerEncodingTheseFounders = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
-				int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
+				int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && heterozygoteMissingProb != 0))))
 				{
@@ -129,7 +129,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
 					int encodingMarker = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
-					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
+					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], markerCounter) == recodedFounders(funnel[founderCounter], markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], markerCounter) != recodedFounders(funnel[founderCounter], markerCounter) && heterozygoteMissingProb != 0))))
 					{
 						//Founder at the previous marker. 
@@ -139,7 +139,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
 								int encodingPreviousMarker = previousMarkerData.hetData(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
-								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
+								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(funnel[founderPreviousCounter2], markerCounter) == recodedFounders(funnel[founderPreviousCounter], markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderPreviousCounter2], markerCounter) != recodedFounders(funnel[founderPreviousCounter], markerCounter) && heterozygoteMissingProb != 0))))
 								{
 									double multiple = 0;
@@ -184,22 +184,19 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)
 			{
-				int value = intermediate1(key(funnel[0], funnel[0]), identicalIndex);
+				int value = intermediate1(key(funnel[0], funnel[0])-1, identicalIndex);
 				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
 				{
 					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 					{
-						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2]);
+						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						if(value != intermediate1(encodingTheseFounders, identicalIndex)) goto stopIdenticalSearch;
 					}
 				}
 				//We don't care about the correct indexing here. Put the correct value in every row. 
-				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+				for(int i = 0; i < (nFounders*(nFounders+1))/2; i++)
 				{
-					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-					{
-						intermediate2(founderCounter*nFounders + founderCounter2, identicalIndex) = value;
-					}
+					intermediate2(i, identicalIndex) = value;
 				}
 				identicalIndex++;
 			}
@@ -223,7 +220,7 @@ stopIdenticalSearch:
 			for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 			{
 				int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
-				int encodingTheseFounders = key(founderCounter, founderCounter2);
+				int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && heterozygoteMissingProb != 0))))
 				{
@@ -248,7 +245,7 @@ stopIdenticalSearch:
 				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
 					int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
-					int encodingTheseFounders = key(founderCounter, founderCounter2);
+					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter) && heterozygoteMissingProb != 0))))
 					{
 						//Founder at the previous marker. 
@@ -258,7 +255,7 @@ stopIdenticalSearch:
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
 								int encodingPreviousMarker = previousMarkerData.hetData(founderPreviousCounter, founderPreviousCounter2);
-								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2);
+								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(founderPreviousCounter2, markerCounter) == recodedFounders(founderPreviousCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderPreviousCounter2, markerCounter) != recodedFounders(founderPreviousCounter, markerCounter) && heterozygoteMissingProb != 0))))
 								{
 									double multiple = 0;
@@ -301,22 +298,19 @@ stopIdenticalSearch:
 			pathLengths1.swap(pathLengths2);
 			while(identicalIndex != markerCounter-start + 1)
 			{
-				int value = intermediate1(key(0,0), identicalIndex);
+				int value = intermediate1(key(0,0)-1, identicalIndex);
 				for(int founderCounter = 1; founderCounter < nFounders; founderCounter++)
 				{
 					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 					{
-						int encodingTheseFounders = key(founderCounter, founderCounter2);
+						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						if(value != intermediate1(encodingTheseFounders, identicalIndex)) goto stopIdenticalSearch;
 					}
 				}
 				//We don't care about the correct indexing here. Put the correct value in every row. 
-				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+				for(int i = 0; i < (nFounders*(nFounders+1))/2; i++)
 				{
-					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-					{
-						intermediate2(founderCounter*nFounders + founderCounter2, identicalIndex) = value;
-					}
+					intermediate2(i, identicalIndex) = value;
 				}
 				identicalIndex++;
 			}

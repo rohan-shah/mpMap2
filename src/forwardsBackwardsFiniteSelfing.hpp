@@ -36,10 +36,12 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	forwardsBackwardsAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
-		: intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), forwardProbabilities(nFounders, maxChromosomeSize), backwardProbabilities(nFounders, maxChromosomeSize)
+		: intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), forwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize), backwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize)
 	{}
 	void apply(int start, int end)
 	{
+		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
+		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		minAIGenerations = std::max(minAIGenerations, 1);
@@ -48,19 +50,253 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)
 			{
-				applyFunnel(start, end, finalCounter, (*lineFunnelIDs)[finalCounter]);
+				applyFunnel(start, end, finalCounter, (*lineFunnelIDs)[finalCounter], (*selfingGenerations)[finalCounter]);
 			}
 			else
 			{
-				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter]);
+				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter], (*selfingGenerations)[finalCounter]);
 			}
 		}
 	}
-	void applyFunnel(int start, int end, int finalCounter, int funnelID)
+	void applyFunnel(int start, int end, int finalCounter, int funnelID, int selfingGenerations)
 	{
+		//Compute forward probabilities
+		int markerValue = recodedFinals(finalCounter, start);
+		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
+		int funnel[16];
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+		}
+		{
+			::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
+			double sum = 0;
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
+					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
+					if(markerValue == markerEncodingTheseFounders || (markerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && heterozygoteMissingProb != 0))))
+					{
+						forwardProbabilities(encodingTheseFounders, 0) = (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+						sum += forwardProbabilities(encodingTheseFounders, 0);
+					}
+					else forwardProbabilities(encodingTheseFounders, 0) = 0;
+				}
+			}
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				forwardProbabilities(founderCounter, 0) /= sum;
+			}
+		}
+		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
+		{
+			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter+1]];
+			double sum = 0;
+			//The founders at the new marker
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
+					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
+					forwardProbabilities(encodingTheseFounders, 0) = 0;
+					if(markerValue == markerEncodingTheseFounders || (markerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && heterozygoteMissingProb != 0))))
+					{
+						//Founders at the previous marker
+						for(int founderCounterPrevious = 0; founderCounterPrevious < nFounders; founderCounterPrevious++)
+						{
+							for(int founderCounterPrevious2 = 0; founderCounterPrevious2 <= founderCounterPrevious; founderCounterPrevious2++)
+							{
+								int encodingPreviousFounders = key(founderCounterPrevious, founderCounterPrevious2)-1;
+								forwardProbabilities(encodingTheseFounders, markerCounter - start + 1) += forwardProbabilities(encodingPreviousFounders, markerCounter - start) * funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderCounterPrevious][founderCounterPrevious2];
+							}
+						}
+					}
+					sum += forwardProbabilities(encodingTheseFounders, markerCounter - start + 1);
+				}
+			}
+			for(int counter = 0; counter < nFounders*(nFounders+1)/2; counter++)
+			{
+				forwardProbabilities(counter, markerCounter - start + 1) /= sum;
+			}
+		}
+		//Now the backwards probabilities
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+			{
+				int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
+				backwardProbabilities(encodingTheseFounders, end - start - 1) = (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+			}
+		}
+		for(int markerCounter = end - 2; markerCounter >= start; markerCounter--)
+		{
+			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter+1]];
+			double sum = 0;
+			//The founder at the current marker
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
+					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
+					backwardProbabilities(encodingTheseFounders, markerCounter - start) = 0;
+					//The founders at the previous marker
+					for(int founderCounterPrevious = 0; founderCounterPrevious < nFounders; founderCounterPrevious++)
+					{
+						for(int founderCounterPrevious2 = 0; founderCounterPrevious2 <= founderCounterPrevious; founderCounterPrevious2++)
+						{
+							int markerEncodingPreviousFounders = currentMarkerData.hetData(founderCounterPrevious, founderCounterPrevious2);
+							int encodingPreviousFounders = key(founderCounterPrevious, founderCounterPrevious2)-1;
+							if(markerValue == markerEncodingPreviousFounders || (markerValue == NA_INTEGER && ((recodedFounders(founderCounterPrevious2, start) == recodedFounders(founderCounterPrevious, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounterPrevious2, start) != recodedFounders(founderCounterPrevious, start) && heterozygoteMissingProb != 0))))
+							{
+								backwardProbabilities(encodingTheseFounders, markerCounter - start) += backwardProbabilities(encodingPreviousFounders, markerCounter - start + 1) * funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderCounterPrevious][founderCounterPrevious2];
+							}
+						}
+					}
+					sum += backwardProbabilities(encodingTheseFounders, markerCounter - start);
+				}
+			}
+			for(int counter = 0; counter < nFounders; counter++)
+			{
+				backwardProbabilities(counter, markerCounter - start) /= sum;
+			}
+		}
+		//Now we can compute the marginal probabilities
+		for(int markerCounter = start; markerCounter < end; markerCounter++)
+		{
+			double sum = 0;
+			for(int counter = 0; counter < nFounders; counter++)
+			{
+				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) = backwardProbabilities(counter, markerCounter - start) * forwardProbabilities(counter, markerCounter - start);
+				sum += results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter);
+			}
+			for(int counter = 0; counter < nFounders; counter++)
+			{
+				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) /= sum;
+			}
+		}
 	}
-	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration)
+	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
+		//Compute forward probabilities
+		int markerValue = recodedFinals(finalCounter, start);
+		{
+			::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
+			double sum = 0;
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
+					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
+					if(markerValue == markerEncodingTheseFounders || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && heterozygoteMissingProb != 0))))
+					{
+						forwardProbabilities(encodingTheseFounders, 0) = (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+						sum += forwardProbabilities(encodingTheseFounders, 0);
+					}
+					else forwardProbabilities(encodingTheseFounders, 0) = 0;
+				}
+			}
+			for(int founderCounter = 0; founderCounter < (nFounders*(nFounders+1))/2; founderCounter++)
+			{
+				forwardProbabilities(founderCounter, 0) /= sum;
+			}
+		}
+		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
+		{
+			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter+1]];
+			double sum = 0;
+			//The founders at the new marker
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = currentMarkerData.hetData(founderCounter, founderCounter2);
+					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
+					forwardProbabilities(encodingTheseFounders, markerCounter - start + 1) = 0;
+					if(markerValue == markerEncodingTheseFounders || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && heterozygoteMissingProb != 0))))
+					{
+						//Founders at the previous marker
+						for(int founderCounterPrevious = 0; founderCounterPrevious < nFounders; founderCounterPrevious++)
+						{
+							for(int founderCounterPrevious2 = 0; founderCounterPrevious2 <= founderCounterPrevious; founderCounterPrevious2++)
+							{
+								int encodingPreviousFounders = key(founderCounterPrevious, founderCounterPrevious2)-1;
+								forwardProbabilities(encodingTheseFounders, markerCounter - start + 1) += forwardProbabilities(encodingPreviousFounders, markerCounter - start) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderCounterPrevious][founderCounterPrevious2];
+							}
+						}
+					}
+					sum += forwardProbabilities(encodingTheseFounders, markerCounter - start + 1);
+				}
+			}
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
+			{
+				forwardProbabilities(counter, markerCounter - start + 1) /= sum;
+			}
+		}
+		//Now the backwards probabilities
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+			{
+				int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
+				backwardProbabilities(encodingTheseFounders, end - start - 1) = (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+			}
+		}
+		for(int markerCounter = end - 2; markerCounter >= start; markerCounter--)
+		{
+			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter+1]];
+			double sum = 0;
+			//The founder at the current marker
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					int markerEncodingTheseFounders = currentMarkerData.hetData(founderCounter, founderCounter2);
+					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
+					backwardProbabilities(encodingTheseFounders, markerCounter - start) = 0;
+					//The founders at the previous marker
+					for(int founderCounterPrevious = 0; founderCounterPrevious < nFounders; founderCounterPrevious++)
+					{
+						for(int founderCounterPrevious2 = 0; founderCounterPrevious2 <= founderCounterPrevious; founderCounterPrevious2++)
+						{
+							int markerEncodingPreviousFounders = currentMarkerData.hetData(founderCounterPrevious, founderCounterPrevious2);
+							int encodingPreviousFounders = key(founderCounterPrevious, founderCounterPrevious2)-1;
+							if(markerValue == markerEncodingPreviousFounders || (markerValue == NA_INTEGER && ((recodedFounders(founderCounterPrevious2, start) == recodedFounders(founderCounterPrevious, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounterPrevious2, start) != recodedFounders(founderCounterPrevious, start) && heterozygoteMissingProb != 0))))
+							{
+								backwardProbabilities(encodingTheseFounders, markerCounter - start) += backwardProbabilities(encodingPreviousFounders, markerCounter - start + 1) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderCounterPrevious][founderCounterPrevious2];
+							}
+						}
+					}
+					sum += backwardProbabilities(encodingTheseFounders, markerCounter - start);
+				}
+			}
+			for(int counter = 0; counter < (nFounders*(nFounders + 1))/2; counter++)
+			{
+				backwardProbabilities(counter, markerCounter - start) /= sum;
+			}
+		}
+		//Now we can compute the marginal probabilities
+		for(int markerCounter = start; markerCounter < end; markerCounter++)
+		{
+			double sum = 0;
+			for(int counter = 0; counter < (nFounders*(nFounders + 1))/2; counter++)
+			{
+				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) = backwardProbabilities(counter, markerCounter - start) * forwardProbabilities(counter, markerCounter - start);
+				sum += results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter);
+			}
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
+			{
+				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) /= sum;
+			}
+		}
 	}
 };
 #endif
