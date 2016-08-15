@@ -85,9 +85,9 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 					else forwardProbabilities(encodingTheseFounders, 0) = 0;
 				}
 			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
 			{
-				forwardProbabilities(founderCounter, 0) /= sum;
+				forwardProbabilities(counter, 0) /= sum;
 			}
 		}
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
@@ -102,7 +102,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 				{
 					int markerEncodingTheseFounders = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
-					forwardProbabilities(encodingTheseFounders, 0) = 0;
+					forwardProbabilities(encodingTheseFounders, markerCounter - start + 1) = 0;
 					if(markerValue == markerEncodingTheseFounders || (markerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && heterozygoteMissingProb != 0))))
 					{
 						//Founders at the previous marker
@@ -161,7 +161,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 					sum += backwardProbabilities(encodingTheseFounders, markerCounter - start);
 				}
 			}
-			for(int counter = 0; counter < nFounders; counter++)
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
 			{
 				backwardProbabilities(counter, markerCounter - start) /= sum;
 			}
@@ -170,12 +170,12 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 		for(int markerCounter = start; markerCounter < end; markerCounter++)
 		{
 			double sum = 0;
-			for(int counter = 0; counter < nFounders; counter++)
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
 			{
 				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) = backwardProbabilities(counter, markerCounter - start) * forwardProbabilities(counter, markerCounter - start);
 				sum += results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter);
 			}
-			for(int counter = 0; counter < nFounders; counter++)
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
 			{
 				results((nFounders*(nFounders+1)/2)*finalCounter + counter, markerCounter) /= sum;
 			}
@@ -202,9 +202,9 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 					else forwardProbabilities(encodingTheseFounders, 0) = 0;
 				}
 			}
-			for(int founderCounter = 0; founderCounter < (nFounders*(nFounders+1))/2; founderCounter++)
+			for(int counter = 0; counter < (nFounders*(nFounders+1))/2; counter++)
 			{
-				forwardProbabilities(founderCounter, 0) /= sum;
+				forwardProbabilities(counter, 0) /= sum;
 			}
 		}
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
