@@ -6,7 +6,7 @@ test_that("Test warnImproperFunnels with four-parent single funnel design",
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), not(gives_warning()))
+		expect_warning(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), NA)
 
 		pedigree@father[5] <- 1L
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
@@ -14,12 +14,12 @@ test_that("Test warnImproperFunnels with four-parent single funnel design",
 
 		pedigree@warnImproperFunnels <- FALSE
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), not(gives_warning()))
+		expect_warning(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), NA)
 
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree@selfing <- "finite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), not(gives_warning()))
+		expect_warning(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), NA)
 
 		pedigree@father[5] <- 1L
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
