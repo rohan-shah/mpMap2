@@ -35,7 +35,7 @@ test_that("Test zero generations of intercrossing, dominant markers",
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
-			expect_true(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities) > 0.85)
+			expect_true(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities) > 0.9)
 		}
 		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 1000)
