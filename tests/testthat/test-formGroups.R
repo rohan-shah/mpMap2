@@ -6,7 +6,7 @@ test_that("Check that formGroups can be applied multiple times",
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 		formGroups <- formGroups(mpcrossRF = rf, groups = 2, method = "average", clusterBy = "theta")
-		expect_that(formGroups <- formGroups(mpcrossRF = formGroups, groups = 2, method = "average", clusterBy = "theta"), not(gives_warning()))
+		expect_warning(formGroups <- formGroups(mpcrossRF = formGroups, groups = 2, method = "average", clusterBy = "theta"), NA)
 		formGroups@rf <- NULL
 		expect_that(formGroups <- formGroups(mpcrossRF = formGroups, groups = 2, method = "average", clusterBy = "theta"), throws_error("cannot be automatically converted to an object of class mpcrossRF"))
 	})

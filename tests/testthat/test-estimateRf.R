@@ -15,7 +15,7 @@ test_that("Checking that we require 0 and 0.5 in the recombination values",
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_that(rf <- estimateRF(cross, recombValues = c(0, 0.1), keepLod = TRUE, keepLkhd=TRUE), throws_error())
 		expect_that(rf <- estimateRF(cross, recombValues = c(0.1, 0.5), keepLod = TRUE, keepLkhd=TRUE), throws_error())
-		expect_that(rf <- estimateRF(cross, recombValues = c(0, 0.1, 0.5), keepLod = TRUE, keepLkhd=TRUE), not(throws_error()))
+		expect_error(rf <- estimateRF(cross, recombValues = c(0, 0.1, 0.5), keepLod = TRUE, keepLkhd=TRUE), NA)
 	})
 test_that("Checking that we must have less than 255 possible levels",
 	{
