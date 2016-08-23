@@ -39,7 +39,7 @@ public:
 		return parent::operator[](index);
 	}
 };
-template<int maxAlleles, int nFounders> struct constructLookupTableArgs
+template<int maxAlleles> struct constructLookupTableArgs
 {
 public:
 	constructLookupTableArgs(allMarkerPairData<maxAlleles>& computedContributions, markerPatternsToUniqueValuesArgs& markerPatternData)
@@ -80,7 +80,7 @@ template<int maxAlleles> bool isValid(std::vector<array2<maxAlleles> >& markerPr
 	}
 	return true;
 }
-template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles, nFounders>& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles>& args)
 {
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int nRecombLevels = (int)args.recombinationFractions->size();
