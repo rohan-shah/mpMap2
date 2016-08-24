@@ -86,7 +86,7 @@ test_that("Check that formGroups works for a ril design",
 		f2Pedigree <- rilPedigree(1000, selfingGenerations = 10)
 		map <- sim.map(len = rep(100, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
-		capture.output(rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
+		suppressWarnings(rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
 
 		for(method in c("average", "complete", "single"))
 		{

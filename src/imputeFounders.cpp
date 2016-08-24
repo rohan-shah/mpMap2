@@ -14,6 +14,7 @@
 #include "funnelHaplotypeToMarker.hpp"
 #include "viterbi.hpp"
 #include "recodeHetsAsNA.h"
+#include "warnings.h"
 template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
 {
 	//Work out maximum number of markers per chromosome
@@ -59,14 +60,15 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 
 	if(infiniteSelfing)
 	{
-		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
+		bool foundHets, foundHetEncodings;
+		replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData, foundHets, foundHetEncodings);
+		Rcpp::Function warning("warning");
 		if(foundHets)
 		{
-			Rcpp::Function warning("warning");
 			//Technically a warning could lead to an error if options(warn=2). This would be bad because it would break out of our code. This solution generates a c++ exception in that case, which we can then ignore. 
 			try
 			{
-				warning("Input data had heterozygotes but was analysed assuming infinite selfing. All heterozygotes were ignored. \n");
+				warning(hetWarning);
 			}
 			catch(...)
 			{}

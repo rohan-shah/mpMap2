@@ -19,6 +19,7 @@
 #include "mpMap2_openmp.h"
 #include <omp.h>
 #endif
+#include "warnings.h"
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -632,12 +633,14 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	bool infiniteSelfing = Rcpp::as<std::string>(args.pedigree.slot("selfing")) == "infinite";
 	if(infiniteSelfing)
 	{
-		bool foundHets = replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData);
+		bool foundHets, foundHetEncodings;
+		replaceHetsWithNA(recodedFounders, recodedFinals, recodedHetData, foundHets, foundHetEncodings);
+		Rcpp::Function warning("warning");
 		if(foundHets)
 		{
 			try
 			{
-				Rcpp::Rcout << "Input data had heterozygotes but was analysed assuming infinite selfing. " << std::endl << "    All hetrozygotes were ignored." << std::endl;
+				warning(hetWarning);
 			}
 			catch(...)
 			{}

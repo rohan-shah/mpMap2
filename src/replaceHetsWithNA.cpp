@@ -1,9 +1,9 @@
 #include "recodeHetsAsNA.h"
-bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix recodedFinals, Rcpp::List recodedHetData)
+void replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix recodedFinals, Rcpp::List recodedHetData, bool& hasHets, bool& hasHetEncodings)
 {
 	int nMarkers = recodedFounders.ncol();
 	int nFinals = recodedFinals.nrow();
-	bool retValue = false;
+	hasHets = hasHetEncodings = false;
 	std::vector<bool> isHet(100);
 	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 	{
@@ -15,6 +15,7 @@ bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix 
 			{
 				isHet[currentMarkerHetData(hetDataRowCounter, 2)] = false;
 			}
+			else hasHetEncodings = true;
 		}
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
@@ -22,9 +23,8 @@ bool replaceHetsWithNA(Rcpp::IntegerMatrix recodedFounders, Rcpp::IntegerMatrix 
 			if(finalValue != NA_INTEGER && isHet[finalValue])
 			{
 				recodedFinals(finalCounter, markerCounter) = NA_INTEGER;
-				retValue = true;
+				hasHets = true;
 			}
 		}
 	}
-	return retValue;
 }
