@@ -688,7 +688,7 @@ void arsaRawParallel(arsaRawArgs& args)
 					if(dirty[swap1] || dirty[swap2])
 					{
 						#pragma omp parallel for
-						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i < stackOfChanges.end(); i++)
 						{
 							deltaForChange(*i, currentPermutation, rawDist, levels);
 						}
@@ -721,7 +721,7 @@ void arsaRawParallel(arsaRawArgs& args)
 					else
 					{
 						#pragma omp parallel for
-						for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+						for(std::vector<change>::iterator i = stackOfChanges.begin(); i < stackOfChanges.end(); i++)
 						{
 							deltaForChange(*i, currentPermutation, rawDist, levels);
 						}
@@ -739,7 +739,7 @@ void arsaRawParallel(arsaRawArgs& args)
 				}
 			}
 			#pragma omp parallel for
-			for(std::vector<change>::iterator i = stackOfChanges.begin(); i != stackOfChanges.end(); i++)
+			for(std::vector<change>::iterator i = stackOfChanges.begin(); i < stackOfChanges.end(); i++)
 			{
 				deltaForChange(*i, currentPermutation, rawDist, levels);
 			}
