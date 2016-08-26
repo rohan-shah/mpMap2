@@ -14,9 +14,17 @@ computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 
 	{
 		results <- .Call("computeGenotypeProbabilities", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, PACKAGE="mpMap2")
 		resultsMatrix <- results$data
-		nAlleles <- nrow(resultsMatrix) / nrow(mpcrossMapped@geneticData[[i]]@finals)
+		founderNames <- rownames(mpcrossMapped@geneticData[[i]]@founders)
 		colnames(resultsMatrix) <- colnames(mpcrossMapped@geneticData[[i]]@finals)
-		rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", 1:nAlleles)))
+		if(mpcrossMapped@geneticData[[i]]@pedigree@selfing == "infinite")
+		{
+			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", founderNames)))
+		}
+		else
+		{
+			nAlleles <- nrow(resultsMatrix) / nrow(mpcrossMapped@geneticData[[i]]@finals)
+			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", 1:nAlleles)))
+		}
 		mpcrossMapped@geneticData[[i]]@probabilities <- new("probabilities", data = resultsMatrix, key = results$key)
 	}
 	return(mpcrossMapped)

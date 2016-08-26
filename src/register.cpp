@@ -34,6 +34,7 @@
 #ifdef HAS_BOOST
 	#include "reorderPedigree.h"
 #endif
+#include "transformForMPWGAIM.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -82,6 +83,7 @@ extern "C"
 		{"testDistortion", (DL_FUNC)&testDistortion, 1},
 		{"removeHets", (DL_FUNC)&removeHets, 3},
 		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 4},
+		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
