@@ -592,6 +592,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	Rcpp::List recodedHetData(nMarkers);
 	recodedHetData.attr("names") = args.hetData.attr("names");
 	recodedFinals.attr("dimnames") = args.finals.attr("dimnames");
+	recodedFounders.attr("dimnames") = args.founders.attr("dimnames");
 	
 	recodeDataStruct recoded;
 	recoded.recodedFounders = recodedFounders;
