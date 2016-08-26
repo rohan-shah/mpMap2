@@ -88,7 +88,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
 				forwardProbabilities(founderCounter, markerCounter - start + 1) = 0;
-				if(recodedFounders(funnel[founderCounter], markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+				if(recodedFounders(funnel[founderCounter], markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
 				{
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -119,7 +119,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 				//The founder at the previous marker
 				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 				{
-					if(recodedFounders(funnel[founderCounter2], markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+					if(recodedFounders(funnel[founderCounter2], markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
 					{
 						backwardProbabilities(funnel[founderCounter], markerCounter - start) += backwardProbabilities(funnel[founderCounter2], markerCounter - start + 1) * funnelHaplotypeProbabilities(markerCounter-start, 0).values[founderCounter2][founderCounter];
 					}
@@ -174,7 +174,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
 				forwardProbabilities(founderCounter, markerCounter - start + 1) = 0;
-				if(recodedFounders(founderCounter, markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+				if(recodedFounders(founderCounter, markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
 				{
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -205,7 +205,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 				//The founder at the previous marker
 				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 				{
-					if(recodedFounders(founderCounter2, markerCounter - start + 1) == markerValue || markerValue == NA_INTEGER)
+					if(recodedFounders(founderCounter2, markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
 					{
 						backwardProbabilities(founderCounter, markerCounter - start) += backwardProbabilities(founderCounter2, markerCounter - start + 1) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
 					}
