@@ -1,9 +1,9 @@
-context("Conversion of 8-way cross to mpwgaim object")
+context("Conversion of 4-way cross to mpwgaim object")
 if(suppressWarnings(require(mpwgaim)) && suppressWarnings(require(mpMap)))
 {
-	test_that("Conversion of 4-way object agrees with old code",
+	test_that("Conversion of 8-way object agrees with old code",
 	{
-		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(keepHets = FALSE)
@@ -16,10 +16,10 @@ if(suppressWarnings(require(mpwgaim)) && suppressWarnings(require(mpMap)))
 		old <- list()
 		old$finals <- finals(cross2)
 		old$founders <- founders(cross2)
-		old$pedigree <- sim.mpped(nfounders=4, nfunnels=1, nperfam=100, nssdgen = 10)
+		old$pedigree <- sim.mpped(nfounders=8, nfunnels=1, nperfam=100, nssdgen = 10)
 		old$map <- map
 		old$id <- which(old$pedigree[,4] == 1)
-		old$fid <- 1:4
+		old$fid <- 1:8
 		class(old) <- "mpcross"
 		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl"))
 
@@ -35,7 +35,7 @@ if(suppressWarnings(require(mpwgaim)) && suppressWarnings(require(mpMap)))
 				}
 			})
 		}
-		expect_identical(newConverted$nfounders, 4L)
+		expect_identical(newConverted$nfounders, 8L)
 		for(chr in 1:2)
 		{
 			expect_identical(oldConverted$geno[[chr]]$dist, newConverted$geno[[chr]]$dist)
