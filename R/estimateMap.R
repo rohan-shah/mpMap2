@@ -12,7 +12,7 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, max
 	}
 	if(is.null(mpcrossLG@lg@imputedTheta))
 	{
-		cat("Imputing recombination fractions\n", sep="")
+		if(verbose) cat("Imputing recombination fractions\n", sep="")
 		mpcrossLG <- impute(mpcrossLG, verbose=verbose)
 	}
 	if(maxOffset > maxMarkers / 8)
