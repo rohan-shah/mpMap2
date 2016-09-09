@@ -46,7 +46,7 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, max
 				cat("Iteration ", row, " / ", nrow(ranges), "\n", sep="")
 			}
 			subsettedRF <- subset(rfData, markers = start:end)
-			resultsThisGroup[[row]] <- estimateMapInternal(subsettedRF = subsettedRF, maxOffset = maxOffset, verbose = verbose, mapFunction = mapFunction)
+			resultsThisGroup[[row]] <- estimateMapInternal(subsettedRF = subsettedRF, maxOffset = maxOffset, mapFunction = mapFunction)
 		}
 		currentChr <- resultsThisGroup[[1]]
 		#Now to glue all these bits together. 
@@ -56,7 +56,7 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, max
 			{
 				#Get out the map for the last maxOffset+1 markers of the end of the last chunk, and the first maxOffset+1 markers of the next chunk. 
 				subsettedRF <- subset(rfData, markers = (ranges[row-1,2] - 2*maxOffset):(ranges[row,1] + 2*maxOffset))
-				overlap <- estimateMapInternal(subsettedRF, maxOffset, FALSE, mapFunction = mapFunction)
+				overlap <- estimateMapInternal(subsettedRF = subsettedRF, maxOffset = maxOffset, mapFunction = mapFunction)
 				currentChr[(length(currentChr) - maxOffset):(length(currentChr))] <- overlap[(maxOffset+1):(2*maxOffset+1)] - overlap[maxOffset+1] + currentChr[length(currentChr) - maxOffset]
 				resultsThisGroup[[row]] <- resultsThisGroup[[row]] + tail(currentChr, 1) + (overlap[2*maxOffset+2] - overlap[2*maxOffset+1])
 				currentChr <- c(currentChr, resultsThisGroup[[row]])
@@ -67,12 +67,8 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, max
 	class(map) <- "map"
 	return(map)
 }
-estimateMapInternal <- function(subsettedRF, maxOffset, verbose, mapFunction)
+estimateMapInternal <- function(subsettedRF, maxOffset, mapFunction)
 {
-	if(verbose) 
-	{
-		cat("Generating design matrx\n", sep="")
-	}
 	#Construct design matrix
 	d <- .Call("generateDesignMatrix", length(subsettedRF@markers)-1, maxOffset, PACKAGE="mpMap2")
 	indices <- matrix(nrow=maxOffset * length(subsettedRF@markers) - maxOffset * (maxOffset + 1) / 2, ncol = 2)
@@ -89,7 +85,6 @@ estimateMapInternal <- function(subsettedRF, maxOffset, verbose, mapFunction)
 	b <- subsettedRF[indices]
 	#Values of 0.5 result in infinite estimated distance, which doesn't really work. 
 	b[b == 0.5] <- 0.49
-	if(verbose) cat("Solving non-negative least squares problem\n", sep="")
 	result <- nnls::nnls(d, mapFunction(b))
 	results <- c(0, cumsum(result$x[which(indices[,1] == indices[,2]+1)]))
 	names(results) <- subsettedRF@markers
