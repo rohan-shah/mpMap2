@@ -1,11 +1,11 @@
-context("Founder imputation, eight parents, infinite selfing")
+context("Founder imputation, eight parents, infinite selfing, no errors")
 test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(pedigree, map)
 		{
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
-			suppressWarnings(result <- imputeFounders(mapped))
+			suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))
 
 			#Hetrozygotes will be discarded in imputation, which means that the imputed version won't be EXACTLY the same as the original data
 			naIndices <- result@geneticData[[1]]@finals > 8
@@ -15,7 +15,7 @@ test_that("Test zero generations of intercrossing",
 
 			cross2 <- cross + multiparentSNP(keepHets=FALSE)
 			mapped <- new("mpcrossMapped", cross2, map = map)
-			result <- imputeFounders(mapped)
+			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.9)
 		}

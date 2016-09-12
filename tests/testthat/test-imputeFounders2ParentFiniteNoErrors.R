@@ -1,17 +1,17 @@
-context("Founder imputation, two parents, finite selfing")
+context("Founder imputation, two parents, finite selfing, no errors")
 test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(map, pedigree)
 		{
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
-			suppressWarnings(result <- imputeFounders(mapped))
+			suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))
 			expect_identical(result@geneticData[[1]]@imputed@data, result@geneticData[[1]]@finals)
 
 			#Dominance doesn't really make a difference, because it's assumed inbred
 			cross2 <- cross + biparentalDominant()
 			mapped <- new("mpcrossMapped", cross2, map = map)
-			result <- imputeFounders(mapped)
+			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.9)
 		}
@@ -37,13 +37,13 @@ test_that("Test non-zero generations of intercrossing",
 		{
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
-			suppressWarnings(result <- imputeFounders(mapped))
+			suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))
 			expect_identical(result@geneticData[[1]]@imputed@data, result@geneticData[[1]]@finals)
 
 			#Dominance doesn't really make a difference, because it's assumed inbred
 			cross2 <- cross + biparentalDominant()
 			mapped <- new("mpcrossMapped", cross2, map = map)
-			result <- imputeFounders(mapped)
+			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.9)
 		}
