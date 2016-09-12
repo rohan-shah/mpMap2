@@ -72,7 +72,7 @@ extern "C"
 		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
 		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
 		{"rawSymmetricMatrixSubsetByMatrix", (DL_FUNC)&rawSymmetricMatrixSubsetByMatrix, 2},
-		{"imputeFounders", (DL_FUNC)&imputeFounders, 4},
+		{"imputeFounders", (DL_FUNC)&imputeFounders, 5},
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 1},
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},

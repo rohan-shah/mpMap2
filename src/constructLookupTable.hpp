@@ -17,18 +17,33 @@ public:
 		allowableFunnel.swap(other.allowableFunnel);
 		allowableAI.swap(other.allowableAI);
 	}
+	singleMarkerPairData()
+	{}
+	singleMarkerPairData(singleMarkerPairData<maxAlleles>&& other)
+		:perFunnelData(std::move(other.perFunnelData)), perAIGenerationData(std::move(other.perAIGenerationData)), allowableFunnel(std::move(other.allowableFunnel)), allowableAI(std:move(other.allowableAI))
+	{}
+	singleMarkerPairData<maxAlleles>& operator=(singleMarkerPairData<maxAlleles>&& other)
+	{
+		perFunnelData = std::move(other.perFunnelData);
+		perAIGenerationData = std::move(other.perAIGenerationData);
+		allowableFunnel = std::move(other.allowableFunnel);
+		allowableAI = std::move(other.allowableAI);
+	}
 	xMajorMatrix<array2<maxAlleles> > perFunnelData;
 	xMajorMatrix<array2<maxAlleles> > perAIGenerationData;
 
 	rowMajorMatrix<bool> allowableFunnel;
 	rowMajorMatrix<bool> allowableAI;
+private:
+	singleMarkerPairData(const singleMarkerPairData<maxAlleles>& other);
+	singleMarkerPairData<maxAlleles>& operator=(const singleMarkerPairData<maxAlleles>& other);
 };
 template<int maxAlleles> class allMarkerPairData : protected std::vector<singleMarkerPairData<maxAlleles> >
 {
 public:
 	typedef typename std::vector<singleMarkerPairData<maxAlleles> > parent;
 	allMarkerPairData(int nMarkerPatternIDs)
-		: parent((std::size_t)((nMarkerPatternIDs * nMarkerPatternIDs - nMarkerPatternIDs)/2 + nMarkerPatternIDs), singleMarkerPairData<maxAlleles> (0, 0, 0, 0))
+		: parent((std::size_t)((nMarkerPatternIDs * nMarkerPatternIDs - nMarkerPatternIDs)/2 + nMarkerPatternIDs))
 	{}
 	singleMarkerPairData<maxAlleles>& operator()(int markerPattern1ID, int markerPattern2ID)
 	{

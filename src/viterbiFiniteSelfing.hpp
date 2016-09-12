@@ -23,8 +23,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	Rcpp::IntegerMatrix results;
 	std::vector<double> pathLengths1, pathLengths2;
 	std::vector<double> working;
-	xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities;
-	rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities;
+	xMajorMatrix<expandedProbabilitiesType>* logIntercrossingHaplotypeProbabilities;
+	rowMajorMatrix<expandedProbabilitiesType>* logFunnelHaplotypeProbabilities;
 	markerPatternsToUniqueValuesArgs& markerData;
 	std::vector<funnelID>* lineFunnelIDs;
 	std::vector<funnelEncoding>* lineFunnelEncodings;
@@ -35,11 +35,11 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	int minAIGenerations;
 	int maxAIGenerations;
 	Rcpp::IntegerMatrix key;
-	double heterozygoteMissingProb, homozygoteMissingProb;
-	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
-	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
-	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
-		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData)
+	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
+	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities;
+	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, int maxChromosomeSize)
+		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), logIntercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL)
 	{}
 	void apply(int start, int end)
 	{
@@ -84,6 +84,10 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	}
 	void applyFunnel(int start, int end, int finalCounter, int funnelID, int selfingGenerations)
 	{
+		if(logFunnelHaplotypeProbabilities == NULL)
+		{
+			throw std::runtime_error("Internal error");
+		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHetrozygoteMissingProb = log(heterozygoteMissingProb);
 		//Initialise the algorithm
@@ -108,7 +112,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(funnel[founderCounter2], start) == recodedFounders(funnel[founderCounter], start) && homozygoteMissingProb != 0) || (recodedFounders(funnel[founderCounter2], start) != recodedFounders(funnel[founderCounter], start) && heterozygoteMissingProb != 0))))
 				{
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 				else
 				{
@@ -145,7 +149,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 									double multiple = 0;
 									if(founderCounter != founderCounter2) multiple += log(2);
 									if(founderPreviousCounter != founderPreviousCounter2) multiple += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + funnelHaplotypeProbabilities(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + (*logFunnelHaplotypeProbabilities)(markerCounter-start, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
 									if(markerValue == NA_INTEGER)
 									{
 										if(founderCounter2 == founderCounter)
@@ -206,6 +210,10 @@ stopIdenticalSearch:
 	}
 	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
+		if(logIntercrossingHaplotypeProbabilities == NULL)
+		{
+			throw std::runtime_error("Internal error");
+		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHetrozygoteMissingProb = log(heterozygoteMissingProb);
 		//Initialise the algorithm
@@ -224,7 +232,7 @@ stopIdenticalSearch:
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && heterozygoteMissingProb != 0))))
 				{
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 				else
 				{
@@ -261,7 +269,7 @@ stopIdenticalSearch:
 									double multiple = 0;
 									if(founderCounter != founderCounter2) multiple += log(2);
 									if(founderPreviousCounter != founderPreviousCounter2) multiple += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + (*logIntercrossingHaplotypeProbabilities)(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
 									if(markerValue == NA_INTEGER)
 									{
 										if(founderCounter2 == founderCounter)

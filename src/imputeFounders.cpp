@@ -15,7 +15,7 @@
 #include "viterbi.hpp"
 #include "recodeHetsAsNA.h"
 #include "warnings.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key)
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomeMarkers = 0;
@@ -119,19 +119,19 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	Rcpp::IntegerMatrix intermediate(nFounders, maxChromosomeMarkers);
 	int cumulativeMarkerCounter = 0;
 
-	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
-	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
+	xMajorMatrix<expandedProbabilitiesType> logIntercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
+	rowMajorMatrix<expandedProbabilitiesType> logFunnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
 
 	//The single loci probabilities are different depending on whether there are zero or one generations of intercrossing. But once you have non-zero generations, it doesn't matter how many
-	std::vector<array2<nFounders> > intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
-	std::vector<array2<nFounders> > funnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
+	std::vector<array2<nFounders> > logIntercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
+	std::vector<array2<nFounders> > logFunnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
 
 	int nFunnels = (int)allFunnelEncodings.size();
 	//Generate single loci genetic data
 	for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 	{
-		array2<nFounders>& funnelArray = funnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
-		array2<nFounders>& intercrossingArray = intercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& funnelArray = logFunnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& intercrossingArray = logIntercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
 		singleLocusGenotypeProbabilitiesNoIntercross<nFounders, infiniteSelfing>(funnelArray, selfingGenerationCounter, nFunnels);
 		singleLocusGenotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingArray, selfingGenerationCounter, nFunnels);
 		//Take logarithms
@@ -148,7 +148,9 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	}
 
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
-	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
+	viterbiAlgorithm<nFounders, infiniteSelfing> viterbi(markerPatternData, maxChromosomeMarkers);
+	viterbi.logIntercrossingHaplotypeProbabilities = &logIntercrossingHaplotypeProbabilities;
+	viterbi.logFunnelHaplotypeProbabilities = &logFunnelHaplotypeProbabilities;
 	viterbi.recodedHetData = recodedHetData;
 	viterbi.recodedFounders = recodedFounders;
 	viterbi.recodedFinals = recodedFinals;
@@ -160,8 +162,9 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.key = key;
 	viterbi.homozygoteMissingProb = homozygoteMissingProb;
 	viterbi.heterozygoteMissingProb = heterozygoteMissingProb;
-	viterbi.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
-	viterbi.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
+	viterbi.errorProb = errorProb;
+	viterbi.logIntercrossingSingleLociHaplotypeProbabilities = &logIntercrossingSingleLociHaplotypeProbabilities;
+	viterbi.logFunnelSingleLociHaplotypeProbabilities = &logFunnelSingleLociHaplotypeProbabilities;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)
@@ -174,13 +177,13 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			double recombination = recombinationFractions(markerCounter);
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
+				expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::noIntercross(logFunnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
 				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(logIntercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}
 			}
 
@@ -190,18 +193,18 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		cumulativeMarkerCounter += (int)positions.size();
 	}
 }
-template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key)
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 	}
 }
-SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp)
+SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -309,6 +312,17 @@ BEGIN_RCPP
 	}
 	if(heterozygoteMissingProb < 0 || heterozygoteMissingProb > 1) throw std::runtime_error("Input heterozygoteMissingProb must be a number between 0 and 1");
 
+	double errorProb;
+	try
+	{
+		errorProb = Rcpp::as<double>(errorProb_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+	}
+	if(errorProb < 0 || errorProb > 1) throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+
 	std::vector<std::string> foundersMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(founders));
 	std::vector<std::string> finalsMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(finals));
 	std::vector<std::string> lineNames = Rcpp::as<std::vector<std::string> >(Rcpp::rownames(finals));
@@ -380,19 +394,19 @@ BEGIN_RCPP
 	{
 		if(nFounders == 2)
 		{
-			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 		}
 		else if(nFounders == 4)
 		{
-			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 		}
 		else if(nFounders == 8)
 		{
-			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 		}
 		else if(nFounders == 16)
 		{
-			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key);
 		}
 		else
 		{
