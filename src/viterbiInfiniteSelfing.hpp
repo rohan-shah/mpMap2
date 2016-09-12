@@ -171,12 +171,9 @@ stopIdenticalSearch:
 		//Table of the number of founders that map to that marker allele
 		int table[nFounders];
 		memset(table, 0, sizeof(int)*nFounders);
-		for(int markerAlleleCounter = 0; markerAlleleCounter < startMarkerData.hetData.getNRows(); markerAlleleCounter++)
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			if(startMarkerData.hetData(markerAlleleCounter, 0) == startMarkerData.hetData(markerAlleleCounter, 1))
-			{
-				table[startMarkerData.hetData(markerAlleleCounter, 0)]++;
-			}
+			table[startMarkerData.hetData(founderCounter, founderCounter)]++;
 		}
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
@@ -199,12 +196,9 @@ stopIdenticalSearch:
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			memset(table, 0, sizeof(int)*nFounders);
-			for(int markerAlleleCounter = 0; markerAlleleCounter < currentMarkerData.hetData.getNRows(); markerAlleleCounter++)
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(currentMarkerData.hetData(markerAlleleCounter, 0) == currentMarkerData.hetData(markerAlleleCounter, 1))
-				{
-					table[currentMarkerData.hetData(markerAlleleCounter, 0)]++;
-				}
+				table[currentMarkerData.hetData(founderCounter, founderCounter)]++;
 			}
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
@@ -352,12 +346,9 @@ stopIdenticalSearch:
 		//Table of the number of founders that map to that marker allele
 		int table[nFounders];
 		memset(table, 0, sizeof(int)*nFounders);
-		for(int markerAlleleCounter = 0; markerAlleleCounter < startMarkerData.hetData.getNRows(); markerAlleleCounter++)
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			if(startMarkerData.hetData(markerAlleleCounter, 0) == startMarkerData.hetData(markerAlleleCounter, 1))
-			{
-				table[startMarkerData.hetData(markerAlleleCounter, 0)]++;
-			}
+			table[startMarkerData.hetData(founderCounter, founderCounter)]++;
 		}
 		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		int markerValue = recodedFinals(finalCounter, start);
@@ -381,6 +372,12 @@ stopIdenticalSearch:
 		{
 			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
+			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
+			memset(table, 0, sizeof(int)*nFounders);
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				table[currentMarkerData.hetData(founderCounter, founderCounter)]++;
+			}
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
