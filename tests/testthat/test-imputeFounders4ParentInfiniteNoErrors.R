@@ -1,5 +1,5 @@
 context("Founder imputation, four parents, infinite selfing, no errors")
-test_that("Test zero generations of intercrossing",
+test_that("Test agreement with the truth",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -27,7 +27,11 @@ test_that("Test zero generations of intercrossing",
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree2@selfing <- "infinite"
-		pedigrees <- list(pedigree1, pedigree2)
+		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree3@selfing <- "infinite"
+		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4@selfing <- "infinite"
+		pedigrees <- list(pedigree1, pedigree2, pedigree4, pedigree4)
 		for(map in maps)
 		{
 			for(pedigree in pedigrees)

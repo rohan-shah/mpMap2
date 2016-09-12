@@ -1,5 +1,5 @@
 context("Founder imputation, four parents, infinite selfing, with errors")
-test_that("Test zero generations of intercrossing",
+test_that("Test deliberate errors",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -17,7 +17,7 @@ test_that("Test zero generations of intercrossing",
 			mapped@geneticData[[1]]@finals[errorIndices] <- sample(0:1, 0.01*length(mapped@geneticData[[1]]@finals), replace=TRUE)
 			result <- imputeFounders(mapped, errorProb = 0.01)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.96)
+			expect_true(sum(diag(tmp)) / sum(tmp) > 0.94)
 		}
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
@@ -27,7 +27,11 @@ test_that("Test zero generations of intercrossing",
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree2@selfing <- "infinite"
-		pedigrees <- list(pedigree1, pedigree2)
+		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree3@selfing <- "infinite"
+		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4@selfing <- "infinite"
+		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(map in maps)
 		{
 			for(pedigree in pedigrees)
