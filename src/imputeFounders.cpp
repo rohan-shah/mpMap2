@@ -123,26 +123,29 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	rowMajorMatrix<expandedProbabilitiesType> logFunnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
 
 	//The single loci probabilities are different depending on whether there are zero or one generations of intercrossing. But once you have non-zero generations, it doesn't matter how many
-	std::vector<array2<nFounders> > logIntercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
-	std::vector<array2<nFounders> > logFunnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
+	std::vector<array2<nFounders> > logIntercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1), intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
+	std::vector<array2<nFounders> > logFunnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1), funnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
 
 	int nFunnels = (int)allFunnelEncodings.size();
 	//Generate single loci genetic data
 	for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 	{
-		array2<nFounders>& funnelArray = logFunnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
-		array2<nFounders>& intercrossingArray = logIntercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& funnelArray = funnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& intercrossingArray = intercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
 		singleLocusGenotypeProbabilitiesNoIntercross<nFounders, infiniteSelfing>(funnelArray, selfingGenerationCounter, nFunnels);
 		singleLocusGenotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingArray, selfingGenerationCounter, nFunnels);
+
+		array2<nFounders>& logFunnelArray = logFunnelSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
+		array2<nFounders>& logIntercrossingArray = logIntercrossingSingleLociHaplotypeProbabilities[selfingGenerationCounter - minSelfing];
 		//Take logarithms
 		for(int i = 0; i < nFounders; i++)
 		{
 			for(int j = 0; j < nFounders; j++)
 			{
-				if(funnelArray.values[i][j] == 0) funnelArray.values[i][j] = -std::numeric_limits<double>::infinity();
-				else funnelArray.values[i][j] = log(funnelArray.values[i][j]);
-				if(intercrossingArray.values[i][j] == 0) intercrossingArray.values[i][j] = -std::numeric_limits<double>::infinity();
-				else intercrossingArray.values[i][j] = log(intercrossingArray.values[i][j]);
+				if(funnelArray.values[i][j] == 0) logFunnelArray.values[i][j] = -std::numeric_limits<double>::infinity();
+				else logFunnelArray.values[i][j] = log(funnelArray.values[i][j]);
+				if(intercrossingArray.values[i][j] == 0) logIntercrossingArray.values[i][j] = -std::numeric_limits<double>::infinity();
+				else logIntercrossingArray.values[i][j] = log(intercrossingArray.values[i][j]);
 			}
 		}
 	}
@@ -160,11 +163,14 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.selfingGenerations = &selfingGenerations;
 	viterbi.results = results;
 	viterbi.key = key;
+	viterbi.maxAlleles = maxAlleles; 
 	viterbi.homozygoteMissingProb = homozygoteMissingProb;
 	viterbi.heterozygoteMissingProb = heterozygoteMissingProb;
 	viterbi.errorProb = errorProb;
 	viterbi.logIntercrossingSingleLociHaplotypeProbabilities = &logIntercrossingSingleLociHaplotypeProbabilities;
 	viterbi.logFunnelSingleLociHaplotypeProbabilities = &logFunnelSingleLociHaplotypeProbabilities;
+	viterbi.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
+	viterbi.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)

@@ -33,6 +33,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	int minSelfingGenerations;
 	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
+	int maxAlleles;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
 	Rcpp::IntegerMatrix key;
 	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities, *intercrossingSingleLociHaplotypeProbabilities;

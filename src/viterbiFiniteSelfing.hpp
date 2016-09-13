@@ -266,7 +266,8 @@ stopIdenticalSearch:
 			//We don't need to consider the other triangle of the matrix startMarkerData.hetData(founderCounter, founderCounter2)
 			for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 			{
-				singleLocusMarkerProbs[startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2])] += (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+				int markerEncoding = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
+				if(markerEncoding != NA_INTEGER) singleLocusMarkerProbs[markerEncoding] += (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 			}
 		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
@@ -542,7 +543,7 @@ stopIdenticalSearch:
 	}
 	void applyIntercrossingWithError(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
-		if(intercrossingSingleLociHaplotypeProbabilities != NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
+		if(intercrossingSingleLociHaplotypeProbabilities == NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -559,7 +560,8 @@ stopIdenticalSearch:
 			//We don't need to consider the other triangle of the matrix startMarkerData.hetData(founderCounter, founderCounter2)
 			for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 			{
-				singleLocusMarkerProbs[startMarkerData.hetData(founderCounter, founderCounter2)] += (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+				int markerEncoding = startMarkerData.hetData(founderCounter, founderCounter2);
+				if(markerEncoding != NA_INTEGER) singleLocusMarkerProbs[startMarkerData.hetData(founderCounter, founderCounter2)] += (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 			}
 		}
 		//Some values are never touched, so just mark those as negative infinity
