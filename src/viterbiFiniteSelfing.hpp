@@ -312,7 +312,7 @@ stopIdenticalSearch:
 				//We don't need to consider the other triangle of the matrix startMarkerData.hetData(founderCounter, founderCounter2)
 				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
-					singleLocusMarkerProbs[startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2])] += (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					singleLocusMarkerProbs[currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2])] += (*funnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
 			//The founder at the next marker
@@ -542,16 +542,26 @@ stopIdenticalSearch:
 	}
 	void applyIntercrossingWithError(int start, int end, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
-		if(logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
+		if(intercrossingSingleLociHaplotypeProbabilities != NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
-		double logHetrozygoteMissingProb = log(heterozygoteMissingProb);
+		double logHeterozygoteMissingProb = log(heterozygoteMissingProb);
 		//Initialise the algorithm
 		int startMarkerValue = recodedFinals(finalCounter, start);
 		::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
 		
+		std::vector<double> singleLocusMarkerProbs(maxAlleles);
+		std::fill(singleLocusMarkerProbs.begin(), singleLocusMarkerProbs.end(), 0);
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			//We don't need to consider the other triangle of the matrix startMarkerData.hetData(founderCounter, founderCounter2)
+			for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+			{
+				singleLocusMarkerProbs[startMarkerData.hetData(founderCounter, founderCounter2)] += (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+			}
+		}
 		//Some values are never touched, so just mark those as negative infinity
 		std::fill(pathLengths1.begin(), pathLengths1.end(), -std::numeric_limits<double>::infinity());
 		std::fill(pathLengths2.begin(), pathLengths2.end(), -std::numeric_limits<double>::infinity());
@@ -562,14 +572,26 @@ stopIdenticalSearch:
 				int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
 				int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 				intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-				if(markerEncodingTheseFounders == startMarkerValue || (startMarkerValue == NA_INTEGER && ((recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start) && heterozygoteMissingProb != 0))))
+				pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+				if(markerEncodingTheseFounders == startMarkerValue)
 				{
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					pathLengths1[encodingTheseFounders] += log(errorProb + (1 - errorProb) *singleLocusMarkerProbs[startMarkerValue]);
+				}
+				else if(startMarkerValue == NA_INTEGER && recodedFounders(founderCounter2, start) == recodedFounders(founderCounter, start))
+				{
+					if(homozygoteMissingProb != 0) pathLengths1[encodingTheseFounders] += logHomozygoteMissingProb;
+					else pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+				}
+				else if(startMarkerValue == NA_INTEGER && recodedFounders(founderCounter2, start) != recodedFounders(founderCounter, start))
+				{
+					if(heterozygoteMissingProb != 0) pathLengths1[encodingTheseFounders] += logHeterozygoteMissingProb;
+					else pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
 				}
 				else
 				{
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+					pathLengths1[encodingTheseFounders] += log(errorProb * singleLocusMarkerProbs[startMarkerValue]);
 				}
+				pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders];
 			}
 		}
 		int identicalIndex = 0;
@@ -579,6 +601,16 @@ stopIdenticalSearch:
 			int markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& previousMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter + 1]];
+
+			std::fill(singleLocusMarkerProbs.begin(), singleLocusMarkerProbs.end(), 0);
+			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+			{
+				//We don't need to consider the other triangle of the matrix startMarkerData.hetData(founderCounter, founderCounter2)
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
+				{
+					singleLocusMarkerProbs[currentMarkerData.hetData(founderCounter, founderCounter2)] += (*intercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+				}
+			}
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
@@ -586,7 +618,24 @@ stopIdenticalSearch:
 				{
 					int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
-					if(encodingMarker == markerValue || (markerValue == NA_INTEGER && ((recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter) && heterozygoteMissingProb != 0))))
+					double multipleNextMarker = 0;
+					if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+					if(encodingMarker == markerValue)
+					{
+						multipleNextMarker += log((1 - errorProb) + errorProb * singleLocusMarkerProbs[startMarkerValue]);
+					}
+					else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, markerCounter) == recodedFounders(founderCounter, markerCounter))
+					{
+						if(homozygoteMissingProb != 0) multipleNextMarker += logHomozygoteMissingProb;
+						else multipleNextMarker = -std::numeric_limits<double>::infinity();
+					}
+					else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, markerCounter) != recodedFounders(founderCounter, markerCounter))
+					{
+						if(heterozygoteMissingProb != 0) multipleNextMarker += logHeterozygoteMissingProb;
+						else multipleNextMarker = -std::numeric_limits<double>::infinity();
+					}
+					else multipleNextMarker += log(errorProb * singleLocusMarkerProbs[startMarkerValue]);
+					if(multipleNextMarker != -std::numeric_limits<double>::infinity())
 					{
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
@@ -596,23 +645,11 @@ stopIdenticalSearch:
 							{
 								int encodingPreviousMarker = previousMarkerData.hetData(founderPreviousCounter, founderPreviousCounter2);
 								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
-								if(encodingPreviousMarker == previousMarkerValue || (previousMarkerValue == NA_INTEGER && ((recodedFounders(founderPreviousCounter2, markerCounter) == recodedFounders(founderPreviousCounter, markerCounter) && homozygoteMissingProb != 0) || (recodedFounders(founderPreviousCounter2, markerCounter) != recodedFounders(founderPreviousCounter, markerCounter) && heterozygoteMissingProb != 0))))
+								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
-									double multiple = 0;
-									if(founderCounter != founderCounter2) multiple += log(2);
-									if(founderPreviousCounter != founderPreviousCounter2) multiple += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiple + (*logIntercrossingHaplotypeProbabilities)(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
-									if(markerValue == NA_INTEGER)
-									{
-										if(founderCounter2 == founderCounter)
-										{
-											working[encodingPreviousTheseFounders] += logHomozygoteMissingProb;
-										}
-										else
-										{
-											working[encodingPreviousTheseFounders] += logHetrozygoteMissingProb;
-										}
-									}
+									double multiplePreviousMarker = 0;
+									if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + multiplePreviousMarker + (*logIntercrossingHaplotypeProbabilities)(markerCounter-start, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
 								}
 							}
 						}
