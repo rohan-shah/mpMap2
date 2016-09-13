@@ -35,13 +35,17 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	int minAIGenerations, maxAIGenerations;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
 	Rcpp::IntegerMatrix key;
-	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities;
-	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities, *intercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities, *funnelSingleLociHaplotypeProbabilities;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, int maxChromosomeSize)
-		: intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), logIntercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL)
+		: intermediate1(nFounders, maxChromosomeSize), intermediate2(nFounders, maxChromosomeSize), pathLengths1(nFounders), pathLengths2(nFounders), working(nFounders), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), lineFunnelIDs(NULL), lineFunnelEncodings(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minSelfingGenerations(-1), maxSelfingGenerations(-1), minAIGenerations(-1), maxAIGenerations(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), logIntercrossingSingleLociHaplotypeProbabilities(NULL), intercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL), funnelSingleLociHaplotypeProbabilities(NULL)
 	{}
 	void apply(int start, int end)
 	{
+		if(logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL)
+		{
+			throw std::runtime_error("Internal error");
+		}
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		minAIGenerations = std::max(minAIGenerations, 1);
