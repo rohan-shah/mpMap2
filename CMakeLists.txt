@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.1)
 project(mpMap2)
 
-#Boost stuff. Only used for the boost graph library. 
-set(Boost_USE_STATIC_LIBS       OFF)
-set(Boost_USE_MULTITHREADED     ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-#Find boost packages
-find_package(Boost 1.50.0 COMPONENTS graph regex)
-
 option(USE_OPENMP "Use OpenMP" ON)
+option(USE_BOOST "Use Boost" ON)
+
+if(USE_BOOST)
+	#Boost stuff. Only used for the boost graph library. 
+	set(Boost_USE_STATIC_LIBS       OFF)
+	set(Boost_USE_MULTITHREADED     ON)
+	set(Boost_USE_STATIC_RUNTIME    OFF)
+	#Find boost packages
+	find_package(Boost 1.50.0 REQUIRED COMPONENTS graph regex)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src)
 find_package(R REQUIRED)

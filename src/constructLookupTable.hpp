@@ -20,7 +20,7 @@ public:
 	singleMarkerPairData()
 	{}
 	singleMarkerPairData(singleMarkerPairData<maxAlleles>&& other)
-		:perFunnelData(std::move(other.perFunnelData)), perAIGenerationData(std::move(other.perAIGenerationData)), allowableFunnel(std::move(other.allowableFunnel)), allowableAI(std:move(other.allowableAI))
+		:perFunnelData(std::move(other.perFunnelData)), perAIGenerationData(std::move(other.perAIGenerationData)), allowableFunnel(std::move(other.allowableFunnel)), allowableAI(std::move(other.allowableAI))
 	{}
 	singleMarkerPairData<maxAlleles>& operator=(singleMarkerPairData<maxAlleles>&& other)
 	{

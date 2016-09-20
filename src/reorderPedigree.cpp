@@ -1,4 +1,5 @@
 #include "reorderPedigree.h"
+#ifdef USE_BOOST
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
 SEXP reorderPedigree(SEXP mother_sexp, SEXP father_sexp, SEXP lineNames_sexp)
@@ -79,3 +80,4 @@ BEGIN_RCPP
 	return Rcpp::List::create(Rcpp::Named("mother") = newMother, Rcpp::Named("father") = newFather, Rcpp::Named("lineNames") = newLineNames);
 END_RCPP
 }
+#endif

@@ -31,7 +31,7 @@
 #include "testDistortion.h"
 #include "removeHets.h"
 #include "computeGenotypeProbabilities.h"
-#ifdef HAS_BOOST
+#ifdef USE_BOOST
 	#include "reorderPedigree.h"
 #endif
 #include "transformForMPWGAIM.h"
@@ -77,7 +77,7 @@ extern "C"
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},
 		{"eightParentPedigreeImproperFunnels", (DL_FUNC)&eightParentPedigreeImproperFunnels, 3},
-#ifdef HAS_BOOST
+#ifdef USE_BOOST
 		{"reorderPedigree", (DL_FUNC)&reorderPedigree, 3},
 #endif
 		{"testDistortion", (DL_FUNC)&testDistortion, 1},
