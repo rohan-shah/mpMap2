@@ -146,6 +146,64 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 		else return(new(to, as(from, "mpcross"), rf = from@rf))
 	})
 #' @export
+mpcross <- function(founders, finals, pedigree, hetData)
+{
+	if(!isS4(pedigree) || !inherits(pedigree, "pedigree"))
+	{
+		stop("Input pedigree must be an S4 object of class peigree")
+	}
+	if(is.character(founders) || is.null(dim(founders)) || length(dim(founders)) != 2)
+	{
+		stop("Input founders must be a numeric matrix")
+	}
+	if(is.data.frame(founders)) founders <- as.matrix(founders)
+	mode(founders) <- "integer"
+	if(is.character(finals) || is.null(dim(finals)) || length(dim(finals)) != 2)
+	{
+		stop("Input finals must be a numeric matrix")
+	}
+	if(is.data.frame(finals)) finals <- as.matrix(finals)
+	if(is.null(rownames(finals)) || is.null(colnames(finals)) || is.null(rownames(founders)) || is.null(colnames(founders)))
+	{
+		stop("Inputs founders and finals must have row and column names")
+	}
+	mode(finals) <- "integer"
+	if(missing(hetData))
+	{
+		hetData <- lapply(1:ncol(founders), function(x)
+			{
+				alleles <- unique(founders[,x])
+				cbind(alleles,alleles,alleles)
+			})
+		names(hetData) <- colnames(founders)
+		hetData <- new("hetData", hetData)
+	}
+	else if(!isS4(hetData) || !inherits(hetData, "hetData"))
+	{
+		stop("Input hetData must be an object of class hetData")
+	}
+	if(ncol(founders) != ncol(finals) || ncol(finals) != length(hetData))
+	{
+		stop("Inputs hetData, founders and finals must have the same number of markers")
+	}
+	sortedFounderMarkers <- sort(colnames(founders))
+	sortedFinalMarkers <- sort(colnames(finals))
+	sortedHetDataMarkers <- sort(names(hetData))
+	if(any(sortedFounderMarkers != sortedFinalMarkers) || any(sortedFinalMarkers != sortedHetDataMarkers))
+	{
+		stop("Inputs founders, finals and hetData must have the same markers")
+	}
+	#Standardise marker order, if required
+	if(any(colnames(founders) != colnames(finals)) || any(colnames(finals) != names(hetData)))
+	{
+		finals <- finals[,sortedFounderMarkers]
+		hetData <- hetData[sortedFounderMarkers]
+	}
+	geneticData <- new("geneticData", founders = founders, hetData = hetData, finals = finals, pedigree = pedigree)
+	mpcross <- new("mpcross", geneticData = new("geneticDataList", list(geneticData)))
+	return(mpcross)
+}
+#' @export
 mpcrossMapped <- function(cross, map, rf=NULL)
 {
 	if(inherits(cross, "mpcrossRF"))

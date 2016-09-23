@@ -20,3 +20,31 @@ setMethod(f = "print", signature = "detailedPedigree", definition = function(x)
 {
 	cat("This is a pedigree object containing ", length(x@lineNames), " lines, of which ", nFounders(x), " are founders and ", nFinals(x), " are observed\n")
 })
+#' @export
+pedigree <- function(lineNames, mother, father, selfing, warnImproperFunnels = TRUE)
+{
+	if(!is.numeric(mother))
+	{
+		stop("Input mother must be a numeric vector")
+	}
+	if(!is.numeric(father))
+	{
+		stop("Input father must be a numeric vector")
+	}
+	if(!is.character(lineNames))
+	{
+		stop("Input lineNames must be a character vector")
+	}
+	if(length(mother) != length(father) || length(father) != length(lineNames))
+	{
+		stop("Inputs mother, father and lineNames must have the same length")
+	}
+	if(selfing != "infinite" && selfing != "finite")
+	{
+		stop("Input selfing must be either \"finite\" or \"infinite\"")
+	}
+	mode(mother) <- "integer"
+	mode(father) <- "integer"
+	pedigree <- new("pedigree", mother = mother, father = father, lineNames = lineNames, selfing = selfing, warnImproperFunnels = warnImproperFunnels)
+	return(pedigree)
+}
