@@ -49,7 +49,7 @@
 #' graph <- pedigreeToGraph(pedigree)
 #' plotWOptions(graph)
 #' @export
-twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)

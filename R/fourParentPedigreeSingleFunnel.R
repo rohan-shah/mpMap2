@@ -10,7 +10,7 @@
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @export
-fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
@@ -24,7 +24,7 @@ fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerat
   }
   return(.Call("fourParentPedigreeSingleFunnel", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
 }
-fourParentPedigreeSingleFunnelPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+fourParentPedigreeSingleFunnelPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)

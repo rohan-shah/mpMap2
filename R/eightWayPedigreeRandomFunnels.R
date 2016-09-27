@@ -20,7 +20,7 @@
 # \dontrun{write.graph(graph = pedigreeAsGraph@@graph, format = "dot", file = "./pedigree.dot")}
 
 # This is written in C because otherwise it's just too damn slow (especially for generating the huge populations that we want to use to get numerically accurate results for unit testing)
-eightParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+eightParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
@@ -34,7 +34,7 @@ eightParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGener
   }
   return(.Call("eightParentPedigreeRandomFunnels", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
 }
-eightParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds, intercrossingGenerations)
+eightParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)
   nonNegativeIntegerArgument(selfingGenerations)
