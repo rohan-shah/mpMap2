@@ -11,11 +11,12 @@ setMethod(f = "+", signature = c("mpcross", "removeHets"), definition = function
 		warning("Removing hets will remove all data except genetic data")
 	}
 	e1 <- as(e1, "mpcross")
-	lapply(1:length(e1@geneticData), 
-		function(index)
-		{
-			founders <- nFounders(e1@geneticData[[index]])
-			e1@geneticData[[index]]@finals[e1@geneticData[[index]]@finals > founders] <<- NA
-		})
+	for(i in 1:length(e1@geneticData))
+	{
+		newResults <- .Call("removeHets", e1@geneticData[[i]]@founders, e1@geneticData[[i]]@finals, e1@geneticData[[i]]@hetData, PACKAGE="mpMap2")
+		e1@geneticData[[i]]@finals <- newResults$finals
+		names(newResults$hetData) <- names(e1@geneticData[[i]]@hetData)
+		e1@geneticData[[i]]@hetData <- new("hetData", newResults$hetData)
+	}
 	return(e1)
 })

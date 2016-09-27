@@ -15,7 +15,21 @@ test_that("Check that multiparentSNP respects NA values",
 		cross3 <- cross + multiparentSNP(keepHets = FALSE)
 		expect_identical(which(is.na(cross3@geneticData[[1]]@finals)), indicesNA)
 	})
+test_that("Check that multiparentSNP works for multiple designs", 
+{
+	pedigree1 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 50, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
+	pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 50, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 0)
+	map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	cross1 <- simulateMPCross(map=map, pedigree=pedigree1, mapFunction = haldane)
+	cross2 <- simulateMPCross(map=map, pedigree=pedigree2, mapFunction = haldane)
+	combined <- cross1 + cross2
+	combinedSNP <- combined + multiparentSNP(keepHets = FALSE)
+	expect_true(all(is.na(combinedSNP@geneticData[[1]]@finals)) %in% c(NA, 0:1))
+	expect_true(sum(is.na(combinedSNP@geneticData[[1]]@finals)) / length(combinedSNP@geneticData[[1]]@finals) > 0.5)
 
+	expect_true(all(combinedSNP@geneticData[[2]]@finals %in% c(NA, 0:1)))
+	expect_true(sum(is.na(combinedSNP@geneticData[[2]]@finals)) / length(combinedSNP@geneticData[[2]]@finals) < 0.02)
+})
 test_that("Check that multiparentSNP works for a 4-way intercross",
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
@@ -31,6 +45,13 @@ test_that("Check that multiparentSNP doesn't work for an F2 or RIL",
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_that(cross+ multiparentSNP(keepHets = TRUE), throws_error())
 		expect_that(cross+ multiparentSNP(keepHets = FALSE), throws_error())
+
+		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 50, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
+		lineNames(pedigree4) <- paste0("4way-", lineNames(pedigree4))
+		cross4 <- simulateMPCross(map=map, pedigree=pedigree4, mapFunction = haldane)
+		combined <- cross + cross4
+		expect_that(combined + multiparentSNP(TRUE), throws_error())
+		expect_that(combined + multiparentSNP(FALSE), throws_error())
 	})
 test_that("Check that multiparentSNP C code works the same as R code for four-way design", 
 	{

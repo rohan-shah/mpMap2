@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.1)
 project(mpMap2)
 
 option(USE_OPENMP "Use OpenMP" ON)
+option(USE_BOOST "Use Boost" ON)
+
+if(USE_BOOST)
+	#Boost stuff. Only used for the boost graph library. 
+	set(Boost_USE_STATIC_LIBS       OFF)
+	set(Boost_USE_MULTITHREADED     ON)
+	set(Boost_USE_STATIC_RUNTIME    OFF)
+	#Find boost packages
+	find_package(Boost 1.50.0 REQUIRED COMPONENTS graph regex)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src)
 find_package(R REQUIRED)
@@ -11,7 +21,7 @@ add_subdirectory(src)
 
 add_custom_target(copyPackage ALL)	
 set(HEADERS alleleDataErrors.h combineGenotypes.h estimateRFCheckFunnels.h estimateRFSpecificDesign.h generateGenotypes.h intercrossingAndSelfingGenerations.h orderFunnel.h recodeHetsAsNA.h checkHets.h crc32.h estimateRF.h funnelsToUniqueValues.h getFunnel.h markerPatternsToUniqueValues.h recodeFoundersFinalsHets.h sortPedigreeLineNames.h unitTypes.hpp fourParentPedigreeRandomFunnels.h matrixChunks.h rawSymmetricMatrix.h dspMatrix.h impute.h arsa.h)
-set(RFILES biparentalDominant.R combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R f2Pedigree.R formGroups.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R multiparentSNP.R multiparentSNPPrototype.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R removeHets.R rf-class.R rilPedigree.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R rawSymmetricMatrix.R orderCross.R eightWayPedigreeRandomFunnels.R impute.R sixteenParentPedigreeRandomFunnels.R eightWayPedigreeSingleFunnel.R imputeFounders.R estimateMap.R jitterMap.R founders.R finals.R hetData.R fixedNumberOfFounderAlleles.R compressedProbabilities.R)
+set(RFILES biparentalDominant.R combineGenotypes.R detailedPedigree-class.R estimateRF.R expand.R f2Pedigree.R formGroups.R fourParentPedigreeRandomFunnels.R fourParentPedigreeSingleFunnel.R fullHetData.R geneticData-class.R hetData-class.R lg-class.R map-class.R mapFunctions.R markers.R mpcross-class.R mpcross.R multiparentSNP.R multiparentSNPPrototype.R nFounders.R nLines.R nMarkers.R pedigree-class.R pedigree.R pedigreeGraph-class.R pedigreeGraph.R pedigreeToGraph.R print.R Rcpp_exceptions.R removeHets.R rf-class.R rilPedigree.R roxygen.R show.R simulateMPCross.R subset.R twoParentPedigree.R validation.R rawSymmetricMatrix.R orderCross.R eightWayPedigreeRandomFunnels.R impute.R sixteenParentPedigreeRandomFunnels.R eightWayPedigreeSingleFunnel.R imputeFounders.R estimateMap.R jitterMap.R founders.R finals.R hetData.R fixedNumberOfFounderAlleles.R compressedProbabilities.R backcrossPedigree.R eightWayPedigreeImproperFunnels.R reorderPedigree.R testDistortion.R lineNames.R selfing.R as.mpInterval.R computeGenotypeProbabilities.R)
 #Copy package to binary directory. This works differently on windows and linux
 if(WIN32)
 	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")

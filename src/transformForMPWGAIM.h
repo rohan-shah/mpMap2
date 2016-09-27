@@ -1,0 +1,5 @@
+#ifndef TRANSFORM_FOR_MPWGAIM_HEADER_GUARD
+#define TRANSFORM_FOR_MPWGAIM_HEADER_GUARD
+#include <Rcpp.h>
+SEXP transformForMPWGAIM(SEXP geneticData);
+#endif

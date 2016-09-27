@@ -142,6 +142,25 @@ checkGeneticData <- function(object)
 		errors <- validObject(object@imputed)
 		if(length(errors) > 0) return(errors)
 	}
+	#Check probabilities
+	if(!is.null(object@probabilities))
+	{
+		if(!is.numeric(object@probabilities@data))
+		{
+			return("Slot probabilities@data must be a numeric matrix")
+		}
+		nGenotypes <- length(unique(object@probabilities@key[,3]))
+		if(nrow(object@probabilities@data) != nLines(object) * nGenotypes)
+		{
+			return("Number of rows of probabilities@data must be consistent with probabilities@key and nrow(finals)")
+		}
+		if(!identical(colnames(object@probabilities@data), markers(object)))
+		{
+			return("Object probabilities@data had the wrong column names")
+		}
+		errors <- validObject(object@probabilities)
+		if(length(errors) > 0) return(errors)
+	}
 	return(TRUE)
 }
 checkImputedData <- function(object)
@@ -165,7 +184,24 @@ checkImputedData <- function(object)
 }
 .imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix"), validity = checkImputedData)
 setClassUnion("imputedOrNULL", c("imputed", "NULL"))
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL"), validity = checkGeneticData)
+checkProbabilities <- function(object)
+{
+	if(!is.numeric(object@data))
+	{
+		return("Slot data must be an integer matrix")
+	}
+	if(!is.numeric(object@key))
+	{
+		return("Slot key must be an integer matrix")
+	}
+	if(ncol(object@key) != 3L)
+	{
+		return("Slot key must have three columns")
+	}
+}
+.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix"), validity = checkProbabilities)
+setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
 checkGeneticDataList <- function(object)
 {
 	if(any(unlist(lapply(object, class)) != "geneticData"))

@@ -6,11 +6,10 @@ rf <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE)
 
 test_that("Can expand to same marker set (without a warning)",
 	{
-		expect_that(expand(rf, newMarkers = markers(rf)), not(gives_warning("recombination data will be lost")))
+		expect_warning(expand(rf, newMarkers = markers(rf)), NA)
 
 		lg <- formGroups(rf, groups = 1)
-		expect_that(expand(lg, newMarkers = markers(lg)), not(gives_warning("recombination data will be lost")))
-		expect_that(expand(lg, newMarkers = markers(lg)), not(gives_warning("linkage group data will be lost")))
+		expect_warning(expand(lg, newMarkers = markers(lg)), NA)
 	})
 test_that("Function warns when discarding recombination data",
 	{

@@ -132,5 +132,5 @@ twoParentPedigree <- function(initialPopulationSize, selfingGenerations, nSeeds 
       observed[lastGenerationStart:lastGenerationEnd] <- TRUE
     }
   }
-  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:2L, observed = observed, selfing = "infinite"))
+  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:2L, observed = observed, selfing = "infinite", warnImproperFunnels = TRUE))
 }

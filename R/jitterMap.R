@@ -20,7 +20,7 @@ jitterMap <- function(map)
 					if(counter == length(mapPart))
 					{
 						totalDist <- mapPart[counter] - mapPart[start-1]
-						mapPart[start:counter] <- seq(mapPart[start-1] + totalDist/nMarkers, mapPart[counter], length.out = nMarkers)
+						mapPart[start:counter] <- seq(mapPart[start-1] + totalDist/(counter - start + 1), mapPart[counter], length.out = counter - start + 1)
 					}
 					else if(start == 1)
 					{

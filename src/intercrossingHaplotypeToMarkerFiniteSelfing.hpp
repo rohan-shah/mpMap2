@@ -14,7 +14,7 @@ public:
 		int funnel[nFounders];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+			funnel[founderCounter] = ((enc & ((std::size_t)15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		int nPoints = haplotypeProbabilities.getSizeX();
 		int table[maxAlleles][maxAlleles][nDifferentProbs];
@@ -84,7 +84,7 @@ public:
 		int funnel[nFounders];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+			funnel[founderCounter] = ((enc & ((std::size_t)15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<16>));
 		for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)

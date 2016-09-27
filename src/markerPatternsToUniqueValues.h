@@ -14,6 +14,11 @@ public:
 	void computeHash() const;
 	rowMajorMatrix<int> hetData;
 	int nObservedValues;
+	markerData(const markerData& other)
+		:hashed(other.hashed), hash(other.hash), nObservedValues(other.nObservedValues)
+	{
+		hetData = other.hetData.copy();
+	}
 private:
 	mutable bool hashed;
 	mutable int hash;

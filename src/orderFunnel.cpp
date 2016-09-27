@@ -3,75 +3,65 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
-//put the funnels into cannonical order
-//order a set of four (considered as first pair / second pair) so that the pair containing the smallest value comes first, followed by the other pair. Each pair also sorted as (smaller, larger)
+//The functions in this file put the funnels into cannonical order
 void orderFour(int* start)
 {
-	int* minElement = std::min_element(start, start + 4);
-	//if minimum is in first pair do nothing
-	if((minElement - start) / 2 == 0)
-	{
-	}
-	//if it's in second pair switch
-	else
-	{
-		int fourValues[4];
-		memcpy(fourValues, start, sizeof(int)*4);
-		memcpy(start+2, fourValues, sizeof(int)*2);
-		memcpy(start, fourValues+2, sizeof(int)*2);
-	}
-	//also order each pair as (min, max)
 	int min = std::min(start[0], start[1]), max = std::max(start[0], start[1]);
 	start[0] = min; start[1] = max;
 	min = std::min(start[2], start[3]), max = std::max(start[2], start[3]);
 	start[2] = min; start[3] = max;
 }
-//order a set of eight values so that the set of  four (out of first four / last four) containing the smallest value come first
-void orderByFour(int* funnel)
+template<int size> void orderByHalves(int* funnel)
 {
-	int* minVal = std::min_element(funnel, funnel + 8);
-	//if the smallest value is in the first four, do nothing
-	if((minVal - funnel) / 4 == 0)
+	//Make a copy of the original.
+	int copied[size];
+	memcpy(copied, funnel, sizeof(int) * size);
+	while(true)
 	{
-	}
-	else
-	{
-		//if the smallest value is in the second four, switch the two sets of four
-		int original[8];
-		memcpy(original, funnel, sizeof(int)*8);
-		memcpy(funnel, original + 4, sizeof(int)*4);
-		memcpy(funnel + 4, original, sizeof(int)*4);
+		int* firstHalfMin = std::min_element(copied, copied+size/2), *secondHalfMin = std::min_element(copied+size/2, copied+size);
+		//If we've exhausted all the elements looking for a minimum value which is contained in one set of eight but not the other, then both halves are the same. So just return the original again.
+		if(*firstHalfMin == std::numeric_limits<int>::max() && *secondHalfMin == std::numeric_limits<int>::max())
+		{
+			return;
+		}
+		//If the minimum value is present in both sides, set it to max() and repeat. 
+		else if(*firstHalfMin == *secondHalfMin)
+		{
+			*secondHalfMin = *firstHalfMin = std::numeric_limits<int>::max();
+			continue;
+		}
+		//Otherwise we have a unique minimum value in one of the sides. 
+		int* minVal = std::min_element(copied, copied + size);
+		//if the smallest value is in the first eight, do nothing
+		if ((minVal - copied) / (size / 2) == 0)
+		{
+			return;
+		}
+		else
+		{
+			memcpy(copied, funnel, sizeof(int) * size);
+			//if the smallest value is in the second eight, switch the two sets of eight
+			memcpy(funnel, copied + (size/2), sizeof(int) * (size/2));
+			memcpy(funnel + (size/2), copied, sizeof(int) * (size/2));
+			return;
+		}
 	}
 }
+//order a set of four (considered as first pair / second pair) so that the pair containing the smallest value comes first, followed by the other pair. Each pair also sorted as (smaller, larger)
 void orderFunnel4(int* funnel)
 {
+	orderByHalves<4>(funnel);
 	orderFour(funnel);
 }
 void orderFunnel8(int* funnel)
 {
-	orderByFour(funnel);
-	orderFour(funnel);
-	orderFour(funnel+4);
-}
-void orderByEight(int* funnel)
-{
-	int* minVal = std::min_element(funnel, funnel + 16);
-	//if the smallest value is in the first four, do nothing
-	if ((minVal - funnel) / 8 == 0)
-	{
-	}
-	else
-	{
-		//if the smallest value is in the second four, switch the two sets of four
-		int original[16];
-		memcpy(original, funnel, sizeof(int) * 16);
-		memcpy(funnel, original + 8, sizeof(int) * 8);
-		memcpy(funnel + 8, original, sizeof(int) * 8);
-	}
+	orderByHalves<8>(funnel);
+	orderFunnel4(funnel);
+	orderFunnel4(funnel+4);
 }
 void orderFunnel16(int* funnel)
 {
-	orderByEight(funnel);
+	orderByHalves<16>(funnel);
 	orderFunnel8(funnel);
 	orderFunnel8(funnel + 8);
 }
@@ -86,7 +76,7 @@ void orderFunnel(int* funnel, int nFounders)
 	}
 	else if(nFounders == 4)
 	{
-		orderFunnel4(funnel);
+		orderFour(funnel);
 	}
 	else if (nFounders == 8)
 	{

@@ -20,7 +20,7 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 		expect_that(subset(cross, markers = -1), throws_error())
 		expect_that(subset(cross, markers = (-3):0), throws_error())
 		expect_that(subset(cross, markers = 1:12), throws_error())
-		expect_that(subset(cross, markers = 1:11), not(throws_error()))
+		expect_error(subset(cross, markers = 1:11), NA)
 
 		#Test without dominant markers
 		subsetted <- subset(cross, markers = 2)
@@ -54,7 +54,7 @@ test_that("Subset changes the pedigree from detailedPedigree to pedigree when su
 		expect_that(subsetted@geneticData[[1]]@pedigree, is_a("detailedPedigree"))
 
 		subsetted <- subset(cross, lines = 1:2)
-		expect_that(subsetted@geneticData[[1]]@pedigree, not(is_a("detailedPedigree")))
+		expect_true(!is(subsetted@geneticData[[1]]@pedigree, "detailedPedigree"))
 	})
 test_that("Checking subset on object of class mpcross by markers, with two datasets",
 	{

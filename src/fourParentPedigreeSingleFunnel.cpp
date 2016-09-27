@@ -118,7 +118,7 @@ BEGIN_RCPP
 			std::fill(observed.begin()+lastGenerationStart, observed.begin() + lastGenerationEnd, true);
 		}
 	}
-	Rcpp::S4 result = newCall("detailedPedigree", Rcpp::Named("lineNames") = lineNames, Rcpp::Named("mother") = mother, Rcpp::Named("father") = father, Rcpp::Named("initial") = Rcpp::Range(1, 4), Rcpp::Named("observed") = observed, Rcpp::Named("selfing") = "infinite");
+	Rcpp::S4 result = newCall("detailedPedigree", Rcpp::Named("lineNames") = lineNames, Rcpp::Named("mother") = mother, Rcpp::Named("father") = father, Rcpp::Named("initial") = Rcpp::Range(1, 4), Rcpp::Named("observed") = observed, Rcpp::Named("selfing") = "infinite", Rcpp::Named("warnImproperFunnels") = true);
 	return result;
 END_RCPP
 }

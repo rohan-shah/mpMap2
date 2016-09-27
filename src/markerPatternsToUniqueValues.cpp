@@ -60,7 +60,7 @@ void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 		{
 			args.markerPatternIDs.push_back((int)args.markerPatterns.size());
 			args.markerPatterns.insert(std::make_pair(currentPattern, args.markerPatterns.size()));
-			args.allMarkerPatterns.push_back(currentPattern);
+			args.allMarkerPatterns.emplace_back(std::move(currentPattern));
 		}
 		else
 		{

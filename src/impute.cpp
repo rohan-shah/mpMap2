@@ -17,7 +17,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 #ifdef USE_OPENMP
 	#pragma omp parallel for schedule(dynamic)
 #endif
-	for(std::vector<int>::iterator marker1 = markersThisGroup.begin(); marker1 != markersThisGroup.end(); marker1++)
+	for(std::vector<int>::iterator marker1 = markersThisGroup.begin(); marker1 < markersThisGroup.end(); marker1++)
 	{
 		bool missing = false;
 		for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)

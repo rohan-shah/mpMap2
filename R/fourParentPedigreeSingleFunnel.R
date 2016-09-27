@@ -100,5 +100,5 @@ fourParentPedigreeSingleFunnelPrototype <- function(initialPopulationSize, selfi
   {
     observed[(nextFree-initialPopulationSize):(nextFree-1)] <- TRUE
   }
-  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:4L, observed = observed, selfing = "infinite"))
+  return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = 1L:4L, observed = observed, selfing = "infinite", warnImproperFunnels = TRUE))
 }

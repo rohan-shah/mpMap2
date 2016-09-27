@@ -8,6 +8,10 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 	}
 	if("lines" %in% names(arguments))
 	{
+		if(any(is.na(arguments$lines)))
+		{
+			stop("Input arguments cannot contain NA")
+		}
 		if(mode(arguments$lines) == "numeric")
 		{
 			if(length(x@geneticData) != 1)
@@ -47,9 +51,34 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 })
 setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
 {
-	subsettedRF <- NULL
-	if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
-	return(new("mpcrossMapped", callNextMethod(), map = subset(x@map, ...), rf = subsettedRF))
+	arguments <- list(...)
+	if("groups" %in% names(arguments))
+	{
+		stop("Cannot subset a map by linkage groups")
+	}
+	if(sum(c("markers", "lines") %in% names(arguments)) != 1)
+	{
+		stop("Exactly one of arguments markers and lines is required for function subset.mpcrossMapped")
+	}
+	if("markers" %in% names(arguments))
+	{
+		subsettedRF <- NULL
+		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
+		groups <- vector(mode = "integer", length = length(arguments$markers))
+		names(groups) <- arguments$markers
+		for(chr in 1:length(x@map)) groups[intersect(names(x@map), arguments$markers)] <- chr
+		newLG <- new("lg", groups = groups, allGroups = unique(groups))
+		return(new("mpcrossLG", callNextMethod(), rf = subsettedRF, lg = newLG))
+	}
+	else
+	{
+		if(any(is.na(arguments$lines)))
+		{
+			stop("Input arguments cannot contain NA")
+		}
+		warning("Subset function is discarding the recombination fraction data")
+		return(new("mpcrossMapped", callNextMethod(), map = x@map, rf = NULL))
+	}
 })
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {

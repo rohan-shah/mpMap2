@@ -17,18 +17,33 @@ public:
 		allowableFunnel.swap(other.allowableFunnel);
 		allowableAI.swap(other.allowableAI);
 	}
+	singleMarkerPairData()
+	{}
+	singleMarkerPairData(singleMarkerPairData<maxAlleles>&& other)
+		:perFunnelData(std::move(other.perFunnelData)), perAIGenerationData(std::move(other.perAIGenerationData)), allowableFunnel(std::move(other.allowableFunnel)), allowableAI(std::move(other.allowableAI))
+	{}
+	singleMarkerPairData<maxAlleles>& operator=(singleMarkerPairData<maxAlleles>&& other)
+	{
+		perFunnelData = std::move(other.perFunnelData);
+		perAIGenerationData = std::move(other.perAIGenerationData);
+		allowableFunnel = std::move(other.allowableFunnel);
+		allowableAI = std::move(other.allowableAI);
+	}
 	xMajorMatrix<array2<maxAlleles> > perFunnelData;
 	xMajorMatrix<array2<maxAlleles> > perAIGenerationData;
 
 	rowMajorMatrix<bool> allowableFunnel;
 	rowMajorMatrix<bool> allowableAI;
+private:
+	singleMarkerPairData(const singleMarkerPairData<maxAlleles>& other);
+	singleMarkerPairData<maxAlleles>& operator=(const singleMarkerPairData<maxAlleles>& other);
 };
 template<int maxAlleles> class allMarkerPairData : protected std::vector<singleMarkerPairData<maxAlleles> >
 {
 public:
 	typedef typename std::vector<singleMarkerPairData<maxAlleles> > parent;
 	allMarkerPairData(int nMarkerPatternIDs)
-		: parent((std::size_t)((nMarkerPatternIDs * nMarkerPatternIDs - nMarkerPatternIDs)/2 + nMarkerPatternIDs), singleMarkerPairData<maxAlleles> (0, 0, 0, 0))
+		: parent((std::size_t)((nMarkerPatternIDs * nMarkerPatternIDs - nMarkerPatternIDs)/2 + nMarkerPatternIDs))
 	{}
 	singleMarkerPairData<maxAlleles>& operator()(int markerPattern1ID, int markerPattern2ID)
 	{
@@ -39,7 +54,7 @@ public:
 		return parent::operator[](index);
 	}
 };
-template<int maxAlleles, int nFounders> struct constructLookupTableArgs
+template<int maxAlleles> struct constructLookupTableArgs
 {
 public:
 	constructLookupTableArgs(allMarkerPairData<maxAlleles>& computedContributions, markerPatternsToUniqueValuesArgs& markerPatternData)
@@ -80,7 +95,7 @@ template<int maxAlleles> bool isValid(std::vector<array2<maxAlleles> >& markerPr
 	}
 	return true;
 }
-template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles, nFounders>& args)
+template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles>& args)
 {
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int nRecombLevels = (int)args.recombinationFractions->size();

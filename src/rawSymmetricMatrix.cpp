@@ -240,3 +240,89 @@ BEGIN_RCPP
 	return Rcpp::wrap(false);
 END_RCPP
 }
+SEXP rawSymmetricMatrixToDist(SEXP object)
+{
+BEGIN_RCPP
+	Rcpp::S4 rawSymmetric = object;
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
+	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	R_xlen_t size = markers.size(), levelsSize = levels.size();
+
+	Rcpp::NumericVector result(size*(size - 1)/2, 0);
+	int counter = 0;
+	for(R_xlen_t row = 0; row < size; row++)
+	{
+		for(R_xlen_t column = row+1; column < size; column++)
+		{
+			int byte = data(column * (column + (R_xlen_t)1)/(R_xlen_t)2 + row);
+			if(byte == 255) result(counter) = std::numeric_limits<double>::quiet_NaN();
+			else result(counter) = levels(byte);
+			counter++;
+		}
+	}
+	result.attr("Size") = (int)size;
+	result.attr("Labels") = markers;
+	result.attr("Diag") = false;
+	result.attr("Upper") = false;
+	result.attr("class") = "dist";
+	return result;
+END_RCPP
+}
+SEXP constructDissimilarityMatrixInternal(unsigned char* data, std::vector<double>& levels, int size, SEXP clusters_, int start, const std::vector<int>& currentPermutation)
+{
+	Rcpp::IntegerVector clusters = Rcpp::as<Rcpp::IntegerVector>(clusters_);
+	int minCluster = *std::min_element(clusters.begin(), clusters.end()), maxCluster = *std::max_element(clusters.begin(), clusters.end());
+	if(minCluster != 1)
+	{
+		throw std::runtime_error("Clusters must have consecutive indices starting at 1");
+	}
+	std::vector<std::vector<int> > groupIndices(maxCluster);
+	for(int i = 0; i < clusters.size(); i++)
+	{
+		groupIndices[clusters[i]-1].push_back(currentPermutation[i + start]);
+	}
+
+	std::vector<int> table(levels.size());
+
+	Rcpp::NumericMatrix result(maxCluster, maxCluster);
+	for(int rowCluster = 1; rowCluster <= maxCluster; rowCluster++)
+	{
+		for(int columnCluster = 1; columnCluster <= rowCluster; columnCluster++)
+		{
+			const std::vector<int>& columnIndices = groupIndices[columnCluster-1];
+			const std::vector<int>& rowIndices = groupIndices[rowCluster-1];
+			std::fill(table.begin(), table.end(), 0);
+			for(std::vector<int>::const_iterator columnMarker = columnIndices.begin(); columnMarker != columnIndices.end(); columnMarker++)
+			{
+				for(std::vector<int>::const_iterator rowMarker = rowIndices.begin(); rowMarker != rowIndices.end(); rowMarker++)
+				{
+					int x = *rowMarker, y = *columnMarker;
+					if(x < y) std::swap(x, y);
+					int byte = data[x *(x + (R_xlen_t)1)/(R_xlen_t)2 + y];
+					if(byte == 255) throw std::runtime_error("Values of NA not allowed");
+					table[byte]++;
+				}
+			}
+			double sum = 0;
+			for(int i = 0; i < table.size(); i++) sum += table[i] * levels[i];
+			result(rowCluster-1, columnCluster-1) = result(columnCluster-1, rowCluster-1) = sum / (columnIndices.size() * rowIndices.size());
+		}
+	}
+	return result;
+}
+SEXP constructDissimilarityMatrix(SEXP object, SEXP clusters_)
+{
+BEGIN_RCPP
+	Rcpp::S4 rawSymmetric = object;
+	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
+	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
+	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
+	int nMarkers = markers.size();
+	std::vector<double> levelsCopied = Rcpp::as<std::vector<double> >(levels);
+	
+	std::vector<int> permutation(nMarkers);
+	for(int i = 0; i < nMarkers; i++) permutation[i] = i;
+	return constructDissimilarityMatrixInternal(&(data(0)), levelsCopied, nMarkers, clusters_, 0, permutation);
+END_RCPP
+}

@@ -1,8 +1,12 @@
 #include "order.h"
 #include "impute.h"
 #include "arsaRaw.h"
-SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP verbose_)
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
+SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp, SEXP verbose_)
 {
+BEGIN_RCPP
 	Rcpp::S4 mpcrossLG;
 	try
 	{
@@ -32,6 +36,43 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		throw std::runtime_error("Slot mpcrossLG@lg must be an S4 object");
 	}
 
+	bool randomStart;
+	try
+	{
+		randomStart = Rcpp::as<bool>(randomStart_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input randomStart must be a logical");
+	}
+
+	int maxMove;
+	try
+	{
+		maxMove = Rcpp::as<int>(maxMove_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input maxMove must be an integer");
+	}
+	if(maxMove < 0)
+	{
+		throw std::runtime_error("Input maxMove must be non-negative");
+	}
+
+	double effortMultiplier;
+	try
+	{
+		effortMultiplier = Rcpp::as<double>(effortMultiplier_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input effortMultiplier must be numeric");
+	}
+	if(effortMultiplier <= 0)
+	{
+		throw std::runtime_error("Input effortMultiplier must be positive");
+	}
 
 	std::vector<int> groups;
 	try
@@ -294,7 +335,27 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 #endif
 			};
 		}
-		arsaRaw(nMarkersCurrentGroup, &(distMatrix[0]), levels, cool, temperatureMin, nReps, currentGroupPermutation, orderingProgressFunction);
+		arsaRawArgs args(levels, currentGroupPermutation);
+		args.n = nMarkersCurrentGroup;
+		args.rawDist = &(distMatrix[0]);
+		args.cool = cool;
+		args.temperatureMin = temperatureMin;
+		args.nReps = nReps;
+		args.progressFunction = orderingProgressFunction;
+		args.randomStart = randomStart;
+		args.maxMove = maxMove;
+		args.effortMultiplier = effortMultiplier;
+#ifdef USE_OPENMP
+		if(omp_get_max_threads() > 1)
+		{
+			arsaRawParallel(args);
+		}
+		else
+#endif
+		{
+			arsaRaw(args);
+		}
+
 		if(verbose)
 		{
 			close(barHandle);
@@ -302,4 +363,5 @@ SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temper
 		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++) permutation.push_back(markersThisGroup[currentGroupPermutation[i]]+1);
 	}
 	return Rcpp::wrap(permutation);
+END_RCPP
 }

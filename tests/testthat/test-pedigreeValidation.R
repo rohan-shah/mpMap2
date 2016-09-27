@@ -106,4 +106,10 @@ test_that("Number of founders must be at least 2",
 		pedigree@mother <- pedigree@father <- 0:1005
 		expect_that(validObject(pedigree, complete=TRUE), throws_error())
 	})
+test_that("Replacement function lineNames checks for duplicates and correct length",
+	{
+		copied <- pedigree
+		expect_that(lineNames(copied)[3] <- lineNames(copied)[4], throws_error("duplicates"))
+		expect_that(lineNames(copied) <- lineNames(copied)[-1], throws_error("wrong length"))
+	})
 rm(pedigree)

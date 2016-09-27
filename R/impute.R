@@ -24,10 +24,11 @@ impute <- function(mpcrossLG, verbose = FALSE)
 	}
 	else
 	{
-		if(!is.list(verbose) || !("progressStyle" %in% names(verbose)) || !("verbose" %in% names(verbose)))
+		if(!is.list(verbose) || !("progressStyle" %in% names(verbose)))
 		{
 			stop("Input verbose must be TRUE, FALSE, or a list with entries named progressStyle and verbose")
 		}
+		if(!("verbose" %in% names(verbose))) verbose$verbose <- TRUE
 		if(length(verbose$progressStyle) != 1L || !(verbose$progressStyle %in% 0:3))
 		{
 			stop("Input verbose$progressStyle must have value 0, 1, 2 or 3")
