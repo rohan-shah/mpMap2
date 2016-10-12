@@ -1,5 +1,7 @@
 #include "mpMap2_openmp.h"
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 SEXP mpMap2_omp_set_num_threads(SEXP num)
 {
 BEGIN_RCPP
