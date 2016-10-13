@@ -156,7 +156,6 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 			{
 				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
-					int markerEncodingTheseFounders = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					backwardProbabilities(encodingTheseFounders, markerCounter - start) = 0;
 					//The founders at the previous marker
@@ -296,7 +295,6 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 			{
 				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
-					int markerEncodingTheseFounders = currentMarkerData.hetData(founderCounter, founderCounter2);
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					backwardProbabilities(encodingTheseFounders, markerCounter - start) = 0;
 					//The founders at the previous marker

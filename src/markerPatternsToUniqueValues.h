@@ -15,7 +15,7 @@ public:
 	rowMajorMatrix<int> hetData;
 	int nObservedValues;
 	markerData(const markerData& other)
-		:hashed(other.hashed), hash(other.hash), nObservedValues(other.nObservedValues)
+		:nObservedValues(other.nObservedValues), hashed(other.hashed), hash(other.hash) 
 	{
 		hetData = other.hetData.copy();
 	}

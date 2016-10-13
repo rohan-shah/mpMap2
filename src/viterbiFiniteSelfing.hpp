@@ -154,7 +154,6 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
-			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			int markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& previousMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter + 1]];
@@ -189,7 +188,6 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 						{
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
-								int encodingPreviousMarker = previousMarkerData.hetData(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
@@ -302,7 +300,6 @@ stopIdenticalSearch:
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
-			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			int markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& previousMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter + 1]];
@@ -348,7 +345,6 @@ stopIdenticalSearch:
 						{
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
-								int encodingPreviousMarker = previousMarkerData.hetData(funnel[founderPreviousCounter], funnel[founderPreviousCounter2]);
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
@@ -489,7 +485,6 @@ stopIdenticalSearch:
 						{
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
-								int encodingPreviousMarker = previousMarkerData.hetData(founderPreviousCounter, founderPreviousCounter2);
 								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
@@ -599,7 +594,6 @@ stopIdenticalSearch:
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
-			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			int markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& previousMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter + 1]];
@@ -645,7 +639,6 @@ stopIdenticalSearch:
 						{
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
-								int encodingPreviousMarker = previousMarkerData.hetData(founderPreviousCounter, founderPreviousCounter2);
 								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{

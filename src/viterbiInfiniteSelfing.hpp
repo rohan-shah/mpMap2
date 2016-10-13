@@ -197,7 +197,6 @@ stopIdenticalSearch:
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
-			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			memset(table, 0, sizeof(int)*nFounders);
@@ -375,7 +374,6 @@ stopIdenticalSearch:
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
-			int previousMarkerValue = recodedFinals(finalCounter, markerCounter);
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
 			memset(table, 0, sizeof(int)*nFounders);
