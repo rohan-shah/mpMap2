@@ -173,50 +173,38 @@ stopIdenticalSearch:
 			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
 		}
 		::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
-		//Table of the number of founders that map to that marker allele
-		int table[nFounders];
-		memset(table, 0, sizeof(int)*nFounders);
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			table[startMarkerData.hetData(founderCounter, founderCounter)]++;
-		}
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
 			intermediate1(founderCounter, 0) = intermediate2(founderCounter, 0) = founderCounter+1;
 			pathLengths2[founderCounter] = pathLengths1[founderCounter] = 0;
 			if(recodedFounders(founderCounter, start) == markerValue)
 			{
-				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb * table[markerValue] / (double)nFounders));
+				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues));
 			}
 			else if(markerValue == NA_INTEGER)
 			{
 				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log(1.0 / (double)nFounders);
 			}
-			else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb * table[markerValue] / (double)nFounders);
+			else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
 		}
 		int identicalIndex = 0;
 		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
 		{
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
-			memset(table, 0, sizeof(int)*nFounders);
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				table[currentMarkerData.hetData(founderCounter, founderCounter)]++;
-			}
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
 				double increment;
 				if(recodedFounders(funnel[founderCounter], markerCounter+1) == markerValue)
 				{
-					increment = log((1 - errorProb) + errorProb * table[markerValue] / (double)nFounders);
+					increment = log((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues);
 				}
 				else if(markerValue == NA_INTEGER)
 				{
 					increment = 0;
 				}
-				else increment = log(errorProb * table[markerValue] / (double)nFounders);
+				else increment = log(errorProb / (double)startMarkerData.nObservedValues);
 				//Founder at the previous marker. 
 				std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -347,14 +335,7 @@ stopIdenticalSearch:
 			throw std::runtime_error("Internal error");
 		}
 		::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[start]];
-		//Table of the number of founders that map to that marker allele
-		int table[nFounders];
-		memset(table, 0, sizeof(int)*nFounders);
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			table[startMarkerData.hetData(founderCounter, founderCounter)]++;
-		}
-		//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
+			//Initialise the algorithm. For infinite generations of selfing, we don't need to bother with the hetData object, as there are no hets
 		int markerValue = recodedFinals(finalCounter, start);
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
@@ -362,13 +343,13 @@ stopIdenticalSearch:
 			pathLengths2[founderCounter] = pathLengths1[founderCounter] = 0;
 			if(recodedFounders(founderCounter, start) == markerValue)
 			{
-				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb * table[markerValue] / (double)nFounders));
+				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues));
 			}
 			else if(markerValue == NA_INTEGER)
 			{
 				pathLengths2[founderCounter] = pathLengths1[founderCounter] = log(1.0 / (double)nFounders);
 			}
-			else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb * table[markerValue] / (double)nFounders);
+			else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
 		}
 		//The index, before which all the paths are identical
 		int identicalIndex = 0;
@@ -376,11 +357,6 @@ stopIdenticalSearch:
 		{
 			markerValue = recodedFinals(finalCounter, markerCounter+1);
 			::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerCounter]];
-			memset(table, 0, sizeof(int)*nFounders);
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				table[currentMarkerData.hetData(founderCounter, founderCounter)]++;
-			}
 			//The founder at the next marker
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
@@ -388,13 +364,13 @@ stopIdenticalSearch:
 				double increment;
 				if(recodedFounders(founderCounter, markerCounter+1) == markerValue)
 				{
-					increment = log((1 - errorProb) + errorProb * table[markerValue] / (double)nFounders);;
+					increment = log((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues);
 				}
 				else if(markerValue == NA_INTEGER)
 				{
 					increment = 0;
 				}
-				else increment = log(errorProb * table[markerValue] / (double)nFounders);
+				else increment = log(errorProb / (double)startMarkerData.nObservedValues);
 				//Founder at the previous marker. 
 				std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
