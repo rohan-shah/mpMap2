@@ -7,6 +7,7 @@
 #ifdef CUSTOM_STATIC_RCPP
 #include "internal.h"
 #endif
+#include "parsePurdy.h"
 #include "fourParentPedigreeRandomFunnels.h"
 #include "fourParentPedigreeSingleFunnel.h"
 #include "eightParentPedigreeRandomFunnels.h"
@@ -84,6 +85,7 @@ extern "C"
 		{"removeHets", (DL_FUNC)&removeHets, 3},
 		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 4},
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
+		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
