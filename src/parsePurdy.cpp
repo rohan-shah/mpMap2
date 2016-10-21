@@ -142,7 +142,7 @@ BEGIN_RCPP
 		}
 		remainingParts.pop_front();
 	}
-	Rcpp::CharacterMatrix results(lineIDs.size(), 3), resultsReordered(lineIDs.size(), 3);
+	Rcpp::CharacterMatrix results(lineIDs.size() + nLines, 3), resultsReordered(lineIDs.size() + nLines, 3);
 	for(std::map<std::string, int>::iterator i = lineIDs.begin(); i != lineIDs.end(); i++)
 	{
 		results(i->second, 0) = i->first;
@@ -155,6 +155,19 @@ BEGIN_RCPP
 			results(i, 2) = results(parentIDs[i].second, 0);
 		}
 		else results(i, 1) = results(i, 2) = "";
+	}
+	//Also add renamed versions, with the names given as inputs. 
+	for(int i = 0; i < nLines; i++)
+	{
+		std::string encoding = Rcpp::as<std::string>(format[i]);
+		int formatLine = lineIDs[encoding];
+		if(Rcpp::as<std::string>(results(formatLine, 0)) != encoding) throw std::runtime_error("Internal error");
+		results(lineIDs.size() + i, 0) = Rcpp::as<std::string>(names[i]);
+		results(lineIDs.size() + i, 1) = results(formatLine, 1);
+		results(lineIDs.size() + i, 2) = results(formatLine, 2);
+		std::pair<int, int> existingPair = parentIDs[formatLine];
+		parentIDs.push_back(existingPair);
+		levels.push_back(levels[formatLine]);
 	}
 	bool continuing = true;
 	int currentLevel = 0;

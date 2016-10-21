@@ -74,6 +74,7 @@ Collate:
     'pedigreeGraph.R'
     'pedigreeToGraph.R'
     'print.R'
+    'purdyToPedigree.R'
     'removeHets.R'
     'reorderPedigree.R'
     'rilPedigree.R'
