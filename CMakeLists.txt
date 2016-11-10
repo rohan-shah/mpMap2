@@ -11,6 +11,7 @@ if(USE_BOOST)
 	set(Boost_USE_STATIC_RUNTIME    OFF)
 	#Find boost packages
 	find_package(Boost 1.50.0 REQUIRED COMPONENTS graph regex)
+	add_definitions(-DBOOST_NO_AUTO_PTR)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src)
