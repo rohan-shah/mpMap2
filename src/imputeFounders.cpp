@@ -491,7 +491,22 @@ BEGIN_RCPP
 		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 
 		throw std::runtime_error(ss.str().c_str());
 	}
-	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey);
+	//Put together a unified map of all the markers and extra locations
+	Rcpp::List unifiedMap(allPositions.chromosomes.size());
+	for(int i = 0; i < allPositions.chromosomes.size(); i++)
+	{
+		const positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[i];
+		Rcpp::NumericVector unifiedMapCurrentChromosome(currentChromosome.end - currentChromosome.start);
+		Rcpp::CharacterVector unifiedMapCurrentChromosomeNames(currentChromosome.end - currentChromosome.start);
+		for(int j = 0; j < currentChromosome.end - currentChromosome.start; j++)
+		{
+			unifiedMapCurrentChromosome[j] = allPositions.positions[j + currentChromosome.start];
+			unifiedMapCurrentChromosomeNames[j] = allPositions.names[j + currentChromosome.start];
+		}
+		unifiedMapCurrentChromosome.names() = unifiedMapCurrentChromosomeNames;
+		unifiedMap[i] = unifiedMapCurrentChromosome;
+	}
+	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = unifiedMap);
 END_RCPP
 }
 

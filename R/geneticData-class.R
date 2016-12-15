@@ -177,12 +177,17 @@ checkImputedData <- function(object)
 	{
 		return("Slot key must have three columns")
 	}
+	allMapMarkers <- unlist(lapply(object@map, names))
+	if(!isTRUE(all.equal(allMapMarkers, colnames(object@data))))
+	{
+		return("Slot data must have marker names that match the markers in slot map")
+	}
 	if(!.Call("checkImputedBounds", object, PACKAGE="mpMap2"))
 	{
 		return("Slot imputed@data must contain values in imputed@key")
 	}
 }
-.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix"), validity = checkImputedData)
+.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkImputedData)
 setClassUnion("imputedOrNULL", c("imputed", "NULL"))
 checkProbabilities <- function(object)
 {
