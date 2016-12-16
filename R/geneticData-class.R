@@ -1,5 +1,6 @@
 #' @include hetData-class.R
 #' @include pedigree-class.R
+#' @include map-class.R
 checkGeneticData <- function(object)
 {
 	errors <- c()
@@ -204,7 +205,7 @@ checkProbabilities <- function(object)
 		return("Slot key must have three columns")
 	}
 }
-.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix"), validity = checkProbabilities)
+.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkProbabilities)
 setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
 .geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
 checkGeneticDataList <- function(object)

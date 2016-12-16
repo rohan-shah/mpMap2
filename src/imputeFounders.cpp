@@ -17,6 +17,7 @@
 #include "warnings.h"
 #include "joinMapWithExtra.h"
 #include "haldaneToRf.h"
+#include "generateKeys.h"
 template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of positions per chromosome
@@ -400,39 +401,12 @@ BEGIN_RCPP
 	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
 
 	//Construct the key that takes pairs of founder values and turns them into encodings
-	Rcpp::IntegerMatrix key(nFounders, nFounders);
-	for(int i = 0; i < nFounders; i++)
-	{
-		key(i, i) = i + 1;
-	}
-	int counter = nFounders+1;
-	for(int i = 0; i < nFounders; i++)
-	{
-		for(int j = i+1; j < nFounders; j++)
-		{
-			key(j, i) = key(i, j) = counter;
-			counter++;
-		}
-	}
 	//We also want a version closer to the hetData format
-	Rcpp::IntegerMatrix outputKey(nFounders*nFounders, 3);
-	{
-		int counter = 0;
-		for(int i = 0; i < nFounders; i++)
-		{
-			for(int j = 0; j < nFounders; j++)
-			{
-				outputKey(counter, 0) = i+1;
-				outputKey(counter, 1) = j+1;
-				outputKey(counter, 2) = key(i, j);
-				counter++;
-			}
-		}
-	}
+	Rcpp::IntegerMatrix key, outputKey;
+	generateKeys(key, outputKey, nFounders);
 
 	std::vector<std::string> mapMarkers;
 	mapMarkers.reserve(foundersMarkers.size());
-	int maxChromosomeMarkers = 0;
 	for(int i = 0; i < map.size(); i++)
 	{
 		Rcpp::NumericVector chromosome;
@@ -447,7 +421,6 @@ BEGIN_RCPP
 		Rcpp::CharacterVector chromosomeMarkers = chromosome.names();
 		mapMarkers.insert(mapMarkers.end(), chromosomeMarkers.begin(), chromosomeMarkers.end());
 	}
-
 	if(mapMarkers.size() != foundersMarkers.size() || !std::equal(mapMarkers.begin(), mapMarkers.end(), foundersMarkers.begin()))
 	{
 		throw std::runtime_error("Map was inconsistent with the markers in the geneticData object");
@@ -491,22 +464,7 @@ BEGIN_RCPP
 		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 
 		throw std::runtime_error(ss.str().c_str());
 	}
-	//Put together a unified map of all the markers and extra locations
-	Rcpp::List unifiedMap(allPositions.chromosomes.size());
-	for(int i = 0; i < allPositions.chromosomes.size(); i++)
-	{
-		const positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[i];
-		Rcpp::NumericVector unifiedMapCurrentChromosome(currentChromosome.end - currentChromosome.start);
-		Rcpp::CharacterVector unifiedMapCurrentChromosomeNames(currentChromosome.end - currentChromosome.start);
-		for(int j = 0; j < currentChromosome.end - currentChromosome.start; j++)
-		{
-			unifiedMapCurrentChromosome[j] = allPositions.positions[j + currentChromosome.start];
-			unifiedMapCurrentChromosomeNames[j] = allPositions.names[j + currentChromosome.start];
-		}
-		unifiedMapCurrentChromosome.names() = unifiedMapCurrentChromosomeNames;
-		unifiedMap[i] = unifiedMapCurrentChromosome;
-	}
-	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = unifiedMap);
+	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = allPositions.makeUnifiedMap());
 END_RCPP
 }
 

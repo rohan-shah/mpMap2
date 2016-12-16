@@ -3,6 +3,7 @@
 #include <Rcpp.h>
 struct positionData
 {
+	Rcpp::List makeUnifiedMap();
 	struct chromosomeDescriptor
 	{
 		int start, end;

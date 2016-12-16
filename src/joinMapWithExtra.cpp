@@ -84,4 +84,22 @@ void joinMapWithExtra(Rcpp::List map, Rcpp::List extraPositions, positionData& a
 		throw std::runtime_error("Extra positions cannot have the same name as a marker");
 	}
 }
-
+Rcpp::List positionData::makeUnifiedMap()
+{
+	//Put together a unified map of all the markers and extra locations
+	Rcpp::List unifiedMap(chromosomes.size());
+	for(int i = 0; i < chromosomes.size(); i++)
+	{
+		const positionData::chromosomeDescriptor& currentChromosome = chromosomes[i];
+		Rcpp::NumericVector unifiedMapCurrentChromosome(currentChromosome.end - currentChromosome.start);
+		Rcpp::CharacterVector unifiedMapCurrentChromosomeNames(currentChromosome.end - currentChromosome.start);
+		for(int j = 0; j < currentChromosome.end - currentChromosome.start; j++)
+		{
+			unifiedMapCurrentChromosome[j] = positions[j + currentChromosome.start];
+			unifiedMapCurrentChromosomeNames[j] = names[j + currentChromosome.start];
+		}
+		unifiedMapCurrentChromosome.names() = unifiedMapCurrentChromosomeNames;
+		unifiedMap[i] = unifiedMapCurrentChromosome;
+	}
+	return unifiedMap;
+}

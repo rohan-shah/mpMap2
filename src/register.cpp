@@ -83,7 +83,7 @@ extern "C"
 #endif
 		{"testDistortion", (DL_FUNC)&testDistortion, 1},
 		{"removeHets", (DL_FUNC)&removeHets, 3},
-		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 4},
+		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 5},
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{NULL, NULL, 0}
