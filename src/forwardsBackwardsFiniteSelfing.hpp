@@ -31,17 +31,21 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 	int minSelfingGenerations;
 	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
-	double heterozygoteMissingProb, homozygoteMissingProb;
+	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
 	Rcpp::IntegerMatrix key;
 	rowMajorMatrix<double> forwardProbabilities, backwardProbabilities;
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
 	const positionData& allPositions;
 	forwardsBackwardsAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize, const positionData& allPositions)
-		: intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), forwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize), backwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize), allPositions(allPositions)
+		: lineFunnelIDs(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minSelfingGenerations(-1), maxSelfingGenerations(-1), minAIGenerations(-1), maxAIGenerations(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), forwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize), backwardProbabilities(nFounders*(nFounders+1)/2, maxChromosomeSize), intercrossingSingleLociHaplotypeProbabilities(NULL), funnelSingleLociHaplotypeProbabilities(NULL), allPositions(allPositions)
 	{}
 	void apply(int startPosition, int endPosition)
 	{
+		if(errorProb < 0 || errorProb >= 1)
+		{
+			throw std::runtime_error("Input errorProb must be in [0, 1)");
+		}
 		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
