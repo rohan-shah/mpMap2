@@ -169,8 +169,6 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.errorProb = errorProb;
 	viterbi.logIntercrossingSingleLociHaplotypeProbabilities = &logIntercrossingSingleLociHaplotypeProbabilities;
 	viterbi.logFunnelSingleLociHaplotypeProbabilities = &logFunnelSingleLociHaplotypeProbabilities;
-	viterbi.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
-	viterbi.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)

@@ -11,7 +11,7 @@
 	}
 	void applyIntercrossingNoError(int startPosition, int endPosition, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
-		if(logIntercrossingHaplotypeProbabilities == NULL || errorProb != 0)
+		if(logIntercrossingSingleLociHaplotypeProbabilities == NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -194,7 +194,7 @@ stopIdenticalSearch:
 	}
 	void applyIntercrossingWithError(int startPosition, int endPosition, int finalCounter, int intercrossingGeneration, int selfingGenerations)
 	{
-		if(intercrossingSingleLociHaplotypeProbabilities == NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
+		if(logIntercrossingSingleLociHaplotypeProbabilities == NULL || logIntercrossingHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}

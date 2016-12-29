@@ -179,6 +179,7 @@ checkImputedData <- function(object)
 		return("Slot key must have three columns")
 	}
 	allMapMarkers <- unlist(lapply(object@map, names))
+	names(allMapMarkers) <- NULL
 	if(!isTRUE(all.equal(allMapMarkers, colnames(object@data))))
 	{
 		return("Slot data must have marker names that match the markers in slot map")

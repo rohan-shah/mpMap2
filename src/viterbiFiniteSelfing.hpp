@@ -38,11 +38,11 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	int maxAlleles;
 	Rcpp::IntegerMatrix key;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
-	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities, *intercrossingSingleLociHaplotypeProbabilities;
-	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities, *funnelSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities;
 	const positionData& allPositions;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, int maxChromosomeSize, const positionData& allPositions)
-		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), lineFunnelIDs(NULL), lineFunnelEncodings(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minSelfingGenerations(-1), maxSelfingGenerations(-1), minAIGenerations(-1), maxAIGenerations(-1), maxAlleles(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), logIntercrossingSingleLociHaplotypeProbabilities(NULL), intercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL), funnelSingleLociHaplotypeProbabilities(NULL), allPositions(allPositions)
+		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), lineFunnelIDs(NULL), lineFunnelEncodings(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minSelfingGenerations(-1), maxSelfingGenerations(-1), minAIGenerations(-1), maxAIGenerations(-1), maxAlleles(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), logIntercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL), allPositions(allPositions)
 	{}
 	void apply(int startPosition, int endPosition)
 	{
