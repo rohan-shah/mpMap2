@@ -42,7 +42,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 	{}
 	void apply(int startPosition, int endPosition)
 	{
-		if(errorProb < 0 || errorProb >= 1)
+		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Input errorProb must be in [0, 1)");
 		}

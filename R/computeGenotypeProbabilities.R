@@ -1,5 +1,5 @@
 #' @export
-computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, extraPositions = list())
+computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list())
 {
 	isNewMpcrossMappedArgument(mpcrossMapped)
 	if(homozygoteMissingProb < 0 || homozygoteMissingProb > 1)
@@ -11,6 +11,7 @@ computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 
 		stop("Input heterozygoteMissingProb must be a value between 0 and 1")
 	}
 	map <- mpcrossMapped@map
+	allMarkerNames <- unlist(lapply(map, names))
 
 	#Input extraPositions can be a list or a function
 	if(class(extraPositions) != "list" && class(extraPositions) != "function")
@@ -44,10 +45,9 @@ computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 
 	}
 	for(i in 1:length(mpcrossMapped@geneticData))
 	{
-		results <- .Call("computeGenotypeProbabilities", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, extraPositions, PACKAGE="mpMap2")
+		results <- .Call("computeGenotypeProbabilities", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, PACKAGE="mpMap2")
 		resultsMatrix <- results$data
 		founderNames <- rownames(mpcrossMapped@geneticData[[i]]@founders)
-		colnames(resultsMatrix) <- colnames(mpcrossMapped@geneticData[[i]]@finals)
 		if(mpcrossMapped@geneticData[[i]]@pedigree@selfing == "infinite")
 		{
 			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", founderNames)))

@@ -45,7 +45,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	{}
 	void apply(int startPosition, int endPosition)
 	{
-		if(logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL)
+		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1 || logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL)
 		{
 			throw std::runtime_error("Internal error");
 		}

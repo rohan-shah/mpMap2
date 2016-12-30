@@ -18,7 +18,7 @@
 #include "warnings.h"
 #include "generateKeys.h"
 #include "joinMapWithExtra.h"
-template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomePositions = 0;
@@ -146,6 +146,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	forwardsBackwards.intercrossingGenerations = &intercrossingGenerations;
 	forwardsBackwards.selfingGenerations = &selfingGenerations;
 	forwardsBackwards.results = results;
+	forwardsBackwards.errorProb = errorProb;
 	forwardsBackwards.key = key;
 	forwardsBackwards.homozygoteMissingProb = homozygoteMissingProb;
 	forwardsBackwards.heterozygoteMissingProb = heterozygoteMissingProb;
@@ -182,19 +183,20 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 		//dispatch based on whether we have infinite generations of selfing or not. 
 		forwardsBackwards.apply(currentChromosome.start, currentChromosome.end);
 	}
+	Rcpp::colnames(results) = Rcpp::wrap(allPositions.names);
 }
-template<int nFounders> void computeGenotypeProbabilitiesInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders> void computeGenotypeProbabilitiesInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	if(infiniteSelfing)
 	{
-		computeFounderGenotypesInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+		computeFounderGenotypesInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 	else
 	{
-		computeFounderGenotypesInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+		computeFounderGenotypesInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 }
-SEXP computeGenotypeProbabilities(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP extraPositions_sexp)
+SEXP computeGenotypeProbabilities(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp, SEXP extraPositions_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -302,6 +304,17 @@ BEGIN_RCPP
 	}
 	if(heterozygoteMissingProb < 0 || heterozygoteMissingProb > 1) throw std::runtime_error("Input heterozygoteMissingProb must be a number between 0 and 1");
 
+	double errorProb;
+	try
+	{
+		errorProb = Rcpp::as<double>(errorProb_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+	}
+	if(errorProb < 0 || errorProb > 1) throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+
 	Rcpp::List extraPositions;
 	try
 	{
@@ -356,29 +369,29 @@ BEGIN_RCPP
 	Rcpp::NumericMatrix results;
 	if(!infiniteSelfing)
 	{
-		results = Rcpp::NumericMatrix(nFinals*nFounders*(nFounders+1)/2, (int)mapMarkers.size());
+		results = Rcpp::NumericMatrix(nFinals*nFounders*(nFounders+1)/2, (int)allPositions.names.size());
 	}
 	else
 	{
-		results = Rcpp::NumericMatrix(nFinals*nFounders, (int)mapMarkers.size());
+		results = Rcpp::NumericMatrix(nFinals*nFounders, (int)allPositions.names.size());
 	}
 	try
 	{
 		if(nFounders == 2)
 		{
-			computeGenotypeProbabilitiesInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+			computeGenotypeProbabilitiesInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 4)
 		{
-			computeGenotypeProbabilitiesInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+			computeGenotypeProbabilitiesInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 8)
 		{
-			computeGenotypeProbabilitiesInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+			computeGenotypeProbabilitiesInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 16)
 		{
-			computeGenotypeProbabilitiesInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key, allPositions);
+			computeGenotypeProbabilitiesInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else
 		{

@@ -11,7 +11,7 @@
 	}
 	void applyIntercrossingNoError(int startPosition, int endPosition, int finalCounter, int intercrossingGeneration)
 	{
-		if(errorProb != 0)
+		if(errorProb!= errorProb || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -145,7 +145,7 @@
 	}
 	void applyIntercrossingWithError(int startPosition, int endPosition, int finalCounter, int intercrossingGeneration)
 	{
-		if(errorProb <= 0 || errorProb >= 1)
+		if(errorProb != errorProb || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}

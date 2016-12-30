@@ -54,7 +54,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		{
 			throw std::runtime_error("One of heterozygoteMissingProb and homozygoteMissingProb must be non-zero");
 		}
-		if(errorProb < 0 || errorProb >= 1)
+		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Input errorProb must be in [0, 1)");
 		}

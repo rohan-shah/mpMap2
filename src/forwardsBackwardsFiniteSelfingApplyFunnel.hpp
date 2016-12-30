@@ -11,7 +11,7 @@
 	}
 	void applyFunnelNoError(int startPosition, int endPosition, int finalCounter, int funnelID, int selfingGenerations)
 	{
-		if(funnelSingleLociHaplotypeProbabilities == NULL || errorProb != 0)
+		if(funnelSingleLociHaplotypeProbabilities == NULL || errorProb != errorProb || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -228,7 +228,7 @@
 	}
 	void applyFunnelWithError(int startPosition, int endPosition, int finalCounter, int funnelID, int selfingGenerations)
 	{
-		if(funnelSingleLociHaplotypeProbabilities == NULL || errorProb <= 0 || errorProb >= 1)
+		if(funnelSingleLociHaplotypeProbabilities == NULL || errorProb != errorProb || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}

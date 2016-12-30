@@ -11,7 +11,7 @@
 	}
 	void applyFunnelNoError(int startPosition, int endPosition, int finalCounter, int funnelID)
 	{
-		if(errorProb != 0)
+		if(errorProb != errorProb || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -151,7 +151,7 @@
 	}
 	void applyFunnelWithError(int startPosition, int endPosition, int finalCounter, int funnelID)
 	{
-		if(errorProb <= 0 || errorProb >= 1)
+		if(errorProb != errorProb || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -173,19 +173,18 @@
 		else
 		{
 			int markerValue = recodedFinals(finalCounter, startMarkerIndex);
-			int validInitial = 0;
+			::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[startMarkerIndex]];
+			double sum = 0;
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(recodedFounders(funnel[founderCounter], startMarkerIndex) == markerValue || markerValue == NA_INTEGER)
-				{
-					forwardProbabilities(funnel[founderCounter], 0) = 1;
-					validInitial++;
-				}
-				else forwardProbabilities(founderCounter, 0) = 0;
+				if(recodedFounders(funnel[founderCounter], startMarkerIndex) == markerValue) forwardProbabilities(funnel[founderCounter], 0) = (1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues);
+				else if(markerValue == NA_INTEGER) forwardProbabilities(funnel[founderCounter], 0) = 1.0 / (double)nFounders;
+				else forwardProbabilities(founderCounter, 0) = (1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues;
+				sum += forwardProbabilities(founderCounter, 0);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				forwardProbabilities(founderCounter, 0) /= (double)validInitial;
+				forwardProbabilities(founderCounter, 0) /= sum;
 			}
 		}
 		for(int positionCounter = startPosition; positionCounter < endPosition - 1; positionCounter++)
@@ -208,16 +207,33 @@
 			else
 			{
 				int markerValue = recodedFinals(finalCounter, markerIndex);
+				::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerIndex]];
 				//The founder at the new marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
-					if(recodedFounders(funnel[founderCounter], markerIndex) == markerValue || markerValue == NA_INTEGER)
+					if(recodedFounders(funnel[founderCounter], markerIndex) == markerValue)
+					{
+						//The founder at the previous marker
+						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+						{
+							forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) += forwardProbabilities(funnel[founderCounter2], positionCounter - startPosition) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter] * ((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
+						}
+					}
+					else if(markerValue == NA_INTEGER)
 					{
 						//The founder at the previous marker
 						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 						{
 							forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) += forwardProbabilities(funnel[founderCounter2], positionCounter - startPosition) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter];
+						}
+					}
+					else
+					{
+						//The founder at the previous marker
+						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+						{
+							forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) += forwardProbabilities(funnel[founderCounter2], positionCounter - startPosition) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter] * errorProb / (double)currentMarkerData.nObservedValues;
 						}
 					}
 					sum += forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1);
@@ -254,6 +270,7 @@
 			else
 			{
 				int markerValue = recodedFinals(finalCounter, markerIndex);
+				::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerIndex]];
 				//The founder at the current marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
@@ -261,9 +278,17 @@
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
-						if(recodedFounders(funnel[founderCounter2], markerIndex) == markerValue || markerValue == NA_INTEGER)
+						if(recodedFounders(funnel[founderCounter2], markerIndex) == markerValue)
+						{
+							backwardProbabilities(funnel[founderCounter], positionCounter - startPosition) += backwardProbabilities(funnel[founderCounter2], positionCounter - startPosition + 1) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter] * ((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
+						}
+						else if(markerValue == NA_INTEGER)
 						{
 							backwardProbabilities(funnel[founderCounter], positionCounter - startPosition) += backwardProbabilities(funnel[founderCounter2], positionCounter - startPosition + 1) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter];
+						}
+						else
+						{
+							backwardProbabilities(funnel[founderCounter], positionCounter - startPosition) += backwardProbabilities(funnel[founderCounter2], positionCounter - startPosition + 1) * funnelHaplotypeProbabilities(positionCounter - startPosition, 0).values[founderCounter2][founderCounter] * errorProb / (double)currentMarkerData.nObservedValues;
 						}
 					}
 					sum += backwardProbabilities(funnel[founderCounter], positionCounter - startPosition);

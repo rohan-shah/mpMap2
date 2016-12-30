@@ -11,7 +11,7 @@
 	}
 	void applyFunnelNoError(int startPosition, int endPosition, int finalCounter, int funnelID)
 	{
-		if(logFunnelHaplotypeProbabilities == NULL || errorProb != 0)
+		if(logFunnelHaplotypeProbabilities == NULL || errorProb != errorProb || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -125,7 +125,7 @@ stopIdenticalSearch:
 	}
 	void applyFunnelWithError(int startPosition, int endPosition, int finalCounter, int funnelID)
 	{
-		if(logFunnelHaplotypeProbabilities == NULL || errorProb == 0 || errorProb == 1)
+		if(logFunnelHaplotypeProbabilities == NULL || errorProb != errorProb || errorProb <= 0 || errorProb >= 1)
 		{
 			throw std::runtime_error("Internal error");
 		}
