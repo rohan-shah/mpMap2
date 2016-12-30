@@ -11,7 +11,7 @@
 	}
 	void applyIntercrossingNoError(int startPosition, int endPosition, int finalCounter, int intercrossingGeneration)
 	{
-		if(errorProb!= errorProb || errorProb != 0)
+		if(errorProb != errorProb || errorProb != 0)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -161,19 +161,18 @@
 		else
 		{
 			int markerValue = recodedFinals(finalCounter, startMarkerIndex);
-			int validInitial = 0;
+			::markerData& startMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[startMarkerIndex]];
+			double sum = 0;
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				if(recodedFounders(founderCounter, startMarkerIndex) == markerValue || markerValue == NA_INTEGER)
-				{
-					forwardProbabilities(founderCounter, 0) = 1;
-					validInitial++;
-				}
-				else forwardProbabilities(founderCounter, 0) = 0;
+				if(recodedFounders(founderCounter, startMarkerIndex) == markerValue) forwardProbabilities(founderCounter, 0) = (1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues);
+				else if(markerValue == NA_INTEGER) forwardProbabilities(founderCounter, 0) = 1.0 / (double)nFounders;
+				else forwardProbabilities(founderCounter, 0) = (1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues;
+				sum += forwardProbabilities(founderCounter, 0);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				forwardProbabilities(founderCounter, 0) /= (double)validInitial;
+				forwardProbabilities(founderCounter, 0) /= sum;
 			}
 		}
 		for(int positionCounter = startPosition; positionCounter < endPosition - 1; positionCounter++)
@@ -195,17 +194,34 @@
 			}
 			else
 			{
-				//The founder at the new marker
 				int markerValue = recodedFinals(finalCounter, markerIndex);
+				::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerIndex]];
+				//The founder at the new marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
-					if(recodedFounders(founderCounter, markerIndex) == markerValue || markerValue == NA_INTEGER)
+					if(recodedFounders(founderCounter, markerIndex) == markerValue)
+					{
+						//The founder at the previous marker
+						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+						{
+							forwardProbabilities(founderCounter, positionCounter - startPosition + 1) += forwardProbabilities(founderCounter2, positionCounter - startPosition) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter] * ((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
+						}
+					}
+					else if(markerValue == NA_INTEGER)
 					{
 						//The founder at the previous marker
 						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 						{
 							forwardProbabilities(founderCounter, positionCounter - startPosition + 1) += forwardProbabilities(founderCounter2, positionCounter - startPosition) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
+						}
+					}
+					else
+					{
+						//The founder at the previous marker
+						for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+						{
+							forwardProbabilities(founderCounter, positionCounter - startPosition + 1) += forwardProbabilities(founderCounter2, positionCounter - startPosition) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter] * errorProb / (double)currentMarkerData.nObservedValues;
 						}
 					}
 					sum += forwardProbabilities(founderCounter, positionCounter - startPosition + 1);
@@ -242,6 +258,7 @@
 			else
 			{
 				int markerValue = recodedFinals(finalCounter, markerIndex);
+				::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerIndex]];
 				//The founder at the current marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
@@ -251,7 +268,15 @@
 					{
 						if(recodedFounders(founderCounter2, markerIndex) == markerValue || markerValue == NA_INTEGER)
 						{
+							backwardProbabilities(founderCounter, positionCounter - startPosition) += backwardProbabilities(founderCounter2, positionCounter - startPosition + 1) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter] * ((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
+						}
+						else if(markerValue == NA_INTEGER)
+						{
 							backwardProbabilities(founderCounter, positionCounter - startPosition) += backwardProbabilities(founderCounter2, positionCounter - startPosition + 1) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
+						}
+						else
+						{
+							backwardProbabilities(founderCounter, positionCounter - startPosition) += backwardProbabilities(founderCounter2, positionCounter - startPosition + 1) * intercrossingHaplotypeProbabilities(positionCounter - startPosition, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter] * errorProb / (double)currentMarkerData.nObservedValues;
 						}
 					}
 					sum += backwardProbabilities(founderCounter, positionCounter - startPosition);
