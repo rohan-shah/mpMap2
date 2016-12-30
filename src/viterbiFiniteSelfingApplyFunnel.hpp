@@ -323,9 +323,9 @@ stopIdenticalSearch:
 				int markerValue = recodedFinals(finalCounter, markerIndex);
 				::markerData& currentMarkerData = markerData.allMarkerPatterns[markerData.markerPatternIDs[markerIndex]];
 
-				//The founder at the next marker
 				double errorTermCurrentMarker1 = log((1 - errorProb) + errorProb * 1.0 / (double) currentMarkerData.nObservedValues);
 				double errorTermCurrentMarker2 = log(errorProb * 1.0 / (double) currentMarkerData.nObservedValues);
+				//The founder at the next marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
