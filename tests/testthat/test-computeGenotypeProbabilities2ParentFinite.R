@@ -1,5 +1,5 @@
-context("genotype probability computation, two parents, finite selfing")
-test_that("Test zero generations of intercrossing, codominant markers",
+context("genotype probability computation, two parents, finite selfing, no errors")
+test_that("Test zero generations of intercrossing, codominant markers, no errors",
 	{
 		testFunc <- function(map, pedigree)
 		{
@@ -20,7 +20,7 @@ test_that("Test zero generations of intercrossing, codominant markers",
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
-test_that("Test zero generations of intercrossing, dominant markers",
+test_that("Test zero generations of intercrossing, dominant markers, no errors",
 	{
 		testFunc <- function(map, pedigree)
 		{
@@ -42,7 +42,7 @@ test_that("Test zero generations of intercrossing, dominant markers",
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
-test_that("Test non-zero generations of intercrossing, codominant markers",
+test_that("Test non-zero generations of intercrossing, codominant markers, no errors",
 	{
 		testFunc <- function(map, pedigree)
 		{
@@ -73,7 +73,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers",
 			testFunc(map, pedigree)
 		}
 	})
-test_that("Test non-zero generations of intercrossing, dominant markers",
+test_that("Test non-zero generations of intercrossing, dominant markers, no errors",
 	{
 		testFunc <- function(map, pedigree)
 		{
