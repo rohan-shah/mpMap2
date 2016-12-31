@@ -56,7 +56,7 @@
 			{
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
+					forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) = 0;
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
@@ -71,7 +71,7 @@
 				//The founder at the new marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
+					forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) = 0;
 					if(recodedFounders(funnel[founderCounter], markerIndex) == markerValue || markerValue == NA_INTEGER)
 					{
 						//The founder at the previous marker
@@ -195,7 +195,7 @@
 			{
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
+					forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) = 0;
 					//The founder at the previous marker
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
 					{
@@ -211,7 +211,7 @@
 				//The founder at the new marker
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
-					forwardProbabilities(founderCounter, positionCounter - startPosition + 1) = 0;
+					forwardProbabilities(funnel[founderCounter], positionCounter - startPosition + 1) = 0;
 					if(recodedFounders(funnel[founderCounter], markerIndex) == markerValue)
 					{
 						//The founder at the previous marker
