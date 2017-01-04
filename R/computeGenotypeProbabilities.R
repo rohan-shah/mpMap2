@@ -58,7 +58,7 @@ computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 
 			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", 1:nAlleles)))
 		}
 		class(results$map) <- "map"
-		names(result$map) <- names(map)
+		names(results$map) <- names(map)
 		mpcrossMapped@geneticData[[i]]@probabilities <- new("probabilities", data = resultsMatrix, key = results$key, map = results$map)
 	}
 	return(mpcrossMapped)

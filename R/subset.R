@@ -1,4 +1,48 @@
 #' @export
+#' @include mpcross-class.R
+#' @include geneticData-class.R
+setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
+{
+	arguments <- list(...)
+	if("markers" %in% names(arguments))
+	{
+		stop("Cannot subset imputation object by markers")
+	}
+	if(sum(c("chromosomes", "lines") %in% names(arguments)) != 1)
+	{
+		stop("Exactly one of arguments chromosomes and lines is required for function subset.imputed")
+	}
+	if("lines" %in% names(arguments))
+	{
+		return(new("imputed", data = x@data[arguments$lines,], key = x@key, map = x@map))
+	}
+	if("chromosomes" %in% names(arguments))
+	{
+		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
+		return(new("imputed", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+	}
+})
+setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
+{
+	arguments <- list(...)
+	if("markers" %in% names(arguments))
+	{
+		stop("Cannot subset probabilities object by markers")
+	}
+	if(sum(c("chromosomes", "lines") %in% names(arguments)) != 1)
+	{
+		stop("Exactly one of arguments chromosomes and lines is required for function subset.probabilities")
+	}
+	if("lines" %in% names(arguments))
+	{
+		return(new("probabilities", data = x@data[arguments$lines,], key = x@key, map = x@map))
+	}
+	if("chromosomes" %in% names(arguments))
+	{
+		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
+		return(new("probabilities", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+	}
+})
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -56,7 +100,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 	{
 		stop("Cannot subset a map by linkage groups")
 	}
-	if(sum(c("markers", "lines") %in% names(arguments)) != 1)
+	if(sum(c("markers", "lines", "chromosomes") %in% names(arguments)) != 1)
 	{
 		stop("Exactly one of arguments markers and lines is required for function subset.mpcrossMapped")
 	}
@@ -69,6 +113,41 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 		for(chr in 1:length(x@map)) groups[intersect(names(x@map), arguments$markers)] <- chr
 		newLG <- new("lg", groups = groups, allGroups = unique(groups))
 		return(new("mpcrossLG", callNextMethod(), rf = subsettedRF, lg = newLG))
+	}
+	else if("chromosomes" %in% names(arguments))
+	{
+		chromosomes <- arguments$chromosomes
+		if(any(is.na(chromosomes)))
+		{
+			stop("Input chromosomes cannot contain NA")
+		}
+		if(length(unique(chromosomes)) != length(chromosomes))
+		{
+			stop("Duplicates detected in argument chromosomes of subset function")
+		}
+		if(mode(chromosomes) != "character")
+		{
+			stop("Input chromosomes must be a character vector")
+		}
+		if(any(!(chromosomes %in% names(x@map))))
+		{
+			stop("Some chromosome names were not in the map")
+		}
+		retainedMarkers <- unlist(lapply(x@map[chromosomes], names))
+		subsettedBase <- callNextMethod(x, markers = retainedMarkers)
+		#Subsetting by markers removes the probabilities and imputed slots, so put them back in. 
+		lapply(1:length(x@geneticData), function(y)
+		{
+			if(!is.null(x@geneticData[[y]]@probabilities))
+			{
+				subsettedBase@geneticData[[y]]@probabilities <<- subset(x@geneticData[[y]]@probabilities, chromosomes = chromosomes)
+			}
+			if(!is.null(x@geneticData[[y]]@imputed))
+			{
+				subsettedBase@geneticData[[y]]@imputed <<- subset(x@geneticData[[y]]@imputed, chromosomes = chromosomes)
+			}
+		})
+		returnValue <- new("mpcrossMapped", subsettedBase, map = x@map[chromosomes])
 	}
 	else
 	{
@@ -199,7 +278,16 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		{
 			stop("Input lines must be a vector of line names")
 		}
-		return(new("geneticData", founders = x@founders, finals = x@finals[rownames(x@finals)%in% lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree")))
+		retVal <- new("geneticData", founders = x@founders, finals = x@finals[rownames(x@finals)%in% lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree"))
+		if(!is.null(x@imputed))
+		{
+			retVal@imputed <- subset(x@imputed, lines = lines)
+		}
+		if(!is.null(x@probabilities))
+		{
+			retVal@probabilities <- subset(x@probabilities, lines = lines)
+		}
+		return(retVal)
 	}
 })
 setMethod(f = "subset", signature = "hetData", definition = function(x, ...)

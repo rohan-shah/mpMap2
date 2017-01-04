@@ -201,7 +201,7 @@ test_that("Test SNP markers, hets not called, and NA assumed biased towards hets
 			cross2 <- cross + multiparentSNP(keepHets = FALSE)
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			mapped@geneticData[[1]]@finals[,"D1M26"] <- sample(1:3, nLines(mapped@geneticData[[1]]), replace=TRUE)
-			suppressWarnings(result <- computeGenotypeProbabilities(mapped, heterozygoteMissingProb = 0.9, homozygoteMissingProb = 0.01, extraPositions = list("1" = c("extra" = 25.5)), errorProb = 0.05))
+			suppressWarnings(result <- computeGenotypeProbabilities(mapped, heterozygoteMissingProb = 0.9, homozygoteMissingProb = 0.01, extraPositions = list("1" = c("extra" = 25.5)), errorProb = 0.1))
 			genotypesFromProbabilities <- lapply(1:nLines(result), function(x)
 				{
 					apply(result@geneticData[[1]]@probabilities@data[(10*x-9):(10*x),], 2, which.max)

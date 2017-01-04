@@ -197,8 +197,8 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"])))/1000, 0.90)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/1000, 0.90)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
