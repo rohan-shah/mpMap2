@@ -5,6 +5,20 @@ fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
   
   oldPedigree <- mpcross$pedigree
   pedigreeLineNames <- rownames(oldPedigree)
+
+  #The row names of the founders may not be lines that are named in the pedigree. In that case, rename them to follow the pedigree and issue a warning
+  if(any(!(rownames(mpcross$founders) %in% pedigreeLineNames)))
+  {
+    warning("The row names of object$founders were not named in the pedigree. These row names are being changed to match those given at the start of the pedigree")
+    rownames(mpcross$founders) <- pedigreeLineNames[1:nrow(mpcross$founders)]
+  }
+
+  if(!isTRUE(all.equal(rownames(mpcross$finals), pedigreeLineNames[mpcross$id])))
+  {
+    warning("The row names of object$finals may have been incorrect. These have been changed to match the row names of the pedigree and object$id")
+    rownames(mpcross$finals) <- pedigreeLineNames[mpcross$id]
+  }
+
   if(is.null(pedigreeLineNames) || length(unique(pedigreeLineNames)) != length(pedigreeLineNames))
   {
     stop("Pedigree of the input object must have unique row names")

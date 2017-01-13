@@ -32,6 +32,7 @@
 #include "testDistortion.h"
 #include "removeHets.h"
 #include "computeGenotypeProbabilities.h"
+#include "computeAllEpistaticChiSquared.h"
 #ifdef USE_BOOST
 	#include "reorderPedigree.h"
 #endif
@@ -86,6 +87,7 @@ extern "C"
 		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 6},
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
+		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
