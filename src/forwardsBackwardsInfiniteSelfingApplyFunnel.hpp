@@ -41,7 +41,7 @@
 					forwardProbabilities(funnel[founderCounter], 0) = 1;
 					validInitial++;
 				}
-				else forwardProbabilities(founderCounter, 0) = 0;
+				else forwardProbabilities(funnel[founderCounter], 0) = 0;
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
@@ -179,8 +179,8 @@
 			{
 				if(recodedFounders(funnel[founderCounter], startMarkerIndex) == markerValue) forwardProbabilities(funnel[founderCounter], 0) = (1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues);
 				else if(markerValue == NA_INTEGER) forwardProbabilities(funnel[founderCounter], 0) = 1.0 / (double)nFounders;
-				else forwardProbabilities(founderCounter, 0) = (1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues;
-				sum += forwardProbabilities(founderCounter, 0);
+				else forwardProbabilities(funnel[founderCounter], 0) = (1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues;
+				sum += forwardProbabilities(funnel[founderCounter], 0);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
