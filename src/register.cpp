@@ -33,6 +33,7 @@
 #include "removeHets.h"
 #include "computeGenotypeProbabilities.h"
 #include "computeAllEpistaticChiSquared.h"
+#include "getAllFunnels.h"
 #ifdef USE_BOOST
 	#include "reorderPedigree.h"
 #endif
@@ -88,6 +89,7 @@ extern "C"
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
+		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
