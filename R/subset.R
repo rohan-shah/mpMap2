@@ -25,11 +25,7 @@ setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
 {
 	arguments <- list(...)
-	if("markers" %in% names(arguments))
-	{
-		stop("Cannot subset probabilities object by markers")
-	}
-	if(sum(c("chromosomes", "lines") %in% names(arguments)) != 1)
+	if(sum(c("chromosomes", "lines", "markers") %in% names(arguments)) != 1)
 	{
 		stop("Exactly one of arguments chromosomes and lines is required for function subset.probabilities")
 	}
@@ -41,6 +37,13 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 	{
 		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
 		return(new("probabilities", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+	}
+	if("markers" %in% names(arguments))
+	{
+		markers <- arguments$markers
+		newMap <- lapply(x@map, function(y) y[names(y) %in% markers])
+		class(newMap) <- "map"
+		return(new("probabilities", data = x@data[,markers], key = x@key, map = newMap))
 	}
 })
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
@@ -264,6 +267,11 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 			markerIndices <- match(markers, markers(x))
 		}
 		else stop("Input markers must be either a vector of marker names or a vector of marker indices")
+
+		if(!is.null(x@probabilities) || !is.null(x@imputed))
+		{
+			warning("When subsetting by markers, probabilities and imputation data is discarded")
+		}
 	
 		return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
 	}
