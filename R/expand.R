@@ -1,3 +1,4 @@
+#' @export
 expand <- function(mpcross, newMarkers)
 {
 	inheritsNewMpcrossArgument(mpcross)
