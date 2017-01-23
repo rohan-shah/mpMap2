@@ -63,8 +63,6 @@ SEXP eightParentPedigreeImproperFunnels(SEXP initialPopulationSize_sexp, SEXP se
 	}
 
 	int currentIndex = 8 + initialPopulationSize*5 + initialPopulationSize;
-	int lastGenerationStart = currentIndex;
-	int lastGenerationEnd = currentIndex + initialPopulationSize;
 	int nextFree = currentIndex+initialPopulationSize;
 	if(selfingGenerations == 1)
 	{

@@ -1,6 +1,10 @@
 #' @export
 testDistortion <- function(object)
 {
+	if(inherits(object, "mpcross") && length(object@geneticData) == 1)
+	{
+		object <- object@geneticData[[1]]
+	}
 	if(!isS4(object) || !inherits(object, "geneticData"))
 	{
 		stop("Input object must be an S4 object of class geneticData")

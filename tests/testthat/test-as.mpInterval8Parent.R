@@ -1,5 +1,6 @@
 context("Conversion of 4-way cross to mpwgaim object")
-if(suppressWarnings(require(mpwgaim)) && suppressWarnings(require(mpMap)))
+suppressWarnings(capture.output(couldLoadPackages <- require(mpwgaim, quietly=T) && require(mpMap, quietly=T)))
+if(couldLoadPackages)
 {
 	test_that("Conversion of 8-way object agrees with old code",
 	{

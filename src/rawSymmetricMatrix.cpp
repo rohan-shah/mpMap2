@@ -247,7 +247,7 @@ BEGIN_RCPP
 	Rcpp::NumericVector levels = Rcpp::as<Rcpp::NumericVector>(rawSymmetric.slot("levels"));
 	Rcpp::CharacterVector markers = Rcpp::as<Rcpp::CharacterVector>(rawSymmetric.slot("markers"));
 	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
-	R_xlen_t size = markers.size(), levelsSize = levels.size();
+	R_xlen_t size = markers.size();
 
 	Rcpp::NumericVector result(size*(size - 1)/2, 0);
 	int counter = 0;
@@ -305,7 +305,7 @@ SEXP constructDissimilarityMatrixInternal(unsigned char* data, std::vector<doubl
 				}
 			}
 			double sum = 0;
-			for(int i = 0; i < table.size(); i++) sum += table[i] * levels[i];
+			for(int i = 0; i < (int)table.size(); i++) sum += table[i] * levels[i];
 			result(rowCluster-1, columnCluster-1) = result(columnCluster-1, rowCluster-1) = sum / (columnIndices.size() * rowIndices.size());
 		}
 	}

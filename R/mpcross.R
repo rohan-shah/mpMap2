@@ -1,6 +1,74 @@
-fromMpMap <- function(mpcross)
+#' @export
+fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 {
   isOldMpMapMpcrossArgument(mpcross)
+  
+  oldPedigree <- mpcross$pedigree
+  pedigreeLineNames <- rownames(oldPedigree)
+
+  #The row names of the founders may not be lines that are named in the pedigree. In that case, rename them to follow the pedigree and issue a warning
+  if(any(!(rownames(mpcross$founders) %in% pedigreeLineNames)))
+  {
+    warning("The row names of object$founders were not named in the pedigree. These row names are being changed to match those given at the start of the pedigree")
+    rownames(mpcross$founders) <- pedigreeLineNames[1:nrow(mpcross$founders)]
+  }
+
+  if(!isTRUE(all.equal(rownames(mpcross$finals), pedigreeLineNames[mpcross$id])))
+  {
+    warning("The row names of object$finals may have been incorrect. These have been changed to match the row names of the pedigree and object$id")
+    rownames(mpcross$finals) <- pedigreeLineNames[mpcross$id]
+  }
+
+  if(is.null(pedigreeLineNames) || length(unique(pedigreeLineNames)) != length(pedigreeLineNames))
+  {
+    stop("Pedigree of the input object must have unique row names")
+  }
+  #Attempt the reordering call, which requires building the package with the boost library
+  reorderedPedigree <- reorderPedigree(lineNames = pedigreeLineNames, mother = as.integer(oldPedigree[, "Female"]), father = as.integer(oldPedigree[, "Male"]), selfing = selfing, warnImproperFunnels = TRUE)
+  if(!is.null(reorderedPedigree))
+  {
+    newPedigree <- reorderedPedigree
+  }
+  else
+  {
+    newPedigree <- pedigree(lineNames = pedigreeLineNames, mother = oldPedigree[, "Female"], father = oldPedigree[, "Male"], selfing = selfing, warnImproperFunnels = TRUE)
+  }
+
+  finalsMarkerNames <- colnames(mpcross$finals)
+  foundersMarkerNames <- colnames(mpcross$finals)
+  if(!all.equal(finalsMarkerNames, foundersMarkerNames))
+  {
+	  stop("Founder and final marker names must be identical")
+  }
+
+  newHetDataList <- lapply(as.list(1:ncol(mpcross$founders)), function(x)
+    {
+      uniqueAlleles <- unique(mpcross$founders[, x])
+      retVal <- cbind(uniqueAlleles, uniqueAlleles, uniqueAlleles)
+      colnames(retVal) <- NULL
+      return(retVal)
+    })
+  names(newHetDataList) <- foundersMarkerNames
+  newHetData <- new("hetData", newHetDataList)
+
+  if(fixCodingErrors)
+  {
+    codingErrors <- .Call("listCodingErrors", mpcross$founders, mpcross$finals, newHetData)
+    uniqueMarkers <- unique(codingErrors$finals[,"Column"])
+    #The results of listCodingErrors are zero-based indexing
+    mpcross$finals[, uniqueMarkers+1] <- NA
+    warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified"))
+  }
+  geneticData <- new("geneticData", finals = mpcross$finals, founders = mpcross$founders, pedigree = newPedigree, hetData = newHetData)
+  geneticDataList <- new("geneticDataList", list(geneticData))
+  if("map" %in% names(mpcross))
+  {
+    return(new("mpcrossMapped", geneticData = geneticDataList, map = mpcross$map))
+  }
+  else
+  {
+    return(new("mpcross", geneticData = geneticDataList))
+  }
 }
 setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1, e2)
 {

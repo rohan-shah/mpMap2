@@ -14,6 +14,7 @@
 #include "intercrossingHaplotypeToMarker.hpp"
 #include "funnelHaplotypeToMarker.hpp"
 #include <limits>
+#include "joinMapWithExtra.h"
 template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 {
 	typedef typename expandedProbabilities<nFounders, true>::type expandedProbabilitiesType;
@@ -28,16 +29,21 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 	std::vector<int>* intercrossingGenerations;
 	std::vector<int>* selfingGenerations;
 	int minAIGenerations, maxAIGenerations;
-	double heterozygoteMissingProb, homozygoteMissingProb;
+	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
 	Rcpp::IntegerMatrix key;
 	rowMajorMatrix<double> forwardProbabilities, backwardProbabilities;
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
-	forwardsBackwardsAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize)
-		: intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), forwardProbabilities(nFounders, maxChromosomeSize), backwardProbabilities(nFounders, maxChromosomeSize)
+	const positionData& allPositions;
+	forwardsBackwardsAlgorithm(markerPatternsToUniqueValuesArgs& markerData, xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities, rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities, int maxChromosomeSize, const positionData& allPositions)
+		: intercrossingHaplotypeProbabilities(intercrossingHaplotypeProbabilities), funnelHaplotypeProbabilities(funnelHaplotypeProbabilities), markerData(markerData), lineFunnelIDs(NULL), lineFunnelEncodings(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minAIGenerations(-1), maxAIGenerations(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), forwardProbabilities(nFounders, maxChromosomeSize), backwardProbabilities(nFounders, maxChromosomeSize), intercrossingSingleLociHaplotypeProbabilities(NULL), funnelSingleLociHaplotypeProbabilities(NULL), allPositions(allPositions)
 	{}
-	void apply(int start, int end)
+	void apply(int startPosition, int endPosition)
 	{
+		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1)
+		{
+			throw std::runtime_error("Input errorProb must be in [0, 1)");
+		}
 		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		minAIGenerations = std::max(minAIGenerations, 1);
@@ -46,191 +52,15 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)
 			{
-				applyFunnel(start, end, finalCounter, (*lineFunnelIDs)[finalCounter]);
+				applyFunnel(startPosition, endPosition, finalCounter, (*lineFunnelIDs)[finalCounter]);
 			}
 			else
 			{
-				applyIntercrossing(start, end, finalCounter, (*intercrossingGenerations)[finalCounter]);
+				applyIntercrossing(startPosition, endPosition, finalCounter, (*intercrossingGenerations)[finalCounter]);
 			}
 		}
 	}
-	void applyFunnel(int start, int end, int finalCounter, int funnelID)
-	{
-		//Compute forward probabilities
-		int markerValue = recodedFinals(finalCounter, start);
-		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
-		int funnel[16];
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
-		}
-		{
-			int validInitial = 0;
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				if(recodedFounders(funnel[founderCounter], start) == markerValue || markerValue == NA_INTEGER)
-				{
-					forwardProbabilities(funnel[founderCounter], 0) = 1;
-					validInitial++;
-				}
-				else forwardProbabilities(founderCounter, 0) = 0;
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(founderCounter, 0) /= (double)validInitial;
-			}
-		}
-		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
-		{
-			markerValue = recodedFinals(finalCounter, markerCounter+1);
-			double sum = 0;
-			//The founder at the new marker
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(founderCounter, markerCounter - start + 1) = 0;
-				if(recodedFounders(funnel[founderCounter], markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
-				{
-					//The founder at the previous marker
-					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-					{
-						forwardProbabilities(funnel[founderCounter], markerCounter - start + 1) += forwardProbabilities(funnel[founderCounter2], markerCounter - start) * funnelHaplotypeProbabilities(markerCounter-start, 0).values[founderCounter2][founderCounter];
-					}
-				}
-				sum += forwardProbabilities(funnel[founderCounter], markerCounter - start + 1);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(funnel[founderCounter], markerCounter - start + 1) /= sum;
-			}
-		}
-		//Now the backwards probabilities
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			backwardProbabilities(founderCounter, end - start - 1) = 1/(double)nFounders;
-		}
-		for(int markerCounter = end - 2; markerCounter >= start; markerCounter--)
-		{
-			markerValue = recodedFinals(finalCounter, markerCounter+1);
-			double sum = 0;
-			//The founder at the current marker
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				backwardProbabilities(funnel[founderCounter], markerCounter - start) = 0;
-				//The founder at the previous marker
-				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-				{
-					if(recodedFounders(funnel[founderCounter2], markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
-					{
-						backwardProbabilities(funnel[founderCounter], markerCounter - start) += backwardProbabilities(funnel[founderCounter2], markerCounter - start + 1) * funnelHaplotypeProbabilities(markerCounter-start, 0).values[founderCounter2][founderCounter];
-					}
-				}
-				sum += backwardProbabilities(funnel[founderCounter], markerCounter - start);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				backwardProbabilities(funnel[founderCounter], markerCounter - start) /= sum;
-			}
-		}
-		//Now we can compute the marginal probabilities
-		for(int markerCounter = start; markerCounter < end; markerCounter++)
-		{
-			double sum = 0;
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				results(nFounders*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
-				sum += results(nFounders*finalCounter + founderCounter, markerCounter);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				results(nFounders*finalCounter + founderCounter, markerCounter) /= sum;
-			}
-		}
-	}
-	void applyIntercrossing(int start, int end, int finalCounter, int intercrossingGeneration)
-	{
-		int markerValue = recodedFinals(finalCounter, start);
-		//Compute forward probabilities
-		{
-			int validInitial = 0;
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				if(recodedFounders(founderCounter, start) == markerValue || markerValue == NA_INTEGER)
-				{
-					forwardProbabilities(founderCounter, 0) = 1;
-					validInitial++;
-				}
-				else forwardProbabilities(founderCounter, 0) = 0;
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(founderCounter, 0) /= (double)validInitial;
-			}
-		}
-		for(int markerCounter = start; markerCounter < end - 1; markerCounter++)
-		{
-			markerValue = recodedFinals(finalCounter, markerCounter+1);
-			double sum = 0;
-			//The founder at the new marker
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(founderCounter, markerCounter - start + 1) = 0;
-				if(recodedFounders(founderCounter, markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
-				{
-					//The founder at the previous marker
-					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-					{
-						forwardProbabilities(founderCounter, markerCounter - start + 1) += forwardProbabilities(founderCounter2, markerCounter - start) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
-					}
-				}
-				sum += forwardProbabilities(founderCounter, markerCounter - start + 1);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				forwardProbabilities(founderCounter, markerCounter - start + 1) /= sum;
-			}
-		}
-		//Now the backwards probabilities
-		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-		{
-			backwardProbabilities(founderCounter, end - start - 1) = 1/(double)nFounders;
-		}
-		for(int markerCounter = end - 2; markerCounter >= start; markerCounter--)
-		{
-			markerValue = recodedFinals(finalCounter, markerCounter+1);
-			double sum = 0;
-			//The founder at the current marker
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				backwardProbabilities(founderCounter, markerCounter - start) = 0;
-				//The founder at the previous marker
-				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
-				{
-					if(recodedFounders(founderCounter2, markerCounter + 1) == markerValue || markerValue == NA_INTEGER)
-					{
-						backwardProbabilities(founderCounter, markerCounter - start) += backwardProbabilities(founderCounter2, markerCounter - start + 1) * intercrossingHaplotypeProbabilities(markerCounter-start, intercrossingGeneration - minAIGenerations, 0).values[founderCounter2][founderCounter];
-					}
-				}
-				sum += backwardProbabilities(founderCounter, markerCounter - start);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				backwardProbabilities(founderCounter, markerCounter - start) /= sum;
-			}
-		}
-		//Now we can compute the marginal probabilities
-		for(int markerCounter = start; markerCounter < end; markerCounter++)
-		{
-			double sum = 0;
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				results(nFounders*finalCounter + founderCounter, markerCounter) = backwardProbabilities(founderCounter, markerCounter - start) * forwardProbabilities(founderCounter, markerCounter - start);
-				sum += results(nFounders*finalCounter + founderCounter, markerCounter);
-			}
-			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
-			{
-				results(nFounders*finalCounter + founderCounter, markerCounter) /= sum;
-			}
-		}
-	}
+#include "forwardsBackwardsInfiniteSelfingApplyFunnel.hpp"
+#include "forwardsBackwardsInfiniteSelfingApplyIntercrossing.hpp"
 };
 #endif

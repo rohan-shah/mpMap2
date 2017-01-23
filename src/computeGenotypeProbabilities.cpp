@@ -16,14 +16,16 @@
 #include "recodeHetsAsNA.h"
 #include "impossibleDataException.h"
 #include "warnings.h"
-template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
+#include "generateKeys.h"
+#include "joinMapWithExtra.h"
+template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of markers per chromosome
-	int maxChromosomeMarkers = 0;
-	for(int i = 0; i < map.size(); i++)
+	int maxChromosomePositions = 0;
+	for(int i = 0; i < allPositions.chromosomes.size(); i++)
 	{
-		Rcpp::NumericVector chromosome = map(i);
-		maxChromosomeMarkers = std::max((int)chromosome.size(), maxChromosomeMarkers);
+		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[i];
+		maxChromosomePositions = std::max(currentChromosome.end - currentChromosome.start, maxChromosomePositions);
 	}
 
 	typedef typename expandedProbabilities<nFounders, infiniteSelfing>::type expandedProbabilitiesType;
@@ -117,10 +119,8 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	markerPatternsToUniqueValues(markerPatternData);
 
 	//Intermediate results. These give the most likely paths from the start of the chromosome to a marker, assuming some value for the underlying founder at the marker
-	int cumulativeMarkerCounter = 0;
-
-	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomeMarkers-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
-	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomeMarkers-1, maxSelfing - minSelfing + 1);
+	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomePositions-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
+	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomePositions-1, maxSelfing - minSelfing + 1);
 
 	//The single loci probabilities are different depending on whether there are zero or one generations of intercrossing. But once you have non-zero generations, it doesn't matter how many
 	std::vector<array2<nFounders> > intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
@@ -137,7 +137,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	}
 
 	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
-	forwardsBackwardsAlgorithm<nFounders, infiniteSelfing> forwardsBackwards(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomeMarkers);
+	forwardsBackwardsAlgorithm<nFounders, infiniteSelfing> forwardsBackwards(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomePositions, allPositions);
 	forwardsBackwards.recodedHetData = recodedHetData;
 	forwardsBackwards.recodedFounders = recodedFounders;
 	forwardsBackwards.recodedFinals = recodedFinals;
@@ -146,6 +146,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	forwardsBackwards.intercrossingGenerations = &intercrossingGenerations;
 	forwardsBackwards.selfingGenerations = &selfingGenerations;
 	forwardsBackwards.results = results;
+	forwardsBackwards.errorProb = errorProb;
 	forwardsBackwards.key = key;
 	forwardsBackwards.homozygoteMissingProb = homozygoteMissingProb;
 	forwardsBackwards.heterozygoteMissingProb = heterozygoteMissingProb;
@@ -153,14 +154,19 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	forwardsBackwards.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
-	for(int chromosomeCounter = 0; chromosomeCounter < map.size(); chromosomeCounter++)
+	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
 	{
-		Rcpp::NumericVector positions = Rcpp::as<Rcpp::NumericVector>(map(chromosomeCounter));
-		Rcpp::NumericVector recombinationFractions = haldaneToRf(diff(positions));
+		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
+		//Take differences
+		std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
+		for(std::size_t i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
+
+		//Convert to recombination fractions
+		std::vector<double> recombinationFractions= Rcpp::as<std::vector<double> >(haldaneToRf(differences));
 		//Generate haplotype probability data. 
 		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
-			double recombination = recombinationFractions(markerCounter);
+			double recombination = recombinationFractions[markerCounter];
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
 				expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
@@ -175,22 +181,22 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 
 		}
 		//dispatch based on whether we have infinite generations of selfing or not. 
-		forwardsBackwards.apply(cumulativeMarkerCounter, cumulativeMarkerCounter+(int)positions.size());
-		cumulativeMarkerCounter += (int)positions.size();
+		forwardsBackwards.apply(currentChromosome.start, currentChromosome.end);
 	}
+	Rcpp::colnames(results) = Rcpp::wrap(allPositions.names);
 }
-template<int nFounders> void computeGenotypeProbabilitiesInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, Rcpp::IntegerMatrix key)
+template<int nFounders> void computeGenotypeProbabilitiesInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	if(infiniteSelfing)
 	{
-		computeFounderGenotypesInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		computeFounderGenotypesInternal2<nFounders, true>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 	else
 	{
-		computeFounderGenotypesInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, key);
+		computeFounderGenotypesInternal2<nFounders, false>(founders, finals, pedigree, hetData, map, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 }
-SEXP computeGenotypeProbabilities(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp)
+SEXP computeGenotypeProbabilities(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp, SEXP extraPositions_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -298,6 +304,27 @@ BEGIN_RCPP
 	}
 	if(heterozygoteMissingProb < 0 || heterozygoteMissingProb > 1) throw std::runtime_error("Input heterozygoteMissingProb must be a number between 0 and 1");
 
+	double errorProb;
+	try
+	{
+		errorProb = Rcpp::as<double>(errorProb_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+	}
+	if(errorProb < 0 || errorProb > 1) throw std::runtime_error("Input errorProb must be a number between 0 and 1");
+
+	Rcpp::List extraPositions;
+	try
+	{
+		extraPositions = Rcpp::as<Rcpp::List>(extraPositions_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input extraPositions must be a list");
+	}
+
 	std::vector<std::string> foundersMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(founders));
 	std::vector<std::string> finalsMarkers = Rcpp::as<std::vector<std::string> >(Rcpp::colnames(finals));
 	std::vector<std::string> lineNames = Rcpp::as<std::vector<std::string> >(Rcpp::rownames(finals));
@@ -306,39 +333,12 @@ BEGIN_RCPP
 	int nFounders = Rcpp::as<int>(nFoundersFunc(geneticData));
 
 	//Construct the key that takes pairs of founder values and turns them into encodings
-	Rcpp::IntegerMatrix key(nFounders, nFounders);
-	for(int i = 0; i < nFounders; i++)
-	{
-		key(i, i) = i + 1;
-	}
-	int counter = nFounders+1;
-	for(int i = 0; i < nFounders; i++)
-	{
-		for(int j = i+1; j < nFounders; j++)
-		{
-			key(j, i) = key(i, j) = counter;
-			counter++;
-		}
-	}
 	//We also want a version closer to the hetData format
-	Rcpp::IntegerMatrix outputKey(nFounders*nFounders, 3);
-	{
-		int counter = 0;
-		for(int i = 0; i < nFounders; i++)
-		{
-			for(int j = 0; j < nFounders; j++)
-			{
-				outputKey(counter, 0) = i+1;
-				outputKey(counter, 1) = j+1;
-				outputKey(counter, 2) = key(i, j);
-				counter++;
-			}
-		}
-	}
+	Rcpp::IntegerMatrix key, outputKey;
+	generateKeys(key, outputKey, nFounders);
 
 	std::vector<std::string> mapMarkers;
 	mapMarkers.reserve(foundersMarkers.size());
-	int maxChromosomeMarkers = 0;
 	for(int i = 0; i < map.size(); i++)
 	{
 		Rcpp::NumericVector chromosome;
@@ -352,7 +352,6 @@ BEGIN_RCPP
 		}
 		Rcpp::CharacterVector chromosomeMarkers = chromosome.names();
 		mapMarkers.insert(mapMarkers.end(), chromosomeMarkers.begin(), chromosomeMarkers.end());
-		maxChromosomeMarkers = std::max(maxChromosomeMarkers, (int)chromosomeMarkers.size());
 	}
 	if(mapMarkers.size() != foundersMarkers.size() || !std::equal(mapMarkers.begin(), mapMarkers.end(), foundersMarkers.begin()))
 	{
@@ -363,33 +362,36 @@ BEGIN_RCPP
 		throw std::runtime_error("Map was inconsistent with the markers in the geneticData object");
 	}
 
+	positionData allPositions;
+	joinMapWithExtra(map, extraPositions, allPositions);
+
 	int nFinals = finals.nrow();
 	Rcpp::NumericMatrix results;
 	if(!infiniteSelfing)
 	{
-		results = Rcpp::NumericMatrix(nFinals*nFounders*(nFounders+1)/2, (int)mapMarkers.size());
+		results = Rcpp::NumericMatrix(nFinals*nFounders*(nFounders+1)/2, (int)allPositions.names.size());
 	}
 	else
 	{
-		results = Rcpp::NumericMatrix(nFinals*nFounders, (int)mapMarkers.size());
+		results = Rcpp::NumericMatrix(nFinals*nFounders, (int)allPositions.names.size());
 	}
 	try
 	{
 		if(nFounders == 2)
 		{
-			computeGenotypeProbabilitiesInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			computeGenotypeProbabilitiesInternal1<2>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 4)
 		{
-			computeGenotypeProbabilitiesInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			computeGenotypeProbabilitiesInternal1<4>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 8)
 		{
-			computeGenotypeProbabilitiesInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			computeGenotypeProbabilitiesInternal1<8>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 16)
 		{
-			computeGenotypeProbabilitiesInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, key);
+			computeGenotypeProbabilitiesInternal1<16>(founders, finals, pedigree, hetData, map, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else
 		{
@@ -402,7 +404,7 @@ BEGIN_RCPP
 		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 
 		throw std::runtime_error(ss.str().c_str());
 	}
-	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey);
+	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = allPositions.makeUnifiedMap());
 END_RCPP
 }
 

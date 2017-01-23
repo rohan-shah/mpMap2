@@ -1,4 +1,4 @@
-context("Test imputation")
+context("Test imputation of recombination fraction matrix")
 pedigree <- f2Pedigree(10000)
 map <- sim.map(len = rep(100, 3), n.mar = 11, anchor.tel = TRUE, include.x = FALSE, eq.spacing=TRUE)
 cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)

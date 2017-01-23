@@ -1,5 +1,6 @@
 #' @include hetData-class.R
 #' @include pedigree-class.R
+#' @include map-class.R
 checkGeneticData <- function(object)
 {
 	errors <- c()
@@ -131,13 +132,9 @@ checkGeneticData <- function(object)
 	#Check imputed slot
 	if(!is.null(object@imputed))
 	{
-		if(!identical(dim(object@imputed@data), dim(object@finals)))
+		if(!identical(rownames(object@imputed@data), rownames(object@finals)))
 		{
-			return("Dimensions of slot imputed@data must be the same as those of slot finals")
-		}
-		if(!identical(dimnames(object@imputed@data), dimnames(object@finals)))
-		{
-			return("Row and column names of slot imputed@data must be the same as those of slot finals")
+			return("Row names of slot imputed@data must be the same as those of slot finals")
 		}
 		errors <- validObject(object@imputed)
 		if(length(errors) > 0) return(errors)
@@ -153,10 +150,6 @@ checkGeneticData <- function(object)
 		if(nrow(object@probabilities@data) != nLines(object) * nGenotypes)
 		{
 			return("Number of rows of probabilities@data must be consistent with probabilities@key and nrow(finals)")
-		}
-		if(!identical(colnames(object@probabilities@data), markers(object)))
-		{
-			return("Object probabilities@data had the wrong column names")
 		}
 		errors <- validObject(object@probabilities)
 		if(length(errors) > 0) return(errors)
@@ -177,12 +170,25 @@ checkImputedData <- function(object)
 	{
 		return("Slot key must have three columns")
 	}
+	allMapMarkers <- unlist(lapply(object@map, names))
+	names(allMapMarkers) <- NULL
+	if(!isTRUE(all.equal(allMapMarkers, colnames(object@data))))
+	{
+		return("Slot data must have marker names that match the markers in slot map")
+	}
 	if(!.Call("checkImputedBounds", object, PACKAGE="mpMap2"))
 	{
 		return("Slot imputed@data must contain values in imputed@key")
 	}
+	tmp <- unlist(lapply(object@map, names))
+	names(tmp) <- NULL
+	if(!identical(colnames(object@data), tmp))
+	{
+		return("Column names of imputed object did not match the associated map")
+	}
+	return(TRUE)
 }
-.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix"), validity = checkImputedData)
+.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkImputedData)
 setClassUnion("imputedOrNULL", c("imputed", "NULL"))
 checkProbabilities <- function(object)
 {
@@ -198,8 +204,15 @@ checkProbabilities <- function(object)
 	{
 		return("Slot key must have three columns")
 	}
+	tmp <- unlist(lapply(object@map, names))
+	names(tmp) <- NULL
+	if(!identical(colnames(object@data), tmp))
+	{
+		return("Column names of probabilities object did not match the associated map")
+	}
+	return(TRUE)
 }
-.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix"), validity = checkProbabilities)
+.probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkProbabilities)
 setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
 .geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
 checkGeneticDataList <- function(object)

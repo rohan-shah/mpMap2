@@ -1,6 +1,6 @@
 #ifndef PROBABILITIES_HEADER_GUARD
 #define PROBABILITIES_HEADER_GUARD
-#include <matrices.hpp>
+#include "matrices.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <limits>

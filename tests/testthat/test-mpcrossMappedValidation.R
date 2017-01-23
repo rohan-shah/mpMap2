@@ -31,7 +31,11 @@ test_that("Check of imputed founders matrix works",
 	{
 		key <- cbind(1:2, 1:2, 1:2)
 		copied <- mapped
-		copied@geneticData[[1]]@imputed <- new("imputed", data = matrix(1L, nrow = nLines(copied), ncol = nMarkers(copied)), key = key)
+
+		imputedData <- matrix(1L, nrow = nLines(copied), ncol = nMarkers(copied))
+		colnames(imputedData) <- markers(mapped)
+
+		copied@geneticData[[1]]@imputed <- new("imputed", data = imputedData, key = key, map = map)
 		dimnames(copied@geneticData[[1]]@imputed@data) <- dimnames(copied@geneticData[[1]]@finals)
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
 
@@ -43,5 +47,8 @@ test_that("Check of imputed founders matrix works",
 
 		copied@geneticData[[1]]@imputed@data[1,1] <- 2L
 		validObject(copied, complete=TRUE)
+
+		names(copied@geneticData[[1]]@imputed@map[[1]])[1] <- "invalidMarkerName"
+		expect_that(validObject(copied, complete=TRUE), throws_error())
 	})
 rm(pedigree, map, cross, rf, mapped)
