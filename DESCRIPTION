@@ -1,7 +1,7 @@
 Package: mpMap2
 Type: Package
 Title: Multi-parent RIL genetic analysis
-Version: 0.0.1
+Version: 0.0.2
 Date: 2016-10-18
 Author: Rohan Shah and Emma Huang
 Maintainer: Rohan Shah <cran@bookshah.com>
@@ -55,6 +55,7 @@ Collate:
     'fourParentPedigreeRandomFunnels.R'
     'fourParentPedigreeSingleFunnel.R'
     'fullHetData.R'
+    'getAllFunnels.R'
     'hetData.R'
     'impute.R'
     'imputeFounders.R'
@@ -82,6 +83,7 @@ Collate:
     'selfing.R'
     'show.R'
     'simulateMPCross.R'
+    'simulatePhenotypes.R'
     'sixteenParentPedigreeRandomFunnels.R'
     'subset.R'
     'testDistortion.R'

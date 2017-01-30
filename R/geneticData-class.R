@@ -154,6 +154,23 @@ checkGeneticData <- function(object)
 		errors <- validObject(object@probabilities)
 		if(length(errors) > 0) return(errors)
 	}
+
+	#Check pheno data
+	if(!is.null(object@pheno))
+	{
+		if(ncol(object@pheno) == 0 || nrow(object@pheno) == 0)
+		{
+			return("A phenotype dataset with zero columns or rows is not allowed. Please enter NULL if there is no phenotype data")
+		}
+		if(nrow(object@pheno) != nrow(object@finals))
+		{
+			return("The number of rows in slot pheno must match the number of rows in slot finals")
+		}
+		if(!isTRUE(all.equal(rownames(object@pheno), rownames(object@finals))))
+		{
+			return("The row names of slot pheno must match the row names of slot finals")
+		}
+	}
 	return(TRUE)
 }
 checkImputedData <- function(object)
@@ -214,7 +231,8 @@ checkProbabilities <- function(object)
 }
 .probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkProbabilities)
 setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
+setClassUnion("data.frameOrNULL", c("data.frame", "NULL"))
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", pheno = "data.frameOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
 checkGeneticDataList <- function(object)
 {
 	if(any(unlist(lapply(object, class)) != "geneticData"))
