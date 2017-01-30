@@ -2,7 +2,7 @@ Package: mpMap2
 Type: Package
 Title: Multi-parent RIL genetic analysis
 Version: 0.0.2
-Date: 2016-10-18
+Date: 2017-01-24
 Author: Rohan Shah and Emma Huang
 Maintainer: Rohan Shah <cran@bookshah.com>
 Description: Tools for constructing linkage maps, reconstructing haplotypes,
@@ -28,10 +28,10 @@ Collate:
     'Rcpp_exceptions.R'
     'as.mpInterval.R'
     'backcrossPedigree.R'
+    'map-class.R'
     'pedigree-class.R'
     'hetData-class.R'
     'geneticData-class.R'
-    'map-class.R'
     'lg-class.R'
     'rawSymmetricMatrix.R'
     'rf-class.R'
