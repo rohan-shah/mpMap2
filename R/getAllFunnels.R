@@ -7,7 +7,14 @@ getAllFunnels <- function(cross)
 	}
 	else if(inherits(cross, "mpcross"))
 	{
-		return(lapply(cross@geneticData, function(x) .Call("getAllFunnels",x, PACKAGE="mpMap2")))
+		if(length(cross@geneticData) == 1)
+		{
+			return(.Call("getAllFunnels", cross@geneticData[[1]], PACKAGE="mpMap2"))
+		}
+		else
+		{
+			return(lapply(cross@geneticData, function(x) .Call("getAllFunnels", x, PACKAGE="mpMap2")))
+		}
 	}
 	else
 	{

@@ -137,7 +137,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 			stop("Some chromosome names were not in the map")
 		}
 		retainedMarkers <- unlist(lapply(x@map[chromosomes], names))
-		subsettedBase <- callNextMethod(x, markers = retainedMarkers)
+		suppressWarnings(subsettedBase <- callNextMethod(x, markers = retainedMarkers))
 		#Subsetting by markers removes the probabilities and imputed slots, so put them back in. 
 		lapply(1:length(x@geneticData), function(y)
 		{
