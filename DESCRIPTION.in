@@ -11,15 +11,15 @@ Description: Tools for constructing linkage maps, reconstructing haplotypes,
 License: GPL-2
 SystemRequirements: C++11
 LazyLoad: yes
-Depends: 
-    qtl,
-    methods,
-    igraph,
-    fastcluster,
-    pryr,
-    nnls,
+Suggests:
     testthat
 Imports: 
     ggplot2,
     Matrix,
-    methods
+    methods,
+    qtl,
+    igraph,
+    fastcluster,
+    pryr,
+    nnls
+
