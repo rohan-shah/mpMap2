@@ -1,5 +1,5 @@
 context("Test multithreading of arsaRaw")
-if(class(try(.Call("omp_set_num_threads", 1, PACKAGE="mpMap2"))) != "try-error")
+if(class(try(.Call("omp_set_num_threads", 1, PACKAGE="mpMap2"), silent=TRUE)) != "try-error")
 {
 	test_that("Test that correct ordering is generated for an F2 population", 
 		{
