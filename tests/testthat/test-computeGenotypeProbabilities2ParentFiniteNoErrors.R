@@ -16,7 +16,7 @@ test_that("Test zero generations of intercrossing, codominant markers, no errors
 			expect_true(all(result@geneticData[[1]]@probabilities@data[1:30, 1:30] == 1 | result@geneticData[[1]]@probabilities@data[1:30, 1:30] == 0))
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- f2Pedigree(populationSize = 1000)
+		pedigree <- f2Pedigree(populationSize = 100)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
@@ -38,7 +38,7 @@ test_that("Test zero generations of intercrossing, dominant markers, no errors, 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities), 0.9)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- f2Pedigree(populationSize = 1000)
+		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
@@ -59,13 +59,13 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 			expect_true(all(genotypesFromProbabilities == result@geneticData[[1]]@finals))
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree3 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree4@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(pedigree in pedigrees)
@@ -91,13 +91,13 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities), 0.85)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree3 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree4@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(pedigree in pedigrees)
@@ -119,11 +119,11 @@ test_that("Test zero generations of intercrossing, codominant markers, no errors
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 		
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.9)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.9)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- f2Pedigree(populationSize = 1000)
+		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
@@ -142,11 +142,11 @@ test_that("Test zero generations of intercrossing, dominant markers, no errors, 
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.9)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.9)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- f2Pedigree(populationSize = 1000)
+		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
 	})
@@ -164,17 +164,17 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
-			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.9)
+			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.9)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree3 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree4@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(pedigree in pedigrees)
@@ -184,6 +184,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 	})
 test_that("Test non-zero generations of intercrossing, dominant markers, no errors, with extra positions",
 	{
+		sampleSize <- 500
 		testFunc <- function(map, pedigree)
 		{
 			#First check that with fully informative markers we get back the original data. 
@@ -197,17 +198,17 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"])))/1000, 0.90)
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/1000, 0.90)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"])))/sampleSize, 0.90)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.90)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree3 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree4@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
 		for(pedigree in pedigrees)

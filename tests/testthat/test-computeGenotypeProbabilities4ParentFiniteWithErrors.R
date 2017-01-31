@@ -241,8 +241,8 @@ test_that("Test SNP markers, with hets called, with errors, with extra positions
 					apply(result@geneticData[[1]]@probabilities@data[(10*x-9):(10*x),], 2, which.max)
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.69)
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.69)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.67)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.67)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()

@@ -1,5 +1,5 @@
 context("Test imputation of recombination fraction matrix")
-pedigree <- f2Pedigree(10000)
+pedigree <- f2Pedigree(1000)
 map <- sim.map(len = rep(100, 3), n.mar = 11, anchor.tel = TRUE, include.x = FALSE, eq.spacing=TRUE)
 cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)

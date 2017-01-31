@@ -31,13 +31,13 @@ test_that("Test non-zero generations of intercrossing, with marker heterozygotes
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
-		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
@@ -78,13 +78,13 @@ test_that("Test non-zero generations of intercrossing, without marker heterozygo
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
-		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree3 <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree4 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 3, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)

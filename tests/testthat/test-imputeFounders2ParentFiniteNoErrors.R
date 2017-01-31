@@ -18,9 +18,9 @@ test_that("Test zero generations of intercrossing",
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
-		pedigree1 <- f2Pedigree(1000)
+		pedigree1 <- f2Pedigree(500)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- rilPedigree(populationSize = 1000, selfingGenerations = 2)
+		pedigree2 <- rilPedigree(populationSize = 500, selfingGenerations = 2)
 		pedigree2@selfing <- "finite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(map in maps)
@@ -50,13 +50,13 @@ test_that("Test non-zero generations of intercrossing",
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "finite"
-		pedigree3 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree3 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree4 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree4@selfing <- "finite"
 
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)

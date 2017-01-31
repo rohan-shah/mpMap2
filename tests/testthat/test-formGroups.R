@@ -57,7 +57,7 @@ test_that("Check that formGroups works for an f2 design",
 	})
 test_that("Check that formGroups works for an f2 design with small chromosomes",
 	{
-		f2Pedigree <- f2Pedigree(10000)
+		f2Pedigree <- f2Pedigree(1000)
 		map <- sim.map(len = rep(5, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)

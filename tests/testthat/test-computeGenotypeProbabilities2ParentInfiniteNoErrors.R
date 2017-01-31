@@ -2,7 +2,7 @@ context("genotype probability computation, two parents, infinite selfing, no err
 test_that("Test zero generations of intercrossing, no errors, no extra positions",
 	{
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- rilPedigree(populationSize = 1000, selfingGenerations = 6)
+		pedigree <- rilPedigree(populationSize = 500, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		#First check that with fully informative markers we get back the original data. 
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -39,9 +39,9 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 			expect_gt(sum(booleans) / length(booleans), 0.95)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "infinite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(pedigree in pedigrees)
@@ -52,7 +52,7 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 test_that("Test zero generations of intercrossing, no errors, with extra positions",
 	{
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree <- rilPedigree(populationSize = 1000, selfingGenerations = 6)
+		pedigree <- rilPedigree(populationSize = 500, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
 		mapped <- new("mpcrossMapped", cross, map = map)
@@ -93,9 +93,9 @@ test_that("Test non-zero generations of intercrossing, no errors, with extra pos
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "infinite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(pedigree in pedigrees)

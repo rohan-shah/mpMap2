@@ -31,7 +31,7 @@ test_that("Test that imputations at positions look right for F2 populations",
 	{
 		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map[[1]] <- map[[1]][c(1:20, 80:101)]
-		pedigree <- f2Pedigree(1000)
+		pedigree <- f2Pedigree(500)
 		pedigree@selfing <- "finite"
 
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)

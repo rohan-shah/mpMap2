@@ -3,7 +3,7 @@ test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(map)
 		{
-			pedigree <- rilPedigree(1000, selfingGenerations = 10)
+			pedigree <- rilPedigree(500, selfingGenerations = 10)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
 			suppressWarnings(result <- imputeFounders(mapped, errorProb = 0.05))
@@ -54,7 +54,7 @@ test_that("Test removal of deliberate errors",
 	{
 		testFunc <- function(map, intercrossingGenerations)
 		{
-			pedigree <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 10, intercrossingGenerations = intercrossingGenerations, nSeeds = 1)
+			pedigree <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 10, intercrossingGenerations = intercrossingGenerations, nSeeds = 1)
 			pedigree@selfing <- "infinite"
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)

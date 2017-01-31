@@ -43,10 +43,10 @@ test_that("Test non-zero generations of intercrossing",
 		}
 		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
-		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
-		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
-		pedigrees[[3]] <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
-		pedigrees[[4]] <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
+		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
+		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
+		pedigrees[[3]] <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
+		pedigrees[[4]] <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
 		for(pedigree in pedigrees)
 		{
 			pedigree@selfing <- "infinite"

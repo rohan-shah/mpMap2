@@ -29,7 +29,7 @@ test_that("Check that removeHets correctly handles the biparental case where the
 	})
 test_that("Check that removeHets correctly handles the 4-parent case where the encodings don't start at 1",
 	{
-		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
 		expect_identical(cross, cross + removeHets())

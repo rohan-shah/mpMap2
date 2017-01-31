@@ -23,9 +23,9 @@ test_that("Test zero generations of intercrossing",
 		map2 <- sim.map(len = c(100, 100), n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
-		pedigree1 <- eightParentPedigreeRandomFunnels(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree1 <- eightParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree1@selfing <- "infinite"
-		pedigree2 <- eightParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree2 <- eightParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree2@selfing <- "infinite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(map in maps)

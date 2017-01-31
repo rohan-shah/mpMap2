@@ -1,4 +1,4 @@
-context("Conversion of 4-way cross to mpwgaim object")
+context("Conversion of 8-way cross to mpwgaim object")
 suppressWarnings(capture.output(couldLoadPackages <- require(mpwgaim, quietly=T) && require(mpMap, quietly=T)))
 if(couldLoadPackages)
 {

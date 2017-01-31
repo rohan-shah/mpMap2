@@ -40,7 +40,7 @@ test_that("Check that multiparentSNP works for a 4-way intercross",
 	})
 test_that("Check that multiparentSNP doesn't work for an F2 or RIL",
 	{
-		pedigree <- f2Pedigree(1000)
+		pedigree <- f2Pedigree(500)
 		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_that(cross+ multiparentSNP(keepHets = TRUE), throws_error())

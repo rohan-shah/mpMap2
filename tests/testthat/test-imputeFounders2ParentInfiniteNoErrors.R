@@ -3,7 +3,7 @@ test_that("Test zero generations of intercrossing",
 	{
 		testFunc <- function(map)
 		{
-			pedigree <- rilPedigree(1000, selfingGenerations = 10)
+			pedigree <- rilPedigree(500, selfingGenerations = 10)
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
 			suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))

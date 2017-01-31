@@ -3,7 +3,7 @@ context("Test addition of mpcrossRf objects")
 test_that("Cannot combine object with itself",
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(5000)
+		f2Pedigree <- f2Pedigree(10)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 		expect_that(rf+rf, throws_error())
@@ -26,15 +26,15 @@ test_that("Checking f2 pedigree split into 10 different datasets gives the same 
 test_that("Checking that f2 experiment split into two different subsets gives the same answer",
 	{
 		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		f2Pedigree <- f2Pedigree(5000)
+		f2Pedigree <- f2Pedigree(1000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
-		cross@geneticData[[1]]@finals[1:2500,1:3] <- cross@geneticData[[1]]@finals[2501:5000,9:11] <- NA
+		cross@geneticData[[1]]@finals[1:500,1:3] <- cross@geneticData[[1]]@finals[501:1000,9:11] <- NA
 
 		cross1 <- subset(cross, markers = 4:11)
-		cross1 <- subset(cross1, lines = 1:2500)
+		cross1 <- subset(cross1, lines = 1:500)
 
 		cross2 <- subset(cross, markers = 1:8)
-		cross2 <- subset(cross2, lines = 2501:5000)
+		cross2 <- subset(cross2, lines = 501:1000)
 
 		rf1 <- estimateRF(cross1, keepLod = TRUE, keepLkhd = TRUE)
 		rf2 <- estimateRF(cross2, keepLod = TRUE, keepLkhd = TRUE)
