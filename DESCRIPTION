@@ -18,7 +18,8 @@ Depends:
     Rcpp,
     fastcluster,
     pryr,
-    nnls
+    nnls,
+    testthat
 Imports:
     ggplot2,
     Matrix,

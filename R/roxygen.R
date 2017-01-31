@@ -1,7 +1,6 @@
 #' @import qtl
 #' @import igraph
 #' @import methods
-#' @import testthat
 #' @importFrom stats as.dist cutree pchisq rnorm
 #' @importFrom utils combn head tail
 #' @importFrom pryr address

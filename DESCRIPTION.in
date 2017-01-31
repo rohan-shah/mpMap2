@@ -17,7 +17,8 @@ Depends:
     igraph,
     fastcluster,
     pryr,
-    nnls
+    nnls,
+    testthat
 Imports: 
     ggplot2,
     Matrix,
