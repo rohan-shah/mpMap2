@@ -184,7 +184,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 	})
 test_that("Test non-zero generations of intercrossing, dominant markers, no errors, with extra positions",
 	{
-		sampleSize <- 500
+		sampleSize <- 1000
 		testFunc <- function(map, pedigree)
 		{
 			#First check that with fully informative markers we get back the original data. 
