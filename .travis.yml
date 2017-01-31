@@ -1,5 +1,27 @@
 language: r
 cache: packages
+
+matrix:
+  include:
+   - os: linux
+   - compiler: gcc 
+     addons: 
+       apt:
+         sources:
+          - ubuntu-toolchain-r-test
+         packages:
+          - g++-5
+    env:
+     - COMPILER=g++-5
+     - CC=gcc-5
+     - CXX=g++-5
+
+before_install:
+ - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 100
+ - mkdir -p ~/.R
+ - echo "VkVSPS01CkNDPWdjYyQoVkVSKSAtc3RkPWMxMSAKQ1hYPWcrKyQoVkVSKQpTSExJQl9DWFhMRD1nKyskKFZFUikKRkM9Z2ZvcnRyYW4KRjc3PWdmb3J0cmFuCg==" | base64 -d > ~/.R/Makevars
+ - cat ~/.R/Makevars
+
 notifications:
   email:
     on_success: change
