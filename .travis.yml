@@ -1,5 +1,6 @@
 language: r
 cache: packages
+sudo: required
 
 matrix:
   include:
@@ -7,10 +8,8 @@ matrix:
    - compiler: gcc 
      addons: 
        apt:
-         sources:
-          - ubuntu-toolchain-r-test
-         packages:
-          - g++-5
+         sources: ['ubuntu-toolchain-r-test']
+         packages: ['g++-5']
      env:
       - COMPILER=g++-5
       - CC=gcc-5
