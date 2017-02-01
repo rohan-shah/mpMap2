@@ -39,9 +39,9 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 			expect_gt(sum(booleans) / length(booleans), 0.95)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
-		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
+		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
 		pedigree2@selfing <- "infinite"
 		pedigrees <- list(pedigree1, pedigree2)
 		for(pedigree in pedigrees)
