@@ -1,6 +1,7 @@
 language: r
 cache: packages
 sudo: required
+warnings_are_errors: false
 
 matrix:
   include:
