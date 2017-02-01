@@ -91,7 +91,7 @@ test_that("Test zero generations of intercrossing, with errors, with extra posit
 	})
 test_that("Test non-zero generations of intercrossing, with errors, with extra positions",
 	{
-		sampleSize <- 500
+		sampleSize <- 1000
 		testFunc <- function(map, pedigree)
 		{
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -108,7 +108,7 @@ test_that("Test non-zero generations of intercrossing, with errors, with extra p
 			#The error model should compensate for the flipped marker
 			expect_gt(cor(genotypesFromProbabilities[,"D1M25"], cross@geneticData[[1]]@finals[,"D1M25"], method = "spearman", use = "complete.obs"), 0.85)
 			correct <- sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"])))
-			expect_gt(correct / sampleSize, 0.91)
+			expect_gt(correct / sampleSize, 0.89)
 			expect_gt(cor(genotypesFromProbabilities[,"D1M27"], cross@geneticData[[1]]@finals[,"D1M27"], method = "spearman", use = "complete.obs"), 0.85)
 
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.85)
