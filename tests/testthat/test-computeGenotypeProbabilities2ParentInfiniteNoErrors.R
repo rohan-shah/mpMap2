@@ -16,7 +16,7 @@ test_that("Test zero generations of intercrossing, no errors, no extra positions
 		#The most probable founders should agree with the actual data, except for the case where the line really is hetrozygous. 
 		expect_true(all((genotypesFromProbabilities == result@geneticData[[1]]@finals) | is.na(result@geneticData[[1]]@finals)))
 		#Almost everything is a 1 or 0. The exception is hets, which end up coded as NA in the original dataset, and lead to probabilities that are neither 0 or 1. 
-		booleans <- result@geneticData[[1]]@probabilities@data[1:10,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:10,1:20] == 0
+		booleans <- result@geneticData[[1]]@probabilities@data[1:100,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:100,1:20] == 0
 		expect_gt(sum(booleans) / length(booleans), 0.92)
 	})
 test_that("Test non-zero generations of intercrossing, no errors, no extra positions",
@@ -35,7 +35,7 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 			#The most probable founders should agree with the actual data, except for the case where the line really is hetrozygous. 
 			expect_true(all((genotypesFromProbabilities == result@geneticData[[1]]@finals) | is.na(result@geneticData[[1]]@finals)))
 			#Almost everything is a 1 or 0. The exception is hets, which end up coded as NA in the original dataset, and lead to probabilities that are neither 0 or 1. 
-			booleans <- result@geneticData[[1]]@probabilities@data[1:10,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:10,1:20] == 0
+			booleans <- result@geneticData[[1]]@probabilities@data[1:100,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:100,1:20] == 0
 			expect_gt(sum(booleans) / length(booleans), 0.92)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
@@ -65,7 +65,7 @@ test_that("Test zero generations of intercrossing, no errors, with extra positio
 		colnames(genotypesFromProbabilities) <- unlist(lapply(result@geneticData[[1]]@probabilities@map, names))
 		expect_true(all(result@geneticData[[1]]@probabilities@data[,"extra"] != 0) && all(result@geneticData[[1]]@probabilities@data[,"extra"] != 1))
 		#Almost everything is a 1 or 0. The exception is hets, which end up coded as NA in the original dataset, and lead to probabilities that are neither 0 or 1. 
-		booleans <- result@geneticData[[1]]@probabilities@data[1:10,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:10,1:20] == 0
+		booleans <- result@geneticData[[1]]@probabilities@data[1:100,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:100,1:20] == 0
 		expect_gt(sum(booleans) / length(booleans), 0.92)
 		#The extra position should have essenitally thet same probabilities as the flanking markers
 		expect_true(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman") > 0.92)
@@ -86,7 +86,7 @@ test_that("Test non-zero generations of intercrossing, no errors, with extra pos
 			colnames(genotypesFromProbabilities) <- unlist(lapply(result@geneticData[[1]]@probabilities@map, names))
 			expect_true(all(result@geneticData[[1]]@probabilities@data[,"extra"] != 0) && all(result@geneticData[[1]]@probabilities@data[,"extra"] != 1))
 			#Almost everything is a 1 or 0. The exception is hets, which end up coded as NA in the original dataset, and lead to probabilities that are neither 0 or 1. 
-			booleans <- result@geneticData[[1]]@probabilities@data[1:10,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:10,1:20] == 0
+			booleans <- result@geneticData[[1]]@probabilities@data[1:100,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:100,1:20] == 0
 			expect_gt(sum(booleans) / length(booleans), 0.85)
 			#The extra position should have essenitally thet same probabilities as the flanking markers
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
