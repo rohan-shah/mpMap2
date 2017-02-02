@@ -1,5 +1,6 @@
-## mpMap2: Map construction for multi-parent crosses
+## mpMap2 [![Build Status](https://travis-ci.org/rohan-shah/mpMap2.svg?branch=master)](https://travis-ci.org/rohan-shah/mpMap2)
 
+### Map construction for multi-parent crosses
 **Authors**: Rohan Shah, Emma Huang
 
 R/mpMap2 is a software package for constructing genetic linkage maps from a family of experimental designs known as **multi-parent crosses**. These types of designs begin with 2^n inbred founder lines, and may incorporate random intermating and inbreeding by selfing. These designs have found recent application in Arabadopsis, barley, rice, maize, tomatoes and wheat. However there do not appear to be appropriate computational tools to perform map construction using data generated from current experimental populations, which may include thousands of lines and over 100,000 markers.
