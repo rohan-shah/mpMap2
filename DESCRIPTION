@@ -61,6 +61,7 @@ Collate:
     'imputeFounders.R'
     'jitterMap.R'
     'lineNames.R'
+    'listCodingErrors.R'
     'mapFunctions.R'
     'markers.R'
     'mpcross.R'
