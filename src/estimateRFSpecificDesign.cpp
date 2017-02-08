@@ -33,7 +33,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData);
+	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.markerRows, args.markerColumns);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -70,7 +70,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounterRow];
 			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
 
-			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+			singleMarkerPairData<maxAlleles>& markerPairData = *(computedContributions(markerPatternID1, markerPatternID2));
 			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			bool swap = markerPatternID1 > markerPatternID2;
 			for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
@@ -145,7 +145,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData);
+	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.markerRows, args.markerColumns);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -190,7 +190,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounterRow];
 			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
 
-			singleMarkerPairData<maxAlleles>& markerPairData = computedContributions(markerPatternID1, markerPatternID2);
+			singleMarkerPairData<maxAlleles>& markerPairData = *(computedContributions(markerPatternID1, markerPatternID2));
 			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			bool swap = markerPatternID1 > markerPatternID2;
 			for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)

@@ -24,11 +24,11 @@ struct estimateRFSpecificDesignArgs
 };
 struct rfhaps_internal_args
 {
-	rfhaps_internal_args(const std::vector<double>& recombinationFractions, triangularIterator& startPosition)
-	: recombinationFractions(recombinationFractions), startPosition(startPosition)
+	rfhaps_internal_args(const std::vector<double>& recombinationFractions, triangularIterator& startPosition, const std::vector<int>& markerRows, const std::vector<int>& markerColumns)
+	: recombinationFractions(recombinationFractions), startPosition(startPosition), markerRows(markerRows), markerColumns(markerColumns)
 	{}
 	rfhaps_internal_args(rfhaps_internal_args&& other)
-		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), maxAlleles(other.maxAlleles), result(other.result), lineFunnelIDs(std::move(other.lineFunnelIDs)), lineFunnelEncodings(std::move(other.lineFunnelEncodings)), allFunnelEncodings(std::move(other.allFunnelEncodings)), startPosition(other.startPosition)
+		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), maxAlleles(other.maxAlleles), result(other.result), lineFunnelIDs(std::move(other.lineFunnelIDs)), lineFunnelEncodings(std::move(other.lineFunnelEncodings)), allFunnelEncodings(std::move(other.allFunnelEncodings)), startPosition(other.startPosition), markerRows(other.markerRows), markerColumns(other.markerColumns)
 	{}
 	Rcpp::IntegerMatrix finals, founders;
 	Rcpp::S4 pedigree;
@@ -49,6 +49,8 @@ struct rfhaps_internal_args
 	std::vector<funnelEncoding> allFunnelEncodings;
 	triangularIterator startPosition;
 	std::function<void(unsigned long long)> updateProgress;
+	const std::vector<int>& markerRows;
+	const std::vector<int>& markerColumns;
 };
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args);
 bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long long& counter);
