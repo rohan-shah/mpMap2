@@ -15,7 +15,7 @@
 #' rf <- estimateRF(cross)
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
-estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE)
+estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 {
 	inheritsNewMpcrossArgument(object)
 
@@ -75,20 +75,26 @@ estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod 
 			stop(paste0("Value of lineWeights[[", i, "]] must have nLines(object)[", i, "] entries"))
 		}
 	}
-	markerRange <- 1:nMarkers(object)
-	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRange, markerColumns = markerRange, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = gbLimit, verbose = verbose)
-	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = listOfResults$theta)
+	listOfResults <- estimateRFInternal(object = object, recombValues = recombValues, lineWeights = lineWeights, markerRows = markerRows, markerColumns = markerColumns, keepLod = keepLod, keepLkhd = keepLkhd, gbLimit = gbLimit, verbose = verbose)
+	theta <- new("rawSymmetricMatrix", markers = markers(object), levels = recombValues, data = rep(as.raw(0xFF), nMarkers(object)*(nMarkers(object) + 1)/2))
+	.Call("assignRawSymmetricMatrixFromEstimateRF", theta, markerRows, markerColumns, listOfResults$theta, PACKAGE="mpMap2")
+
+	lod <- NULL
 	if(!is.null(listOfResults$lod))
 	{
-		listOfResults$lod <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lod)
-		rownames(listOfResults$lod) <- colnames(listOfResults$lod) <- markers(object)
+		lod <- new("dspMatrix", Dim = rep(nMarkers(object), 2), x = rep(0, nMarkers(object)*(nMarkers(object) + 1)/2))
+		.Call("assignDspMatrixFromEstimateRF", lod, markerRows, markerColumns, listOfResults$lod, PACKAGE="mpMap2")
+		rownames(lod) <- colnames(lod) <- markers(object)
 	}
+
+	lkhd <- NULL
 	if(!is.null(listOfResults$lkhd))
 	{
-		listOfResults$lkhd <- new("dspMatrix", Dim = c(length(markers(object)), length(markers(object))), x = listOfResults$lkhd)
-		rownames(listOfResults$lkhd) <- colnames(listOfResults$lkhd) <- markers(object)
+		lkhd <- new("dspMatrix", Dim = rep(nMarkers(object), 2), x = rep(0, nMarkers(object)*(nMarkers(object) + 1)/2))
+		.Call("assignDspMatrixFromEstimateRF", lkhd, markerRows, markerColumns, listOfResults$lkhd, PACKAGE="mpMap2")
+		rownames(lkhd) <- colnames(lkhd) <- markers(object)
 	}
-	rf <- new("rf", theta = theta, lod = listOfResults$lod, lkhd = listOfResults$lkhd, gbLimit = gbLimit)
+	rf <- new("rf", theta = theta, lod = lod, lkhd = lkhd, gbLimit = gbLimit)
 
 	if(class(object) == "mpcrossLG" || class(object) == "mpcrossMapped")
 	{
