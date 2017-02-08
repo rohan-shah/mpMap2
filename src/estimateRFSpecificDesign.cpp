@@ -33,7 +33,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.markerRows, args.markerColumns);
+	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.rowPatterns, args.columnPatterns);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -145,7 +145,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
 	
-	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.markerRows, args.markerColumns);
+	constructLookupTableArgs<maxAlleles> lookupArgs(computedContributions, args.markerPatternData, args.rowPatterns, args.columnPatterns);
 	lookupArgs.recombinationFractions = &args.recombinationFractions;
 	lookupArgs.lineFunnelEncodings = &args.lineFunnelEncodings;
 	lookupArgs.intercrossingGenerations = &args.intercrossingGenerations;
@@ -663,6 +663,15 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	internal_args.lineFunnelIDs.swap(lineFunnelIDs);
 	internal_args.lineFunnelEncodings.swap(lineFunnelEncodings);
 	internal_args.allFunnelEncodings.swap(allFunnelEncodings);
+
+	for(std::vector<int>::const_iterator i = internal_args.markerRows->begin(); i != internal_args.markerRows->end(); i++) internal_args.rowPatterns.push_back(internal_args.markerPatternData.markerPatternIDs[*i]);
+	for(std::vector<int>::const_iterator i = internal_args.markerColumns->begin(); i != internal_args.markerColumns->end(); i++) internal_args.columnPatterns.push_back(internal_args.markerPatternData.markerPatternIDs[*i]);
+
+	std::sort(internal_args.rowPatterns.begin(), internal_args.rowPatterns.end());
+	std::sort(internal_args.columnPatterns.begin(), internal_args.columnPatterns.end());
+
+	internal_args.rowPatterns.erase(std::unique(internal_args.rowPatterns.begin(), internal_args.rowPatterns.end()), internal_args.rowPatterns.end());
+	internal_args.columnPatterns.erase(std::unique(internal_args.columnPatterns.begin(), internal_args.columnPatterns.end()), internal_args.columnPatterns.end());
 	return true;
 }
 bool estimateRFSpecificDesign(rfhaps_internal_args& internal_args, unsigned long long& counter)

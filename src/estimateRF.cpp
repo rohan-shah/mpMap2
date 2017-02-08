@@ -234,7 +234,10 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 			}
 			//This has to be copied / swapped in, because it's a local temporary at the moment
 			args.lineWeights.swap(lineWeightsThisDesign);
-			rfhaps_internal_args internalArgs(args.recombinationFractions, startPosition, markerRows, markerColumns);
+			rfhaps_internal_args internalArgs(args.recombinationFractions, startPosition);
+			internalArgs.markerRows = &markerRows;
+			internalArgs.markerColumns = &markerColumns;
+
 			bool converted = toInternalArgs(std::move(args), internalArgs, error);
 			if(!converted)
 			{

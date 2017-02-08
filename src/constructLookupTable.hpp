@@ -72,8 +72,8 @@ private:
 template<int maxAlleles> struct constructLookupTableArgs
 {
 public:
-	constructLookupTableArgs(allMarkerPairData<maxAlleles>& computedContributions, markerPatternsToUniqueValuesArgs& markerPatternData, const std::vector<int>& markerRows, const std::vector<int>& markerColumns)
-		: computedContributions(computedContributions), markerPatternData(markerPatternData), markerRows(markerRows), markerColumns(markerColumns)
+	constructLookupTableArgs(allMarkerPairData<maxAlleles>& computedContributions, markerPatternsToUniqueValuesArgs& markerPatternData, const std::vector<int>& rowPatterns, const std::vector<int>& columnPatterns)
+		: computedContributions(computedContributions), markerPatternData(markerPatternData), rowPatterns(rowPatterns), columnPatterns(columnPatterns)
 	{}
 	allMarkerPairData<maxAlleles>& computedContributions;
 	markerPatternsToUniqueValuesArgs& markerPatternData;
@@ -83,8 +83,8 @@ public:
 	const std::vector<double>* recombinationFractions;
 	std::vector<int>* intercrossingGenerations;
 	std::vector<int>* selfingGenerations;
-	const std::vector<int>& markerRows;
-	const std::vector<int>& markerColumns;
+	const std::vector<int>& rowPatterns;
+	const std::vector<int>& columnPatterns;
 };
 template<int maxAlleles> bool isValid(std::vector<array2<maxAlleles> >& markerProbabilities, int nPoints, int nFirstMarkerAlleles, int nSecondMarkerAlleles, std::vector<double>& recombLevels)
 {
@@ -122,22 +122,9 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 	int maxSelfing = *std::max_element(args.selfingGenerations->begin(), args.selfingGenerations->end());
 	int minSelfing = *std::min_element(args.selfingGenerations->begin(), args.selfingGenerations->end());
 
-	const std::vector<int>& markerRows = args.markerRows;
-	const std::vector<int>& markerColumns = args.markerColumns;
-
-	std::vector<int> rowPatterns, columnPatterns;
-	for(std::vector<int>::const_iterator i = markerRows.begin(); i != markerRows.end(); i++) rowPatterns.push_back(args.markerPatternData.markerPatternIDs[*i]);
-	for(std::vector<int>::const_iterator i = markerColumns.begin(); i != markerColumns.end(); i++) columnPatterns.push_back(args.markerPatternData.markerPatternIDs[*i]);
-
-	std::sort(rowPatterns.begin(), rowPatterns.end());
-	std::sort(columnPatterns.begin(), columnPatterns.end());
-
-	rowPatterns.erase(std::unique(rowPatterns.begin(), rowPatterns.end()), rowPatterns.end());
-	columnPatterns.erase(std::unique(columnPatterns.begin(), columnPatterns.end()), columnPatterns.end());
-
 	//Only compute the compressed haplotype probabilities once. This is for the no intercrossing case
 	typedef std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs> compressedProbabilitiesType;
-	rowMajorMatrix<compressedProbabilitiesType> funnelHaplotypeProbabilities(nRecombLevels, maxSelfing-minSelfing+1);
+	rowMajorMatrix<compressedProbabilitiesType> funnelHaplotypeProbabilities(nRecombLevels, maxSelfing - minSelfing + 1);
 	//In order to determine if a marker combination is informative, we use a much finer numerical grid.
 	const int nFinerPoints = 101;
 	std::vector<double> finerRecombLevels(nFinerPoints);
@@ -184,11 +171,11 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 #ifdef USE_OPENMP
 #pragma omp for schedule(dynamic)
 #endif
-		for(std::vector<int>::iterator rowPatternIterator = rowPatterns.begin(); rowPatternIterator < rowPatterns.end(); rowPatternIterator++)
+		for(std::vector<int>::const_iterator rowPatternIterator = args.rowPatterns.begin(); rowPatternIterator < args.rowPatterns.end(); rowPatternIterator++)
 		{
 			int firstPattern = *rowPatternIterator;
 			markerData& firstMarkerPatternData = args.markerPatternData.allMarkerPatterns[firstPattern];
-			for(std::vector<int>::iterator columnPatternIterator = columnPatterns.begin(); columnPatternIterator != columnPatterns.end(); columnPatternIterator++)
+			for(std::vector<int>::const_iterator columnPatternIterator = args.columnPatterns.begin(); columnPatternIterator != args.columnPatterns.end(); columnPatternIterator++)
 			{
 				int secondPattern = *columnPatternIterator;
 				if(secondPattern >= firstPattern)
