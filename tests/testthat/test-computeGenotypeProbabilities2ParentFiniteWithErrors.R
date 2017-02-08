@@ -148,7 +148,7 @@ test_that("Test zero generations of intercrossing, dominant markers, with errors
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
 			#Our abilitiy to correctly impute hetrozygotes is very limited if there are no hets called!
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.7)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.5)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 1000)
@@ -204,7 +204,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, with er
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
 			#Our abilitiy to correctly impute hetrozygotes is very limited if there are no hets called!		
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.7)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.5)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
