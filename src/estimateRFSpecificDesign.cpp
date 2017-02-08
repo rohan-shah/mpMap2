@@ -402,6 +402,8 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 	std::size_t nDifferentFunnels = internal_args.lineFunnelEncodings.size();
 	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
 
+	int nMarkerPatternIDs = (int)internal_args.markerPatternData.allMarkerPatterns.size();
+
 	std::size_t arraySize;
 	//for i in `seq 1 64`; do echo -e "\t\tcase $i:\n\t\t\tarraySize = sizeof(array2<$i>);\n\t\t\tbreak;"; done > tmp
 	switch(internal_args.maxAlleles)
@@ -537,7 +539,7 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 		default:
 			throw std::runtime_error("Internal error");
 	}
-	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize;
+	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize * (nMarkerPatternIDs * (nMarkerPatternIDs - 1))/2;
 }
 bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& internal_args, std::string& error)
 {
