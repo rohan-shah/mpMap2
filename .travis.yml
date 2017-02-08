@@ -32,3 +32,11 @@ notifications:
   email:
     on_success: change
     on_failure: always
+
+after_failure:
+- find *Rcheck -name '*.fail' -print -exec cat '{}' \;
+
+script: 
+  - |
+    travis_wait 20 R CMD build .
+    travis_wait  R CMD check mpMap2*tar.gz
