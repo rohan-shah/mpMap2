@@ -257,7 +257,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		//Output a message giving the allocation size, if either it's more than a gb, or the verbose option is specified
 		if(lookupBytes > 1000000000 || verbose)
 		{
-			Rcpp::Rcout << "Total lookup table size of " << lookupBytes << " bytes" << std::endl;
+			Rcpp::Rcout << "Total lookup table size of " << lookupBytes << " bytes = " << (lookupBytes / 1000000000ULL) << " gb" << std::endl;
 		}
 		Rcpp::NumericVector lod, lkhd;
 		Rcpp::RawVector theta(nValuesToEstimate);

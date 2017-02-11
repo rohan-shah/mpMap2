@@ -174,46 +174,50 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 		for(std::vector<int>::const_iterator rowPatternIterator = args.rowPatterns.begin(); rowPatternIterator < args.rowPatterns.end(); rowPatternIterator++)
 		{
 			int firstPattern = *rowPatternIterator;
-			markerData& firstMarkerPatternData = args.markerPatternData.allMarkerPatterns[firstPattern];
 			for(std::vector<int>::const_iterator columnPatternIterator = args.columnPatterns.begin(); columnPatternIterator != args.columnPatterns.end(); columnPatternIterator++)
 			{
 				int secondPattern = *columnPatternIterator;
-				if(secondPattern >= firstPattern)
+				int copiedFirstPattern = firstPattern;
+				int copiedSecondPattern = secondPattern;
+				if(copiedSecondPattern < copiedFirstPattern)
 				{
-					markerData& secondMarkerPatternData = args.markerPatternData.allMarkerPatterns[secondPattern];
-					//The data for this pair of markers
-					args.computedContributions(firstPattern, secondPattern) = new singleMarkerPairData<maxAlleles>(nRecombLevels, nDifferentFunnels, maxAIGenerations, maxSelfing - minSelfing + 1);
-					singleMarkerPairData<maxAlleles>& thisMarkerPairData = *(args.computedContributions(firstPattern, secondPattern));
-					for(int selfingCounter = minSelfing; selfingCounter <= maxSelfing; selfingCounter++)
+					std::swap(copiedFirstPattern, copiedSecondPattern);
+				}
+				markerData& firstMarkerPatternData = args.markerPatternData.allMarkerPatterns[copiedFirstPattern];
+				markerData& secondMarkerPatternData = args.markerPatternData.allMarkerPatterns[copiedSecondPattern];
+				//The data for this pair of markers
+				if(args.computedContributions(copiedFirstPattern, copiedSecondPattern) != NULL) continue;
+				args.computedContributions(copiedFirstPattern, copiedSecondPattern) = new singleMarkerPairData<maxAlleles>(nRecombLevels, nDifferentFunnels, maxAIGenerations, maxSelfing - minSelfing + 1);
+				singleMarkerPairData<maxAlleles>& thisMarkerPairData = *(args.computedContributions(copiedFirstPattern, copiedSecondPattern));
+				for(int selfingCounter = minSelfing; selfingCounter <= maxSelfing; selfingCounter++)
+				{
+					//Compute marker probabilities for a finer grid. If me seem to see a repeated probability model (numerically, up to a tolerance), then in that particular situtation this pair of markers is no good
+					for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
 					{
-						//Compute marker probabilities for a finer grid. If me seem to see a repeated probability model (numerically, up to a tolerance), then in that particular situtation this pair of markers is no good
-						for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
+						funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<false>(finerFunnelHaplotypeProbabilities, &(markerProbabilities[0]), (*args.lineFunnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
+						thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues, finerRecombLevels);
+					}
+					for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
+					{
+						intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<false>(finerIntercrossingHaplotypeProbabilities, &(markerProbabilities[0]), intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing, (*args.allFunnelEncodings)[0]);
+						thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues, finerRecombLevels);
+					}
+					//The next two loops relate to the input recombination fractions
+					for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
+					{
+						array2<maxAlleles>* markerProbabilitiesThisIntercrossing = &(thisMarkerPairData.perAIGenerationData(0, intercrossingGeneration-1, selfingCounter - minSelfing));
+						if(thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing))
 						{
-							funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<false>(finerFunnelHaplotypeProbabilities, &(markerProbabilities[0]), (*args.lineFunnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
-							thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues, finerRecombLevels);
+							intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(intercrossingHaplotypeProbabilities, markerProbabilitiesThisIntercrossing, intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing, (*args.allFunnelEncodings)[0]);
 						}
-						for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
+					}
+					for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
+					{
+						array2<maxAlleles>* markerProbabilitiesThisFunnel = &(thisMarkerPairData.perFunnelData(0, funnelCounter, selfingCounter - minSelfing));
+						memset(markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
+						if(thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing))
 						{
-							intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<false>(finerIntercrossingHaplotypeProbabilities, &(markerProbabilities[0]), intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing, (*args.allFunnelEncodings)[0]);
-							thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues, finerRecombLevels);
-						}
-						//The next two loops relate to the input recombination fractions
-						for(int intercrossingGeneration = 1; intercrossingGeneration <= maxAIGenerations; intercrossingGeneration++)
-						{
-							array2<maxAlleles>* markerProbabilitiesThisIntercrossing = &(thisMarkerPairData.perAIGenerationData(0, intercrossingGeneration-1, selfingCounter - minSelfing));
-							if(thisMarkerPairData.allowableAI(intercrossingGeneration-1, selfingCounter - minSelfing))
-							{
-								intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(intercrossingHaplotypeProbabilities, markerProbabilitiesThisIntercrossing, intercrossingGeneration, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing, (*args.allFunnelEncodings)[0]);
-							}
-						}
-						for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
-						{
-							array2<maxAlleles>* markerProbabilitiesThisFunnel = &(thisMarkerPairData.perFunnelData(0, funnelCounter, selfingCounter - minSelfing));
-							memset(markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
-							if(thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing))
-							{
-								funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(funnelHaplotypeProbabilities, markerProbabilitiesThisFunnel, (*args.lineFunnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
-							}
+							funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(funnelHaplotypeProbabilities, markerProbabilitiesThisFunnel, (*args.lineFunnelEncodings)[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 						}
 					}
 				}

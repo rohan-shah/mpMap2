@@ -190,9 +190,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 			int markerPatternID1 = args.markerPatternData.markerPatternIDs[markerCounterRow];
 			int markerPatternID2 = args.markerPatternData.markerPatternIDs[markerCounterColumn];
 
-			singleMarkerPairData<maxAlleles>& markerPairData = *(computedContributions(markerPatternID1, markerPatternID2));
-			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			bool swap = markerPatternID1 > markerPatternID2;
+
+			int markerPatternID1Copied = markerPatternID1, markerPatternID2Copied = markerPatternID2;
+			if(swap) std::swap(markerPatternID1Copied, markerPatternID2Copied);
+
+			singleMarkerPairData<maxAlleles>& markerPairData = *(computedContributions(markerPatternID1Copied, markerPatternID2Copied));
+			//We only calculated tabels for markerPattern1 <= markerPattern2. So if we want things the other way around we have to swap the data for markers 1 and 2 later on. 
 			for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
 			{
 				int marker1Value = args.finals(finalCounter, markerCounterRow);
@@ -402,7 +406,8 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 	std::size_t nDifferentFunnels = internal_args.lineFunnelEncodings.size();
 	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
 
-	int nMarkerPatternIDs = (int)internal_args.markerPatternData.allMarkerPatterns.size();
+	int nMarkerRowPatterns = (int)internal_args.rowPatterns.size();
+	int nMarkerColumnPatternss = (int)internal_args.columnPatterns.size();
 
 	std::size_t arraySize;
 	//for i in `seq 1 64`; do echo -e "\t\tcase $i:\n\t\t\tarraySize = sizeof(array2<$i>);\n\t\t\tbreak;"; done > tmp
@@ -539,7 +544,13 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 		default:
 			throw std::runtime_error("Internal error");
 	}
-	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize * (nMarkerPatternIDs * (nMarkerPatternIDs - 1))/2;
+	int nMarkerPairs = 0;
+	for(std::vector<int>::iterator markerRowPattern = internal_args.rowPatterns.begin(); markerRowPattern != internal_args.rowPatterns.end(); markerRowPattern++)
+	{
+		std::vector<int>::iterator firstBiggerOrEqual = std::lower_bound(internal_args.columnPatterns.begin(), internal_args.columnPatterns.end(), *markerRowPattern);
+		nMarkerPairs += (int)std::distance(firstBiggerOrEqual, internal_args.columnPatterns.end());
+	}
+	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize * nMarkerPairs;
 }
 bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& internal_args, std::string& error)
 {
