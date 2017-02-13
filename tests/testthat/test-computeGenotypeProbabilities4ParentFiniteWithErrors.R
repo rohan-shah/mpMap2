@@ -137,7 +137,7 @@ test_that("Test fully informative markers, with errors, with extra positions",
 			cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 			mapped <- new("mpcrossMapped", cross, map = map)
 			mapped@geneticData[[1]]@finals[,"D1M26"] <- sample(1:3, nLines(mapped@geneticData[[1]]), replace=TRUE)
-			suppressWarnings(result <- computeGenotypeProbabilities(mapped, extraPositions = list("1" = c("extra" = 25.5)), errorProb = 0.05))
+			suppressWarnings(result <- computeGenotypeProbabilities(mapped, extraPositions = list("1" = c("extra" = 25.5)), errorProb = 0.1))
 			genotypesFromProbabilities <- lapply(1:nLines(result), function(x)
 				{
 					apply(result@geneticData[[1]]@probabilities@data[(10*x-9):(10*x),], 2, which.max)
