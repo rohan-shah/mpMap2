@@ -18,6 +18,8 @@ test_that("Test agreement with the truth",
 			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.96)
+
+			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)

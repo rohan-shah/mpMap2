@@ -18,6 +18,9 @@ test_that("Test zero generations of intercrossing",
 			result <- imputeFounders(mapped, errorProb = 0.05)
 			tmp <- table(result@geneticData[[1]]@imputed@data, result@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
+			
+			errors <- result@geneticData[[1]]@imputed@errors
+			expect_lt(sum(errors) / length(errors), 0.01)
 		}
 		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
@@ -44,6 +47,9 @@ test_that("Test non-zero generations of intercrossing",
 			result <- imputeFounders(mapped, errorProb = 0.05)
 			tmp <- table(result@geneticData[[1]]@imputed@data, result@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
+			
+			errors <- result@geneticData[[1]]@imputed@errors
+			expect_lt(sum(errors) / length(errors), 0.01)
 		}
 		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
@@ -68,13 +74,23 @@ test_that("Test removal of deliberate errors",
 			result@geneticData[[1]]@imputed@data[naIndices] <- NA
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
+			
+			errors <- result@geneticData[[1]]@imputed@errors
+			expect_lt(sum(errors[,-50]) / length(errors[,-50]), 0.01)
+			expect_gt(sum(errors[,50]), 100)
 
 			#Dominance doesn't really make a difference, because it's assumed inbred
 			cross <- cross + biparentalDominant()
 			mapped <- new("mpcrossMapped", cross, map = map)
+			#Add an error
+			mapped@geneticData[[1]]@finals[,50] <- 1L
 			result <- imputeFounders(mapped, errorProb = 0.05)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
+			
+			errors <- result@geneticData[[1]]@imputed@errors
+			expect_lt(sum(errors[,-50]) / length(errors[,-50]), 0.01)
+			expect_gt(sum(errors[,50]), 100)
 		}
 		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map, 0)

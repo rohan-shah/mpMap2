@@ -11,6 +11,8 @@ test_that("Test deliberate errors",
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
 
+			expect_gt(sum(result@geneticData[[1]]@imputed@errors), 0.5*0.01*length(mapped@geneticData[[1]]@finals))
+
 			cross2 <- cross + multiparentSNP(keepHets=FALSE)
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			errorIndices <- sample(1:length(mapped@geneticData[[1]]@finals), 0.01 * length(mapped@geneticData[[1]]@finals))
@@ -18,6 +20,8 @@ test_that("Test deliberate errors",
 			result <- imputeFounders(mapped, errorProb = 0.01)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.94)
+			
+			expect_gt(sum(result@geneticData[[1]]@imputed@errors), 0.25*0.01*length(mapped@geneticData[[1]]@finals))
 		}
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)

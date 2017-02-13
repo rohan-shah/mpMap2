@@ -26,6 +26,8 @@ test_that("Test non-zero generations of intercrossing, with marker heterozygotes
 			expect_true(sum(diag(tmp[1:4,1:4])) / sum(tmp[1:4,1:4]) > 0.95)
 			#If a het is called, it should actually be a het (any het) with at least 95% chance
 			expect_true(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]) > 0.95)
+
+			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
@@ -73,6 +75,8 @@ test_that("Test non-zero generations of intercrossing, without marker heterozygo
 			expect_identical(rownames(tmp), colnames(tmp))
 			endHet <- nrow(tmp)
 			expect_true(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]) > 0.95)
+
+			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
 		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)

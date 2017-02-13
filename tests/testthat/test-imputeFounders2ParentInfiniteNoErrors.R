@@ -20,6 +20,8 @@ test_that("Test zero generations of intercrossing",
 			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, result@geneticData[[1]]@finals)
 			expect_true(sum(diag(tmp)) / sum(tmp) > 0.99)
+
+			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
 		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
