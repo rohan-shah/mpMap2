@@ -10,5 +10,7 @@ getChromosomes <- function(mpcrossMapped, markers)
 	{
 		which(unlist(lapply(mpcrossMapped@map, function(x) !is.na(match(marker, names(x))))))
 	}))
-	return(names(mpcrossMapped@map)[chromosomeIndices])
+	result <- names(mpcrossMapped@map)[chromosomeIndices]
+	names(result) <- markers
+	return(result)
 }
