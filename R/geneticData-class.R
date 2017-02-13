@@ -205,7 +205,8 @@ checkImputedData <- function(object)
 	}
 	return(TRUE)
 }
-.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkImputedData)
+setClassUnion("matrixOrNULL", c("matrix", "NULL"))
+.imputed <- setClass("imputed", slots=list(data = "matrix", key = "matrix", map = "map", errors = "matrixOrNULL"), validity = checkImputedData)
 setClassUnion("imputedOrNULL", c("imputed", "NULL"))
 checkProbabilities <- function(object)
 {

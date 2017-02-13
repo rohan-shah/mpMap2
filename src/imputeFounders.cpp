@@ -18,7 +18,7 @@
 #include "joinMapWithExtra.h"
 #include "haldaneToRf.h"
 #include "generateKeys.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of positions per chromosome
 	int maxChromosomePositions = 0;
@@ -162,6 +162,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.intercrossingGenerations = &intercrossingGenerations;
 	viterbi.selfingGenerations = &selfingGenerations;
 	viterbi.results = results;
+	viterbi.resultsErrors = resultsErrors;
 	viterbi.key = key;
 	viterbi.maxAlleles = maxAlleles; 
 	viterbi.homozygoteMissingProb = homozygoteMissingProb;
@@ -204,15 +205,15 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	Rcpp::rownames(results) = Rcpp::rownames(finals);
 	Rcpp::colnames(results) = Rcpp::wrap(allPositions.names);
 }
-template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, results, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 	}
 }
 SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp, SEXP extraPositions_sexp)
@@ -433,23 +434,24 @@ BEGIN_RCPP
 
 	int nFinals = finals.nrow();
 	Rcpp::IntegerMatrix results(nFinals, (int)allPositions.names.size());
+	Rcpp::IntegerMatrix resultsErrors(nFinals, (int)allPositions.names.size());
 	try
 	{
 		if(nFounders == 2)
 		{
-			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 4)
 		{
-			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 8)
 		{
-			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else if(nFounders == 16)
 		{
-			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, results, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
 		}
 		else
 		{
@@ -462,7 +464,7 @@ BEGIN_RCPP
 		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 
 		throw std::runtime_error(ss.str().c_str());
 	}
-	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = allPositions.makeUnifiedMap());
+	return Rcpp::List::create(Rcpp::Named("data") = results, Rcpp::Named("key") = outputKey, Rcpp::Named("map") = allPositions.makeUnifiedMap(), Rcpp::Named("errors") = resultsErrors);
 END_RCPP
 }
 

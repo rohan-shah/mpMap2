@@ -38,6 +38,10 @@ public:
 		retVal.data = data;
 		return retVal;
 	}
+	typename std::vector<T>::iterator iterator(int row, int column)
+	{
+		return data.begin() + column + row*nColumns;
+	}
 	typename std::vector<T>::reference operator()(int row, int column)
 	{
 		return data[column + row*nColumns];

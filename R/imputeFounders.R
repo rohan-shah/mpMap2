@@ -68,10 +68,12 @@ imputeFounders <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygot
 	for(i in 1:length(mpcrossMapped@geneticData))
 	{
 		results <- .Call("imputeFounders", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, PACKAGE="mpMap2")
+		errors <- NULL
+		if(errorProb != 0) errors <- results$errors
 		resultsMatrix <- results$data
 		class(results$map) <- "map"
 		names(results$map) <- names(map)
-		mpcrossMapped@geneticData[[i]]@imputed <- new("imputed", data = resultsMatrix, key = results$key, map = results$map)
+		mpcrossMapped@geneticData[[i]]@imputed <- new("imputed", data = resultsMatrix, key = results$key, map = results$map, errors = errors)
 	}
 	return(mpcrossMapped)
 }

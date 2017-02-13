@@ -235,25 +235,31 @@ stopIdenticalSearch:
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 					pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					bool isError;
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{
 						pathLengths1[encodingTheseFounders] += errorTermStart1;
+						isError = false;
 					}
 					else if(startMarkerValue == NA_INTEGER && recodedFounders(founderCounter2, startMarkerIndex) == recodedFounders(founderCounter, startMarkerIndex))
 					{
 						if(homozygoteMissingProb != 0) pathLengths1[encodingTheseFounders] += logHomozygoteMissingProb;
 						else pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+						isError = false;
 					}
 					else if(startMarkerValue == NA_INTEGER && recodedFounders(founderCounter2, startMarkerIndex) != recodedFounders(founderCounter, startMarkerIndex))
 					{
 						if(heterozygoteMissingProb != 0) pathLengths1[encodingTheseFounders] += logHeterozygoteMissingProb;
 						else pathLengths1[encodingTheseFounders] = -std::numeric_limits<double>::infinity();
+						isError = false;
 					}
 					else
 					{
 						pathLengths1[encodingTheseFounders] += errorTermStart2;
+						isError = true;
 					}
 					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders];
+					error2(encodingTheseFounders, 0) = error1(encodingTheseFounders, 0) = isError;
 				}
 			}
 		}
@@ -291,6 +297,7 @@ stopIdenticalSearch:
 						int bestPrevious = (int)std::distance(working.begin(), longest);
 						
 						memcpy(&(intermediate2(encodingTheseFounders, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter - startPosition + 1 - identicalIndex));
+						std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious, positionCounter - startPosition + 1), error2.iterator(encodingTheseFounders, identicalIndex));
 						intermediate2(encodingTheseFounders, positionCounter-startPosition+1) = encodingTheseFounders;
 						pathLengths2[encodingTheseFounders] = *longest;
 					}
@@ -311,22 +318,30 @@ stopIdenticalSearch:
 						int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
+						bool isError;
 						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
 						if(encodingMarker == markerValue)
 						{
 							multipleNextMarker += errorTermCurrentMarker1;
+							isError = false;
 						}
 						else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, positionCounter) == recodedFounders(founderCounter, positionCounter))
 						{
 							if(homozygoteMissingProb != 0) multipleNextMarker += logHomozygoteMissingProb;
 							else multipleNextMarker = -std::numeric_limits<double>::infinity();
+							isError = false;
 						}
 						else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, positionCounter) != recodedFounders(founderCounter, positionCounter))
 						{
 							if(heterozygoteMissingProb != 0) multipleNextMarker += logHeterozygoteMissingProb;
 							else multipleNextMarker = -std::numeric_limits<double>::infinity();
+							isError = false;
 						}
-						else multipleNextMarker += errorTermCurrentMarker2;
+						else
+						{
+							multipleNextMarker += errorTermCurrentMarker2;
+							isError = true;
+						}
 						if(multipleNextMarker != -std::numeric_limits<double>::infinity())
 						{
 							//Founder at the previous marker. 
@@ -349,7 +364,9 @@ stopIdenticalSearch:
 							int bestPrevious = (int)std::distance(working.begin(), longest);
 							
 							memcpy(&(intermediate2(encodingTheseFounders, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter - startPosition + 1 - identicalIndex));
+							std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious, positionCounter - startPosition + 1), error2.iterator(encodingTheseFounders, identicalIndex));
 							intermediate2(encodingTheseFounders, positionCounter-startPosition+1) = encodingTheseFounders;
+							error2(encodingTheseFounders, positionCounter-startPosition+1) = isError;
 							pathLengths2[encodingTheseFounders] = *longest;
 						}
 						else
@@ -365,6 +382,7 @@ stopIdenticalSearch:
 
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
+			error1.swap(error2);
 			while(identicalIndex != positionCounter-startPosition + 1)
 			{
 				int value = intermediate1(key(0,0)-1, identicalIndex);
@@ -380,6 +398,7 @@ stopIdenticalSearch:
 				for(int i = 0; i < (nFounders*(nFounders+1))/2; i++)
 				{
 					intermediate2(i, identicalIndex) = value;
+					error2(i, identicalIndex) = error1(key(0,0)-1, identicalIndex);
 				}
 				identicalIndex++;
 			}

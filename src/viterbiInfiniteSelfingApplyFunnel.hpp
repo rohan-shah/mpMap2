@@ -157,12 +157,18 @@ stopIdenticalSearch:
 				if(recodedFounders(founderCounter, startPosition) == markerValue)
 				{
 					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues));
+					error1(founderCounter, 0) = error2(founderCounter, 0) = false;
 				}
 				else if(markerValue == NA_INTEGER)
 				{
 					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log(1.0 / (double)nFounders);
+					error1(founderCounter, 0) = error2(founderCounter, 0) = false;
 				}
-				else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
+				else 
+				{
+					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
+					error1(founderCounter, 0) = error2(founderCounter, 0) = true;
+				}
 			}
 		}
 		int identicalIndex = 0;
@@ -184,6 +190,7 @@ stopIdenticalSearch:
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(funnel[founderCounter], identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter - startPosition + 1 - identicalIndex));
+					std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious,positionCounter-startPosition+1), error2.iterator(funnel[founderCounter], identicalIndex));
 					intermediate2(funnel[founderCounter], positionCounter-startPosition+1) = funnel[founderCounter]+1;
 					pathLengths2[funnel[founderCounter]] = *longest;
 				}
@@ -196,6 +203,7 @@ stopIdenticalSearch:
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					double increment;
+					bool isError = false;
 					if(recodedFounders(funnel[founderCounter], markerIndex) == markerValue)
 					{
 						increment = log((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
@@ -204,7 +212,11 @@ stopIdenticalSearch:
 					{
 						increment = 0;
 					}
-					else increment = log(errorProb / (double)currentMarkerData.nObservedValues);
+					else 
+					{
+						increment = log(errorProb / (double)currentMarkerData.nObservedValues);
+						isError = true;
+					}
 					//Founder at the previous marker. 
 					std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -216,7 +228,9 @@ stopIdenticalSearch:
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(funnel[founderCounter], identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter- startPosition + 1 - identicalIndex));
+					std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious,positionCounter-startPosition+1), error2.iterator(funnel[founderCounter], identicalIndex));
 					intermediate2(funnel[founderCounter],positionCounter-startPosition+1) = funnel[founderCounter]+1;
+					error2(funnel[founderCounter], positionCounter-startPosition+1) = isError;
 					pathLengths2[funnel[founderCounter]] = *longest;
 				}
 			}
@@ -226,6 +240,7 @@ stopIdenticalSearch:
 
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
+			error1.swap(error2);
 			while(identicalIndex != positionCounter-startPosition + 1)
 			{
 				int value = intermediate1(0, identicalIndex);
@@ -236,6 +251,7 @@ stopIdenticalSearch:
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					intermediate2(founderCounter, identicalIndex) = value;
+					error2(founderCounter, identicalIndex) = error1(0, identicalIndex);
 				}
 				identicalIndex++;
 			}

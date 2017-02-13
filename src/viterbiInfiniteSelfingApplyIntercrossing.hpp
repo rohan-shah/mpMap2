@@ -144,12 +144,18 @@ stopIdenticalSearch:
 				if(recodedFounders(founderCounter, startMarkerIndex) == markerValue)
 				{
 					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * ((1 - errorProb) + errorProb / (double)startMarkerData.nObservedValues));
+					error2(founderCounter, 0) = error1(founderCounter, 0) = false;
 				}
 				else if(markerValue == NA_INTEGER)
 				{
 					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log(1.0 / (double)nFounders);
+					error2(founderCounter, 0) = error1(founderCounter, 0) = false;
 				}
-				else pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
+				else
+				{
+					pathLengths2[founderCounter] = pathLengths1[founderCounter] = log((1.0 / (double)nFounders) * errorProb / (double)startMarkerData.nObservedValues);
+					error2(founderCounter, 0) = error1(founderCounter, 0) = true;
+				}
 			}
 		}
 		//The index, before which all the paths are identical
@@ -172,6 +178,7 @@ stopIdenticalSearch:
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(founderCounter, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter - startPosition + 1 - identicalIndex));
+					std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious, positionCounter-startPosition + 1), error2.iterator(founderCounter, identicalIndex));
 					intermediate2(founderCounter, positionCounter-startPosition+1) = founderCounter+1;
 					pathLengths2[founderCounter] = *longest;
 				}
@@ -185,15 +192,22 @@ stopIdenticalSearch:
 				{
 					//NA corresponds to no restriction from the marker value
 					double increment;
+					bool isError;
 					if(recodedFounders(founderCounter, markerIndex) == markerValue)
 					{
 						increment = log((1 - errorProb) + errorProb / (double)currentMarkerData.nObservedValues);
+						isError = false;
 					}
 					else if(markerValue == NA_INTEGER)
 					{
 						increment = 0;
+						isError = false;
 					}
-					else increment = log(errorProb / (double)currentMarkerData.nObservedValues);
+					else
+					{
+						increment = log(errorProb / (double)currentMarkerData.nObservedValues);
+						isError = true;
+					}
 					//Founder at the previous marker. 
 					std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 					for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
@@ -205,7 +219,9 @@ stopIdenticalSearch:
 					int bestPrevious = (int)std::distance(working.begin(), longest);
 					
 					memcpy(&(intermediate2(founderCounter, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter- startPosition + 1 - identicalIndex));
+					std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious, positionCounter-startPosition + 1), error2.iterator(founderCounter, identicalIndex));
 					intermediate2(founderCounter, positionCounter-startPosition+1) = founderCounter+1;
+					error2(founderCounter, positionCounter-startPosition+1) = isError;
 					pathLengths2[founderCounter] = *longest;
 				}
 			}
@@ -215,6 +231,7 @@ stopIdenticalSearch:
 
 			intermediate1.swap(intermediate2);
 			pathLengths1.swap(pathLengths2);
+			error1.swap(error2);
 			while(identicalIndex != positionCounter-startPosition + 1)
 			{
 				int value = intermediate1(0, identicalIndex);
@@ -225,6 +242,7 @@ stopIdenticalSearch:
 				for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 				{
 					intermediate2(founderCounter, identicalIndex) = value;
+					error2(founderCounter, identicalIndex) = error1(0, identicalIndex);
 				}
 				identicalIndex++;
 			}
