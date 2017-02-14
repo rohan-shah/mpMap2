@@ -26,6 +26,7 @@ toMpMap <- function(mpcross)
 	observed[match(rownames(finals(mpcross)), pedigree@lineNames)] <- 1
 
 	retVal$pedigree <- data.frame(id = 1:length(pedigree@lineNames), Male = pedigree@father, Female = pedigree@mother, Observed = observed)
+	rownames(retVal$pedigree) <- pedigree@lineNames
 
 	retVal$id <- match(rownames(finals(mpcross)), pedigree@lineNames)
 	retVal$fid <- match(rownames(founders(mpcross)), pedigree@lineNames)

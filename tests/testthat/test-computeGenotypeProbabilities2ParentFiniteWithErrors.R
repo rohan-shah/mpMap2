@@ -37,7 +37,7 @@ test_that("Test zero generations of intercrossing, dominant markers, with errors
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.75)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.73)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 1000)

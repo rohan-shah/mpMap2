@@ -42,13 +42,13 @@ test_that("Test non-zero generations of intercrossing, with errors, no extra pos
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 			colnames(genotypesFromProbabilities) <- unlist(lapply(result@geneticData[[1]]@probabilities@map, names))
 			#The error model should compensate for the flipped marker
-			expect_gt(cor(genotypesFromProbabilities[,"D1M25"], cross@geneticData[[1]]@finals[,"D1M25"], method = "spearman", use = "complete.obs"), 0.88)
+			expect_gt(cor(genotypesFromProbabilities[,"D1M25"], cross@geneticData[[1]]@finals[,"D1M25"], method = "spearman", use = "complete.obs"), 0.86)
 			correct <- sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"])))
 			expect_gt(correct / sampleSize, 0.91)
-			expect_gt(cor(genotypesFromProbabilities[,"D1M27"], cross@geneticData[[1]]@finals[,"D1M27"], method = "spearman", use = "complete.obs"), 0.88)
+			expect_gt(cor(genotypesFromProbabilities[,"D1M27"], cross@geneticData[[1]]@finals[,"D1M27"], method = "spearman", use = "complete.obs"), 0.86)
 
-			expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M25"], method = "spearman"), 0.88)
-			expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.88)
+			expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M25"], method = "spearman"), 0.86)
+			expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.86)
 			expect_true(all(result@geneticData[[1]]@probabilities@data[1:10,1:20] != 1 & result@geneticData[[1]]@probabilities@data[1:10,1:20] != 0))
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
