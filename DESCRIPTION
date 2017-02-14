@@ -91,6 +91,7 @@ Collate:
     'sixteenParentPedigreeRandomFunnels.R'
     'subset.R'
     'testDistortion.R'
+    'toMpMap.R'
     'twoParentPedigree.R'
     'validation.R'
 RoxygenNote: 5.0.1
