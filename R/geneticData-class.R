@@ -122,7 +122,7 @@ checkGeneticData <- function(object)
 	if(length(errors) > 0) return(errors)
 	#This checks the relation between the het data, founder data and final data. It doesn't check that the het data is itself valid
 	#It also checks that if any of the founders are NULL for a marker, ALL the founder alleles must be NULL, and all the finals alleles must be NULL too
-	alleleDataErrors <- .Call("alleleDataErrors", object, 10, PACKAGE="mpMap2")
+	alleleDataErrors <- .Call("alleleDataErrors", object, 5, PACKAGE="mpMap2")
 	if(length(alleleDataErrors) > 0)
 	{
 		errors <- c(errors, alleleDataErrors)
