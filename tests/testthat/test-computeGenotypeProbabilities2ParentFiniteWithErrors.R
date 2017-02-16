@@ -92,7 +92,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, with er
 				})
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 		
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.7)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.68)
 		}
 		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)

@@ -53,11 +53,10 @@ fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 
   if(fixCodingErrors)
   {
-    codingErrors <- .Call("listCodingErrors", mpcross$founders, mpcross$finals, newHetData)
+    codingErrors <- listCodingErrors(founders = mpcross$founders, finals = mpcross$finals, hetData = newHetData)
     uniqueMarkers <- unique(codingErrors$finals[,"Column"])
-    #The results of listCodingErrors are zero-based indexing
-    mpcross$finals[, uniqueMarkers+1] <- NA
-    warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified"))
+    mpcross$finals[, uniqueMarkers] <- NA
+    warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified. For less aggressive removal, use listCodingErrors"))
   }
   geneticData <- new("geneticData", finals = mpcross$finals, founders = mpcross$founders, pedigree = newPedigree, hetData = newHetData)
   geneticDataList <- new("geneticDataList", list(geneticData))

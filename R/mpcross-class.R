@@ -146,7 +146,19 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 		else return(new(to, as(from, "mpcross"), rf = from@rf))
 	})
 #' @export
-mpcross <- function(founders, finals, pedigree, hetData)
+infiniteSelfing <- function(founders, finals, pedigree)
+{
+	hetData <- lapply(1:ncol(founders), function(x)
+		{
+			alleles <- unique(founders[,x])
+			cbind(alleles,alleles,alleles)
+		})
+	names(hetData) <- colnames(founders)
+	hetData <- new("hetData", hetData)
+	return(hetData)
+}
+#' @export
+mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCodingErrors = FALSE)
 {
 	if(!isS4(pedigree) || !inherits(pedigree, "pedigree"))
 	{
@@ -168,15 +180,9 @@ mpcross <- function(founders, finals, pedigree, hetData)
 		stop("Inputs founders and finals must have row and column names")
 	}
 	mode(finals) <- "integer"
-	if(missing(hetData))
+	if(is.function(hetData))
 	{
-		hetData <- lapply(1:ncol(founders), function(x)
-			{
-				alleles <- unique(founders[,x])
-				cbind(alleles,alleles,alleles)
-			})
-		names(hetData) <- colnames(founders)
-		hetData <- new("hetData", hetData)
+		hetData <- hetData(founders, finals, pedigree)
 	}
 	else if(!isS4(hetData) || !inherits(hetData, "hetData"))
 	{
@@ -198,6 +204,13 @@ mpcross <- function(founders, finals, pedigree, hetData)
 	{
 		finals <- finals[,sortedFounderMarkers]
 		hetData <- hetData[sortedFounderMarkers]
+	}
+	if(fixCodingErrors)
+	{
+		codingErrors <- listCodingErrors(founders = founders, finals = finals, hetData = hetData)
+		uniqueMarkers <- unique(codingErrors$finals[,"Column"])
+		finals[, uniqueMarkers] <- NA
+		warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified. For less aggressive removal, use listCodingErrors"))
 	}
 	geneticData <- new("geneticData", founders = founders, hetData = hetData, finals = finals, pedigree = pedigree)
 	mpcross <- new("mpcross", geneticData = new("geneticDataList", list(geneticData)))
