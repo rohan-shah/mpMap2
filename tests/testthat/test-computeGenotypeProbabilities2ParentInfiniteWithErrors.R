@@ -22,8 +22,8 @@ test_that("Test zero generations of intercrossing, with errors, no extra positio
 		expect_gt(correct / sampleSize, 0.91)
 		expect_gt(cor(genotypesFromProbabilities[,"D1M27"], cross@geneticData[[1]]@finals[,"D1M27"], method = "spearman", use = "complete.obs"), 0.91)
 		
-		expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M25"], method = "spearman"), 0.9)
-		expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.9)
+		expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M25"], method = "spearman"), 0.89)
+		expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.89)
 		expect_true(all(result@geneticData[[1]]@probabilities@data[1:10,1:20] != 1 & result@geneticData[[1]]@probabilities@data[1:10,1:20] != 0))
 	})
 test_that("Test non-zero generations of intercrossing, with errors, no extra positions",
