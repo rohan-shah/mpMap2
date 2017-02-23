@@ -90,6 +90,7 @@ extern "C"
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
+		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

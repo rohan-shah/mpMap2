@@ -1,5 +1,56 @@
 #include "rawSymmetricMatrix.h"
 #include "matrixChunks.h"
+SEXP rawSymmetricMatrixUncompress(SEXP object_)
+{
+BEGIN_RCPP
+	Rcpp::S4 object;
+	try
+	{
+		object = object_;
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input object must be an S4 object");
+	}
+
+	Rcpp::RawVector data;
+	try
+	{
+		data = Rcpp::as<Rcpp::RawVector>(object.slot("data"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot object@data must be a raw vector");
+	}
+
+	Rcpp::NumericVector levels;
+	try
+	{
+		levels = Rcpp::as<Rcpp::NumericVector>(object.slot("levels"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Slot object@levels must be a numeric vector");
+	}
+	Rcpp::CharacterVector markers = object.slot("markers");
+
+	int dimension = (int)markers.size();
+	Rcpp::NumericMatrix output(dimension, dimension);
+	for(int row = 0; row < dimension; row++)
+	{
+		for(int column = 0; column < dimension; column++)
+		{
+			R_xlen_t i = row+1;
+			R_xlen_t j = column+1;
+			if(i > j) std::swap(i, j);
+			Rbyte rawValue = data[(j*(j-(R_xlen_t)1))/(R_xlen_t)2 + i-(R_xlen_t)1];
+			if(rawValue == 0xff) output(row, column) = NA_REAL;
+			else output(row, column) = levels[rawValue];
+		}
+	}
+	return output;
+END_RCPP
+}
 SEXP rawSymmetricMatrixSubsetByMatrix(SEXP object_, SEXP index_)
 {
 BEGIN_RCPP
@@ -42,6 +93,7 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input index must be an integer matrix");
 	}
+	if(index.ncol() != 2) throw std::runtime_error("Matrix of indices must have two columns");
 
 	int nIndices = index.nrow();
 	Rcpp::NumericVector output(nIndices);
@@ -50,7 +102,9 @@ BEGIN_RCPP
 		R_xlen_t i = index(row, 0);
 		R_xlen_t j = index(row, 1);
 		if(i > j) std::swap(i, j);
-		output(row) = levels[data[(j*(j-(R_xlen_t)1))/(R_xlen_t)2 + i-(R_xlen_t)1]];
+		Rbyte rawValue = data[(j*(j-(R_xlen_t)1))/(R_xlen_t)2 + i-(R_xlen_t)1];
+		if(rawValue == 0xff) output(row) = NA_REAL;
+		else output(row) = levels[rawValue];
 	}
 	return output;
 END_RCPP

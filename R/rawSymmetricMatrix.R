@@ -40,6 +40,13 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", dro
 		if(any(i > nMarkers) || any(j > nMarkers) || any(i < 1) || any(j < 1)) stop("Indices were out of range")
 		return(.Call("rawSymmetricMatrixSubsetIndices", x, i, j, TRUE, PACKAGE="mpMap2"))
 	})
+setMethod("[", signature(x = "rawSymmetricMatrix", i = "missing", j = "missing", drop = "missing"), 
+	function(x, i, j, ..., drop)
+	{
+		data <- .Call("rawSymmetricMatrixUncompress", x, PACKAGE="mpMap2")
+		rownames(data) <- colnames(data) <- x@markers
+		return(data)
+	})
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "matrix", j = "missing", drop = "missing"), 
 	function(x, i, j, ..., drop)
 	{
@@ -81,5 +88,5 @@ setAs("matrix", "rawSymmetricMatrix", def = function(from, to)
 	})
 setAs("rawSymmetricMatrix", "matrix", def = function(from, to)
 	{
-		return(from[1:length(from@markers), 1:length(from@markers)])
+		return(from[])
 	})
