@@ -473,10 +473,7 @@ void arsaRaw(arsaRawArgs& args)
 				}
 				done++;
 				threadZeroCounter++;
-				if(threadZeroCounter % 100 == 0)
-				{
-					progressFunction(done, totalSteps);
-				}
+				progressFunction(done, totalSteps);
 			}
 			temperature *= cool;
 		}
