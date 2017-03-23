@@ -63,9 +63,13 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		}
 		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
-		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
-		minAIGenerations = std::max(minAIGenerations, 1);
+		minAIGenerations = 0;
+		std::vector<int>::iterator smallestNonZeroAIC;
+		if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations->begin(), intercrossingGenerations->end(), 1)) != intercrossingGenerations->end())
+		{
+			minAIGenerations = *smallestNonZeroAIC;
+		}
 		int nFinals = recodedFinals.nrow();
 
 		//If there's not meant to be any missing values, check that first

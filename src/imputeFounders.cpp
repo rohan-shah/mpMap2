@@ -38,8 +38,12 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	int maxSelfing = *std::max_element(selfingGenerations.begin(), selfingGenerations.end());
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
-	int minAIGenerations = *std::min_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
-	minAIGenerations = std::max(minAIGenerations, 1);
+	int minAIGenerations = 0;
+	std::vector<int>::iterator smallestNonZeroAIC;
+	if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations.begin(), intercrossingGenerations.end(), 1)) != intercrossingGenerations.end())
+	{
+		minAIGenerations = *smallestNonZeroAIC;
+	}
 	int nMarkers = founders.ncol();
 	int nFinals = finals.nrow();
 
@@ -220,7 +224,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+				for(int intercrossingGenerations =  std::max(minAIGenerations, 1); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
 					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(logIntercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}

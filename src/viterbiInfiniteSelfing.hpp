@@ -52,9 +52,13 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 		{
 			throw std::runtime_error("Internal error");
 		}
-		minAIGenerations = *std::min_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
 		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
-		minAIGenerations = std::max(minAIGenerations, 1);
+		minAIGenerations = 0;
+		std::vector<int>::iterator smallestNonZeroAIC;
+		if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations->begin(), intercrossingGenerations->end(), 1)) != intercrossingGenerations->end())
+		{
+			minAIGenerations = *smallestNonZeroAIC;
+		}
 		int nFinals = recodedFinals.nrow();
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{

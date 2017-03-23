@@ -138,7 +138,12 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
-	int minAIGenerations = *std::min_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
+	int minAIGenerations = 0;
+	std::vector<int>::iterator smallestNonZeroAIC;
+	if((smallestNonZeroAIC = std::lower_bound(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end(), 1)) != args.intercrossingGenerations.end())
+	{
+		minAIGenerations = *smallestNonZeroAIC;
+	}
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 
