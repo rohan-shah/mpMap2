@@ -320,7 +320,7 @@ BEGIN_RCPP
 		}
 	
 		
-		std::function<void(unsigned long, unsigned long)> orderingProgressFunction = [](unsigned long,unsigned long){};
+		std::function<bool(unsigned long, unsigned long)> orderingProgressFunction = [](unsigned long,unsigned long){return false;};
 		if(verbose)
 		{
 			//Only output this text if there was an imputation step, or we're ordering multiple groups
@@ -333,6 +333,7 @@ BEGIN_RCPP
 #else
 				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)totalSteps));
 #endif
+				return false;
 			};
 		}
 		arsaRawArgs args(levels, currentGroupPermutation);

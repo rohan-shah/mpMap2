@@ -158,7 +158,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 		{
 			stop("Input arguments cannot contain NA")
 		}
-		warning("Subset function is discarding the recombination fraction data")
+		if(!is.null(x@rf)) warning("Subset function is discarding the recombination fraction data")
 		return(new("mpcrossMapped", callNextMethod(), map = x@map, rf = NULL))
 	}
 })

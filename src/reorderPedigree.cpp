@@ -18,6 +18,14 @@ BEGIN_RCPP
 	std::vector<int> founderIndices;
 	for(int i = 0; i < nVertices; i++)
 	{
+		if(mother[i] == NA_INTEGER || father[i] == NA_INTEGER)
+		{
+			throw std::runtime_error("Values of NA are not allowed in the pedigree");
+		}
+		if(mother[i] < 0 || father[i] < 0) 
+		{
+			throw std::runtime_error("Negative values are not allowed in the pedigree");
+		}
 		if(mother[i] != 0)
 		{
 			boost::add_edge(i, mother[i]-1, graph);

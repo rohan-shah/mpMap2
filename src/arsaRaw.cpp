@@ -282,7 +282,7 @@ BEGIN_RCPP
 		}
 	}
 	std::vector<int> permutation;
-	std::function<void(long,long)> progressFunction = [](long,long){};
+	std::function<bool(long,long)> progressFunction = [](long,long){return false;};
 	arsaRawArgs args(levels, permutation);
 	args.n = n;
 	args.rawDist = &(distMatrix[0]);
@@ -320,7 +320,7 @@ void arsaRaw(arsaRawArgs& args)
 	
 	long nReps = args.nReps;
 	std::vector<int>& permutation = args.permutation;
-	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
+	std::function<bool(unsigned long, unsigned long)> progressFunction = args.progressFunction;
 	bool randomStart = args.randomStart;
 
 	int maxMove = args.maxMove;
@@ -473,7 +473,13 @@ void arsaRaw(arsaRawArgs& args)
 				}
 				done++;
 				threadZeroCounter++;
-				progressFunction(done, totalSteps);
+				bool cancel = progressFunction(done, totalSteps);
+				if(cancel)
+				{
+					for(int i = 0; i < n; i++) permutation[i] = i;
+					PutRNGstate();
+					return;
+				}
 			}
 			temperature *= cool;
 		}
@@ -577,7 +583,7 @@ void arsaRawParallel(arsaRawArgs& args)
 	
 	long nReps = args.nReps;
 	std::vector<int>& permutation = args.permutation;
-	std::function<void(unsigned long, unsigned long)> progressFunction = args.progressFunction;
+	std::function<bool(unsigned long, unsigned long)> progressFunction = args.progressFunction;
 	bool randomStart = args.randomStart;
 
 	int maxMove = args.maxMove;
@@ -694,7 +700,13 @@ void arsaRawParallel(arsaRawArgs& args)
 							makeChange(*i, currentPermutation, rawDist, levels, z, zbestThisRep, bestPermutationThisRep, temperature);
 						}
 						done += stackOfChanges.size();
-						progressFunction(done, totalSteps);
+						bool cancel = progressFunction(done, totalSteps);
+						if(cancel)
+						{
+							for(int i = 0; i < n; i++) permutation[i] = i;
+							PutRNGstate();
+							return;
+						}
 						stackOfChanges.clear();
 						std::fill(dirty.begin(), dirty.end(), false);
 					}
@@ -728,7 +740,13 @@ void arsaRawParallel(arsaRawArgs& args)
 						}
 
 						done += stackOfChanges.size();
-						progressFunction(done, totalSteps);
+						bool cancel = progressFunction(done, totalSteps);
+						if(cancel)
+						{
+							for(int i = 0; i < n; i++) permutation[i] = i;
+							PutRNGstate();
+							return;
+						}
 						stackOfChanges.clear();
 						std::fill(dirty.begin(), dirty.end(), false);
 					}
@@ -746,7 +764,13 @@ void arsaRawParallel(arsaRawArgs& args)
 			}
 
 			done += stackOfChanges.size();
-			progressFunction(done, totalSteps);
+			bool cancel = progressFunction(done, totalSteps);
+			if(cancel)
+			{
+				for(int i = 0; i < n; i++) permutation[i] = i;
+				PutRNGstate();
+				return;
+			}
 			stackOfChanges.clear();
 			std::fill(dirty.begin(), dirty.end(), false);
 			temperature *= cool;

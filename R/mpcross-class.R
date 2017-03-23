@@ -116,7 +116,7 @@ checkMpcrossMapped <- function(object)
 			geneticDataMarkers <- markers(object@geneticData[[i]])
 			if(length(geneticDataMarkers) != length(markerNames) || any(geneticDataMarkers != markerNames))
 			{
-				errors <- c(errors, "Marker names in map disagree with marker names in genetic data")
+				errors <- c(errors, "Marker names in the genetic data must be the same as those in the map, and must occur in the same order as unlist(lapply(map, names))")
 			}
 		}
 	}

@@ -14,7 +14,7 @@ public:
 	double cool;
 	double temperatureMin;
 	long nReps;
-	std::function<void(unsigned long,unsigned long)> progressFunction;
+	std::function<bool(unsigned long,unsigned long)> progressFunction;
 	bool randomStart;
 	int maxMove;
 	double effortMultiplier;
