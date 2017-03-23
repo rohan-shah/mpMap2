@@ -18,7 +18,7 @@
 #include "joinMapWithExtra.h"
 #include "haldaneToRf.h"
 #include "generateKeys.h"
-template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions, bool showProgress)
 {
 	//Work out maximum number of positions per chromosome
 	int maxChromosomePositions = 0;
@@ -171,10 +171,38 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.logIntercrossingSingleLociHaplotypeProbabilities = &logIntercrossingSingleLociHaplotypeProbabilities;
 	viterbi.logFunnelSingleLociHaplotypeProbabilities = &logFunnelSingleLociHaplotypeProbabilities;
 
+	Rcpp::Function txtProgressBar("txtProgressBar");
+	Rcpp::Function setTxtProgressBar("setTxtProgressBar");
+	Rcpp::Function close("close");
+	Rcpp::RObject barHandle;
+	std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
+	if(showProgress)
+	{
+		updateProgress = [&barHandle,nFinals,setTxtProgressBar](unsigned long long done)
+		{
+			try
+			{
+#ifdef CUSTOM_STATIC_RCPP
+				setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*done) / (double)nFinals));
+#else
+				setTxtProgressBar(barHandle, (int)((double)(1000*done) / (double)nFinals));
+#endif
+			}
+			catch(...)
+			{
+			}
+		};
+	}
+	viterbi.updateProgress = updateProgress;
+
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
 	{
 		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
+		if(showProgress)
+		{
+			Rcpp::Rcout << "Begining chromosome " << currentChromosome.name << std::endl;
+		}
 		//Take differences
 		std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
 		for(std::size_t i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
@@ -199,24 +227,32 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			}
 
 		}
+		if(showProgress)
+		{
+			barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+		}
 		//dispatch based on whether we have infinite generations of selfing or not. 
 		viterbi.apply(currentChromosome.start, currentChromosome.end);
+		if(showProgress)
+		{
+			close(barHandle);
+		}
 	}
 	Rcpp::rownames(results) = Rcpp::rownames(finals);
 	Rcpp::colnames(results) = Rcpp::wrap(allPositions.names);
 }
-template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
+template<int nFounders> void imputedFoundersInternal1(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, bool infiniteSelfing, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions, bool showProgress)
 {
 	if(infiniteSelfing)
 	{
-		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+		imputedFoundersInternal2<nFounders, true>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 	}
 	else
 	{
-		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+		imputedFoundersInternal2<nFounders, false>(founders, finals, pedigree, hetData, results, resultsErrors, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 	}
 }
-SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp, SEXP extraPositions_sexp)
+SEXP imputeFounders(SEXP geneticData_sexp, SEXP map_sexp, SEXP homozygoteMissingProb_sexp, SEXP heterozygoteMissingProb_sexp, SEXP errorProb_sexp, SEXP extraPositions_sexp, SEXP showProgress_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -237,6 +273,16 @@ BEGIN_RCPP
 	catch(...)
 	{
 		throw std::runtime_error("Input geneticData@founders must be an integer matrix");
+	}
+
+	bool showProgress;
+	try
+	{
+		showProgress = Rcpp::as<bool>(showProgress_sexp);
+	}
+	catch(...)
+	{
+		throw  std::runtime_error("Input showProgress must be a boolean");
 	}
 	//Check that row and column names are not null
 	if(Rcpp::as<Rcpp::RObject>(Rcpp::rownames(founders)).isNULL())
@@ -439,19 +485,19 @@ BEGIN_RCPP
 	{
 		if(nFounders == 2)
 		{
-			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<2>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 		}
 		else if(nFounders == 4)
 		{
-			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<4>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 		}
 		else if(nFounders == 8)
 		{
-			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<8>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 		}
 		else if(nFounders == 16)
 		{
-			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions);
+			imputedFoundersInternal1<16>(founders, finals, pedigree, hetData, results, resultsErrors, infiniteSelfing, homozygoteMissingProb, heterozygoteMissingProb, errorProb, key, allPositions, showProgress);
 		}
 		else
 		{

@@ -17,7 +17,7 @@ generateGridPositions <- function(spacing)
 	return(retFunction)
 }
 #' @export
-imputeFounders <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list())
+imputeFounders <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list(), showProgress = FALSE)
 {
 	isNewMpcrossMappedArgument(mpcrossMapped)
 	if(homozygoteMissingProb < 0 || homozygoteMissingProb > 1)
@@ -67,7 +67,7 @@ imputeFounders <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygot
 	}
 	for(i in 1:length(mpcrossMapped@geneticData))
 	{
-		results <- .Call("imputeFounders", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, PACKAGE="mpMap2")
+		results <- .Call("imputeFounders", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, showProgress, PACKAGE="mpMap2")
 		resultsMatrix <- results$data
 		errors <- NULL
 		if(errorProb != 0)

@@ -43,6 +43,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities;
 	const positionData& allPositions;
+	std::function<void(unsigned long long)> updateProgress;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, int maxChromosomeSize, const positionData& allPositions)
 		: intermediate1((nFounders*(nFounders+1))/2, maxChromosomeSize), intermediate2(nFounders*nFounders, maxChromosomeSize), error1((nFounders*(nFounders+1))/2, maxChromosomeSize), error2(nFounders*nFounders, maxChromosomeSize), pathLengths1((nFounders*(nFounders+1))/2), pathLengths2((nFounders*(nFounders+1))/2), working((nFounders*(nFounders+1)/2)), logIntercrossingHaplotypeProbabilities(NULL), logFunnelHaplotypeProbabilities(NULL), markerData(markerData), lineFunnelIDs(NULL), lineFunnelEncodings(NULL), intercrossingGenerations(NULL), selfingGenerations(NULL), minSelfingGenerations(-1), maxSelfingGenerations(-1), minAIGenerations(-1), maxAIGenerations(-1), maxAlleles(-1), heterozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), homozygoteMissingProb(std::numeric_limits<double>::quiet_NaN()), errorProb(std::numeric_limits<double>::quiet_NaN()), logIntercrossingSingleLociHaplotypeProbabilities(NULL), logFunnelSingleLociHaplotypeProbabilities(NULL), allPositions(allPositions)
 	{}
@@ -111,6 +112,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 					resultsErrors(finalCounter, i+startPosition) = error1(longestIndex, i);
 				}
 			}
+			updateProgress((unsigned long long)finalCounter);
 		}
 	}
 #include "viterbiFiniteSelfingApplyFunnel.hpp"

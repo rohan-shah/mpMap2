@@ -1,5 +1,22 @@
 #include "intercrossingAndSelfingGenerations.h"
 #include "sortPedigreeLineNames.h"
+SEXP getIntercrossingAndSelfingGenerationsExport(SEXP pedigree_sexp, SEXP finals_sexp)
+{
+BEGIN_RCPP
+	Rcpp::S4 pedigree = Rcpp::as<Rcpp::S4>(pedigree_sexp);
+	Rcpp::IntegerMatrix finals = Rcpp::as<Rcpp::IntegerMatrix>(finals_sexp);
+	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother"));
+	int nFounders = 0;
+	for(; nFounders < mother.size(); nFounders++)
+	{
+		if(mother(nFounders) == 0) nFounders++;
+		else break;
+	}
+	std::vector<int> intercrossing, selfing;
+	getIntercrossingAndSelfingGenerations(pedigree, finals, nFounders, intercrossing, selfing);
+	return Rcpp::List::create(Rcpp::Named("selfing") = Rcpp::wrap(selfing), Rcpp::Named("intercrossing") = Rcpp::wrap(intercrossing));
+END_RCPP
+}
 bool getIntercrossingAndSelfingGenerations(Rcpp::S4 pedigree, Rcpp::IntegerMatrix finals, int nFounders, std::vector<int>& intercrossing, std::vector<int>& selfing)
 {
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));

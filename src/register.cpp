@@ -38,6 +38,7 @@
 	#include "reorderPedigree.h"
 #endif
 #include "transformForMPWGAIM.h"
+#include "intercrossingAndSelfingGenerations.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -75,7 +76,7 @@ extern "C"
 		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
 		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
 		{"rawSymmetricMatrixSubsetByMatrix", (DL_FUNC)&rawSymmetricMatrixSubsetByMatrix, 2},
-		{"imputeFounders", (DL_FUNC)&imputeFounders, 6},
+		{"imputeFounders", (DL_FUNC)&imputeFounders, 7},
 		{"checkImputedBounds", (DL_FUNC)&checkImputedBounds, 1},
 		{"generateDesignMatrix", (DL_FUNC)&generateDesignMatrix, 2},
 		{"compressedProbabilities", (DL_FUNC)&compressedProbabilities_RInterface, 6},
@@ -91,6 +92,7 @@ extern "C"
 		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
+		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
