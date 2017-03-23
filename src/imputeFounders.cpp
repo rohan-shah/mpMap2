@@ -39,13 +39,17 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
 	int minAIGenerations = 0;
-	std::vector<int>::iterator smallestNonZeroAIC;
-	if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations.begin(), intercrossingGenerations.end(), 1)) != intercrossingGenerations.end())
-	{
-		minAIGenerations = *smallestNonZeroAIC;
-	}
-	int nMarkers = founders.ncol();
 	int nFinals = finals.nrow();
+	for(int i = 0; i < nFinals; i++)
+	{
+		if((intercrossingGenerations)[i] != 0)
+		{
+			if(minAIGenerations == 0) minAIGenerations = (intercrossingGenerations)[i];
+			else minAIGenerations = std::min(minAIGenerations, (intercrossingGenerations)[i]);
+		}
+	}
+	minAIGenerations = std::max(minAIGenerations, 1);
+	int nMarkers = founders.ncol();
 
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles
 	//We do this to make it easier to identify markers with identical segregation patterns. recodedFounders = column major matrix
@@ -174,6 +178,8 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.errorProb = errorProb;
 	viterbi.logIntercrossingSingleLociHaplotypeProbabilities = &logIntercrossingSingleLociHaplotypeProbabilities;
 	viterbi.logFunnelSingleLociHaplotypeProbabilities = &logFunnelSingleLociHaplotypeProbabilities;
+	viterbi.minAIGenerations = minAIGenerations;
+	viterbi.maxAIGenerations = maxAIGenerations;
 
 	Rcpp::Function txtProgressBar("txtProgressBar");
 	Rcpp::Function setTxtProgressBar("setTxtProgressBar");
@@ -224,7 +230,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				for(int intercrossingGenerations =  std::max(minAIGenerations, 1); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
 					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(logIntercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}

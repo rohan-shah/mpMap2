@@ -46,16 +46,12 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 		{
 			throw std::runtime_error("Input errorProb must be in [0, 1)");
 		}
+		if(minAIGenerations == -1 || maxAIGenerations == -1)
+		{
+			throw std::runtime_error("Internal error");
+		}
 		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
-		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
-		minAIGenerations = 0;
-		std::vector<int>::iterator smallestNonZeroAIC;
-		if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations->begin(), intercrossingGenerations->end(), 1)) != intercrossingGenerations->end())
-		{
-			minAIGenerations = *smallestNonZeroAIC;
-		}
-		minAIGenerations = std::max(minAIGenerations, 1);
 		int nFinals = recodedFinals.nrow();
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{

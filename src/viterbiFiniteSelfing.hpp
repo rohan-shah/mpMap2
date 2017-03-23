@@ -49,7 +49,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	{}
 	void apply(int startPosition, int endPosition)
 	{
-		if(logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL)
+		if(logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL || minAIGenerations == -1 || maxAIGenerations == -1)
 		{
 			throw std::runtime_error("Internal error");
 		}
@@ -63,13 +63,6 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 		}
 		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
-		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
-		minAIGenerations = 0;
-		std::vector<int>::iterator smallestNonZeroAIC;
-		if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations->begin(), intercrossingGenerations->end(), 1)) != intercrossingGenerations->end())
-		{
-			minAIGenerations = *smallestNonZeroAIC;
-		}
 		int nFinals = recodedFinals.nrow();
 
 		//If there's not meant to be any missing values, check that first

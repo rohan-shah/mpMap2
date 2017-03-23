@@ -40,14 +40,19 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	int maxSelfing = *std::max_element(selfingGenerations.begin(), selfingGenerations.end());
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
-	int minAIGenerations = 0;
-	std::vector<int>::iterator smallestNonZeroAIC;
-	if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations.begin(), intercrossingGenerations.end(), 1)) != intercrossingGenerations.end())
-	{
-		minAIGenerations = *smallestNonZeroAIC;
-	}
-	int nMarkers = founders.ncol();
 	int nFinals = finals.nrow();
+	int minAIGenerations = 0;
+	for(int i = 0; i < nFinals; i++)
+	{
+	        if((intercrossingGenerations)[i] != 0)
+	        {
+			if(minAIGenerations == 0) minAIGenerations = (intercrossingGenerations)[i];
+			else minAIGenerations = std::min(minAIGenerations, (intercrossingGenerations)[i]);
+		}
+	}
+	minAIGenerations = std::max(minAIGenerations, 1);
+
+	int nMarkers = founders.ncol();
 
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles
 	//We do this to make it easier to identify markers with identical segregation patterns. recodedFounders = column major matrix
@@ -156,6 +161,8 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	forwardsBackwards.heterozygoteMissingProb = heterozygoteMissingProb;
 	forwardsBackwards.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
 	forwardsBackwards.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
+	forwardsBackwards.minAIGenerations = minAIGenerations;
+	forwardsBackwards.maxAIGenerations = maxAIGenerations;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
 	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
@@ -177,7 +184,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				for(int intercrossingGenerations =  std::max(minAIGenerations, 1); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
 					expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}

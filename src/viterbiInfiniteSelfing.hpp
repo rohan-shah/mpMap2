@@ -48,16 +48,9 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, true>
 	{}
 	void apply(int startPosition, int endPosition)
 	{
-		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1 || logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL)
+		if(errorProb != errorProb || errorProb < 0 || errorProb >= 1 || logIntercrossingHaplotypeProbabilities == NULL || logFunnelHaplotypeProbabilities == NULL || lineFunnelIDs == NULL || lineFunnelEncodings == NULL || intercrossingGenerations == NULL || selfingGenerations == NULL || minAIGenerations == -1 || maxAIGenerations == -1)
 		{
 			throw std::runtime_error("Internal error");
-		}
-		maxAIGenerations = *std::max_element(intercrossingGenerations->begin(), intercrossingGenerations->end());
-		minAIGenerations = 0;
-		std::vector<int>::iterator smallestNonZeroAIC;
-		if((smallestNonZeroAIC = std::lower_bound(intercrossingGenerations->begin(), intercrossingGenerations->end(), 1)) != intercrossingGenerations->end())
-		{
-			minAIGenerations = *smallestNonZeroAIC;
 		}
 		int nFinals = recodedFinals.nrow();
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
