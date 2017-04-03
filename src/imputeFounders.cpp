@@ -18,6 +18,7 @@
 #include "joinMapWithExtra.h"
 #include "haldaneToRf.h"
 #include "generateKeys.h"
+#include "getMinAIGenerations.h"
 template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::IntegerMatrix results, Rcpp::IntegerMatrix resultsErrors, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions, bool showProgress)
 {
 	//Work out maximum number of positions per chromosome
@@ -38,17 +39,8 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	int maxSelfing = *std::max_element(selfingGenerations.begin(), selfingGenerations.end());
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
-	int minAIGenerations = 0;
+	int minAIGenerations = getMinAIGenerations(&intercrossingGenerations);
 	int nFinals = finals.nrow();
-	for(int i = 0; i < nFinals; i++)
-	{
-		if((intercrossingGenerations)[i] != 0)
-		{
-			if(minAIGenerations == 0) minAIGenerations = (intercrossingGenerations)[i];
-			else minAIGenerations = std::min(minAIGenerations, (intercrossingGenerations)[i]);
-		}
-	}
-	minAIGenerations = std::max(minAIGenerations, 1);
 	int nMarkers = founders.ncol();
 
 	//re-code the founder and final marker genotypes so that they always start at 0 and go up to n-1 where n is the number of distinct marker alleles

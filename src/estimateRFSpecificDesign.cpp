@@ -20,6 +20,7 @@
 #include <omp.h>
 #endif
 #include "warnings.h"
+#include "getMinAIGenerations.h"
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
@@ -138,16 +139,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
-	int minAIGenerations = 0;
-	for(int i = 0; i < nFinals; i++)
-	{
-		if(args.intercrossingGenerations[i] != 0)
-		{
-			if(minAIGenerations == 0) minAIGenerations = args.intercrossingGenerations[i];
-			else minAIGenerations = std::min(minAIGenerations, args.intercrossingGenerations[i]);
-		}
-	}
-	minAIGenerations = std::max(minAIGenerations, 1);
+	int minAIGenerations = getMinAIGenerations(&args.intercrossingGenerations);
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
 

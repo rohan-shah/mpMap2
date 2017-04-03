@@ -18,6 +18,7 @@
 #include "warnings.h"
 #include "generateKeys.h"
 #include "joinMapWithExtra.h"
+#include "getMinAIGenerations.h"
 template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of markers per chromosome
@@ -41,16 +42,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	int minSelfing = *std::min_element(selfingGenerations.begin(), selfingGenerations.end());
 	int maxAIGenerations = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end());
 	int nFinals = finals.nrow();
-	int minAIGenerations = 0;
-	for(int i = 0; i < nFinals; i++)
-	{
-	        if((intercrossingGenerations)[i] != 0)
-	        {
-			if(minAIGenerations == 0) minAIGenerations = (intercrossingGenerations)[i];
-			else minAIGenerations = std::min(minAIGenerations, (intercrossingGenerations)[i]);
-		}
-	}
-	minAIGenerations = std::max(minAIGenerations, 1);
+	int minAIGenerations = getMinAIGenerations(&intercrossingGenerations);
 
 	int nMarkers = founders.ncol();
 
