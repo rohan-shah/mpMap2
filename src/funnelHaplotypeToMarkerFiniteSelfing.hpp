@@ -101,24 +101,15 @@ public:
 		}
 		if(takeLogs)
 		{
-#ifdef INTERNAL_CHECKS
-			double sum = 0;
-#endif
 			//now take logs of every value in markerProbabilities
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 				{
-#ifdef INTERNAL_CHECKS
-					sum += markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue];
-#endif
 					if(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] == 0) markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = -std::numeric_limits<double>::infinity();
 					else markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue]);
 				}
 			}
-#ifdef INTERNAL_CHECKS
-			if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
-#endif
 		}
 	}
 
