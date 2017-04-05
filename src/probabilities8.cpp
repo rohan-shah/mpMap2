@@ -265,6 +265,7 @@ template<> void genotypeProbabilitiesNoIntercross<8, true>(std::array<double, 3>
 }
 template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 46>& prob, double r, int selfingGenerations, std::size_t nFunnels)
 {
+	const int stateCounts[] = {8, 32, 64, 128, 8, 64, 128, 16, 32, 256, 32, 64, 128, 8, 64, 128, 8, 64, 128, 16, 256, 32, 128, 16, 32, 256, 16, 256, 16, 32, 256, 16, 256, 128, 32, 64, 128, 32, 128, 128, 32, 64, 128, 32, 128, 128};
 	if (nFunnels == 1)
 	{
 		double pow2 = std::pow(2, selfingGenerations);
@@ -322,52 +323,7 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 4
 		prob[44] = ((-complex1 + powOneMinus2R1)*(-1 + r)*rSquared) / pow2;
 		prob[45] = -((-complex1 + powOneMinus2R1)*rSquared) / (2 * pow2);
 		//This is because we combined some states (see mathematica code)
-		prob[0] /= 8;
-		prob[1] /= 32;
-		prob[2] /= 64;
-		prob[3] /= 128;
-		prob[4] /= 8;
-		prob[5] /= 64;
-		prob[6] /= 128;
-		prob[7] /= 16;
-		prob[8] /= 32;
-		prob[9] /= 256;
-		prob[10] /= 32;
-		prob[11] /= 64;
-		prob[12] /= 128;
-		prob[13] /= 8;
-		prob[14] /= 64;
-		prob[15] /= 128;
-		prob[16] /= 8;
-		prob[17] /= 64;
-		prob[18] /= 128;
-		prob[19] /= 16;
-		prob[20] /= 256;
-		prob[21] /= 32;
-		prob[22] /= 128;
-		prob[23] /= 16;
-		prob[24] /= 32;
-		prob[25] /= 256;
-		prob[26] /= 16;
-		prob[27] /= 256;
-		prob[28] /= 16;
-		prob[29] /= 32;
-		prob[30] /= 256;
-		prob[31] /= 16;
-		prob[32] /= 256;
-		prob[33] /= 128;
-		prob[34] /= 32;
-		prob[35] /= 64;
-		prob[36] /= 128;
-		prob[37] /= 32;
-		prob[38] /= 128;
-		prob[39] /= 128;
-		prob[40] /= 32;
-		prob[41] /= 64;
-		prob[42] /= 128;
-		prob[43] /= 32;
-		prob[44] /= 128;
-		prob[45] /= 128;
+		for(int i = 0; i < 46; i ++) prob[i] /= stateCounts[i];
 	}
 	else
 	{
@@ -435,7 +391,7 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 4
 	}
 #ifdef INTERNAL_CHECKS
         double sum = 0;
-        for(int i = 0; i < 46; i++) sum += prob[i];
+        for(int i = 0; i < 46; i++) sum += prob[i] * stateCounts[i];
 	if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Internal error");
 #endif
 }

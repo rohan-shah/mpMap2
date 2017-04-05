@@ -157,11 +157,6 @@ template<> void genotypeProbabilitiesNoIntercross<16, false>(std::array<double, 
 	prob[92] = -(oneMinusRSquared*(-powD1 + powOneMinus2R)*rSquared)/(1024*pow2);
 	prob[93] = -(oneMinusR*(-powD1 + powOneMinus2R)*rSquared)/(2048*pow2);
 	prob[94] = ((powD1 - powOneMinus2R)*rSquared)/(4096*pow2);
-#ifdef INTERNAL_CHECKS
-	double sum = 0;
-	for(int i = 0; i < 95; i++) sum += prob[i];
-	if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Internal error");
-#endif
 }
 template<> void genotypeProbabilitiesWithIntercross<16, true>(std::array<double, 4>& prob, int nAIGenerations, double r, int, std::size_t nFunnels)
 {
