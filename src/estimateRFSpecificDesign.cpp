@@ -30,6 +30,8 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
+	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
+	int minAIGenerations = getMinAIGenerations(&args.intercrossingGenerations);
 
 	//This is basically just a huge lookup table
 	allMarkerPairData<maxAlleles> computedContributions(nMarkerPatternIDs);
@@ -100,10 +102,10 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 						}
 						else if(intercrossingGenerations > 0)
 						{
-							allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
+							allowable = markerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
 							if(allowable)
 							{
-								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, selfingGenerations-minSelfing);
+								array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-minAIGenerations, selfingGenerations-minSelfing);
 								contribution = perMarkerGenotypeValues.values[marker1Value][marker2Value];
 							}
 						}
@@ -228,14 +230,14 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 					{
 						for(int marker2Value = 0; marker2Value < maxAlleles; marker2Value++)
 						{
-							for(int intercrossingGenerations = std::max(minAIGenerations,1); intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+							for(int intercrossingGenerations = minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 							{
 								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
 								if(count == 0) continue;
-								bool allowable = markerPairData.allowableAI(intercrossingGenerations-1, selfingGenerations - minSelfing);
+								bool allowable = markerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
 								if(allowable)
 								{
-									array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-1, selfingGenerations - minSelfing);
+									array2<maxAlleles>& perMarkerGenotypeValues = markerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
 									contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
 								}
 							}
@@ -303,6 +305,7 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 		case 2:
 			return estimateRFSpecificDesignInternal2<nFounders, 2>(args, counter);
 		case 3:
+			return estimateRFSpecificDesignInternal2<nFounders, 3>(args, counter);
 		case 4:
 			return estimateRFSpecificDesignInternal2<nFounders, 4>(args, counter);
 		case 5:
@@ -402,6 +405,7 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 {
 	int maxAIGenerations = *std::max_element(internal_args.intercrossingGenerations.begin(), internal_args.intercrossingGenerations.end());
+	int minAIGenerations = getMinAIGenerations(&internal_args.intercrossingGenerations);
 	int minSelfing = *std::min_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
 	int maxSelfing = *std::max_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
 	std::size_t nDifferentFunnels = internal_args.lineFunnelEncodings.size();
@@ -419,6 +423,8 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 			arraySize = sizeof(array2<2>);
 			break;
 		case 3:
+			arraySize = sizeof(array2<3>);
+			break;
 		case 4:
 			arraySize = sizeof(array2<4>);
 			break;
@@ -551,7 +557,7 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 		std::vector<int>::iterator firstBiggerOrEqual = std::lower_bound(internal_args.columnPatterns.begin(), internal_args.columnPatterns.end(), *markerRowPattern);
 		nMarkerPairs += (int)std::distance(firstBiggerOrEqual, internal_args.columnPatterns.end());
 	}
-	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations) * arraySize * nMarkerPairs;
+	return nRecombLevels * (maxSelfing - minSelfing + 1) * (nDifferentFunnels + maxAIGenerations - minAIGenerations + 1) * arraySize * nMarkerPairs;
 }
 bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& internal_args, std::string& error)
 {

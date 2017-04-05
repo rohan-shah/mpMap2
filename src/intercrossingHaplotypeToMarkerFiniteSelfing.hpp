@@ -8,7 +8,7 @@ private:
 public:
 	static const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
 	typedef typename std::array<double, nDifferentProbs> compressedProbabilitiesType;
-	template<bool takeLogs> static void convert(xMajorMatrix<compressedProbabilitiesType>& haplotypeProbabilities, array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
+	template<bool takeLogs> static void convert(xMajorMatrix<compressedProbabilitiesType>& haplotypeProbabilities, array2<maxAlleles>* markerProbabilities, int intercrossingGenerationsIndex, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
 	{
 		/*The funnel input only makes a difference to the result if there is a single funnel - If there was more than one funnel we assumed random funnels, in which case every choice of funnel here gives the same result. */
 		int funnel[nFounders];
@@ -53,7 +53,7 @@ public:
 			double sum = 0;
 #endif
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
+			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGenerationsIndex, selfingGenerationsIndex);
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
@@ -79,7 +79,7 @@ public:
 #endif
 		}
 	}
-	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
+	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGenerationsIndex, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
 	{
 		int funnel[nFounders];
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)

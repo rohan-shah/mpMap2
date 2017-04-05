@@ -8,7 +8,7 @@ private:
 public:
 	static const int nDifferentProbs = compressedProbabilities<nFounders, true>::nDifferentProbs;
 	typedef typename std::array<double, nDifferentProbs> compressedProbabilitiesType;
-	template<bool takeLogs> static void convert(xMajorMatrix<compressedProbabilitiesType>& haplotypeProbabilities, array2<maxAlleles>* markerProbabilities, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
+	template<bool takeLogs> static void convert(xMajorMatrix<compressedProbabilitiesType>& haplotypeProbabilities, array2<maxAlleles>* markerProbabilities, int intercrossingGenerationsIndex, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
 	{
 		int nPoints = haplotypeProbabilities.getSizeX();
 		int table[maxAlleles][maxAlleles][nDifferentProbs];
@@ -36,7 +36,7 @@ public:
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
-			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGeneration-1, selfingGenerationsIndex);
+			compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb = haplotypeProbabilities(recombCounter, intercrossingGenerationsIndex, selfingGenerationsIndex);
 			for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
 			{
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
@@ -56,7 +56,7 @@ public:
 			}
 		}
 	}
-	template<bool takeLogs> static void convert(array2<maxAlleles>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc)
+	template<bool takeLogs> static void convert(array2<maxAlleles>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGenerationsIndex, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex, funnelEncoding enc, int minAIGenerations)
 	{
 		memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<maxAlleles>));
 		for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
@@ -99,7 +99,7 @@ public:
 #endif
 		}
 	}
-	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGeneration, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
+	template<bool takeLogs> static void convert16MarkerAlleles(array2<16>& markerProbabilitiesThisRecomb, compressedProbabilitiesType& haplotypeProbabilitiesThisRecomb, int intercrossingGenerationsIndex, const markerData& firstMarkerPatternData, const markerData& secondMarkerPatternData, int selfingGenerationsIndex)
 	{
 		memset(&markerProbabilitiesThisRecomb, 0, sizeof(array2<16>));
 		for(int firstMarkerValue = 0; firstMarkerValue < firstMarkerPatternData.nObservedValues; firstMarkerValue++)
