@@ -196,9 +196,10 @@ template<> void genotypeProbabilitiesWithIntercross<4, false>(std::array<double,
 		prob[16] = (2 * oneMinusR*powOneMinus2R*powOneMinusR2*quadratic1*(-3 * oneMinusR + oneMinusR*powOneMinusR2*quadratic1) + (9 * oneMinusRSquared - powOneMinusR3*quadratic1Squared)*quadraticPower) / (144 * oneMinusRSquared*pow2);
 		prob[17] = (cubicPower*quadraticPower) / (288 * oneMinusRSquared*pow2);
 	}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 	double sum = 0;
 	for (int i = 0; i < 18; i++) sum += prob[i];
+	if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Internal error");
 #endif
 	prob[0] /= 4;
 	prob[1] /= 16;

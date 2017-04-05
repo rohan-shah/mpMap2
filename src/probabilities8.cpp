@@ -433,9 +433,10 @@ template<> void genotypeProbabilitiesNoIntercross<8, false>(std::array<double, 4
 		prob[44] = (powD1*rMinus2Squared*rSquared) / (1680 * pow2);
 		prob[45] = (powD1*rMinus2Squared*rSquared) / (1680 * pow2);
 	}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
         double sum = 0;
         for(int i = 0; i < 46; i++) sum += prob[i];
+	if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Internal error");
 #endif
 }
 template<> void genotypeProbabilitiesWithIntercross<8, true>(std::array<double, 3>& prob, int nAIGenerations, double r, int, std::size_t nFunnels)
@@ -642,9 +643,10 @@ template<> void genotypeProbabilitiesWithIntercross<8, false>(std::array<double,
 		prob[44] = (quadratic4*toPowD1) / (1568 * oneMinusRSquared*pow2);
 		prob[45] = (quadratic4*toPowD1) / (1568 * oneMinusRSquared*pow2);
 	}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 	double sum = 0;
 	for(int i = 0; i < 46; i++) sum += prob[i];
+	if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Internal error");
 #endif
 	//This is because we combined some states (see mathematica code)
 	prob[0] /= 8;

@@ -92,7 +92,7 @@ BEGIN_RCPP
 				}
 			}
 			double accumulated = 0;
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			double sumExpected = 0, sumObs = 0;
 #endif
 			for(int allele1 = 0; allele1 < nAlleles; allele1++)
@@ -105,13 +105,13 @@ BEGIN_RCPP
 						double absDifference = fabs(expected - obs[allele1*nAlleles + allele2]);
 						accumulated += (absDifference - 0.5) * (absDifference - 0.5) / expected;
 					}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 					sumExpected += expected;
 					sumObs += obs[allele1*nAlleles + allele2];
 #endif
 				}
 			}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			if(fabs(sumExpected - sumObs) > 1e-4) throw std::runtime_error("Internal error");
 #endif
 			returnValue(marker1, marker2) = returnValue(marker2, marker1) = accumulated;

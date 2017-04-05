@@ -49,7 +49,7 @@ public:
 
 		for(int recombCounter = 0; recombCounter < nPoints; recombCounter++)
 		{
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			double sum = 0;
 #endif
 			array2<maxAlleles>& markerProbabilitiesThisRecomb = markerProbabilities[recombCounter];
@@ -63,7 +63,7 @@ public:
 					{
 						if(table[firstMarkerValue][secondMarkerValue][differentProbCounter] > 0) currentMarkerProb += table[firstMarkerValue][secondMarkerValue][differentProbCounter]*haplotypeProbabilitiesThisRecomb[differentProbCounter];
 					}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 					sum += currentMarkerProb;
 #endif
 					if(takeLogs)
@@ -74,7 +74,7 @@ public:
 					markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = currentMarkerProb;
 				}
 			}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
 #endif
 		}
@@ -116,7 +116,7 @@ public:
 		}
 		if(takeLogs)
 		{
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			double sum = 0;
 #endif
 			//now take logs of every value in markerProbabilities
@@ -124,14 +124,14 @@ public:
 			{
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 				{
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 					sum += markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue];
 #endif
 					if(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] == 0) markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = -std::numeric_limits<double>::infinity();
 					else markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue] = log10(markerProbabilitiesThisRecomb.values[firstMarkerValue][secondMarkerValue]);
 				}
 			}
-#ifndef NDEBUG
+#ifdef INTERNAL_CHECKS
 			if(fabs(sum - 1) > 1e-6) throw std::runtime_error("Joint marker probabilities didn't sum to 1");
 #endif
 		}

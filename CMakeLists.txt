@@ -3,6 +3,11 @@ project(mpMap2)
 
 option(USE_OPENMP "Use OpenMP" ON)
 option(USE_BOOST "Use Boost" ON)
+option(INTERNAL_CHECKS "Run internal consistency checks" OFF)
+
+if(INTERNAL_CHECKS)
+	add_definitions(-DINTERNAL_CHECKS)
+endif()
 
 if(USE_BOOST)
 	#Boost stuff. Only used for the boost graph library. 
