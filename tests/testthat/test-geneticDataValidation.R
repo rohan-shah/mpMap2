@@ -231,6 +231,18 @@ test_that("NA founders are allowed, so long as the hetData entry has 0 rows, and
 		copied@finals[,1] <- NA
 		expect_identical(validObject(copied, complete=TRUE), TRUE)
 	})
+test_that("Every marker allele must be present in hetData", 
+	{
+		copied <- geneticData
+		copied@hetData[[1]] <- matrix(0, 0, 3)
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
+test_that("Heterozygotes cannot be coded as homozygotes", 
+	{
+		copied <- geneticData
+		copied@hetData[[1]][2:3,3] <- 1
+		expect_that(validObject(copied, complete=TRUE), throws_error())
+	})
 test_that("Values in first two columns of hetData matrix must be founder alleles", 
 	{
 		#Completely invalid values

@@ -10,6 +10,10 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 	
 	std::vector<int> hetValues;
 	std::map<int, int> founderTranslations, finalTranslations;
+	if(Rcpp::as<Rcpp::List>(inputs.hetData).size() != nMarkers)
+	{
+		throw std::runtime_error("Internal error");
+	}
 	for(long markerCounter = 0; markerCounter < nMarkers; markerCounter++)
 	{
 		founderTranslations.clear();

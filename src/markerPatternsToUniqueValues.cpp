@@ -34,6 +34,8 @@ void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 		Rcpp::IntegerMatrix currentMarkerHetData = args.recodedHetData(markerCounter);
 		//Set up struct containing data about this marker
 		markerData currentPattern(args.nFounders);
+		//Variable to check that at least one hetData entry is set in the loop. This could fail in the case that the hetData struct has zero rows, which is allowed in the case of a marker with NA founders. 
+		bool hasHetdataEntry = false;
 		for(int founderCounter1 = 0; founderCounter1 < args.nFounders; founderCounter1++)
 		{
 			for(int founderCounter2 = 0; founderCounter2 < args.nFounders; founderCounter2++)
@@ -45,12 +47,20 @@ void markerPatternsToUniqueValues(markerPatternsToUniqueValuesArgs& args)
 					if(currentMarkerHetData(hetDataRowCounter, 0) == markerAllele1 && currentMarkerHetData(hetDataRowCounter, 1) == markerAllele2)
 					{
 						currentPattern.hetData(founderCounter1, founderCounter2) = currentMarkerHetData(hetDataRowCounter, 2);
+						hasHetdataEntry = true;
 					}
 				}
 			}
 		}
-		currentPattern.nObservedValues = *std::max_element(&(currentPattern.hetData(0,0)), &(currentPattern.hetData(0,0))+currentPattern.hetData.getNRows() * currentPattern.hetData.getNColumns());
-		currentPattern.nObservedValues++;
+		if(!hasHetdataEntry)
+		{
+			currentPattern.nObservedValues = 0;
+		}
+		else
+		{
+			currentPattern.nObservedValues = *std::max_element(&(currentPattern.hetData(0,0)), &(currentPattern.hetData(0,0))+currentPattern.hetData.getNRows() * currentPattern.hetData.getNColumns());
+			currentPattern.nObservedValues++;
+		}
 
 		currentPattern.computeHash();
 		//Have we already seen a marker like this?

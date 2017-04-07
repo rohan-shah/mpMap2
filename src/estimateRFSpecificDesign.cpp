@@ -623,13 +623,6 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	recoded.recodedHetData = recodedHetData;
 	recodeFoundersFinalsHets(recoded);
 
-	unsigned int maxAlleles = recoded.maxAlleles;
-	if(maxAlleles > 64)
-	{
-		error = "Internal error - Cannot have more than 64 alleles per marker";
-		return false;
-	}
-
 	//We need to assign a unique ID to each marker pattern - Where by pattern we mean the combination of hetData and founder alleles. Note that this is possible because we just recoded everything to a standardised format.
 	//Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
 	//Note that markerPatternID is defined in unitTypes.hpp. It's just an integer (and automatically convertible to an integer), but it's represented by a unique type - This stops us from confusing it with an ordinary integer.
@@ -640,6 +633,24 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	markerPatternConversionArgs.recodedHetData = recodedHetData;
 	markerPatternsToUniqueValues(markerPatternConversionArgs);
 	
+	//We don't use recoded.maxAlleles, because we want to restrict to the markers in markerRows and markerColumns
+	unsigned int maxAlleles = 0; //= recoded.maxAlleles;
+	for(std::vector<int>::const_iterator i = internal_args.markerRows->begin(); i != internal_args.markerRows->end(); i++) 
+	{
+		markerPatternID currentMarkerID = markerPatternConversionArgs.markerPatternIDs[*i];
+		maxAlleles = std::max(maxAlleles, (unsigned int)markerPatternConversionArgs.allMarkerPatterns[currentMarkerID].nObservedValues);
+	}
+	for(std::vector<int>::const_iterator i = internal_args.markerColumns->begin(); i != internal_args.markerColumns->end(); i++)
+	{
+		markerPatternID currentMarkerID = markerPatternConversionArgs.markerPatternIDs[*i];
+		maxAlleles = std::max(maxAlleles, (unsigned int)markerPatternConversionArgs.allMarkerPatterns[currentMarkerID].nObservedValues);
+	}
+	if(maxAlleles > 64)
+	{
+		error = "Internal error - Cannot have more than 64 alleles per marker";
+		return false;
+	}
+
 	//map containing encodings of the funnels involved in the experiment (as key), and an associated unique index (again, using the encoded values directly is no good because they'll be all over the place). Unique indices are contiguous again.
 	std::map<funnelEncoding, funnelID> funnelTranslation;
 	//vector giving the funnel ID for each individual

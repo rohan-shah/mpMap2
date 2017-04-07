@@ -23,19 +23,33 @@ RcppExport void codingErrorsToStrings(Rcpp::List codingErrors, std::vector<std::
 	BEGIN_RCPP
 		Rcpp::CharacterVector markerNames = hetData.attr("names");
 
-		Rcpp::IntegerMatrix hetDataErrors = codingErrors["hetData"];
+		Rcpp::IntegerMatrix missingHetDataErrors = codingErrors["missingHetData"];
+		Rcpp::IntegerMatrix invalidHetDataErrors = codingErrors["invalidHetData"];
 		Rcpp::IntegerMatrix finalErrors = codingErrors["finals"];
 		Rcpp::IntegerVector nullErrors = codingErrors["null"];
 
-		R_xlen_t nFounderErrors = hetDataErrors.nrow(), nFinalErrors = finalErrors.nrow(), nNullErrors = nullErrors.length();
-		for(int i = 0; i < nFounderErrors; i++)
+		R_xlen_t nInvalidHetDataErrors = invalidHetDataErrors.nrow(), nFinalErrors = finalErrors.nrow(), nNullErrors = nullErrors.length(), nMissingHetDataErrors = missingHetDataErrors.nrow();
+		for(int i = 0; i < nMissingHetDataErrors; i++)
 		{
 			if((int)codingErrorsAsStrings.size() >= limit) 
 			{
 				codingErrorsAsStrings.push_back("Omitting details of further coding errors");
 				return;
 			}
-			int markerIndex = hetDataErrors(i, 0), hetDataRow = hetDataErrors(i, 1), hetDataColumn = hetDataErrors(i, 2);
+			int markerIndex = missingHetDataErrors(i, 0), allele = missingHetDataErrors(i, 1);
+			Rcpp::IntegerMatrix hetDataEntry = hetData(markerIndex);
+			std::stringstream ss;
+			ss << "Coding error for marker " << markerNames[markerIndex] << ": Founder allele " << allele << " was not present in @hetData[[" << markerIndex+1 << "]]";
+			codingErrorsAsStrings.push_back(ss.str());
+		}
+		for(int i = 0; i < nInvalidHetDataErrors; i++)
+		{
+			if((int)codingErrorsAsStrings.size() >= limit) 
+			{
+				codingErrorsAsStrings.push_back("Omitting details of further coding errors");
+				return;
+			}
+			int markerIndex = invalidHetDataErrors(i, 0), hetDataRow = invalidHetDataErrors(i, 1), hetDataColumn = invalidHetDataErrors(i, 2);
 			Rcpp::IntegerMatrix hetDataEntry = hetData(markerIndex);
 			std::stringstream ss;
 			ss << "Coding error for marker " << markerNames[markerIndex] << ": Value " << hetDataEntry(hetDataRow, hetDataColumn) << " of @hetData[[" << markerIndex+1 << "]][" << hetDataRow+1 << ", " << hetDataColumn+1 << "] not present in @founders[,"<< markerIndex+1<<"]";
@@ -66,13 +80,30 @@ RcppExport void codingErrorsToStrings(Rcpp::List codingErrors, std::vector<std::
 		}
 	VOID_END_RCPP
 }
+struct hetDataError
+{
+public:
+	hetDataError(int marker, int row, int column)
+		: marker(marker), row(row), column(column)
+	{}
+	int marker, row, column;
+};
+struct missingHetDataAllele
+{
+public:
+	missingHetDataAllele(int marker, int allele)
+		: marker(marker), allele(allele)
+	{}
+	int marker, allele;
+};
 RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 {
 	BEGIN_RCPP
 		Rcpp::IntegerMatrix founders = _founders, finals = _finals;
 		Rcpp::List hetData = _hetData;
 
-		std::vector<int> hetDataErrorMarker, hetDataErrorRow, hetDataErrorColumn;
+		std::vector<hetDataError> invalidHetDataErrors;
+		std::vector<missingHetDataAllele> missingHetDataAlleles;
 		std::vector<int> finalErrorRow, finalErrorMarker;
 		std::vector<int> nullErrorMarkers;
 
@@ -114,21 +145,35 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 			}
 			else
 			{
+				//Check that the first two columns of hetData matrices are entries of founders
 				for(int hetRowCounter = 0; hetRowCounter < currentHetData.nrow(); hetRowCounter++)
 				{
 					if(std::find(validFounderValues.begin(), validFounderValues.end(), currentHetData(hetRowCounter, 0)) == validFounderValues.end())
 					{
-						hetDataErrorMarker.push_back((int)markerCounter);
-						hetDataErrorRow.push_back(hetRowCounter);
-						hetDataErrorColumn.push_back(0);
+						invalidHetDataErrors.push_back(hetDataError((int)markerCounter, hetRowCounter, 0));
 					}
 					if(std::find(validFounderValues.begin(), validFounderValues.end(), currentHetData(hetRowCounter, 1)) == validFounderValues.end())
 					{
-						hetDataErrorMarker.push_back((int)markerCounter);
-						hetDataErrorRow.push_back(hetRowCounter);
-						hetDataErrorColumn.push_back(1);
+						invalidHetDataErrors.push_back(hetDataError((int)markerCounter, hetRowCounter, 1));
 					}
 					validFinalValues.push_back(currentHetData(hetRowCounter, 2));
+				}
+				//Check that every founder allele appears in the hetData entry as a homozygote.
+				for(std::size_t founderAlleleCounter = 0; founderAlleleCounter < validFounderValues.size(); founderAlleleCounter++)
+				{
+					bool found = false;
+					for(int hetRowCounter = 0; hetRowCounter < currentHetData.nrow(); hetRowCounter++)
+					{
+						if(currentHetData(hetRowCounter, 0) == currentHetData(hetRowCounter, 1) && currentHetData(hetRowCounter, 0) == validFounderValues[founderAlleleCounter])
+						{
+							found = true;
+							break;
+						}
+					}
+					if(!found)
+					{
+						missingHetDataAlleles.push_back(missingHetDataAllele(markerCounter, validFounderValues[founderAlleleCounter]));
+					}
 				}
 				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 				{
@@ -140,15 +185,22 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 				}
 			}
 		}
-		Rcpp::IntegerMatrix hetDataErrors((int)hetDataErrorRow.size(), 3), finalErrors((int)finalErrorRow.size(), 2);
+		Rcpp::IntegerMatrix invalidHetDataErrorsMatrix((int)invalidHetDataErrors.size(), 3), finalErrors((int)finalErrorRow.size(), 2), missingHetDataErrorsMatrix((int)missingHetDataAlleles.size(), 2);
 		Rcpp::IntegerVector nullErrors = Rcpp::wrap(nullErrorMarkers);
-		for(int hetDataErrorCounter = 0; hetDataErrorCounter < (int)hetDataErrorRow.size(); hetDataErrorCounter++)
+		for(int hetDataErrorCounter = 0; hetDataErrorCounter < (int)invalidHetDataErrors.size(); hetDataErrorCounter++)
 		{
-			hetDataErrors(hetDataErrorCounter, 0) = hetDataErrorMarker[hetDataErrorCounter];
-			hetDataErrors(hetDataErrorCounter, 1) = hetDataErrorRow[hetDataErrorCounter];
-			hetDataErrors(hetDataErrorCounter, 2) = hetDataErrorColumn[hetDataErrorCounter];
+			invalidHetDataErrorsMatrix(hetDataErrorCounter, 0) = invalidHetDataErrors[hetDataErrorCounter].marker;
+			invalidHetDataErrorsMatrix(hetDataErrorCounter, 1) = invalidHetDataErrors[hetDataErrorCounter].row;
+			invalidHetDataErrorsMatrix(hetDataErrorCounter, 2) = invalidHetDataErrors[hetDataErrorCounter].column;
 		}
-		hetDataErrors.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::CharacterVector::create("Marker", "Row", "Column"));
+		invalidHetDataErrorsMatrix.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::CharacterVector::create("Marker", "Row", "Column"));
+
+		for(int hetDataErrorCounter = 0;  hetDataErrorCounter < (int)missingHetDataAlleles.size(); hetDataErrorCounter++)
+		{
+			missingHetDataErrorsMatrix(hetDataErrorCounter, 0) = missingHetDataAlleles[hetDataErrorCounter].marker;
+			missingHetDataErrorsMatrix(hetDataErrorCounter, 1) = missingHetDataAlleles[hetDataErrorCounter].allele;
+		}
+		missingHetDataErrorsMatrix.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::CharacterVector::create("Marker", "Allele"));
 
 		for(int i = 0; i < (int)finalErrorRow.size(); i++)
 		{
@@ -156,6 +208,6 @@ RcppExport SEXP listCodingErrors(SEXP _founders, SEXP _finals, SEXP _hetData)
 			finalErrors(i, 1) = finalErrorMarker[i];
 		}
 		finalErrors.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::CharacterVector::create("Row", "Column"));
-		return Rcpp::List::create(Rcpp::Named("hetData") = hetDataErrors, Rcpp::Named("finals") = finalErrors, Rcpp::Named("null") = nullErrors);
+		return Rcpp::List::create(Rcpp::Named("invalidHetData") = invalidHetDataErrorsMatrix, Rcpp::Named("finals") = finalErrors, Rcpp::Named("null") = nullErrors, Rcpp::Named("missingHetData") = missingHetDataErrorsMatrix);
 	END_RCPP
 }
