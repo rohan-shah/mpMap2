@@ -51,21 +51,21 @@ fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
   names(newHetDataList) <- foundersMarkerNames
 
   newHetData <- new("hetData", newHetDataList)
+  codingErrors <- listCodingErrors(founders = mpcross$founders, finals = mpcross$finals, hetData = newHetData)
   if(fixCodingErrors)
   {
-    codingErrors <- listCodingErrors(founders = mpcross$founders, finals = mpcross$finals, hetData = newHetData)
     uniqueMarkers <- unique(codingErrors$finals[,"Column"])
     if(length(uniqueMarkers) > 0)
     {
       mpcross$finals[, uniqueMarkers] <- NA
       warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified, and these markers had invalid alleles. For less aggressive removal, use listCodingErrors"))
     }
-    if(length(codingErrors$null))
-    {
-      newHetData[codingErrors$null] <- list(matrix(0L, 0, 3))
-      mpcross$finals[,codingErrors$null] <- NA
-      warning(paste0("Removing data for ", length(codingErrors$null), " markers, because fixCodingErrors = TRUE was specified, and a founder had an NA allele for these markers. For less aggressive removal, use listCodingErrors"))
-    }
+  }
+  if(length(codingErrors$null))
+  {
+    newHetData[codingErrors$null] <- list(matrix(0L, 0, 3))
+    mpcross$finals[,codingErrors$null] <- NA
+    warning(paste0("Removing data for ", length(codingErrors$null), " markers, because these markers have NA founder alleles"))
   }
   geneticData <- new("geneticData", finals = mpcross$finals, founders = mpcross$founders, pedigree = newPedigree, hetData = newHetData)
   geneticDataList <- new("geneticDataList", list(geneticData))
