@@ -205,9 +205,16 @@ mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCo
 		finals <- finals[,sortedFounderMarkers]
 		hetData <- hetData[sortedFounderMarkers]
 	}
+	codingErrors <- listCodingErrors(founders = founders, finals = finals, hetData = hetData)
+	if(length(codingErrors$null))
+	{
+		hetData[codingErrors$null] <- list(matrix(0L, 0, 3))
+		finals[,codingErrors$null] <- NA
+		warning(paste0("Removing data for ", length(codingErrors$null), " markers, because these markers have NA founder alleles"))
+	}
+
 	if(fixCodingErrors)
 	{
-		codingErrors <- listCodingErrors(founders = founders, finals = finals, hetData = hetData)
 		uniqueMarkers <- unique(codingErrors$finals[,"Column"])
 		finals[, uniqueMarkers] <- NA
 		warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified. For less aggressive removal, use listCodingErrors"))
