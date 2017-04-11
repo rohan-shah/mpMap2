@@ -1,18 +1,26 @@
 #include "impute.h"
 #include <vector>
-#include <map>
+#include <set>
 #include <math.h>
 #include <limits>
 #include <sstream>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
+struct differenceSetComp
+{
+	bool operator()(const std::pair<float, int>& a, const std::pair<float, int>& b) const
+	{
+		return a.second < b.second;
+	}
+};
 template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
 	unsigned long done = 0;
 	unsigned long total = (unsigned long)markersThisGroup.size();
 	unsigned long doneThreadZero = 0;
 	bool hasError = false;
+	typedef std::set<std::pair<float, int>, differenceSetComp> differenceSetType;
 	//This is a marker row
 #ifdef USE_OPENMP
 	#pragma omp parallel for schedule(dynamic)
@@ -36,8 +44,8 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 		if(missing)
 		{
 			//There's a missing value for *marker1. So find the closest matching column and overwrite any missing values from that column.
-			//Map with the difference as the key and the marker index as the value. These are sorted internally so we can go from smallest difference to lowest difference
-			std::map<float, int> averageDifferences;
+			//Set with the difference and the marker index. These are sorted internally so we can go from smallest difference to lowest difference
+			differenceSetType averageDifferences;
 			//marker 2 is the candidate other marker (another row)
 			for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
 			{
@@ -78,7 +86,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 				{
 					//go through the other markers from most similar to least similar, looking for something which has a value here. So marker3 is the 
 					bool replacementFound = false;
-					for(std::map<float, int>::iterator marker3 = averageDifferences.begin(); marker3 != averageDifferences.end(); marker3++)
+					for(differenceSetType::iterator marker3 = averageDifferences.begin(); marker3 != averageDifferences.end(); marker3++)
 					{
 						unsigned long long pair2Row = marker3->second;
 						unsigned long long pair2Column = *marker2;
