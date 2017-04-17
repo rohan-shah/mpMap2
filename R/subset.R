@@ -150,7 +150,9 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 				subsettedBase@geneticData[[y]]@imputed <<- subset(x@geneticData[[y]]@imputed, chromosomes = chromosomes)
 			}
 		})
-		returnValue <- new("mpcrossMapped", subsettedBase, map = x@map[chromosomes])
+		if(!is.null(x@rf)) rf <- subset(x@rf, markers = retainedMarkers)
+		else rf <- NULL
+		returnValue <- new("mpcrossMapped", subsettedBase, map = x@map[chromosomes], rf = rf)
 	}
 	else
 	{
