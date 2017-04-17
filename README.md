@@ -21,29 +21,29 @@ This package builds on R/mpMap by Emma Huang. Compared to that previous version,
 6. R/mpMap2 allows the use of multiple data-sets to construct a single genetic map.
 7. R/mpMap2 uses only simple OpenMP parallelisation and is therefore simpler to compile and run than R/mpMap, which made use of GPUs and MPI. 
 
-##Using this package
+## Using this package
 
 Releases of mpMap2 are available under [the releases section](https://github.com/rohan-shah/mpMap2/releases). Binaries are available for windows, other platforms will need to compile from source. For information on how to use this package, see the [package vignette](https://github.com/rohan-shah/mpMap2Paper/releases). The source for the vignette is available [here](https://github.com/rohan-shah/mpMap2Paper). 
 
-##Package compilation
+## Package compilation
 
 This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. On Windows, compilation using the standard toolset **requires Rtools 3.3**.
 
 The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
 
-###Compilation on Windows using CMake and Visual Studio
+### Compilation on Windows using CMake and Visual Studio
 
 1. Download and compile the customized version of Rcpp from github repository rohan-shah/Rcpp. See the associated Readme file for details on compiling that code. 
 2. Run the cmake gui. 
 3. Set Rcpp_DIR to the Rcpp binaries directory. 
-4. Set R_COMMAND to *\<R_HOME\>/bin/x64/R.exe*. Ensure that you choose the 64-bit version. 
-5. Enter the source directory and the binaries directory (E.g. *\<mpMap2Root\>/build* for Visual Studio 64-bit output, or *\<mpMap2Root\>/release* for NMake Makefiles output)
+4. Set R_COMMAND to **\<R_HOME\>/bin/x64/R.exe**. Ensure that you choose the 64-bit version. 
+5. Enter the source directory and the binaries directory (E.g. **\<mpMap2Root\>/build** for Visual Studio 64-bit output, or **\<mpMap2Root\>/release** for NMake Makefiles output)
 6. If the output is going to be NMake Makefiles, set CMAKE_BUILD_TYPE appropriately (E.g. as either Release or Debug)
 7. Hit Configure and when prompted choose a Visual Studio 64-bit output, or NMake Makefiles.
 8. When configuring succeeds, hit generate. 
 
 The configuration scripts generate an import library for R.dll. This means that the scripts must be able to run cl.exe and lib.exe. If this step fails, check that cl.exe and lib.exe can run. If not, you may need to set up the correct environment for the compiler (by running a script such as vcvarsx86_amd64.bat) before running cmake. 
 
-The package can now be compiled by either running nmake in the binaries directory (NMake Makefiles) or opening mpMap2.sln in the binaries directory. Once the package is compiled a properly formed R package (including NAMESPACE, DESCRIPTION, .R files and C code) will have been constructed in the binaries directory. If Visual Studio output was selected, the package directory will be *\<mpMap2Binaries\>/\<buildType\>* (E.g. *\<mpMap2Root\>/build/Release* for a release build). If NMake Makefiles output was selected, the package will be *\<mpMap2Binaries\>* (E.g *\<mpMap2Root\>/Release*). 
+The package can now be compiled by either running nmake in the binaries directory (NMake Makefiles) or opening mpMap2.sln in the binaries directory. Once the package is compiled a properly formed R package (including NAMESPACE, DESCRIPTION, .R files and C code) will have been constructed in the binaries directory. If Visual Studio output was selected, the package directory will be **\<mpMap2Binaries\>/\<buildType\>** (E.g. **\<mpMap2Root\>/build/Release** for a release build). If NMake Makefiles output was selected, the package will be **\<mpMap2Binaries\>** (E.g **\<mpMap2Root\>/Release**). 
 
 The package can be built using the INSTALL target, which is run using "nmake install" if NMake Makefiles output was selected. Alternatively, after the package is built you can run the standard R CMD INSTALL command. 
