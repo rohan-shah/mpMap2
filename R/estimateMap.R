@@ -5,6 +5,10 @@
 #' @export
 estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, maxMarkers = 2000, verbose=FALSE)
 {
+	if(identical(mapFunction, haldane))
+	{
+		mapFunction <- rfToHaldane
+	}
 	isNewMpcrossLGArgument(mpcrossLG)
 	if (is.null(mpcrossLG@rf) && is.null(mpcrossLG@lg@imputedTheta))
 	{
