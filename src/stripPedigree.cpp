@@ -1,7 +1,9 @@
+#ifdef USE_BOOST
 #include "stripPedigree.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/topological_sort.hpp>
+#include <boost/graph/reverse_graph.hpp>
 enum pedigreeEdgeType
 {
 	MOTHER, FATHER
@@ -11,8 +13,35 @@ bool lineNamesSorter(const std::pair<std::string, int>& first, const std::pair<s
 	return first.first < second.first;
 }
 //Here vertex_descriptor will be the original vertex number in the original pedigree, and vertex_name will be the vertex number in the new pedigree.
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, boost::property<boost::vertex_name_t, std::size_t>, boost::property<boost::edge_name_t, pedigreeEdgeType> > graphType;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, boost::property<boost::vertex_name_t, std::size_t>, boost::property<boost::edge_name_t, pedigreeEdgeType> > graphType;
 typedef boost::color_traits<boost::default_color_type> Colour;
+//Visitor used to work out the number of generations for each line in the pedigree. 
+class generationsVisitor : public boost::default_dfs_visitor
+{
+public:
+	generationsVisitor(Rcpp::IntegerVector& generations)
+		: generations(generations), currentGeneration(-1)
+	{}
+	template<typename Edge, typename Graph> void forward_or_cross_edge(Edge e, Graph& g)
+	{
+		int& targetGeneration = generations[boost::get(boost::vertex_name, g, boost::target(e, g))];
+		if(targetGeneration != -2 && targetGeneration != currentGeneration+1)
+		{
+			targetGeneration = -1;
+		}
+	}
+	template<typename Vertex, typename Graph> void discover_vertex(Vertex v, Graph& g)
+	{
+		currentGeneration++;
+		generations[boost::get(boost::vertex_name, g, v)] = currentGeneration;
+	}
+	template<typename Vertex, typename Graph> void finish_vertex(Vertex v, Graph& g)
+	{
+		currentGeneration--;
+	}
+	int currentGeneration;
+	Rcpp::IntegerVector& generations;
+};
 SEXP stripPedigree(SEXP pedigree_sexp, SEXP finalLines_sexp)
 {
 BEGIN_RCPP
@@ -57,6 +86,8 @@ BEGIN_RCPP
 		if(*i == Colour::black()) *i = Colour::white();
 		else *i = Colour::black();
 	}
+	//A copy of the colour vector, which we can use later to get out the generation for every vertex. We can't combine this graph search with the topological sort one, because that one starts from the end of the pedigree, and we want to start from the founders (the beginning)
+	std::vector<boost::default_color_type> copiedColourVector = colourVector;
 
 	std::vector<std::size_t> topologicalSortOutput;
 	graphType::vertex_iterator current, end;
@@ -98,13 +129,26 @@ BEGIN_RCPP
 			}
 		}
 	}
+
+	//Get out the generations for every line. A value of -1 means inconsistent generations, a value of -2 means unknown. 
+	Rcpp::IntegerVector generations(topologicalSortOutput.size(), -2);
+	for(std::size_t counter = 0; counter < nFounders; counter++)
+	{
+		colourVector = copiedColourVector;
+		boost::depth_first_visit(boost::make_reverse_graph(graph), counter, generationsVisitor(generations), &(colourVector[0]));
+	}
+	for(std::size_t counter = 0; counter < nFounders; counter++)
+	{
+		generations[counter] = 0;
+	}
 	Rcpp::S4 newPedigree("pedigree");
 	newPedigree.slot("mother") = Rcpp::wrap(newMother);
 	newPedigree.slot("father") = Rcpp::wrap(newFather);
 	newPedigree.slot("lineNames") = Rcpp::wrap(newLineNames);
 	newPedigree.slot("selfing") = pedigree.slot("selfing");
 	newPedigree.slot("warnImproperFunnels") = pedigree.slot("warnImproperFunnels");
+	newPedigree.attr("generations") = generations;
 	return newPedigree;
 END_RCPP
 }
-
+#endif

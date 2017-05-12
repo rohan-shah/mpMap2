@@ -84,6 +84,7 @@ extern "C"
 		{"eightParentPedigreeImproperFunnels", (DL_FUNC)&eightParentPedigreeImproperFunnels, 3},
 #ifdef USE_BOOST
 		{"reorderPedigree", (DL_FUNC)&reorderPedigree, 3},
+		{"stripPedigree", (DL_FUNC)&stripPedigree, 2},
 #endif
 		{"testDistortion", (DL_FUNC)&testDistortion, 1},
 		{"removeHets", (DL_FUNC)&removeHets, 3},
@@ -94,7 +95,6 @@ extern "C"
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
-		{"stripPedigree", (DL_FUNC)&stripPedigree, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

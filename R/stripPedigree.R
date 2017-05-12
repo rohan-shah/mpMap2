@@ -6,6 +6,12 @@ stripPedigree <- function(pedigree, finalLines)
 	{
 		stop("Input finalLines must be a character vector")
 	}
-	newPedigree <- .Call("stripPedigree", pedigree, finalLines, PACKAGE="mpMap2")
-	return(newPedigree)
+	success <- FALSE
+	try(
+	{
+		newPedigree <- .Call("stripPedigree", pedigree, finalLines, PACKAGE="mpMap2")
+		success <- TRUE
+	}, silent=TRUE)
+	if(success) return(newPedigree)
+	return(NULL)
 }
