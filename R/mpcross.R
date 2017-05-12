@@ -78,6 +78,44 @@ fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
     return(new("mpcross", geneticData = geneticDataList))
   }
 }
+setMethod(f = "+", signature = c("mpcrossMapped", "mpcrossMapped"), definition = function(e1, e2)
+{
+  if(pryr::address(e1) == pryr::address(e2))
+  {
+    stop("Cannot combine an object with itself")
+  }
+  allMarkers <- sort(unique(c(markers(e1), markers(e2))))
+  #If e1 and e2 have exactly the same markers, this is trivial. 
+  if(nMarkers(e1) == nMarkers(e2) && all(markers(e1) == markers(e2)))
+  {
+    if(!identical(e1@map, e2@map))
+    {
+      stop("Cannot combined two mpcrossMapped objects with the same markers, but different maps")
+    }
+    return(new("mpcrossMapped", geneticData = new("geneticDataList", c(e1@geneticData, e2@geneticData)), map = e1@map))
+  }
+  else if(length(intersect(markers(e1), markers(e2))) == 0 && length(intersect(names(e1@map), names(e2@map))) == 0)
+  {
+    newMap <- c(e1@map, e2@map)
+    class(newMap) <- "map"
+    if(length(e1@geneticData) == 1 && length(e2@geneticData) == 1 && identical(lineNames(e1), lineNames(e2)) && identical(rownames(founders(e1)), rownames(founders(e2))) && identical(e1@geneticData[[1]]@pedigree, e2@geneticData[[1]]@pedigree))
+    {
+      newGeneticData <- new("geneticData", founders = cbind(founders(e1), founders(e2)), finals = cbind(finals(e1), finals(e2)), hetData = new("hetData", c(hetData(e1), hetData(e2))), pedigree = e1@geneticData[[1]]@pedigree)
+      return(new("mpcrossMapped", geneticData = new("geneticDataList", list(newGeneticData)), map = newMap))
+    }
+    else
+    {
+      newMarkers <- c(markers(e1), markers(e2))
+      e1 <- expand(e1, newMarkers)
+      e2 <- expand(e2, newMarkers)
+      return(new("mpcrossMapped", geneticData = new("geneticDataList", c(e1@geneticData, e2@geneticData)), map = newMap))
+    }
+  }
+  else
+  {
+    stop("Cannot combine these objects")
+  }
+})
 setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1, e2)
 {
   if(pryr::address(e1) == pryr::address(e2))
@@ -86,7 +124,7 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
   }
   allMarkers <- sort(unique(c(markers(e1), markers(e2))))
   #If e1 and e2 have exactly the same markers, this is trivial. 
-  if(nMarkers(e1) == nMarkers(e1) && all(markers(e1) == markers(e2)))
+  if(nMarkers(e1) == nMarkers(e2) && all(markers(e1) == markers(e2)))
   {
     return(new("mpcross", geneticData = new("geneticDataList", c(e1@geneticData, e2@geneticData))))
   }
