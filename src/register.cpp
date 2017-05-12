@@ -39,6 +39,7 @@
 #endif
 #include "transformForMPWGAIM.h"
 #include "intercrossingAndSelfingGenerations.h"
+#include "stripPedigree.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -93,6 +94,7 @@ extern "C"
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
+		{"stripPedigree", (DL_FUNC)&stripPedigree, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
