@@ -190,7 +190,7 @@ SEXP eightParentPedigreeRandomFunnels(SEXP initialPopulationSize_sexp, SEXP self
 	{
 		if(intercrossingGenerations == 0)
 		{
-			std::fill(observed.begin()+nextFree-initialPopulationSize+1, observed.end(), true);
+			std::fill(observed.begin()+nextFree-initialPopulationSize, observed.end(), true);
 		}
 		else
 		{

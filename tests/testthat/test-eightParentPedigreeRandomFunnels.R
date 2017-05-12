@@ -14,3 +14,11 @@ test_that("Check that the C and R versions are identical",
 				seed <<- seed + 1
 			})
 	})
+
+test_that("Correct number of lines are generated with zero generations of selfing",
+{
+	pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 10, selfingGenerations = 0, intercrossingGenerations = 0)
+	map <- sim.map(len = 1, n.mar = 2, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+	cross <- simulateMPCross(pedigree = pedigree, map = map, mapFunction = haldane, seed =1)
+	expect_equal(nLines(cross), 10)
+})

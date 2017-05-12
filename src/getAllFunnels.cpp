@@ -2,7 +2,8 @@
 #include "intercrossingAndSelfingGenerations.h"
 #include "estimateRF.h"
 #include "getFunnel.h"
-SEXP getAllFunnels(SEXP geneticData_sexp)
+#include "orderFunnel.h"
+SEXP getAllFunnels(SEXP geneticData_sexp, SEXP standardise_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -47,6 +48,16 @@ BEGIN_RCPP
 	}
 	Rcpp::CharacterVector pedigreeLineNames = Rcpp::as<Rcpp::CharacterVector>(pedigree.slot("lineNames"));
 
+	bool standardise;
+	try
+	{
+		standardise = Rcpp::as<bool>(standardise_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input standardise must be a boolean");
+	}
+
 	int nFounders = founders.nrow(), nFinals = finals.nrow(), nMarkers = finals.ncol();
 	std::vector<int> intercrossingGenerations, selfingGenerations;
 	getIntercrossingAndSelfingGenerations(pedigree, finals, nFounders, intercrossingGenerations, selfingGenerations);
@@ -56,6 +67,7 @@ BEGIN_RCPP
 
 	funnelType funnel;
 	Rcpp::IntegerMatrix result(nFinals, nFounders);
+
 	for(int lineCounter = 0; lineCounter < finalNames.size(); lineCounter++)
 	{
 		if(intercrossingGenerations[lineCounter] == 0)
@@ -76,6 +88,10 @@ BEGIN_RCPP
 				std::stringstream ss;
 				ss << "Attempting to trace pedigree for line " << finalNames(lineCounter) << ": Unable to get funnel";
 				throw std::runtime_error(ss.str().c_str());
+			}
+			if(standardise)
+			{
+				orderFunnel(funnel.val, nFounders);
 			}
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++) result(lineCounter, founderCounter) = funnel.val[founderCounter];
 		}

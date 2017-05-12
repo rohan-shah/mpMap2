@@ -92,7 +92,7 @@ extern "C"
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
-		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 1}, 
+		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 2}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
 		{NULL, NULL, 0}

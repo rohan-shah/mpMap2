@@ -89,6 +89,7 @@ Collate:
     'simulateMPCross.R'
     'simulatePhenotypes.R'
     'sixteenParentPedigreeRandomFunnels.R'
+    'stripPedigree.R'
     'subset.R'
     'testDistortion.R'
     'toMpMap.R'
