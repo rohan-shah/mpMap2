@@ -35,6 +35,8 @@ notifications:
 
 after_failure:
 - find *Rcheck -name '*.fail' -print -exec cat '{}' \;
+- find *Rcheck -name '00install.out' -print -exec tail -n 100 '{}' \;
+- find *Rcheck -name '00check.log' -print -exec tail -n 100 '{}' \;
 
 script: 
   - |
