@@ -50,15 +50,15 @@ test_that("Arguments must have correct types",
 		#Must be at least one markerCloumn value
 		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = as.integer(c()), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("markerColumns must have at least one entry"))
 
-		#Cannot have negative values for markerRows
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = -(1:2), markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid values for input markerRows"))
-
-		#Cannot have negative values for markerColumns
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:2, markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid value for input markerColumns"))
-
-		#Number of values to estimate cannot be zero
-		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1000, markerColumns = 1, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("give a region that is contained in the lower triangular part"))
-
 		#Entry of lineWeights has the wrong lengthi
 		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(1), markerRows = 1:10, markerColumns = 1:10, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("lineWeights had the wrong length"))
+
+		#Cannot have negative values for markerRows
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(rep(1, 1000)), markerRows = -(1:2), markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid values for input markerRows"))
+
+		#Cannot have negative values for markerColumns
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(rep(1, 1000)), markerRows = 1:2, markerColumns = -(1:2), keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("Invalid value for input markerColumns"))
+
+		#Number of values to estimate cannot be zero
+		expect_that(estimateRFInternal(object = cross, recombValues = c(0.0, 0.5), lineWeights = list(rep(1, 1000)), markerRows = 1000, markerColumns = 1, keepLod = TRUE, keepLkhd = TRUE, gbLimit = -1, verbose = list(verbose=FALSE, progressStyle = 1L)), throws_error("give a region that is contained in the lower triangular part"))
 	})

@@ -142,13 +142,6 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		if(markerRows.size() == 0) throw std::runtime_error("Input markerRows must have at least one entry");
 		if(markerColumns.size() == 0) throw std::runtime_error("Input markerColumns must have at least one entry");
 
-		//If the input values of markerRows and markerColumns give a region that's completely in the lower triangular region, then throw an error
-		R_xlen_t nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);
-		if(nValuesToEstimate == 0)
-		{
-			throw std::runtime_error("Input values of markerRows and markerColumns give a region that is contained in the lower triangular part of the matrix");
-		}
-
 		//Last bit of validation
 		unsigned long nMarkers = 0;
 		for(int i = 0; i < nDesigns; i++)
@@ -172,6 +165,13 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		int markerColumnMin = *std::min_element(markerColumns.begin(), markerColumns.end()), markerColumnMax = *std::max_element(markerColumns.begin(), markerColumns.end());
 		if(markerRowMin < 0 || markerRowMax >= nMarkers) throw std::runtime_error("Invalid values for input markerRows");
 		if(markerColumnMin < 0 || markerColumnMax >= nMarkers) throw std::runtime_error("Invalid value for input markerColumns");
+
+		//If the input values of markerRows and markerColumns give a region that's completely in the lower triangular region, then throw an error
+		R_xlen_t nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);
+		if(nValuesToEstimate == 0)
+		{
+			throw std::runtime_error("Input values of markerRows and markerColumns give a region that is contained in the lower triangular part of the matrix");
+		}
 
 		//Warn if we're going to allocate over 4gb
 		R_xlen_t valuesToEstimateInChunk;
