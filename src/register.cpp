@@ -34,6 +34,7 @@
 #include "computeGenotypeProbabilities.h"
 #include "computeAllEpistaticChiSquared.h"
 #include "getAllFunnels.h"
+#include "getAllFunnelsIncAIC.h"
 #ifdef USE_BOOST
 	#include "reorderPedigree.h"
 #endif
@@ -93,6 +94,7 @@ extern "C"
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
 		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 2}, 
+		{"getAllFunnelsIncAIC", (DL_FUNC)&getAllFunnelsIncAIC, 2}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
 		{NULL, NULL, 0}

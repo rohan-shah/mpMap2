@@ -140,6 +140,11 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
     e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
     return(new("mpcross", geneticData = new("geneticDataList", c(e1ExpandedGeneticData@geneticData, e2@geneticData))))
   }
+  else if(length(e1@geneticData) == 1 && length(e2@geneticData) == 1 && identical(lineNames(e1), lineNames(e2)) && identical(rownames(founders(e1)), rownames(founders(e2))) && identical(e1@geneticData[[1]]@pedigree, e2@geneticData[[1]]@pedigree))
+  {
+      newGeneticData <- new("geneticData", founders = cbind(founders(e1), founders(e2)), finals = cbind(finals(e1), finals(e2)), hetData = new("hetData", c(hetData(e1), hetData(e2))), pedigree = e1@geneticData[[1]]@pedigree)
+      return(new("mpcross", geneticData = new("geneticDataList", list(newGeneticData))))
+  }
   else
   {
     #Put all the markers from e1 first

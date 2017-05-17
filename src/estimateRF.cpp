@@ -142,17 +142,36 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		if(markerRows.size() == 0) throw std::runtime_error("Input markerRows must have at least one entry");
 		if(markerColumns.size() == 0) throw std::runtime_error("Input markerColumns must have at least one entry");
 
-		int markerRowMin = *std::min_element(markerRows.begin(), markerRows.end());
-		int markerColumnMin = *std::min_element(markerColumns.begin(), markerColumns.end());
-		if(markerRowMin < 0) throw std::runtime_error("Invalid values for input markerRows");
-		if(markerColumnMin < 0) throw std::runtime_error("Invalid value for input markerColumns");
-
 		//If the input values of markerRows and markerColumns give a region that's completely in the lower triangular region, then throw an error
 		R_xlen_t nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);
 		if(nValuesToEstimate == 0)
 		{
 			throw std::runtime_error("Input values of markerRows and markerColumns give a region that is contained in the lower triangular part of the matrix");
 		}
+
+		//Last bit of validation
+		unsigned long nMarkers = 0;
+		for(int i = 0; i < nDesigns; i++)
+		{
+			Rcpp::S4 currentGeneticData = geneticData(i);
+			Rcpp::IntegerMatrix finals = currentGeneticData.slot("finals");
+			if(i != 0 && finals.ncol() != nMarkers)
+			{
+				throw std::runtime_error("Inconsistent number of markers across the designs");
+			}
+			nMarkers = finals.ncol();
+
+			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
+			if((int)lineWeightsThisDesign.size() != finals.nrow())
+			{
+				throw std::runtime_error("An entry of input lineWeights had the wrong length");
+			}
+		}
+
+		int markerRowMin = *std::min_element(markerRows.begin(), markerRows.end()), markerRowMax = *std::max_element(markerRows.begin(), markerRows.end());
+		int markerColumnMin = *std::min_element(markerColumns.begin(), markerColumns.end()), markerColumnMax = *std::max_element(markerColumns.begin(), markerColumns.end());
+		if(markerRowMin < 0 || markerRowMax >= nMarkers) throw std::runtime_error("Invalid values for input markerRows");
+		if(markerColumnMin < 0 || markerColumnMax >= nMarkers) throw std::runtime_error("Invalid value for input markerColumns");
 
 		//Warn if we're going to allocate over 4gb
 		R_xlen_t valuesToEstimateInChunk;
@@ -172,17 +191,6 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		//This is not an Rcpp::NumericVector because it can quite easily overflow the size of such a vector (signed int)
 		std::vector<double> result(valuesToEstimateInChunk * nRecombLevels, 0);
 
-		//Last bit of validation
-		for(int i = 0; i < nDesigns; i++)
-		{
-			Rcpp::S4 currentGeneticData = geneticData(i);
-			Rcpp::IntegerMatrix finals = currentGeneticData.slot("finals");
-			std::vector<double> lineWeightsThisDesign = Rcpp::as<std::vector<double> >(lineWeights[i]);
-			if((int)lineWeightsThisDesign.size() != finals.nrow())
-			{
-				throw std::runtime_error("An entry of input lineWeights had the wrong length");
-			}
-		}
 		//Construct vector of rfhaps_internal_args objects
 		triangularIterator startPosition(markerRows, markerColumns);
 		std::vector<rfhaps_internal_args> internalArgumentObjects;
