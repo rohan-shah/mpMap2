@@ -24,6 +24,8 @@
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesign(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
+	if(nFinals == 0) return true;
+
 	std::vector<double>& lineWeights = args.lineWeights;
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
@@ -135,6 +137,8 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpecificDesignNoLineWeights(rfhaps_internal_args& args, unsigned long long& progressCounter)
 {
 	std::size_t nFinals = args.finals.nrow(), nRecombLevels = args.recombinationFractions.size();
+	if(nFinals == 0) return true;
+
 	std::size_t nDifferentFunnels = args.lineFunnelEncodings.size();
 	Rcpp::List finalDimNames = args.finals.attr("dimnames");
 	Rcpp::CharacterVector finalNames = finalDimNames[0];
@@ -404,6 +408,10 @@ template<int nFounders> bool estimateRFSpecificDesignInternal1(rfhaps_internal_a
 }
 unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 {
+	if(internal_args.finals.nrow() == 0)
+	{
+		return 0ULL;
+	}
 	int maxAIGenerations = *std::max_element(internal_args.intercrossingGenerations.begin(), internal_args.intercrossingGenerations.end());
 	int minAIGenerations = getMinAIGenerations(&internal_args.intercrossingGenerations);
 	int minSelfing = *std::min_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
@@ -567,7 +575,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	int nFounders = args.founders.nrow(), nFinals = args.finals.nrow(), nMarkers = args.finals.ncol();
 	std::vector<int> intercrossingGenerations, selfingGenerations;
 	getIntercrossingAndSelfingGenerations(args.pedigree, args.finals, nFounders, intercrossingGenerations, selfingGenerations);
-	bool hasAIC = *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end()) > 0;
+	bool hasAIC = nFinals > 0 && *std::max_element(intercrossingGenerations.begin(), intercrossingGenerations.end()) > 0;
 
 	/*Check that all the observed marker values are potentially valid (ignoring pedigree). That is, is every observed value for the finals consistent with something in the hetData object?*/
 	Rcpp::List codingErrors = listCodingErrors(args.founders, args.finals, args.hetData);

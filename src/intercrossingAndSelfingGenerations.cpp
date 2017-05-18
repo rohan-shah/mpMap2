@@ -27,14 +27,18 @@ bool getIntercrossingAndSelfingGenerations(Rcpp::S4 pedigree, Rcpp::IntegerMatri
 
 	Rcpp::IntegerVector mother = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("mother")), father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 
-	Rcpp::CharacterVector finalNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[0]);
-	int nFinals = finals.nrow();
-
 	intercrossing.clear();
-	intercrossing.resize(nFinals);
-
 	selfing.clear();
+	int nFinals = finals.nrow();
+	if(nFinals == 0)
+	{
+		return true;
+	}
+	Rcpp::CharacterVector finalNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[0]);
+
+	intercrossing.resize(nFinals);
 	selfing.resize(nFinals);
+
 	int log2Founders = (int)((log(nFounders) / log(2)) + 0.5);
 	for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 	{

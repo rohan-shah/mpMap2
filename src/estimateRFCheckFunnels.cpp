@@ -47,9 +47,13 @@ void estimateRFCheckFunnels(Rcpp::IntegerMatrix finals, Rcpp::IntegerMatrix foun
 	Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 	bool warnImproperFunnels = Rcpp::as<bool>(pedigree.slot("warnImproperFunnels"));
 
+	int nFinals = finals.nrow(), nFounders = founders.nrow(), nMarkers = finals.ncol();
+	if(nFinals == 0)
+	{
+		return;
+	}
 	Rcpp::CharacterVector finalNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[0]);
 	Rcpp::CharacterVector markerNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::List>(finals.attr("dimnames"))[1]);
-	int nFinals = finals.nrow(), nFounders = founders.nrow(), nMarkers = finals.ncol();
 
 	if(nFounders != 2 && nFounders != 4 && nFounders != 8 && nFounders != 16)
 	{
