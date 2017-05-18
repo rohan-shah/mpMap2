@@ -58,6 +58,7 @@ Collate:
     'fullHetData.R'
     'getAllFunnels.R'
     'getChromosomes.R'
+    'getIntercrossingAndSelfingGenerations.R'
     'getPositions.R'
     'hetData.R'
     'impute.R'
