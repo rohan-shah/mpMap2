@@ -111,6 +111,7 @@ checkMpcrossMapped <- function(object)
 	else
 	{
 		markerNames <- unlist(lapply(object@map, names))
+		names(markerNames) <- NULL
 		for(i in 1:length(object@geneticData))
 		{
 			geneticDataMarkers <- markers(object@geneticData[[i]])
