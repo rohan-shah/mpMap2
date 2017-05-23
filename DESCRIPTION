@@ -94,6 +94,7 @@ Collate:
     'subset.R'
     'testDistortion.R'
     'toMpMap.R'
+    'transposeProbabilities.R'
     'twoParentPedigree.R'
     'validation.R'
 RoxygenNote: 5.0.1

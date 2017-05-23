@@ -41,6 +41,7 @@
 #include "transformForMPWGAIM.h"
 #include "intercrossingAndSelfingGenerations.h"
 #include "stripPedigree.h"
+#include "transposeProbabilities.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -97,6 +98,7 @@ extern "C"
 		{"getAllFunnelsIncAIC", (DL_FUNC)&getAllFunnelsIncAIC, 2}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
+		{"transposeProbabilities", (DL_FUNC)&transposeProbabilities, 1},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

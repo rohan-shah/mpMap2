@@ -105,7 +105,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 	}
 	if(sum(c("markers", "lines", "chromosomes") %in% names(arguments)) != 1)
 	{
-		stop("Exactly one of arguments markers and lines is required for function subset.mpcrossMapped")
+		stop("Exactly one of arguments markers, lines and chromosomes is required for function subset.mpcrossMapped")
 	}
 	if("markers" %in% names(arguments))
 	{
