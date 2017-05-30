@@ -79,6 +79,7 @@ Collate:
     'pedigreeGraph-class.R'
     'pedigreeGraph.R'
     'pedigreeToGraph.R'
+    'plotProbabilities.R'
     'print.R'
     'purdyToPedigree.R'
     'removeHets.R'
