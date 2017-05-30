@@ -2,7 +2,7 @@
 #include <iterator>
 #include <vector>
 #include <string>
-SEXP transposeProbabilities(SEXP probabilities_sexp)
+SEXP transposeProbabilities(SEXP geneticData_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
@@ -35,6 +35,33 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input geneticData@founders must be an integer matrix");
 	}
+	Rcpp::CharacterVector founderNames = rownames(founders);
+	int nFounders = founders.nrow();
+
+	Rcpp::S4 pedigree;
+	try
+	{
+		pedigree = Rcpp::as<Rcpp::S4>(geneticData.slot("pedigree"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input geneticData@pedigree must be an S4 object");
+	}
+
+	std::string selfing;
+	try
+	{
+		selfing = Rcpp::as<std::string>(pedigree.slot("selfing"));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input geneticData@pedigree@selfing must be a string");
+	}
+	if(selfing != "infinite" && selfing != "finite")
+	{
+		throw std::runtime_error("Input geneticData@pedigree@selfing had an invalid value");
+	}
+	bool infiniteSelfing = selfing != "finite";
 
 	Rcpp::S4 probabilities;
 	try
@@ -88,27 +115,53 @@ BEGIN_RCPP
 		std::transform(names.begin(), names.end(), std::back_inserter(positionNames), &Rcpp::as<std::string>);
 	}
 
-	if(data.ncol() != positionNames.size() || data.nrow() != nAlleles * nFinals)
+	if(infiniteSelfing && (data.ncol() != positionNames.size() || data.nrow() != nFounders * nFinals))
+	{
+		throw std::runtime_error("Input geneticData@probabilities@data had the wrong dimensions");
+	}
+	if(!infiniteSelfing && (data.ncol() != positionNames.size() || data.nrow() != nAlleles * nFinals))
 	{
 		throw std::runtime_error("Input geneticData@probabilities@data had the wrong dimensions");
 	}
 
-	Rcpp::NumericMatrix results(nFinals, positionNames.size()*nAlleles);
-	Rcpp::CharacterVector newColumnNames(positionNames.size()*nAlleles);
-	for(int alleleCounter = 0; alleleCounter < nAlleles; alleleCounter++)
+	Rcpp::NumericMatrix results;
+	Rcpp::CharacterVector newColumnNames;
+	if(infiniteSelfing)
 	{
-		for(int positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
+		results = Rcpp::NumericMatrix (nFinals, positionNames.size()*nFounders);
+		newColumnNames = Rcpp::CharacterVector(positionNames.size()*nFounders);
+		for(int alleleCounter = 0; alleleCounter < nFounders; alleleCounter++)
 		{
-			std::stringstream ss;
-			ss << positionNames[positionCounter] << " - " << (alleleCounter+1);
-			newColumnNames(positionCounter * nAlleles + alleleCounter) = ss.str();
-			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+			for(int positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
 			{
-				results(finalCounter, positionCounter*nAlleles+ alleleCounter) = data(finalCounter*nAlleles+ alleleCounter, positionCounter);
+				std::stringstream ss;
+				ss << positionNames[positionCounter] << " - " << Rcpp::as<std::string>(founderNames(alleleCounter));
+				newColumnNames(positionCounter * nFounders + alleleCounter) = ss.str();
+				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+				{
+					results(finalCounter, positionCounter*nFounders + alleleCounter) = data(finalCounter*nFounders + alleleCounter, positionCounter);
+				}
 			}
 		}
 	}
-
+	else
+	{
+		results = Rcpp::NumericMatrix (nFinals, positionNames.size()*nAlleles);
+		newColumnNames = Rcpp::CharacterVector(positionNames.size()*nAlleles);
+		for(int alleleCounter = 0; alleleCounter < nAlleles; alleleCounter++)
+		{
+			for(int positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
+			{
+				std::stringstream ss;
+				ss << positionNames[positionCounter] << " - " << (alleleCounter+1);
+				newColumnNames(positionCounter * nAlleles + alleleCounter) = ss.str();
+				for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
+				{
+					results(finalCounter, positionCounter*nAlleles+ alleleCounter) = data(finalCounter*nAlleles+ alleleCounter, positionCounter);
+				}
+			}
+		}
+		}
 	Rcpp::rownames(results) = Rcpp::rownames(finals);
 	Rcpp::colnames(results) = newColumnNames;
 	return(results);

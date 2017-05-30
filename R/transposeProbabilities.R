@@ -1,35 +1,39 @@
 #' @export
-transposeProbabilities <- function(probabilities)
+transposeProbabilities <- function(inputObject)
 {
-	if(inherits(probabilities, "mpcrossMapped"))
+	if(inherits(inputObject, "mpcrossMapped"))
 	{
-		mpcross <- probabilities
-		if(length(mpcross@geneticData) == 1)
+		if(length(inputObject@geneticData) == 1)
 		{
-			probabilities <- mpcross@geneticData[[1]]
+			geneticData <- inputObject@geneticData[[1]]
 		}
-		else stop("Please input an mpcrossMapped object with a single experiment, or a geneticData object, or a probabilities object")
+		else stop("Please input an mpcrossMapped object with a single experiment, or a geneticData object")
 	}
-	if(inherits(probabilities, "geneticData"))
+	else if(inherits(inputObject, "geneticData"))
 	{
-		if(!is.null(probabilities@probabilities))
+		if(is.null(inputObject@probabilities))
 		{
 			stop("Input object had no probabilities")
 		}
-		probabilities <- probabilities@probabilities
+		geneticData <- inputObject
 	}
-	if(!inherits(probabilities, "probabilities"))
+	else
 	{
 		stop("Please input an mpcrossMapped object with a single experiment, or a geneticData object, or a probabilities object")
 	}
-	nFounders <- length(unique(probabilities@key[,1]))
-	nFinals <- nrow(probabilities@data) / nAlleles
+	probabilities <- geneticData@probabilities
+	nFounders <- nFounders(geneticData)
+	nFinals <- nLines(geneticData)
 	nProbabilitiesPositions <- length(unlist(probabilities@map))
 	key <- probabilities@key
 	nAlleles <- max(key[,3])
-	if(nrow(probabilities@data) != nAlleles * nFinals || ncol(probabilities@data) != nProbabilitiesPositions)
+	if(geneticData@pedigree@selfing == "infinite" && (nrow(probabilities@data) != nFounders * nFinals || ncol(probabilities@data) != nProbabilitiesPositions))
 	{
-		stop("probabilities@data had the wrong dimensions")
+		stop("Slot probabilities@data had the wrong dimensions")
 	}
-	return(.Call("transposeProbabilities", probabilities, PACKAGE="mpMap2"))
+	else if(geneticData@pedigree@selfing == "finite" && (nrow(probabilities@data) != nAlleles * nFinals || ncol(probabilities@data) != nProbabilitiesPositions))
+	{
+		stop("Slot probabilities@data had the wrong dimensions")
+	}
+	return(.Call("transposeProbabilities", geneticData, PACKAGE="mpMap2"))
 }
