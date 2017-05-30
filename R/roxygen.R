@@ -10,6 +10,7 @@
 #' @importFrom fastcluster hclust
 #' @importFrom nnls nnls
 #' @exportClass pedigreeGraph
+#' @exportClass probabilities
 #' @exportMethod subset 
 #' @exportMethod plot
 #' @importClassesFrom Matrix index dspMatrix dppMatrix

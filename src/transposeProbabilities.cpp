@@ -2,7 +2,7 @@
 #include <iterator>
 #include <vector>
 #include <string>
-SEXP transposeProbabilities(SEXP geneticData_sexp)
+SEXP transposeProbabilities(SEXP probabilities_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 geneticData;
