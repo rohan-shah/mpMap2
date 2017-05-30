@@ -25,9 +25,9 @@ setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
 {
 	arguments <- list(...)
-	if(sum(c("chromosomes", "lines", "markers") %in% names(arguments)) != 1)
+	if(sum(c("chromosomes", "lines", "positions") %in% names(arguments)) != 1)
 	{
-		stop("Exactly one of arguments chromosomes and lines is required for function subset.probabilities")
+		stop("Exactly one of arguments chromosomes, lines and positions is required for function subset.probabilities")
 	}
 	if("lines" %in% names(arguments))
 	{
@@ -35,15 +35,17 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 	}
 	if("chromosomes" %in% names(arguments))
 	{
-		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
-		return(new("probabilities", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+		positions <- unlist(lapply(x@map[arguments$chromosomes], names))
+		return(new("probabilities", data = x@data[,positions], key = x@key, map = x@map[arguments$chromosomes]))
 	}
-	if("markers" %in% names(arguments))
+	if("positions" %in% names(arguments))
 	{
-		markers <- arguments$markers
-		newMap <- lapply(x@map, function(y) y[names(y) %in% markers])
+		positions <- arguments$positions
+		newMap <- lapply(x@map, function(y) y[names(y) %in% positions])
+		#Omit empty chromosomes
+		newMap <- newMap[unlist(lapply(newMap, function(x) length(x) > 0))]
 		class(newMap) <- "map"
-		return(new("probabilities", data = x@data[,markers], key = x@key, map = newMap))
+		return(new("probabilities", data = x@data[,positions], key = x@key, map = newMap))
 	}
 })
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)

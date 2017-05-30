@@ -9,6 +9,7 @@
 #' @importFrom pryr address
 #' @importFrom fastcluster hclust
 #' @importFrom nnls nnls
+#' @importFrom ggplot2 ggplot
 #' @exportClass pedigreeGraph
 #' @exportClass probabilities
 #' @exportMethod subset 
