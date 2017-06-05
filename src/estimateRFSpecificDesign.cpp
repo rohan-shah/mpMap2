@@ -32,7 +32,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 
 	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int minSelfing = *std::min_element(args.selfingGenerations.begin(), args.selfingGenerations.end());
-	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
 	int minAIGenerations = getMinAIGenerations(&args.intercrossingGenerations);
 
 	//This is basically just a huge lookup table
@@ -418,10 +417,7 @@ unsigned long long estimateLookup(rfhaps_internal_args& internal_args)
 	int maxSelfing = *std::max_element(internal_args.selfingGenerations.begin(), internal_args.selfingGenerations.end());
 	std::size_t nDifferentFunnels = internal_args.lineFunnelEncodings.size();
 	std::size_t nRecombLevels = internal_args.recombinationFractions.size();
-
-	int nMarkerRowPatterns = (int)internal_args.rowPatterns.size();
-	int nMarkerColumnPatternss = (int)internal_args.columnPatterns.size();
-
+	
 	std::size_t arraySize;
 	//for i in `seq 1 64`; do echo -e "\t\tcase $i:\n\t\t\tarraySize = sizeof(array2<$i>);\n\t\t\tbreak;"; done > tmp
 	switch(internal_args.maxAlleles)

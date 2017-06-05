@@ -23,7 +23,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 {
 	//Work out maximum number of positions per chromosome
 	int maxChromosomePositions = 0;
-	for(int i = 0; i < allPositions.chromosomes.size(); i++)
+	for(std::size_t i = 0; i < allPositions.chromosomes.size(); i++)
 	{
 		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[i];
 		maxChromosomePositions = std::max(currentChromosome.end - currentChromosome.start, maxChromosomePositions);

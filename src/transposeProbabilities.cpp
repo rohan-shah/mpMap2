@@ -115,11 +115,11 @@ BEGIN_RCPP
 		std::transform(names.begin(), names.end(), std::back_inserter(positionNames), &Rcpp::as<std::string>);
 	}
 
-	if(infiniteSelfing && (data.ncol() != positionNames.size() || data.nrow() != nFounders * nFinals))
+	if(infiniteSelfing && ((std::size_t)data.ncol() != positionNames.size() || data.nrow() != nFounders * nFinals))
 	{
 		throw std::runtime_error("Input geneticData@probabilities@data had the wrong dimensions");
 	}
-	if(!infiniteSelfing && (data.ncol() != positionNames.size() || data.nrow() != nAlleles * nFinals))
+	if(!infiniteSelfing && ((std::size_t)data.ncol() != positionNames.size() || data.nrow() != nAlleles * nFinals))
 	{
 		throw std::runtime_error("Input geneticData@probabilities@data had the wrong dimensions");
 	}

@@ -60,7 +60,7 @@ BEGIN_RCPP
 			alleleCounts[recodedFounders(j, i)]++;
 		}
 		probabilities.resize(uniqueAlleles.size());
-		for(int j = 0; j < uniqueAlleles.size(); j++) probabilities[j] = (double)alleleCounts[j] / (double)nFounders;
+		for(std::size_t j = 0; j < uniqueAlleles.size(); j++) probabilities[j] = (double)alleleCounts[j] / (double)nFounders;
 
 		table.resize(uniqueAlleles.size());
 		std::fill(table.begin(), table.end(), 0);
@@ -74,7 +74,7 @@ BEGIN_RCPP
 			}
 		}
 		testStatistics(i) = L1(i) = L2(i) = 0;
-		for(int j = 0; j < uniqueAlleles.size(); j++)
+		for(std::size_t j = 0; j < uniqueAlleles.size(); j++)
 		{
 			double expected = counter*probabilities[j];
 			testStatistics(i) += (expected - table[j]) * (expected - table[j]) / expected;

@@ -59,7 +59,7 @@ BEGIN_RCPP
 		throw std::runtime_error("Input standardise must be a boolean");
 	}
 
-	int nFounders = founders.nrow(), nFinals = finals.nrow(), nMarkers = finals.ncol();
+	int nFounders = founders.nrow();
 	std::vector<int> intercrossingGenerations, selfingGenerations;
 	getIntercrossingAndSelfingGenerations(pedigree, finals, nFounders, intercrossingGenerations, selfingGenerations);
 
