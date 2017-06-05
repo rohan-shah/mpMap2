@@ -8,20 +8,21 @@ bool split(std::string input, Rcpp::Function& gregexpr, std::string& output1, st
 	}
 	Rcpp::IntegerVector result = Rcpp::as<Rcpp::IntegerVector>(Rcpp::as<Rcpp::List>(gregexpr("/[0-9]+/", input))(0));
 	Rcpp::IntegerVector matchLength = Rcpp::as<Rcpp::IntegerVector>(result.attr("match.length"));
-	int size = -1, matchPosition = -1;
+	int size = -1;
+	std::size_t matchPosition = -1;
 	if(result.size() == 1 && result[0] == -1)
 	{
-		if((matchPosition = (int)input.find("///")) != std::string::npos)
+		if((matchPosition = input.find("///")) != std::string::npos)
 		{
 			matchLength = 3;
 			level = size = 3;
 		}
-		else if((matchPosition = (int)input.find("//")) != std::string::npos)
+		else if((matchPosition = input.find("//")) != std::string::npos)
 		{
 			matchLength = 2;
 			level = size = 2;
 		}
-		else if((matchPosition = (int)input.find("/")) != std::string::npos)
+		else if((matchPosition = input.find("/")) != std::string::npos)
 		{
 			matchLength = 1;
 			level = size = 1;
@@ -175,7 +176,7 @@ BEGIN_RCPP
 	while(continuing)
 	{
 		continuing = false;
-		for(int i = 0 ; i < parentIDs.size(); i++)
+		for(std::size_t i = 0 ; i < parentIDs.size(); i++)
 		{
 			if(levels[i] == currentLevel)
 			{

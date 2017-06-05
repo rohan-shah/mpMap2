@@ -23,7 +23,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 {
 	//Work out maximum number of markers per chromosome
 	int maxChromosomePositions = 0;
-	for(int i = 0; i < allPositions.chromosomes.size(); i++)
+	for(std::size_t i = 0; i < allPositions.chromosomes.size(); i++)
 	{
 		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[i];
 		maxChromosomePositions = std::max(currentChromosome.end - currentChromosome.start, maxChromosomePositions);
@@ -157,17 +157,17 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	forwardsBackwards.maxAIGenerations = maxAIGenerations;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
-	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
+	for(std::size_t chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
 	{
 		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
 		//Take differences
 		std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
-		for(std::size_t i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
+		for(int i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
 
 		//Convert to recombination fractions
 		std::vector<double> recombinationFractions= Rcpp::as<std::vector<double> >(haldaneToRf(differences));
 		//Generate haplotype probability data. 
-		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
+		for(std::size_t markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
 			double recombination = recombinationFractions[markerCounter];
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)

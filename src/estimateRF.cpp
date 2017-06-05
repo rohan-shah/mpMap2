@@ -143,12 +143,12 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		if(markerColumns.size() == 0) throw std::runtime_error("Input markerColumns must have at least one entry");
 
 		//Last bit of validation
-		unsigned long nMarkers = 0;
+		std::size_t nMarkers = 0;
 		for(int i = 0; i < nDesigns; i++)
 		{
 			Rcpp::S4 currentGeneticData = geneticData(i);
 			Rcpp::IntegerMatrix finals = currentGeneticData.slot("finals");
-			if(i != 0 && finals.ncol() != nMarkers)
+			if(i != 0 && (std::size_t)finals.ncol() != nMarkers)
 			{
 				throw std::runtime_error("Inconsistent number of markers across the designs");
 			}
@@ -163,8 +163,8 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 
 		int markerRowMin = *std::min_element(markerRows.begin(), markerRows.end()), markerRowMax = *std::max_element(markerRows.begin(), markerRows.end());
 		int markerColumnMin = *std::min_element(markerColumns.begin(), markerColumns.end()), markerColumnMax = *std::max_element(markerColumns.begin(), markerColumns.end());
-		if(markerRowMin < 0 || markerRowMax >= nMarkers) throw std::runtime_error("Invalid values for input markerRows");
-		if(markerColumnMin < 0 || markerColumnMax >= nMarkers) throw std::runtime_error("Invalid value for input markerColumns");
+		if(markerRowMin < 0 || (std::size_t)markerRowMax >= nMarkers) throw std::runtime_error("Invalid values for input markerRows");
+		if(markerColumnMin < 0 || (std::size_t)markerColumnMax >= nMarkers) throw std::runtime_error("Invalid value for input markerColumns");
 
 		//If the input values of markerRows and markerColumns give a region that's completely in the lower triangular region, then throw an error
 		R_xlen_t nValuesToEstimate = countValuesToEstimate(markerRows, markerColumns);

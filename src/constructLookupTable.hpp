@@ -115,7 +115,6 @@ template<int maxAlleles> bool isValid(std::vector<array2<maxAlleles> >& markerPr
 }
 template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLookupTable(constructLookupTableArgs<maxAlleles>& args)
 {
-	int nMarkerPatternIDs = (int)args.markerPatternData.allMarkerPatterns.size();
 	int nRecombLevels = (int)args.recombinationFractions->size();
 	int nDifferentFunnels = (int)args.lineFunnelEncodings->size();
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations->begin(), args.intercrossingGenerations->end());

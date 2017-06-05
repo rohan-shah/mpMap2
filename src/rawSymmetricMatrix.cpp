@@ -303,7 +303,7 @@ BEGIN_RCPP
 	Rcpp::RawVector data = Rcpp::as<Rcpp::RawVector>(rawSymmetric.slot("data"));
 	R_xlen_t size = markers.size();
 
-	Rcpp::NumericVector result(size*(size - 1)/2, 0);
+	Rcpp::NumericVector result(size*(size - 1)/2, 0.0);
 	int counter = 0;
 	for(R_xlen_t row = 0; row < size; row++)
 	{
