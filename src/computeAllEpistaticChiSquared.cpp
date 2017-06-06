@@ -68,56 +68,61 @@ BEGIN_RCPP
 	int nMarkers = data.ncol();
 	int nLines = data.nrow() / nAlleles;
 	Rcpp::NumericMatrix returnValue(nMarkers, nMarkers);
-	std::vector<double> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
 #ifdef USE_OPENMP
-	#pragma omp parallel for schedule(dynamic)
+	#pragma omp parallel
 #endif
-	for(int marker1 = 0; marker1 < nMarkers; marker1++)
 	{
-		for(int marker2 = 0; marker2 <= marker1; marker2++)
+		std::vector<double> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
+#ifdef USE_OPENMP
+		#pragma omp for schedule(dynamic)
+#endif
+		for(int marker1 = 0; marker1 < nMarkers; marker1++)
 		{
-			std::fill(obs.begin(), obs.end(), 0);
-			std::fill(sums1.begin(), sums1.end(), 0);
-			std::fill(sums2.begin(), sums2.end(), 0);
-			for(int allele1 = 0; allele1 < nAlleles; allele1++)
+			for(int marker2 = 0; marker2 <= marker1; marker2++)
 			{
-				for(int lineCounter = 0; lineCounter < nLines; lineCounter++)
-				{
-					sums1[allele1] += data(lineCounter * nAlleles + allele1, marker1);
-					sums2[allele1] += data(lineCounter * nAlleles + allele1, marker2);
-				}
-				for(int allele2 = 0; allele2 < nAlleles ; allele2++)
+				std::fill(obs.begin(), obs.end(), 0);
+				std::fill(sums1.begin(), sums1.end(), 0);
+				std::fill(sums2.begin(), sums2.end(), 0);
+				for(int allele1 = 0; allele1 < nAlleles; allele1++)
 				{
 					for(int lineCounter = 0; lineCounter < nLines; lineCounter++)
 					{
-						obs[allele1*nAlleles + allele2] += data(lineCounter * nAlleles + allele1, marker1) * data(lineCounter * nAlleles + allele2, marker2);
+						sums1[allele1] += data(lineCounter * nAlleles + allele1, marker1);
+						sums2[allele1] += data(lineCounter * nAlleles + allele1, marker2);
 					}
-				}
-			}
-			double accumulated = 0;
-#ifdef INTERNAL_CHECKS
-			double sumExpected = 0, sumObs = 0;
-#endif
-			for(int allele1 = 0; allele1 < nAlleles; allele1++)
-			{
-				for(int allele2 = 0; allele2 < nAlleles; allele2++)
-				{
-					double expected = sums1[allele1] * sums2[allele2] / nLines;
-					if(expected != 0)
+					for(int allele2 = 0; allele2 < nAlleles ; allele2++)
 					{
-						double absDifference = fabs(expected - obs[allele1*nAlleles + allele2]);
-						accumulated += (absDifference - 0.5) * (absDifference - 0.5) / expected;
+						for(int lineCounter = 0; lineCounter < nLines; lineCounter++)
+						{
+							obs[allele1*nAlleles + allele2] += data(lineCounter * nAlleles + allele1, marker1) * data(lineCounter * nAlleles + allele2, marker2);
+						}
 					}
-#ifdef INTERNAL_CHECKS
-					sumExpected += expected;
-					sumObs += obs[allele1*nAlleles + allele2];
-#endif
 				}
-			}
+				double accumulated = 0;
 #ifdef INTERNAL_CHECKS
-			if(fabs(sumExpected - sumObs) > 1e-4) throw std::runtime_error("Internal error");
+				double sumExpected = 0, sumObs = 0;
 #endif
-			returnValue(marker1, marker2) = returnValue(marker2, marker1) = accumulated;
+				for(int allele1 = 0; allele1 < nAlleles; allele1++)
+				{
+					for(int allele2 = 0; allele2 < nAlleles; allele2++)
+					{
+						double expected = sums1[allele1] * sums2[allele2] / nLines;
+						if(expected != 0)
+						{
+							double absDifference = fabs(expected - obs[allele1*nAlleles + allele2]);
+							accumulated += (absDifference - 0.5) * (absDifference - 0.5) / expected;
+						}
+#ifdef INTERNAL_CHECKS
+						sumExpected += expected;
+						sumObs += obs[allele1*nAlleles + allele2];
+#endif
+					}
+				}
+#ifdef INTERNAL_CHECKS
+				if(fabs(sumExpected - sumObs) > 1e-4) throw std::runtime_error("Internal error");
+#endif
+				returnValue(marker1, marker2) = returnValue(marker2, marker1) = accumulated;
+			}
 		}
 	}
 	return returnValue;
