@@ -9,8 +9,8 @@ Description: Tools for constructing linkage maps, reconstructing haplotypes,
     estimating linkage disequilibrium and QTL mapping in multi-parent RIL
     designs (e.g. MAGIC)
 License: GPL-2
-LazyLoad: yes
 SystemRequirements: C++11
+LazyLoad: yes
 Suggests:
     testthat
 Imports:
@@ -18,12 +18,12 @@ Imports:
     Matrix,
     methods,
     qtl,
-    methods,
     igraph,
     fastcluster,
     pryr,
     nnls
 LinkingTo: Rcpp
+RoxygenNote: 5.0.1
 Collate:
     'Rcpp_exceptions.R'
     'as.mpInterval.R'
@@ -79,11 +79,13 @@ Collate:
     'pedigreeGraph-class.R'
     'pedigreeGraph.R'
     'pedigreeToGraph.R'
+    'plot.probabilities.R'
     'plotProbabilities.R'
     'print.R'
     'purdyToPedigree.R'
     'removeHets.R'
     'reorderPedigree.R'
+    'reverseChromosomes.R'
     'rilPedigree.R'
     'roxygen.R'
     'selfing.R'
@@ -98,4 +100,3 @@ Collate:
     'transposeProbabilities.R'
     'twoParentPedigree.R'
     'validation.R'
-RoxygenNote: 5.0.1

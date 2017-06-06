@@ -69,6 +69,9 @@ BEGIN_RCPP
 	int nLines = data.nrow() / nAlleles;
 	Rcpp::NumericMatrix returnValue(nMarkers, nMarkers);
 	std::vector<double> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
+#ifdef USE_OPENMP
+	#pragma omp parallel for schedule(dynamic)
+#endif
 	for(int marker1 = 0; marker1 < nMarkers; marker1++)
 	{
 		for(int marker2 = 0; marker2 <= marker1; marker2++)
