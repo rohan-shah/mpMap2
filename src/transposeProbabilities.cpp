@@ -132,7 +132,7 @@ BEGIN_RCPP
 		newColumnNames = Rcpp::CharacterVector(positionNames.size()*nFounders);
 		for(int alleleCounter = 0; alleleCounter < nFounders; alleleCounter++)
 		{
-			for(int positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
+			for(std::size_t positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
 			{
 				std::stringstream ss;
 				ss << positionNames[positionCounter] << " - " << Rcpp::as<std::string>(founderNames(alleleCounter));
@@ -150,7 +150,7 @@ BEGIN_RCPP
 		newColumnNames = Rcpp::CharacterVector(positionNames.size()*nAlleles);
 		for(int alleleCounter = 0; alleleCounter < nAlleles; alleleCounter++)
 		{
-			for(int positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
+			for(std::size_t positionCounter = 0; positionCounter < positionNames.size(); positionCounter++)
 			{
 				std::stringstream ss;
 				ss << positionNames[positionCounter] << " - " << (alleleCounter+1);
