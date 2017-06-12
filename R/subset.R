@@ -31,7 +31,13 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 	}
 	if("lines" %in% names(arguments))
 	{
-		return(new("probabilities", data = x@data[arguments$lines,], key = x@key, map = x@map))
+		if(is.character(arguments$lines))
+		{
+			stop("Subsetting probabilities objects by line names is not supported. Use line indices instead")
+		}
+		nAlleles <- length(unique(x@key[,3]))
+		rows <- unlist(sapply(arguments$lines, function(x) ((x-1)*nAlleles+1):((x-1)*nAlleles+nAlleles), simplify=FALSE))
+		return(new("probabilities", data = x@data[rows,], key = x@key, map = x@map))
 	}
 	if("chromosomes" %in% names(arguments))
 	{
@@ -297,7 +303,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		}
 		if(!is.null(x@probabilities))
 		{
-			retVal@probabilities <- subset(x@probabilities, lines = lines)
+			retVal@probabilities <- subset(x@probabilities, lines = match(lines, finalNames(x)))
 		}
 		return(retVal)
 	}

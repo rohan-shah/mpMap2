@@ -5,7 +5,7 @@ test_that("Test transposeProbabilities with infinite selfing",
 	pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 20, selfingGenerations = 1, intercrossingGenerations = 1)
 	pedigree@selfing <- "infinite"
 	map <- sim.map(len = rep(100, 2), n.mar = rep(51, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-	cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+	cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
 	rf <- estimateRF(cross)
 	grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
 	mapped <- new("mpcrossMapped", grouped, map = map)
