@@ -41,8 +41,8 @@ test_that("Subsetting of mapped objects by line names works for probabilities, w
 	subsettedSecond <- subset(probabilities, lines = finalNames(mapped)[2])
 	subsettedSecond <- subset(probabilities, lines = 2)
 	
-	expect_identical(subsettedFirst@geneticData[[1]]@probabilities@data, mapped@geneticData[[1]]@probabilities@data[1:4,])
-	expect_identical(subsettedSecond@geneticData[[1]]@probabilities@data, mapped@geneticData[[1]]@probabilities@data[5:8,])
+	expect_identical(subsettedFirst@geneticData[[1]]@probabilities@data, probabilities@geneticData[[1]]@probabilities@data[1:4,])
+	expect_identical(subsettedSecond@geneticData[[1]]@probabilities@data, probabilities@geneticData[[1]]@probabilities@data[5:8,])
 })
 test_that("Subsetting of mapped objects by line names works for probabilities, with finite selfing",
 {
