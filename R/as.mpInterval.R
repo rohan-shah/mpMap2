@@ -27,6 +27,11 @@ as.mpInterval <- function(object, type = "mpMarker")
 	for(datasetCounter in 1:length(object@geneticData))
 	{
 		geneticData <- object@geneticData[[datasetCounter]]
+		if(any(!(colnames(geneticData@probabilities@data) %in% markers(geneticData))))
+		{
+			warning("Discarding probability data not corresponding to a marker")
+			geneticData@probabilities <- subset(geneticData@probabilities, positions = markers(geneticData))
+		}
 		currentDataFounders <- nFounders(geneticData)
 		wgaimObject <- list()
 		wgaimObject$pheno <- data.frame(id = rownames(finals(geneticData)))
@@ -44,7 +49,7 @@ as.mpInterval <- function(object, type = "mpMarker")
 			markerIndices <- match(names(currentChrMap), flattenedMap)
 			start <- min(markerIndices)
 			end <- max(markerIndices)
-			wgaimObject$geno[[chromosome]]$imputed.dat <- transformed$probabilities[, (start*currentDataFounders - (currentDataFounders - 1)):(currentDataFounders*end)]
+			wgaimObject$geno[[chromosome]]$imputed.data <- transformed$probabilities[, (start*currentDataFounders - (currentDataFounders - 1)):(currentDataFounders*end)]
 			class(wgaimObject$geno[[chromosome]]) <- "A"
 		}
 		class(wgaimObject) <- c("mpInterval", "cross", "interval")

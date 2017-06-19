@@ -2,6 +2,21 @@ context("Conversion of 8-way cross to mpwgaim object")
 suppressWarnings(capture.output(couldLoadPackages <- require(mpwgaim, quietly=T) && require(mpMap, quietly=T)))
 if(couldLoadPackages)
 {
+	test_that("Require probabilities", 
+	{
+		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
+		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		cross2 <- cross + multiparentSNP(keepHets = FALSE)
+		mapped <- new("mpcrossMapped", cross2, map = map)
+		expect_error(newConverted <- as.mpInterval(mapped), "not have genotype probabilities")
+
+		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
+		expect_warning(newConverted <- as.mpInterval(prob), "Discarding probability data not corresponding to a marker")
+		
+		prob <- computeGenotypeProbabilities(mapped)
+		newConverted <- as.mpInterval(prob)
+	})
 	test_that("Conversion of 8-way object agrees with old code",
 	{
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
@@ -11,7 +26,6 @@ if(couldLoadPackages)
 		mapped <- new("mpcrossMapped", cross2, map = map)
 		prob <- computeGenotypeProbabilities(mapped)
 		newConverted <- as.mpInterval(prob)
-		class(newConverted[[1]]) <- c("mpMarker", "cross", "interval")
 		newConverted <- newConverted[[1]]
 
 		old <- list()

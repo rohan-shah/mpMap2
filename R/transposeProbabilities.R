@@ -19,7 +19,7 @@ transposeProbabilities <- function(inputObject)
 	}
 	else
 	{
-		stop("Please input an mpcrossMapped object with a single experiment, or a geneticData object, or a probabilities object")
+		stop("Please input an mpcrossMapped object with a single experiment, or a geneticData object")
 	}
 	probabilities <- geneticData@probabilities
 	nFounders <- nFounders(geneticData)
