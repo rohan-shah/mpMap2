@@ -12,7 +12,7 @@ if(couldLoadPackages)
 		expect_error(newConverted <- as.mpInterval(mapped), "not have genotype probabilities")
 
 		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
-		expect_warning(newConverted <- as.mpInterval(prob), "Discarding probability data not corresponding to a marker")
+		newConverted <- as.mpInterval(prob)
 		
 		prob <- computeGenotypeProbabilities(mapped)
 		newConverted <- as.mpInterval(prob)

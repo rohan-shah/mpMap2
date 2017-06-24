@@ -14,7 +14,7 @@ BEGIN_RCPP
 	int nMarkers = (int)founders.ncol();
 	int nFinals = (int)finals.nrow();
 
-	if(probabilitiesData.nrow() != nFinals * nFounders || probabilitiesData.ncol() != nMarkers)
+	if(probabilitiesData.nrow() != nFinals * nFounders)
 	{
 		throw std::runtime_error("Probabilities data had the wrong dimensions");
 	}
@@ -89,14 +89,16 @@ BEGIN_RCPP
 		}
 	}
 	//Probability data also has to be transformed
-	Rcpp::NumericMatrix transformedProbabilities(nFinals, nMarkers*nFounders);
-	Rcpp::CharacterVector transformedProbabilitiesColNames(nMarkers*nFounders);
+	int nProbabilitiesMarkers = probabilitiesData.ncol();
+	Rcpp::NumericMatrix transformedProbabilities(nFinals, nProbabilitiesMarkers*nFounders);
+	Rcpp::CharacterVector transformedProbabilitiesColNames(nProbabilitiesMarkers*nFounders);
+	Rcpp::CharacterVector probabilitiesMarkerNames = Rcpp::colnames(probabilitiesData);
 	int counter = 0;
-	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)
+	for(int markerCounter = 0; markerCounter < nProbabilitiesMarkers; markerCounter++)
 	{
 		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 		{
-			transformedProbabilitiesColNames(counter) = Rcpp::as<std::string>(markerNames(markerCounter)) + " - " + Rcpp::as<std::string>(founderNames(founderCounter));
+			transformedProbabilitiesColNames(counter) = Rcpp::as<std::string>(probabilitiesMarkerNames(markerCounter)) + " - " + Rcpp::as<std::string>(founderNames(founderCounter));
 			counter++;
 			for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 			{

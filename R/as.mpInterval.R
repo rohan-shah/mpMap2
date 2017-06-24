@@ -27,11 +27,6 @@ as.mpInterval <- function(object, type = "mpMarker")
 	for(datasetCounter in 1:length(object@geneticData))
 	{
 		geneticData <- object@geneticData[[datasetCounter]]
-		if(any(!(colnames(geneticData@probabilities@data) %in% markers(geneticData))))
-		{
-			warning("Discarding probability data not corresponding to a marker")
-			geneticData@probabilities <- subset(geneticData@probabilities, positions = markers(geneticData))
-		}
 		currentDataFounders <- nFounders(geneticData)
 		wgaimObject <- list()
 		wgaimObject$pheno <- data.frame(id = rownames(finals(geneticData)))
@@ -40,13 +35,15 @@ as.mpInterval <- function(object, type = "mpMarker")
 		wgaimObject$nfounders <- nFounders(geneticData)
 		wgaimObject$founders <- rownames(founders(geneticData))
 		transformed <- .Call("transformForMPWGAIM", geneticData, PACKAGE="mpMap2")
+		flattenedProbabilitiesMap <- unlist(lapply(geneticData@probabilities@map, names))
 		for(chromosome in 1:length(object@map))
 		{
 			currentChrMap <- object@map[[chromosome]]
+			currentChrProbabilitiesMap <- geneticData@probabilities@map[[chromosome]]
 			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrMap
 			wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrMap)]
 			wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrMap)]
-			markerIndices <- match(names(currentChrMap), flattenedMap)
+			markerIndices <- match(names(currentChrProbabilitiesMap), flattenedProbabilitiesMap)
 			start <- min(markerIndices)
 			end <- max(markerIndices)
 			wgaimObject$geno[[chromosome]]$imputed.data <- transformed$probabilities[, (start*currentDataFounders - (currentDataFounders - 1)):(currentDataFounders*end)]
