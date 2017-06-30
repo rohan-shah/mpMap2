@@ -29,9 +29,15 @@ Releases of mpMap2 are available under [the releases section](https://github.com
 
 This package can be compiled in two ways; either using the standard package compilation commands (E.g. R CMD INSTALL) or by using the included CMake build files. On Windows, compilation using the standard toolset **requires Rtools 3.3**.
 
-The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
+### Compilation on Linux using CMake
+
+1. Download and compile the customized version of Rcpp from github repository rohan-shah/Rcpp, using CMake. Once the library is built, a file RcppConfig.cmake will be generated.
+2. Run cmake, specifying -DRcpp_DIR=**\<RcppBinaryDir\>**, where **\<RcppBinaryDir\>** is the directory containing RcppConfig.cmake.
+3. Run make && make install. 
 
 ### Compilation on Windows using CMake and Visual Studio
+
+The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
 
 1. Download and compile the customized version of Rcpp from github repository rohan-shah/Rcpp. See the associated Readme file for details on compiling that code. 
 2. Run the cmake gui. 
@@ -46,4 +52,4 @@ The configuration scripts generate an import library for R.dll. This means that 
 
 The package can now be compiled by either running nmake in the binaries directory (NMake Makefiles) or opening mpMap2.sln in the binaries directory. Once the package is compiled a properly formed R package (including NAMESPACE, DESCRIPTION, .R files and C code) will have been constructed in the binaries directory. If Visual Studio output was selected, the package directory will be **\<mpMap2Binaries\>/\<buildType\>** (E.g. **\<mpMap2Root\>/build/Release** for a release build). If NMake Makefiles output was selected, the package will be **\<mpMap2Binaries\>** (E.g **\<mpMap2Root\>/Release**). 
 
-The package can be built using the INSTALL target, which is run using "nmake install" if NMake Makefiles output was selected. Alternatively, after the package is built you can run the standard R CMD INSTALL command. 
+The package can be built using the INSTALL target, or the standard R CMD INSTALL command. 
