@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(mpMap2)
 
-option(USE_OPENMP "Use OpenMP" ON)
-option(USE_BOOST "Use Boost" ON)
+option(USE_OPENMP "Use OpenMP" OFF)
+option(USE_BOOST "Use Boost" OFF)
 option(INTERNAL_CHECKS "Run internal consistency checks" OFF)
 
 if(INTERNAL_CHECKS)
