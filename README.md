@@ -35,6 +35,21 @@ This package can be compiled in two ways; either using the standard package comp
 2. Run cmake, specifying -DRcpp_DIR=**\<RcppBinaryDir\>**, where **\<RcppBinaryDir\>** is the directory containing RcppConfig.cmake.
 3. Run make && make install. 
 
+For example:
+
+    git clone https://github.com/rohan-shah/mpMap2.git
+    git clone https://github.com/rohan-shah/Rcpp.git
+    cd Rcpp
+    mkdir release
+    cd release
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make
+    cd ../../mpMap2
+    mkdir release
+    cd release
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DRcpp_DIR=../Rcpp/release
+    make && make install
+
 ### Compilation on Windows using CMake and Visual Studio
 
 The CMake build files allow compilation using Visual Studio on Windows. Although using Visual Studio is optional for R/mpMap2, R/mpMapInteractive2 definitely needs to be compiled using Visual Studio as it uses the Qt graphics framework. 
