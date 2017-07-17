@@ -50,6 +50,7 @@ as.mpInterval <- function(object, type = "mpMarker")
 			class(wgaimObject$geno[[chromosome]]) <- "A"
 		}
 		class(wgaimObject) <- c("mpInterval", "cross", "interval")
+		wgaimObject$gen.type <- "mpMarker"
 		results[[length(results)+1]] <- wgaimObject
 	}
 	return(results)
