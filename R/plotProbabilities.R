@@ -1,5 +1,5 @@
 #' @export
-plotProbabilities <- function(inputObject, positions, alleles)
+plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 {
 	if(inherits(inputObject, "mpcrossMapped"))
 	{
@@ -20,6 +20,12 @@ plotProbabilities <- function(inputObject, positions, alleles)
 	if(is.null(geneticData@probabilities))
 	{
 		stop("No probabilities were found")
+	}
+	if(!missing(chromosomes))
+	{
+		subsettedMap <- inputObject@map[names(inputObject@map) %in% chromosomes]
+		if(length(subsettedMap) == 0 || any(!(chromosomes %in% names(inputObject@map)))) stop("Please enter valid chromosome names")
+		positions <- unlist(lapply(subsettedMap, names))
 	}
 	if(!missing(positions))
 	{
@@ -42,7 +48,7 @@ plotProbabilities <- function(inputObject, positions, alleles)
 		dataSets <- list()
 		for(founder in 1:nFounders)
 		{
-			averages <- apply(transposed[,(0:(nPositions-1))*nFounders + founder], 2, mean)
+			averages <- apply(transposed[,(0:(nPositions-1))*nFounders + founder,drop=FALSE], 2, mean)
 			dataSets[[founder]] <- data.frame(value = averages, positionName = positionNames, position = positions + offsetVector, chromosome = rep(names(geneticData@probabilities@map), times = unlist(lapply(geneticData@probabilities@map, length))), founder = rownames(founders(geneticData))[founder], stringsAsFactors = FALSE)
 		}
 		combined <- do.call(rbind, dataSets[alleles])

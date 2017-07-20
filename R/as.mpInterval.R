@@ -40,9 +40,16 @@ as.mpInterval <- function(object, type = "mpMarker")
 		{
 			currentChrMap <- object@map[[chromosome]]
 			currentChrProbabilitiesMap <- geneticData@probabilities@map[[chromosome]]
-			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrMap
-			wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrMap)]
-			wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrMap)]
+			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrProbabilitiesMap
+			
+			wgaimObject$geno[[chromosome]]$data <- matrix(nrow = nrow(transformed$finals), ncol = length(currentChrProbabilitiesMap), data = NA) #transformed$finals[,names(currentChrMap)]
+			rownames(wgaimObject$geno[[chromosome]]$data) <- rownames(transformed$finals)
+			colnames(wgaimObject$geno[[chromosome]]$data) <- names(currentChrProbabilitiesMap)
+
+			wgaimObject$geno[[chromosome]]$founders <- matrix(nrow = nrow(transformed$founders), ncol = length(currentChrProbabilitiesMap), data = NA) #transformed$founders[,names(currentChrMap)]
+			rownames(wgaimObject$geno[[chromosome]]$founders) <- rownames(transformed$founders)
+			colnames(wgaimObject$geno[[chromosome]]$founders) <- names(currentChrProbabilitiesMap)
+
 			markerIndices <- match(names(currentChrProbabilitiesMap), flattenedProbabilitiesMap)
 			start <- min(markerIndices)
 			end <- max(markerIndices)
