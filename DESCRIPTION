@@ -79,6 +79,8 @@ Collate:
     'pedigreeGraph-class.R'
     'pedigreeGraph.R'
     'pedigreeToGraph.R'
+    'plot.R'
+    'plotMosaic.R'
     'plotProbabilities.R'
     'print.R'
     'purdyToPedigree.R'
