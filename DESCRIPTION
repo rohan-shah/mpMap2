@@ -21,7 +21,9 @@ Imports:
     igraph,
     fastcluster,
     pryr,
-    nnls
+    nnls,
+    Heatplus,
+    RColorBrewer
 LinkingTo: Rcpp
 RoxygenNote: 5.0.1
 Collate:
