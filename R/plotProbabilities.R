@@ -17,6 +17,10 @@ plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 	{
 		stop("Input object must have class mpcrossMapped or geneticData")
 	}
+	if(!missing(positions) && !missing(chromosomes))
+	{
+		stop("Cannot use inputs positions and chromosomes together")
+	}
 	if(is.null(geneticData@probabilities))
 	{
 		stop("No probabilities were found")

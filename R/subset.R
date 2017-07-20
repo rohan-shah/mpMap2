@@ -4,22 +4,30 @@
 setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 {
 	arguments <- list(...)
-	if("markers" %in% names(arguments))
+	if(sum(c("chromosomes", "lines", "positions") %in% names(arguments)) != 1)
 	{
-		stop("Cannot subset imputation object by markers")
-	}
-	if(sum(c("chromosomes", "lines") %in% names(arguments)) != 1)
-	{
-		stop("Exactly one of arguments chromosomes and lines is required for function subset.imputed")
+		stop("Exactly one of arguments chromosomes lines and positions is required for function subset.imputed")
 	}
 	if("lines" %in% names(arguments))
 	{
 		return(new("imputed", data = x@data[arguments$lines,], key = x@key, map = x@map))
 	}
-	if("chromosomes" %in% names(arguments))
+	else if("chromosomes" %in% names(arguments))
 	{
 		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
 		return(new("imputed", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+	}
+	else
+	{
+		allPositions <- unlist(lapply(x@map, names))
+		if(!is.character(arguments$positions))
+		{
+			stop("Input positions must be position names")
+		}
+		if(any(!(arguments$positions %in% allPositions))) stop("Input positions contained invalid values")
+		newMap <- lapply(x@map, function(y) y[names(y) %in% arguments$positions])
+		class(newMap) <- "map"
+		return(new("imputed", data = x@data[,arguments$positions], key = x@key, map = newMap))
 	}
 })
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
