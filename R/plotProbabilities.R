@@ -62,12 +62,12 @@ plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 	}
 	else if(geneticData@pedigree@selfing == "finite")
 	{
+		nAlleles <- length(unique(geneticData@probabilities@key[,3]))
 		if(missing(alleles)) alleles <- 1:nAlleles
 		dataSets <- list()
-		nAlleles <- length(unique(geneticData@probabilities@key[,3]))
 		for(allele in 1:nAlleles)
 		{
-			averages <- apply(transposed[,(0:(nPositions-1))*nAlleles + allele], 2, mean)
+			averages <- apply(transposed[,(0:(nPositions-1))*nAlleles + allele,drop=FALSE], 2, mean)
 			if(allele <= nFounders) alleleName <- rownames(founders(geneticData))[allele]
 			else
 			{

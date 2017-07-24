@@ -10,7 +10,7 @@ setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 	}
 	if("lines" %in% names(arguments))
 	{
-		return(new("imputed", data = x@data[arguments$lines,], key = x@key, map = x@map))
+		return(new("imputed", data = x@data[arguments$lines,,drop=FALSE], key = x@key, map = x@map))
 	}
 	else if("chromosomes" %in% names(arguments))
 	{
@@ -27,7 +27,7 @@ setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 		if(any(!(arguments$positions %in% allPositions))) stop("Input positions contained invalid values")
 		newMap <- lapply(x@map, function(y) y[names(y) %in% arguments$positions])
 		class(newMap) <- "map"
-		return(new("imputed", data = x@data[,arguments$positions], key = x@key, map = newMap))
+		return(new("imputed", data = x@data[,arguments$positions,drop=FALSE], key = x@key, map = newMap))
 	}
 })
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)

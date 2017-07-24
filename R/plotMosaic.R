@@ -37,10 +37,17 @@ plotMosaic <- function(inputObject, chromosomes, positions, lines, ...)
 	}
 	if(!missing(lines))
 	{
-		imputed <- imputed[lines, ]
+		imputed <- subset(imputed, lines = lines)
 	}
 	dataMatrix <- imputed@data
 	founders <- nFounders(geneticData)
 	dataMatrix[dataMatrix > founders+1] <- founders+1
-	heatmap_2(dataMatrix, scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+	if(nrow(dataMatrix) == 1)
+	{
+		heatmap_2(rbind(dataMatrix, dataMatrix), scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+	}
+	else
+	{
+		heatmap_2(dataMatrix, scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+	}
 }
