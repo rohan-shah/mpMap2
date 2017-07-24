@@ -18,5 +18,6 @@
 #' @exportMethod plot
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @importFrom methods setClass
+#' @importFrom jsonlite toJSON
 #' @useDynLib mpMap2
 NULL

@@ -23,4 +23,5 @@ Imports:
     pryr,
     nnls,
     Heatplus,
-    RColorBrewer
+    RColorBrewer,
+    jsonlite

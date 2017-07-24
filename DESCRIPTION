@@ -23,7 +23,8 @@ Imports:
     pryr,
     nnls,
     Heatplus,
-    RColorBrewer
+    RColorBrewer,
+    jsonlite
 LinkingTo: Rcpp
 RoxygenNote: 5.0.1
 Collate:
@@ -50,6 +51,7 @@ Collate:
     'estimateMap.R'
     'estimateRF.R'
     'expand.R'
+    'exportMapToPretzl.R'
     'f2Pedigree.R'
     'finals.R'
     'fixedNumberOfFounderAlleles.R'
