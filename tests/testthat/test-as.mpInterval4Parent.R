@@ -9,13 +9,19 @@ if(couldLoadPackages)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(keepHets = FALSE)
 		mapped <- new("mpcrossMapped", cross2, map = map)
-		expect_error(newConverted <- as.mpInterval(mapped), "not have genotype probabilities")
+		expect_error(suppressWarnings(newConverted <- as.mpInterval(mapped, positions = "all")), "not have genotype probabilities")
 		
 		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
-		newConverted <- as.mpInterval(prob)
+		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all"))
 		
 		prob <- computeGenotypeProbabilities(mapped)
-		newConverted <- as.mpInterval(prob)
+		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all"))
+
+		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
+		newConverted <- as.mpInterval(prob, positions = "marker")
+		
+		prob <- computeGenotypeProbabilities(mapped)
+		newConverted <- as.mpInterval(prob, positions = "marker")
 	})
 	test_that("Conversion of 4-way object agrees with old code, for SNP markers",
 	{
@@ -24,8 +30,10 @@ if(couldLoadPackages)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(keepHets = FALSE)
 		mapped <- new("mpcrossMapped", cross2, map = map)
+
+		#This error probability is chosen to match the one in mpcross2int. It seems the one in mpcross2int can't be easily changed. 
 		prob <- computeGenotypeProbabilities(mapped)
-		newConverted <- as.mpInterval(prob)
+		newConverted <- as.mpInterval(prob, positions = "marker")
 		newConverted <- newConverted[[1]]
 
 		old <- list()
@@ -36,7 +44,7 @@ if(couldLoadPackages)
 		old$id <- which(old$pedigree[,4] == 1)
 		old$fid <- 1:4
 		class(old) <- "mpcross"
-		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl"))
+		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0))
 
 		#They may disagree on the marker encoding, so fix that up
 		for(chr in 1:2)
@@ -57,7 +65,6 @@ if(couldLoadPackages)
 			expect_identical(oldConverted$geno[[chr]]$map, newConverted$geno[[chr]]$map)
 			expect_true(all.equal(oldConverted$geno[[chr]]$founders, newConverted$geno[[chr]]$founders, check.attributes = FALSE))
 			expect_true(all.equal(oldConverted$geno[[chr]]$data, newConverted$geno[[chr]]$data, check.attributes = FALSE))
-			expect_true(all.equal(oldConverted$geno[[chr]]$imputed.dat, newConverted$geno[[chr]]$imputed.dat, check.attributes = FALSE, tolerance = 0.01))
 		}
 	})
 	test_that("Conversion of 4-way object agrees with old code, for multiallelic markers",
@@ -67,8 +74,9 @@ if(couldLoadPackages)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + removeHets()
 		mapped <- new("mpcrossMapped", cross2, map = map)
-		prob <- computeGenotypeProbabilities(mapped)
-		newConverted <- as.mpInterval(prob)
+		#This error probability is chosen to match the one in mpcross2int. It seems the one in mpcross2int can't be easily changed. 
+		prob <- computeGenotypeProbabilities(mapped, errorProb = 0)
+		newConverted <- as.mpInterval(prob, positions = "marker")
 		newConverted <- newConverted[[1]]
 
 		old <- list()
@@ -79,7 +87,7 @@ if(couldLoadPackages)
 		old$id <- which(old$pedigree[,4] == 1)
 		old$fid <- 1:4
 		class(old) <- "mpcross"
-		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl"))
+		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0))
 
 		expect_identical(newConverted$nfounders, 4L)
 		for(chr in 1:2)
@@ -88,7 +96,6 @@ if(couldLoadPackages)
 			expect_identical(oldConverted$geno[[chr]]$map, newConverted$geno[[chr]]$map)
 			expect_true(all.equal(oldConverted$geno[[chr]]$founders, newConverted$geno[[chr]]$founders + 1, check.attributes = FALSE))
 			expect_true(all.equal(oldConverted$geno[[chr]]$data, newConverted$geno[[chr]]$data + 1, check.attributes = FALSE))
-			expect_true(all.equal(oldConverted$geno[[chr]]$imputed.dat, newConverted$geno[[chr]]$imputed.dat, check.attributes = FALSE, tolerance = 0.01))
 		}
 	})
 }
