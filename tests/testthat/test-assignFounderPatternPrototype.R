@@ -8,7 +8,10 @@ test_that("Check that works with a biparental marker, 8-way design",
 	newFounders <- rep(c(rep(0L, 4), rep(1L, 4)), times = nMarkers(cross))
 	dim(newFounders) <- dim(founders(cross))
 	dimnames(newFounders) <- dimnames(founders(cross))
+
 	changed <- cross + mpMap2:::assignFounderPatternPrototype(newFounders)
+	changed_cpp <- cross + mpMap2:::assignFounderPattern(newFounders)
+	expect_identical(changed, changed_cpp)
 
 	translationVector <- vector(length = 36, mode = "integer")
 	translationVector[1:4] <- 0L
@@ -42,6 +45,8 @@ test_that("Check that works with random SNP markers, 8-way design",
 	#First with hets
 	changed <- cross + multiparentSNP(keepHets = TRUE)
 	manuallyChanged <- cross + mpMap2:::assignFounderPatternPrototype(changed@geneticData[[1]]@founders)
+	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders)
+	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
 	#Hetdata isn't ordered quite the same way, not that it really matters.
 	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L), c(0L, 0L, 0L)))
@@ -71,6 +76,8 @@ test_that("Check that works with a biparental marker, 4-way design",
 	dim(newFounders) <- dim(founders(cross))
 	dimnames(newFounders) <- dimnames(founders(cross))
 	changed <- cross + mpMap2:::assignFounderPatternPrototype(newFounders)
+	changed_cpp <- cross + mpMap2:::assignFounderPattern(newFounders)
+	expect_identical(changed, changed_cpp)
 
 	translationVector <- vector(length = 10, mode = "integer")
 	translationVector[1:2] <- 0L
@@ -104,6 +111,8 @@ test_that("Check that works with random SNP markers, 4-way design",
 	#First with hets
 	changed <- cross + multiparentSNP(keepHets = TRUE)
 	manuallyChanged <- cross + mpMap2:::assignFounderPatternPrototype(changed@geneticData[[1]]@founders)
+	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders)
+	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
 	#Hetdata isn't ordered quite the same way, not that it really matters.
 	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L), c(0L, 0L, 0L)))
@@ -116,6 +125,9 @@ test_that("Check that works with random SNP markers, 4-way design",
 	#Without hets
 	changed <- cross + multiparentSNP(keepHets = FALSE)
 	manuallyChanged <- cross + mpMap2:::assignFounderPatternPrototype(changed@geneticData[[1]]@founders) + removeHets()
+	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders) + removeHets()
+	expect_identical(manuallyChanged, manuallyChanged_cpp)
+
 	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 0L, 0L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{

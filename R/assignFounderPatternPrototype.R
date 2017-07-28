@@ -63,7 +63,7 @@ assignFounderPatternPrototypeInternal <- function(geneticData, founderPattern)
 		allAlleles <- unique(currentHetData[,3])
 		if(any(allAlleles > nFounders*(nFounders+1)/2) || any(allAlleles < 1))
 		{
-			stop("An encoding for an allele was out of range. All alleles should be smaller than (nFounders*(nFounders+1)/2 + 1)")
+			stop("An encoding for an allele was out of range. All alleles should be between 0 and (nFounders*(nFounders+1)/2 + 1)")
 		}
 		nNewHomozygotes <- length(unique(founderPattern[,x]))
 		newHet <- as.integer(max(unique(founderPattern[,x])) + 1)
