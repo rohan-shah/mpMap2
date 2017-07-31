@@ -99,7 +99,7 @@ isNewMpcrossLGArgument <- function(x)
 {
 	call <- sys.call(sys.parent(0))
 	parentCall <- sys.call(sys.parent(1))
-	if(missing(x) || (class(x) != "mpcrossLG" && canCoerce(x, "mpcrossRF")))
+	if(missing(x) || (class(x) != "mpcrossLG" && !canCoerce(x, "mpcrossLG")))
 	{
 		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " must be an mpcrossLG object"))
 	}
@@ -117,9 +117,13 @@ isNewMpcrossRFArgument <- function(x)
 {
 	call <- sys.call(sys.parent(0))
 	parentCall <- sys.call(sys.parent(1))
-	if(missing(x) || (class(x) != "mpcrossLG" && class(x) != "mpcrossRF"))
+	if(missing(x) || (class(x) != "mpcrossLG" && class(x) != "mpcrossRF" && class(x) != "mpcrossMapped"))
 	{
 		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " must be an mpcrossRF object"))
+	}
+	if(class(x) == "mpcrossMapped" && is.null(x@rf))
+	{
+		stop(paste0("Argument ", deparse(call[[2]]), " of ", deparse(parentCall[[1]]), " cannot be automatically converted to an object of class mpcrossRF"))
 	}
 	if(class(x) == "mpcrossLG" && is.null(x@rf))
 	{

@@ -134,6 +134,14 @@ checkMpcrossMapped <- function(object)
 }
 .mpcrossMapped <- setClass("mpcrossMapped", contains = "mpcross", slots = list(map = "map", rf = "rfOrNULL"), validity=checkMpcrossMapped)
 
+setAs("mpcrossMapped", "mpcrossRF", def = function(from, to)
+	{
+		if(is.null(from@rf))
+		{
+			stop("Must have recombination fraction data, to convert from class mpcrossMapped to mpcross")
+		}
+		return(new(to, as(from, "mpcross"), rf = from@rf))
+	})
 setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
 	{
 		groups <- rep(1:length(from@map), each = unlist(lapply(from@map, length)))

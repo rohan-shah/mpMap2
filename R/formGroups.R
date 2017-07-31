@@ -18,6 +18,14 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 	{
 		stop("Input mpcrossRF object must have a @rf@lod entry (likelihood ratio) in order to use combined or lod grouping")
 	}
+	if(groups == 1)
+	{
+		groups <- rep(1L, nMarkers(mpcrossRF))
+		names(groups) <- markers(mpcrossRF)
+		lg <- new("lg", allGroups=1L, groups=groups)
+		output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
+		return(output)
+	}
 	if(!preCluster)
 	{
 		nMarkers <- length(mpcrossRF@rf@theta@markers)
@@ -93,9 +101,7 @@ formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average"
 		}
 		cut <- originalCut
 	}
-	
 	lg <- new("lg", allGroups=1:groups, groups=cut)
 	output <- new("mpcrossLG", mpcrossRF, lg = lg, rf = mpcrossRF@rf)
 	return(subset(output, markers = order(cut)))
-
 }
