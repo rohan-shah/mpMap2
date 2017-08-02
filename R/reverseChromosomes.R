@@ -21,5 +21,10 @@ reverseChromosomes <- function(mpcrossMapped, chromosomes)
 		warning("Discarding imputation data")
 	}
 	newOrder <- unlist(lapply(newMap, names))
-	return(new("mpcrossMapped", subset(mpcrossMapped, markers = newOrder), map = newMap))
+	newRF <- NULL
+	if(!is.null(mpcrossMapped@rf))
+	{
+		newRF <- subset(mpcrossMapped@rf, markers = newOrder)
+	}
+	return(new("mpcrossMapped", subset(mpcrossMapped, markers = newOrder), map = newMap, rf = newRF))
 }

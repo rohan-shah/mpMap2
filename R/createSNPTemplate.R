@@ -17,14 +17,30 @@ createSNPTemplate <- function(inputObject, newData, hetEncoding, markerName)
 	{
 		stop("Input object must have class mpcross or geneticData")
 	}
+	if(is.null(names(newData)))
+	{
+		stop("Input data must have names")
+	}
 	founders <- cbind(newData[rownames(founders(geneticData))])
 	colnames(founders) <- markerName
 	alleles <- na.omit(unique(founders))
-	if(length(alleles) > 2)
+	if(missing(hetEncoding))
 	{
-		stop("Cannot call createSNPTemplate with more than two homozygous alleles")
+		hetData <- rbind(cbind(alleles, alleles, alleles))
+		warning("Input hetEncoding was missing, so no heterozygote encodings are generated. Was this desired?")
 	}
-	hetData <- rbind(cbind(alleles, alleles, alleles), c(alleles[1], alleles[2], hetEncoding), c(alleles[2], alleles[1], hetEncoding))
+	else if(length(hetEncoding) == 1)
+	{
+		hetData <- rbind(cbind(alleles, alleles, alleles), c(alleles[1], alleles[2], hetEncoding), c(alleles[2], alleles[1], hetEncoding))
+	} 
+	else
+	{
+		if(is.null(dim(hetEncoding)) || ncol(hetEncoding) != 3)
+		{
+			stop("Input hetEncoding must be a single number, or a matrix with three columns")
+		}
+		hetData <- rbind(cbind(alleles, alleles, alleles), hetEncoding)
+	}
 	dimnames(hetData) <- NULL
 	hetData <- list(hetData)
 	names(hetData) <- markerName
