@@ -3,6 +3,7 @@ cache: packages
 sudo: required
 warnings_are_errors: false
 latex: false
+dist: trusty
 
 matrix:
   include:
