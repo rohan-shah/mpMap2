@@ -71,6 +71,7 @@ Collate:
     'getIntercrossingAndSelfingGenerations.R'
     'getPositions.R'
     'hetData.R'
+    'imputationGenerics.R'
     'impute.R'
     'imputeFounders.R'
     'jitterMap.R'
