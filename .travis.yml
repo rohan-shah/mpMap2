@@ -29,6 +29,7 @@ before_install:
  - mkdir -p ~/.R
  - echo "VkVSPS01DQpDQz1nY2MkKFZFUikgLXN0ZD1jMTEgDQpDWFg9ZysrJChWRVIpDQpTSExJQl9DWFhMRD1nKyskKFZFUikNCkZDPWdmb3J0cmFuJChWRVIpDQpGNzc9Z2ZvcnRyYW4kKFZFUik=" | base64 -d > ~/.R/Makevars
  - cat ~/.R/Makevars
+ - Rscript -e 'source("https://bioconductor.org/biocLite.R");  biocLite("Heatplus")'
 
 notifications:
   email:
