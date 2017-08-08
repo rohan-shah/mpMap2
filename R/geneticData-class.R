@@ -132,7 +132,7 @@ checkGeneticData <- function(object)
 	#Check imputed slot
 	if(!is.null(object@imputed))
 	{
-		if(!identical(rownames(object@imputed@data), rownames(object@finals)))
+		if(!identical(rownames(imputationData(object)), rownames(object@finals)))
 		{
 			return("Row names of slot imputed@data must be the same as those of slot finals")
 		}
@@ -166,7 +166,7 @@ checkGeneticData <- function(object)
 		{
 			return("The number of rows in slot pheno must match the number of rows in slot finals")
 		}
-		if(!isTRUE(all.equal(rownames(object@pheno), rownames(object@finals))))
+		if(!isTRUE(all.equal(rownames(object@pheno), rownames(object@finals), check.attributes = FALSE)))
 		{
 			return("The row names of slot pheno must match the row names of slot finals")
 		}
@@ -188,8 +188,7 @@ checkImputedData <- function(object)
 		return("Slot key must have three columns")
 	}
 	allMapMarkers <- unlist(lapply(object@map, names))
-	names(allMapMarkers) <- NULL
-	if(!isTRUE(all.equal(allMapMarkers, colnames(object@data))))
+	if(!isTRUE(all.equal(allMapMarkers, colnames(object@data), check.attributes = FALSE)))
 	{
 		return("Slot data must have marker names that match the markers in slot map")
 	}
@@ -199,7 +198,7 @@ checkImputedData <- function(object)
 	}
 	tmp <- unlist(lapply(object@map, names))
 	names(tmp) <- NULL
-	if(!identical(colnames(object@data), tmp))
+	if(!isTRUE(all.equal(colnames(object@data), tmp, check.attributes = FALSE)))
 	{
 		return("Column names of imputed object did not match the associated map")
 	}

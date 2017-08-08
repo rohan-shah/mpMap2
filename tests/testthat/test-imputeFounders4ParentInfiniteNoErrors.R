@@ -17,7 +17,7 @@ test_that("Test agreement with the truth",
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.96)
+			expect_gt(sum(diag(tmp)) / sum(tmp), 0.95)
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
