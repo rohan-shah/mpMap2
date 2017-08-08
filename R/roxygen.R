@@ -16,6 +16,8 @@
 #' @exportClass probabilities
 #' @exportMethod subset 
 #' @exportMethod plot
+#' @exportMethod imputationMap
+#' @exportMethod flatImputationMapNames
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @importFrom methods setClass
 #' @importFrom jsonlite toJSON
