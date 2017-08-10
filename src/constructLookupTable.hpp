@@ -1,5 +1,6 @@
 #ifndef CONSTRUCT_LOOKUP_TABLE_HEADER_GUARD
 #define CONSTRUCT_LOOKUP_TABLE_HEADER_GUARD
+#define N_FINER_POINTS 101
 #include "matrices.hpp"
 #include "probabilities.hpp"
 #include "intercrossingHaplotypeToMarker.hpp"
@@ -127,7 +128,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 	typedef std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs> compressedProbabilitiesType;
 	rowMajorMatrix<compressedProbabilitiesType> funnelHaplotypeProbabilities(nRecombLevels, maxSelfing - minSelfing + 1);
 	//In order to determine if a marker combination is informative, we use a much finer numerical grid.
-	const int nFinerPoints = 101;
+	const int nFinerPoints = N_FINER_POINTS;
 	std::vector<double> finerRecombLevels(nFinerPoints);
 	for(int recombCounter = 0; recombCounter < nFinerPoints; recombCounter++)
 	{

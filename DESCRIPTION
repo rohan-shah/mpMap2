@@ -55,6 +55,7 @@ Collate:
     'eightWayPedigreeSingleFunnel.R'
     'estimateMap.R'
     'estimateRF.R'
+    'estimateRFSingleDesign.R'
     'expand.R'
     'exportMapToPretzl.R'
     'extraImputationPoints.R'

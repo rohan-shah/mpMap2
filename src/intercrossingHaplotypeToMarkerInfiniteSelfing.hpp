@@ -42,9 +42,10 @@ public:
 				for(int secondMarkerValue = 0; secondMarkerValue < secondMarkerPatternData.nObservedValues; secondMarkerValue++)
 				{
 					double currentMarkerProb = 0;
+					int* tableOffset = table[firstMarkerValue][secondMarkerValue];
 					for(int differentProbCounter = 0; differentProbCounter < nDifferentProbs; differentProbCounter++)
 					{
-						if(table[firstMarkerValue][secondMarkerValue][differentProbCounter] > 0) currentMarkerProb += table[firstMarkerValue][secondMarkerValue][differentProbCounter]*haplotypeProbabilitiesThisRecomb[differentProbCounter];
+						currentMarkerProb += tableOffset[differentProbCounter]*haplotypeProbabilitiesThisRecomb[differentProbCounter];
 					}
 					if(takeLogs)
 					{
