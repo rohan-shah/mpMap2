@@ -21,5 +21,7 @@ Imports:
     igraph,
     fastcluster,
     pryr,
-    nnls
-
+    nnls,
+    Heatplus,
+    RColorBrewer,
+    jsonlite

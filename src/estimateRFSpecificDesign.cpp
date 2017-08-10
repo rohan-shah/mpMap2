@@ -659,7 +659,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	std::map<funnelEncoding, funnelID> funnelTranslation;
 	//vector giving the funnel ID for each individual
 	std::vector<funnelID> lineFunnelIDs;
-	//vector giving the encoded value for each individual
+	//vector giving the encoded value for each funnelID in lineFunnelIDs
 	std::vector<funnelEncoding> lineFunnelEncodings;
 	//vector giving the encoded value for each value in allFunnels
 	std::vector<funnelEncoding> allFunnelEncodings;

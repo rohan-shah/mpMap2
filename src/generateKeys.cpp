@@ -1,5 +1,5 @@
 #include "generateKeys.h"
-void generateKeys(Rcpp::IntegerMatrix& key, Rcpp::IntegerMatrix& outputKey, int nFounders)
+void generateKeys(Rcpp::IntegerMatrix& key, Rcpp::IntegerMatrix& outputKey, int nFounders, bool infiniteSelfing)
 {
 	key = Rcpp::IntegerMatrix(nFounders, nFounders);
 	for(int i = 0; i < nFounders; i++)
@@ -16,8 +16,19 @@ void generateKeys(Rcpp::IntegerMatrix& key, Rcpp::IntegerMatrix& outputKey, int 
 		}
 	}
 	//We also want a version closer to the hetData format
-	outputKey = Rcpp::IntegerMatrix(nFounders*nFounders, 3);
+	if(infiniteSelfing)
 	{
+		outputKey = Rcpp::IntegerMatrix(nFounders, 3);
+		for(int i = 0; i < nFounders; i++)
+		{
+			outputKey(i, 0) = i+1;
+			outputKey(i, 1) = i+1;
+			outputKey(i, 2) = key(i, i);
+		}
+	}
+	else
+	{
+		outputKey = Rcpp::IntegerMatrix(nFounders*nFounders, 3);
 		int counter = 0;
 		for(int i = 0; i < nFounders; i++)
 		{

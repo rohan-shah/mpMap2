@@ -7,7 +7,7 @@ getAllFunnels <- function(cross, standardised = FALSE)
 	}
 	if(class(cross) == "geneticData")
 	{
-		return(.Call("getAllFunnels", cross, PACKAGE="mpMap2"))
+		return(.Call("getAllFunnels", cross, standardised, PACKAGE="mpMap2"))
 	}
 	else if(inherits(cross, "mpcross"))
 	{
@@ -34,7 +34,7 @@ getAllFunnelsIncAIC <- function(cross, standardised = FALSE)
 	}
 	if(class(cross) == "geneticData")
 	{
-		return(.Call("getAllFunnels", cross, PACKAGE="mpMap2"))
+		return(.Call("getAllFunnels", cross, standardised, PACKAGE="mpMap2"))
 	}
 	else if(inherits(cross, "mpcross"))
 	{

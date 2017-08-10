@@ -98,6 +98,7 @@ estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod 
 			rownames(lkhd) <- colnames(lkhd) <- markers(object)
 			object@rf@lkhd <- lkhd
 		}
+		object@rf@gbLimit <- gbLimit
 		output <- object
 	}
 	else

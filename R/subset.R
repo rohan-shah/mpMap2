@@ -4,22 +4,30 @@
 setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 {
 	arguments <- list(...)
-	if("markers" %in% names(arguments))
+	if(sum(c("chromosomes", "lines", "positions") %in% names(arguments)) != 1)
 	{
-		stop("Cannot subset imputation object by markers")
-	}
-	if(sum(c("chromosomes", "lines") %in% names(arguments)) != 1)
-	{
-		stop("Exactly one of arguments chromosomes and lines is required for function subset.imputed")
+		stop("Exactly one of arguments chromosomes lines and positions is required for function subset.imputed")
 	}
 	if("lines" %in% names(arguments))
 	{
-		return(new("imputed", data = x@data[arguments$lines,], key = x@key, map = x@map))
+		return(new("imputed", data = x@data[arguments$lines,,drop=FALSE], key = x@key, map = x@map))
 	}
-	if("chromosomes" %in% names(arguments))
+	else if("chromosomes" %in% names(arguments))
 	{
 		markers <- unlist(lapply(x@map[arguments$chromosomes], names))
 		return(new("imputed", data = x@data[,markers], key = x@key, map = x@map[arguments$chromosomes]))
+	}
+	else
+	{
+		allPositions <- unlist(lapply(x@map, names))
+		if(!is.character(arguments$positions))
+		{
+			stop("Input positions must be position names")
+		}
+		if(any(!(arguments$positions %in% allPositions))) stop("Input positions contained invalid values")
+		newMap <- lapply(x@map, function(y) y[names(y) %in% arguments$positions])
+		class(newMap) <- "map"
+		return(new("imputed", data = x@data[,arguments$positions,drop=FALSE], key = x@key, map = newMap))
 	}
 })
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
@@ -31,7 +39,13 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 	}
 	if("lines" %in% names(arguments))
 	{
-		return(new("probabilities", data = x@data[arguments$lines,], key = x@key, map = x@map))
+		if(is.character(arguments$lines))
+		{
+			stop("Subsetting probabilities objects by line names is not supported. Use line indices instead")
+		}
+		nAlleles <- length(unique(x@key[,3]))
+		rows <- unlist(sapply(arguments$lines, function(x) ((x-1)*nAlleles+1):((x-1)*nAlleles+nAlleles), simplify=FALSE))
+		return(new("probabilities", data = x@data[rows,], key = x@key, map = x@map))
 	}
 	if("chromosomes" %in% names(arguments))
 	{
@@ -297,7 +311,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		}
 		if(!is.null(x@probabilities))
 		{
-			retVal@probabilities <- subset(x@probabilities, lines = lines)
+			retVal@probabilities <- subset(x@probabilities, lines = match(lines, finalNames(x)))
 		}
 		return(retVal)
 	}

@@ -76,7 +76,7 @@ void orderFunnel(int* funnel, int nFounders)
 	}
 	else if(nFounders == 4)
 	{
-		orderFour(funnel);
+		orderFunnel4(funnel);
 	}
 	else if (nFounders == 8)
 	{

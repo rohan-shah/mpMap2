@@ -9,8 +9,8 @@ Description: Tools for constructing linkage maps, reconstructing haplotypes,
     estimating linkage disequilibrium and QTL mapping in multi-parent RIL
     designs (e.g. MAGIC)
 License: GPL-2
-LazyLoad: yes
 SystemRequirements: C++11
+LazyLoad: yes
 Suggests:
     testthat
 Imports:
@@ -18,15 +18,21 @@ Imports:
     Matrix,
     methods,
     qtl,
-    methods,
     igraph,
     fastcluster,
     pryr,
-    nnls
+    nnls,
+    Heatplus,
+    RColorBrewer,
+    jsonlite
 LinkingTo: Rcpp
+RoxygenNote: 5.0.1
 Collate:
     'Rcpp_exceptions.R'
+    'addExtraMarker.R'
     'as.mpInterval.R'
+    'assignFounderPattern.R'
+    'assignFounderPatternPrototype.R'
     'backcrossPedigree.R'
     'map-class.R'
     'pedigree-class.R'
@@ -39,15 +45,20 @@ Collate:
     'biparentalDominant.R'
     'changeMarkerPosition.R'
     'combineGenotypes.R'
+    'combineKeepRF.R'
     'compressedProbabilities.R'
     'computeGenotypeProbabilities.R'
+    'createSNPTemplate.R'
     'detailedPedigree-class.R'
     'eightWayPedigreeImproperFunnels.R'
     'eightWayPedigreeRandomFunnels.R'
     'eightWayPedigreeSingleFunnel.R'
     'estimateMap.R'
     'estimateRF.R'
+    'estimateRFSingleDesign.R'
     'expand.R'
+    'exportMapToPretzl.R'
+    'extraImputationPoints.R'
     'f2Pedigree.R'
     'finals.R'
     'fixedNumberOfFounderAlleles.R'
@@ -61,6 +72,7 @@ Collate:
     'getIntercrossingAndSelfingGenerations.R'
     'getPositions.R'
     'hetData.R'
+    'imputationGenerics.R'
     'impute.R'
     'imputeFounders.R'
     'jitterMap.R'
@@ -79,11 +91,14 @@ Collate:
     'pedigreeGraph-class.R'
     'pedigreeGraph.R'
     'pedigreeToGraph.R'
+    'plot.R'
+    'plotMosaic.R'
     'plotProbabilities.R'
     'print.R'
     'purdyToPedigree.R'
     'removeHets.R'
     'reorderPedigree.R'
+    'reverseChromosomes.R'
     'rilPedigree.R'
     'roxygen.R'
     'selfing.R'
@@ -98,4 +113,3 @@ Collate:
     'transposeProbabilities.R'
     'twoParentPedigree.R'
     'validation.R'
-RoxygenNote: 5.0.1

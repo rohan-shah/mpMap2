@@ -14,3 +14,19 @@ setMethod(f = "founders", signature = "geneticData", definition = function(objec
 {
 	return(object@founders)
 })
+
+#' @export
+setGeneric(name = "founderNames", def = function(object){standardGeneric("founderNames")})
+setMethod(f = "founderNames", signature = "mpcross", definition = function(object)
+{
+	if(length(object@geneticData) == 1)
+	{
+		return(rownames(object@geneticData[[1]]@founders))
+	}
+	return(lapply(object@geneticData, function(x) rownames(x@founders)))
+})
+setMethod(f = "founderNames", signature = "geneticData", definition = function(object)
+{
+	return(rownames(object@founders))
+})
+

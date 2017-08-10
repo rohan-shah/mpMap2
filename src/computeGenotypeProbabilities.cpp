@@ -338,7 +338,7 @@ BEGIN_RCPP
 	//Construct the key that takes pairs of founder values and turns them into encodings
 	//We also want a version closer to the hetData format
 	Rcpp::IntegerMatrix key, outputKey;
-	generateKeys(key, outputKey, nFounders);
+	generateKeys(key, outputKey, nFounders, infiniteSelfing);
 
 	std::vector<std::string> mapMarkers;
 	mapMarkers.reserve(foundersMarkers.size());

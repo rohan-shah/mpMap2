@@ -10,11 +10,16 @@
 #' @importFrom fastcluster hclust
 #' @importFrom nnls nnls
 #' @importFrom ggplot2 ggplot
+#' @importFrom Heatplus heatmap_2
+#' @importFrom RColorBrewer brewer.pal
 #' @exportClass pedigreeGraph
 #' @exportClass probabilities
 #' @exportMethod subset 
 #' @exportMethod plot
+#' @exportMethod imputationMap
+#' @exportMethod flatImputationMapNames
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @importFrom methods setClass
+#' @importFrom jsonlite toJSON
 #' @useDynLib mpMap2
 NULL

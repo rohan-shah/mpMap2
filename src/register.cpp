@@ -42,6 +42,9 @@
 #include "intercrossingAndSelfingGenerations.h"
 #include "stripPedigree.h"
 #include "transposeProbabilities.h"
+#include "assignFounderPattern.h"
+#include "combineRFDisjoint.h"
+#include "estimateRFSingleDesign.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -99,6 +102,9 @@ extern "C"
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
 		{"getIntercrossingAndSelfingGenerationsExport", (DL_FUNC)&getIntercrossingAndSelfingGenerationsExport, 2},
 		{"transposeProbabilities", (DL_FUNC)&transposeProbabilities, 1},
+		{"assignFounderPattern", (DL_FUNC)&assignFounderPattern, 2},
+		{"combineRFDisjoint", (DL_FUNC)&combineRFDisjoint, 2},
+		{"estimateRFSingleDesign", (DL_FUNC)&estimateRFSingleDesign, 8},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)

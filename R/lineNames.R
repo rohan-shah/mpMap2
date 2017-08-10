@@ -13,6 +13,10 @@ setMethod(f = "lineNames", signature = "mpcross", definition = function(object)
 	if(length(object@geneticData) == 1) return(rownames(finals(object)))
 	else return(lapply(finals(object), rownames))
 })
+setMethod(f = "lineNames", signature = "geneticData", definition = function(object)
+{
+	return(rownames(finals(object)))
+})
 setReplaceMethod("lineNames", "detailedPedigree", function(object, value)
 {
 	if(length(value) != length(object@lineNames))

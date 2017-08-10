@@ -10,6 +10,7 @@ estimateMap <- function(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1, max
 		mapFunction <- rfToHaldane
 	}
 	isNewMpcrossLGArgument(mpcrossLG)
+	if(!inherits(mpcrossLG, "mpcrossLG")) mpcrossLG <- as(mpcrossLG, "mpcrossLG")
 	if (is.null(mpcrossLG@rf) && is.null(mpcrossLG@lg@imputedTheta))
 	{
 		stop("Input object must have recombination fractions")

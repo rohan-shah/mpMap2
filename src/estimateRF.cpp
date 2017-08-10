@@ -80,6 +80,7 @@ SEXP estimateRF(SEXP object_, SEXP recombinationFractions_, SEXP markerRows_, SE
 		{
 			throw Rcpp::not_compatible("Input gbLimit must be a single numeric value");
 		}
+		//The gbLimit / bytesLimit variables only apply to the generated likelihood data - They don't apply to the lookup table, which can be a huge memory bottleneck in some cases. 
 		R_xlen_t bytesLimit = (R_xlen_t)(gbLimit*1000000000LL + 1LL);
 	
 		Rcpp::List geneticData;

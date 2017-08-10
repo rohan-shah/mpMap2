@@ -2,6 +2,8 @@ language: r
 cache: packages
 sudo: required
 warnings_are_errors: false
+latex: false
+dist: trusty
 
 matrix:
   include:
@@ -27,6 +29,7 @@ before_install:
  - mkdir -p ~/.R
  - echo "VkVSPS01DQpDQz1nY2MkKFZFUikgLXN0ZD1jMTEgDQpDWFg9ZysrJChWRVIpDQpTSExJQl9DWFhMRD1nKyskKFZFUikNCkZDPWdmb3J0cmFuJChWRVIpDQpGNzc9Z2ZvcnRyYW4kKFZFUik=" | base64 -d > ~/.R/Makevars
  - cat ~/.R/Makevars
+ - Rscript -e 'source("https://bioconductor.org/biocLite.R");  biocLite("Heatplus")'
 
 notifications:
   email:
@@ -40,5 +43,5 @@ after_failure:
 
 script: 
   - |
-    travis_wait 20 R CMD build .
-    travis_wait  R CMD check mpMap2*tar.gz
+    travis_wait 20 R CMD build . --no-manual
+    travis_wait  R CMD check mpMap2*tar.gz --no-manual

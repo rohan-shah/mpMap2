@@ -1,5 +1,5 @@
 #' @export
-as.mpInterval <- function(object, type = "mpMarker")
+as.mpInterval <- function(object, type = "mpMarker", positions = "marker")
 {
 	if(!isS4(object) || !is(object, "mpcrossMapped"))
 	{
@@ -8,6 +8,14 @@ as.mpInterval <- function(object, type = "mpMarker")
 	if(type != "mpMarker")
 	{
 		stop("The only value for type is currently \"mpMarker\". Value \"mpInterval\" will be implemented later")
+	}
+	if(!(positions %in% c("all", "marker")))
+	{
+		stop("Input positions must be either \"all\" or \"marker\"")
+	}
+	if(positions == "all")
+	{
+		warning("Using positions = \"all\" will result in genetic data being replaced by NA's")
 	}
 	for(dataset in object@geneticData)
 	{
@@ -35,19 +43,43 @@ as.mpInterval <- function(object, type = "mpMarker")
 		wgaimObject$nfounders <- nFounders(geneticData)
 		wgaimObject$founders <- rownames(founders(geneticData))
 		transformed <- .Call("transformForMPWGAIM", geneticData, PACKAGE="mpMap2")
+		flattenedProbabilitiesMap <- unlist(lapply(geneticData@probabilities@map, names))
 		for(chromosome in 1:length(object@map))
 		{
 			currentChrMap <- object@map[[chromosome]]
-			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrMap
-			wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrMap)]
-			wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrMap)]
-			markerIndices <- match(names(currentChrMap), flattenedMap)
-			start <- min(markerIndices)
-			end <- max(markerIndices)
-			wgaimObject$geno[[chromosome]]$imputed.dat <- transformed$probabilities[, (start*currentDataFounders - (currentDataFounders - 1)):(currentDataFounders*end)]
+			currentChrProbabilitiesMap <- geneticData@probabilities@map[[chromosome]]
+
+			#Determine whether we keep the genetic data. If we're using *all* the locations at which the probabilities were calculated, then there isn't necessarily any genetic data for those positions. So put in NA matrices. 
+			if(positions == "all")
+			{
+				wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrProbabilitiesMap
+				wgaimObject$geno[[chromosome]]$data <- matrix(nrow = nrow(transformed$finals), ncol = length(currentChrProbabilitiesMap), data = NA)
+				rownames(wgaimObject$geno[[chromosome]]$data) <- rownames(transformed$finals)
+				colnames(wgaimObject$geno[[chromosome]]$data) <- names(currentChrProbabilitiesMap)
+
+				wgaimObject$geno[[chromosome]]$founders <- matrix(nrow = nrow(transformed$founders), ncol = length(currentChrProbabilitiesMap), data = NA)
+				rownames(wgaimObject$geno[[chromosome]]$founders) <- rownames(transformed$founders)
+				colnames(wgaimObject$geno[[chromosome]]$founders) <- names(currentChrProbabilitiesMap)
+
+				markerIndices <- match(names(currentChrProbabilitiesMap), flattenedProbabilitiesMap)
+				start <- min(markerIndices)
+				end <- max(markerIndices)
+				wgaimObject$geno[[chromosome]]$imputed.data <- transformed$probabilities[, (start*currentDataFounders - (currentDataFounders - 1)):(currentDataFounders*end)]
+			}
+			else
+			{
+				wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrMap
+				wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrMap)]
+				wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrMap)]
+
+				markerIndices <- match(names(currentChrMap), flattenedProbabilitiesMap)
+				probabilityColumnIndices <- rep(markerIndices, times = currentDataFounders)*currentDataFounders + rep(((-(currentDataFounders - 1)):0), times = length(markerIndices))
+				wgaimObject$geno[[chromosome]]$imputed.data <- transformed$probabilities[, probabilityColumnIndices]
+			}
 			class(wgaimObject$geno[[chromosome]]) <- "A"
 		}
 		class(wgaimObject) <- c("mpInterval", "cross", "interval")
+		wgaimObject$gen.type <- "mpMarker"
 		results[[length(results)+1]] <- wgaimObject
 	}
 	return(results)
