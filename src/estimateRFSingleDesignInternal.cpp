@@ -389,6 +389,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 			}
 		}
 	}
+	return true;
 }
 template<bool infiniteSelfing> bool estimateRFSingleDesignInternal1(estimateRFSingleDesignInternalArgs& args)
 {
