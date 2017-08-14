@@ -125,6 +125,10 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 	}
 	if("markers" %in% names(arguments))
 	{
+		if(is.integer(arguments$markers))
+		{
+			arguments$markers <- markers(x)[arguments$markers]
+		}
 		subsettedRF <- NULL
 		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
 		groups <- vector(mode = "integer", length = length(arguments$markers))
