@@ -147,6 +147,17 @@ setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1
   }
   else
   {
+    if(length(e1@geneticData) == 1 && length(e2@geneticData) == 1 && identical(lineNames(e1), lineNames(e2)) && identical(rownames(founders(e1)), rownames(founders(e2))))
+    {
+      copiedPedigree1 <- e1@geneticData[[1]]@pedigree
+      copiedPedigree2 <- e2@geneticData[[1]]@pedigree
+      copiedPedigree1@selfing <- "infinite"
+      copiedPedigree2@selfing <- "infinite"
+      if(identical(copiedPedigree1, copiedPedigree2))
+      {
+        warning("Object pedigrees differ only in slot @selfing. If the values in @slot selfing were identical, these objects could be combined as a single experiment")
+      }
+    }
     #Put all the markers from e1 first
     allMarkers <- c(markers(e1), setdiff(allMarkers, markers(e1)))
     e1ExpandedGeneticData <- expand(e1, newMarkers = allMarkers)
