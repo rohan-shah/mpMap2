@@ -21,6 +21,7 @@ matrix:
       - CXX=g++-5
       - FC=gfortran-5
       - F77=gfortran-5
+      - _R_CHECK_FORCE_SUGGESTS_=0
 
 before_install:
  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 100
