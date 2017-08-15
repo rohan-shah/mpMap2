@@ -1,4 +1,22 @@
 context("Test subsetting of mpcrossMapped objects")
+test_that("Subsetting of mapped objects by markers discards map, unless keepMap is specified",
+{
+	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	f2Pedigree <- f2Pedigree(500)
+	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+	rf <- estimateRF(cross)
+	grouped <- formGroups(rf, groups = 2, clusterBy = "theta", method = "average")
+	mapped <- new("mpcrossMapped", grouped, map = estimateMap(grouped), rf = rf@rf)
+	
+	suppressWarnings(subsetted <- subset(mapped, markers = 1:10))
+	expect_equivalent(class(subsetted), "mpcrossLG")
+
+	suppressWarnings(subsetted <- subset(mapped, markers = 1:10, keepMap = FALSE))
+	expect_equivalent(class(subsetted), "mpcrossLG")
+
+	suppressWarnings(subsetted <- subset(mapped, markers = 1:10, keepMap = TRUE))
+	expect_equivalent(class(subsetted), "mpcrossMapped")
+})
 test_that("Subsetting of mapped objects by lines discards rf data",
 {
 	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)

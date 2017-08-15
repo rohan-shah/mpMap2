@@ -131,11 +131,22 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 		}
 		subsettedRF <- NULL
 		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
-		groups <- vector(mode = "integer", length = length(arguments$markers))
-		names(groups) <- arguments$markers
-		for(chr in 1:length(x@map)) groups[intersect(names(x@map), arguments$markers)] <- chr
-		newLG <- new("lg", groups = groups, allGroups = unique(groups))
-		return(new("mpcrossLG", callNextMethod(), rf = subsettedRF, lg = newLG))
+		if("keepMap" %in% names(arguments) && arguments$keepMap)
+		{
+			if(is.numeric(arguments$markers)) arguments$markers <- markers(x)[arguments$markers]
+			newMap <- lapply(x@map, function(y) y[names(y) %in% arguments$markers])
+			names(newMap) <- names(x@map)
+			class(newMap) <- "map"
+			return(new("mpcrossMapped", callNextMethod(), rf = subsettedRF, map = newMap))
+		}
+		else
+		{
+			groups <- vector(mode = "integer", length = length(arguments$markers))
+			names(groups) <- arguments$markers
+			for(chr in 1:length(x@map)) groups[intersect(names(x@map), arguments$markers)] <- chr
+			newLG <- new("lg", groups = groups, allGroups = unique(groups))
+			return(new("mpcrossLG", callNextMethod(), rf = subsettedRF, lg = newLG))
+		}
 	}
 	else if("chromosomes" %in% names(arguments))
 	{
@@ -186,7 +197,20 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 })
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {
-	return(new("mpcrossRF", callNextMethod(), "rf" = subset(x@rf, ...)))
+	arguments <- list(...)
+	if(sum(c("groups", "markers", "lines") %in% names(arguments)) != 1)
+	{
+		stop("Exactly one of arguments markers, lines and groups is required for function subset.mpcrossRF")
+	}
+	if("lines" %in% names(arguments))
+	{
+		warning("Discarding rf data")
+		return(new("mpcross", callNextMethod()))
+	}
+	else
+	{
+		return(new("mpcrossRF", callNextMethod(), "rf" = subset(x@rf, ...)))
+	}
 })
 setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 {
@@ -218,6 +242,12 @@ setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 		subsettedRF <- NULL
 		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, markers = markers)
 		return(new("mpcrossLG", callNextMethod(x, markers = markers), "lg" = subset(x@lg, markers = markers), "rf" = subsettedRF))
+	}
+	else if("lines" %in% names(arguments))
+	{
+		if(!is.null(x@rf)) warning("Discarding rf data")
+		warning("Retaining linkage group data, even though lines are being discarded")
+		return(new("mpcrossLG", callNextMethod(), "lg" = x@lg, "rf" = NULL))
 	}
 	else
 	{

@@ -2,7 +2,7 @@
 
 export("lineNames<-")
 export("selfing<-")
-export(addExtraMarker)
+export(addExtraMarkers)
 export(as.mpInterval)
 export(assignFounderPattern)
 export(backcrossPedigree)

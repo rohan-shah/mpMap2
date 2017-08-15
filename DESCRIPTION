@@ -12,7 +12,8 @@ License: GPL-2
 SystemRequirements: C++11
 LazyLoad: yes
 Suggests:
-    testthat
+    testthat,
+    mpMapInteractive2
 Imports:
     ggplot2,
     Matrix,
@@ -29,7 +30,7 @@ LinkingTo: Rcpp
 RoxygenNote: 5.0.1
 Collate:
     'Rcpp_exceptions.R'
-    'addExtraMarker.R'
+    'addExtraMarkers.R'
     'as.mpInterval.R'
     'assignFounderPattern.R'
     'assignFounderPatternPrototype.R'

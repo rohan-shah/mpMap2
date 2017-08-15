@@ -1,13 +1,10 @@
 #' @export
-addExtraMarker <- function(mpcrossMapped, newMarker, useOnlyExtraImputationPoints = TRUE, intervalMarkerRadius = 50, maxOffset, knownChromosome, imputationArgs = NULL)
+addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoints = TRUE, reorderRadius = 50, maxOffset = 50, knownChromosome, imputationArgs = NULL, onlyStatistics = FALSE, orderCrossArgs = list(), attemptMpMap2Interactive = TRUE, verbose = TRUE)
 {
-	if(!require(mpMapInteractive2, quietly = TRUE))
+	hasMpMapInteractive2 <- attemptMpMap2Interactive && require(mpMapInteractive2, quietly = TRUE)
+	if(!inherits(newMarkers, "mpcross"))
 	{
-		stop("Function addExtraMarker requires package mpMapInteractiv2")
-	}
-	if(!inherits(newMarker, "mpcross"))
-	{
-		stop("Input newMarker must be an object of class mpcross")
+		stop("Input newMarkers must be an object of class mpcross")
 	}
 	if(!inherits(mpcrossMapped, "mpcrossMapped"))
 	{
@@ -25,12 +22,21 @@ addExtraMarker <- function(mpcrossMapped, newMarker, useOnlyExtraImputationPoint
 	{
 		stop("Input knownChromosome must be a chromosome named in mpcrossMapped@map")
 	}
-	newMarker <- estimateRF(newMarker, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
-	combined <- combineKeepRF(mpcrossMapped, newMarker, verbose = TRUE, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = TRUE)
-	marginalNewMarker <- table(finals(newMarker))
+	if(inherits(newMarkers, "mpcrossMapped"))
+	{
+		warning("Discarding map for additional markers")
+		newMarkers <- as(newMarkers, "mpcross")
+	}
+	newMarkers <- estimateRF(newMarkers, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
+	combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = TRUE)
+	marginalNewMarker <- table(finals(newMarkers))
 	nObservations <- sum(marginalNewMarker)
 	if(useOnlyExtraImputationPoints)
 	{
+		if(length(extraImputationPoints(mpcrossMapped)) == 0)
+		{
+			stop("There were no additional imputation points")
+		}
 		#Get out the imputation map
 		imputationMap <- imputationMap(mpcrossMapped)
 		#Flatten the imputation map
@@ -44,12 +50,16 @@ addExtraMarker <- function(mpcrossMapped, newMarker, useOnlyExtraImputationPoint
 		chiSquared <- apply(imputationGridResults, 2, function(x)
 		{
 			x[x > 8] <- NA
-			subsettedX <- x[!is.na(finals(newMarker))]
-			observed <- table(subsettedX, na.omit(finals(newMarker)))
+			subsettedX <- x[!is.na(finals(newMarkers))]
+			observed <- table(subsettedX, na.omit(finals(newMarkers)))
 			marginalImputed <- table(subsettedX)
 			expected <- outer(marginalImputed, marginalNewMarker) / nObservations
 			return(sum((observed - expected)^2 / expected))
 		})
+		if(onlyStatistics)
+		{
+			return(chiSquared)
+		}
 		chromosomeAssignments <- rep(names(imputationMap), times = unlist(lapply(imputationMap, length)))
 		#Name of the best location
 		if(missing(knownChromosome))
@@ -68,18 +78,27 @@ addExtraMarker <- function(mpcrossMapped, newMarker, useOnlyExtraImputationPoint
 		relevantChromosomeMap <- mpcrossMapped@map[[bestChromosome]]
 		markerIndex <- tail(which(relevantChromosomeMap < bestPosition), 1)
 		#Get out range. 
-		markerRange <- max(1, markerIndex - intervalMarkerRadius):min(length(relevantChromosomeMap), markerIndex + intervalMarkerRadius)
+		markerRange <- max(1, markerIndex - reorderRadius):min(length(relevantChromosomeMap), markerIndex + reorderRadius)
 
-		relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[markerRange], markers(newMarker)))
+		relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[markerRange], markers(newMarkers)))
 		grouped <- formGroups(relevantSubset, groups = 1, clusterBy = "theta")
-		reorderedGrouped <- mpMapInteractive2(grouped)
-		#Get out the reordered markers
-		reorderedMarkers <- markers(reorderedGrouped$object)
+		if(hasMpMapInteractive2)
+		{
+			reorderedGrouped <- mpMapInteractive2(grouped)
+			#Get out the reordered markers
+			reorderedMarkers <- markers(reorderedGrouped$object)
+		}
+		else
+		{
+			reorderedGrouped <- do.call(orderCross, c(list(grouped), orderCrossArgs))
+			#Get out the reordered markers
+			reorderedMarkers <- markers(reorderedGrouped)
+		}
 		permutation <- sapply(reorderedMarkers, function(x) match(x, markers(relevantSubset)))
 		if(cor(permutation, 1:length(reorderedMarkers)) < 0) reorderedMarkers <- rev(reorderedMarkers)
 
 		firstMarkerRange <- match(head(markers(grouped), 1), markers(mpcrossMapped))
-		lastMarkerRange <- match(tail(markers(grouped), 2)[1], markers(mpcrossMapped))
+		lastMarkerRange <- match(tail(markers(grouped), nMarkers(newMarkers) + 1)[1], markers(mpcrossMapped))
 
 		#Construct a new overall ordering of *all* the markers (not just the ones on this chromosome)
 		newMarkerOrder <- c()
@@ -90,14 +109,14 @@ addExtraMarker <- function(mpcrossMapped, newMarker, useOnlyExtraImputationPoint
 
 		#Put original object (Plus extra marker) in the new order. 
 		objectInNewOrder <- subset(combined, markers = newMarkerOrder)
-		newChromosomeMarkers <- newMarkerOrder[(newMarkerOrder %in% names(mpcrossMapped@map[[bestChromosome]])) | newMarkerOrder == markers(newMarker)]
+		newChromosomeMarkers <- newMarkerOrder[(newMarkerOrder %in% names(mpcrossMapped@map[[bestChromosome]])) | (newMarkerOrder %in% markers(newMarkers))]
 		#Get out just the chromosome that's been changed. We only need to recompute the map for these markers.
 		changedChromosomeInNewOrder <- subset(objectInNewOrder, markers = newChromosomeMarkers)
 
 		#Estimate RF fractions for the changed chromosome
 		changedChromosomeInNewOrder <- formGroups(changedChromosomeInNewOrder, groups = 1, clusterBy = "theta")
 		#Re-estimate map for the changed chromosome
-		newMap <- estimateMap(changedChromosomeInNewOrder, maxOffset = maxOffset, mapFunction = haldane, verbose = TRUE)
+		newMap <- estimateMap(changedChromosomeInNewOrder, maxOffset = maxOffset, mapFunction = haldane, verbose = verbose)
 		names(newMap) <- bestChromosome
 		#Copy the old map, and update the chromosome that changed. 
 		finalMap <- mpcrossMapped@map
