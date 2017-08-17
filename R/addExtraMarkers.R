@@ -28,8 +28,7 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		newMarkers <- as(newMarkers, "mpcross")
 	}
 	newMarkers <- estimateRF(newMarkers, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
-	combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = TRUE)
-	marginalNewMarker <- table(finals(newMarkers))
+	marginalNewMarker <- table(finals(newMarkers)[,1])
 	nObservations <- sum(marginalNewMarker)
 	if(useOnlyExtraImputationPoints)
 	{
@@ -50,8 +49,8 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		chiSquared <- apply(imputationGridResults, 2, function(x)
 		{
 			x[x > 8] <- NA
-			subsettedX <- x[!is.na(finals(newMarkers))]
-			observed <- table(subsettedX, na.omit(finals(newMarkers)))
+			subsettedX <- x[!is.na(finals(newMarkers)[,1])]
+			observed <- table(subsettedX, na.omit(finals(newMarkers)[,1]))
 			marginalImputed <- table(subsettedX)
 			expected <- outer(marginalImputed, marginalNewMarker) / nObservations
 			return(sum((observed - expected)^2 / expected))
@@ -79,7 +78,10 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		markerIndex <- tail(which(relevantChromosomeMap < bestPosition), 1)
 		#Get out range. 
 		markerRange <- max(1, markerIndex - reorderRadius):min(length(relevantChromosomeMap), markerIndex + reorderRadius)
+		cat("Reordering markers [", min(markerRange), ":", max(markerRange), "], total nmuber of markres for this chromosome was ", length(relevantChromosomeMap), "\n", sep = "")
 
+		#Combine and keep recombination fractions
+		combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = match(names(mpcrossMapped@map[[bestChromosome]]), markers(mpcrossMapped)))
 		relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[markerRange], markers(newMarkers)))
 		grouped <- formGroups(relevantSubset, groups = 1, clusterBy = "theta")
 		if(hasMpMapInteractive2)

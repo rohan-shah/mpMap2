@@ -17,6 +17,10 @@ combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEs
 	{
 		stop("Slots lod and lkhd must be present for both objects, or missing for both objects")
 	}
+	if(!is.logical(callEstimateRF) && !is.numeric(callEstimateRF))
+	{
+		stop("Input callEstimateRF must be TRUE, FALSE, or a numeric vector")
+	}
 	#Not worried about lineWeights warning
 	suppressWarnings(combined <- object1 + object2)
 	if(length(combined@geneticData) > 1)
@@ -27,9 +31,13 @@ combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEs
 	combined <- new("mpcrossRF", combined, rf = newRF)
 	combined@rf@gbLimit <- gbLimit
 	#Not worried about warning for changing RF of existing object
-	if(callEstimateRF)
+	if(is.logical(callEstimateRF) && callEstimateRF)
 	{
-		suppressWarnings(combined <- estimateRF(combined, recombValues = object1@rf@theta@levels, markerRows = 1:nMarkers(object1), markerColumns = (nMarkers(object1)+1):nMarkers(combined), verbose = verbose, gbLimit = gbLimit))
+		suppressWarnings(combined <- estimateRF(combined, recombValues = object1@rf@theta@levels, markerRows = 1:nMarkers(combined), markerColumns = (nMarkers(object1)+1):nMarkers(combined), verbose = verbose, gbLimit = gbLimit))
+	}
+	else if(is.numeric(callEstimateRF))
+	{
+		suppressWarnings(combined <- estimateRF(combined, recombValues = object1@rf@theta@levels, markerRows = callEstimateRF, markerColumns = (nMarkers(object1)+1):nMarkers(combined), verbose = verbose, gbLimit = gbLimit))
 	}
 	return(combined)
 }
