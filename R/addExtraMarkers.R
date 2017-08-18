@@ -78,11 +78,27 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		markerIndex <- tail(which(relevantChromosomeMap < bestPosition), 1)
 		#Get out range. 
 		markerRange <- max(1, markerIndex - reorderRadius):min(length(relevantChromosomeMap), markerIndex + reorderRadius)
-		cat("Reordering markers [", min(markerRange), ":", max(markerRange), "], total nmuber of markres for this chromosome was ", length(relevantChromosomeMap), "\n", sep = "")
+		cat("Reordering markers [", min(markerRange), ":", max(markerRange), "] of the chromosome, total nmuber of markers for this chromosome was ", length(relevantChromosomeMap), "\n", sep = "")
 
 		#Combine and keep recombination fractions
 		combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = match(names(mpcrossMapped@map[[bestChromosome]]), markers(mpcrossMapped)))
-		relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[markerRange], markers(newMarkers)))
+		#Put the new subset of markers in the right place.
+		if(min(markerRange) == 1 && max(markerRange) == length(relevantChromosomeMap))
+		{
+			relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[1:markerIndex], markers(newMarkers), names(relevantChromosomeMap)[(markerIndex+1):length(relevantChromosomeMap)]))
+		}
+		else if(min(markerRange) == 1)
+		{
+			relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[1:markerIndex], markers(newMarkers), names(relevantChromosomeMap)[(markerIndex+1):(markerIndex+reorderRadius)]))
+		}
+		else if(max(markerRange) == length(relevantChromosomeMap))
+		{
+			relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[(markerIndex - reorderRadius):markerIndex], markers(newMarkers), names(relevantChromosomeMap)[(markerIndex+1):length(relevantChromosomeMap)]))
+		}
+		else
+		{
+			relevantSubset <- subset(combined, markers = c(names(relevantChromosomeMap)[(markerIndex - reorderRadius):markerIndex], markers(newMarkers), names(relevantChromosomeMap)[(markerIndex+1):(markerIndex+reorderRadius)]))
+		}
 		grouped <- formGroups(relevantSubset, groups = 1, clusterBy = "theta")
 		if(hasMpMapInteractive2)
 		{
@@ -99,8 +115,8 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		permutation <- sapply(reorderedMarkers, function(x) match(x, markers(relevantSubset)))
 		if(cor(permutation, 1:length(reorderedMarkers)) < 0) reorderedMarkers <- rev(reorderedMarkers)
 
-		firstMarkerRange <- match(head(markers(grouped), 1), markers(mpcrossMapped))
-		lastMarkerRange <- match(tail(markers(grouped), nMarkers(newMarkers) + 1)[1], markers(mpcrossMapped))
+		firstMarkerRange <- match(names(relevantChromosomeSubset)[min(markerRange)], markers(mpcrossMapped))
+		lastMarkerRange <- match(names(relevantChromosomeSubset)[max(markerRange)], markers(mpcrossMapped))
 
 		#Construct a new overall ordering of *all* the markers (not just the ones on this chromosome)
 		newMarkerOrder <- c()
