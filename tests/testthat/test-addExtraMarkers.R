@@ -22,7 +22,30 @@ test_that("Test validation",
 	expect_true(is.numeric(statistics))
 
 	#Check that the resulting objcet is correct. 
-	results <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, verbose = FALSE)
+	capture.output(results <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, verbose = FALSE))
 	permutation <- match(markers(results$object), markers(cross))
 	expect_gt(abs(cor(permutation, 1:nMarkers(cross))), 0.95)
+})
+test_that("Test that markers go to the right place",
+{
+	map <- sim.map(len = 200, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	f2Pedigree <- f2Pedigree(200)
+	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+	for(relevantMarker in c(1, 10, 90, 101))
+	{
+		subset1 <- subset(cross, markers = (1:101)[-relevantMarker], keepMap = TRUE)
+		subset2 <- subset(cross, markers = relevantMarker)
+
+		rf <- estimateRF(subset1)
+		grouped <- formGroups(rf, groups = 1, clusterBy = "theta", method = "average")
+		estimatedMap <- estimateMap(grouped, maxOffset = 15)
+		mapped <- new("mpcrossMapped", grouped, map = estimatedMap, rf = grouped@rf)
+
+		imputed <- imputeFounders(mapped, errorProb = 0.1, extraPositions = generateGridPositions(1))
+		capture.output(added <- addExtraMarkers(imputed, newMarkers = subset2, reorder = FALSE, maxOffset = 15, reorderRadius = 40))
+		permutation <- sapply(markers(added$object), function(x) match(x, markers(cross)))
+		expect_gt(cor(1:101, permutation), 0.99)
+		reestimatedMap <- estimateMap(added$object, maxOffset = 15)
+		expect_gt(cor(reestimatedMap[[1]], added$object@map[[1]]), 0.99)
+	}
 })
