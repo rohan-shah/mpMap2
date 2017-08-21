@@ -58,6 +58,7 @@ Collate:
     'estimateRF.R'
     'estimateRFSingleDesign.R'
     'expand.R'
+    'expandedProbabilities.R'
     'exportMapToPretzl.R'
     'extraImputationPoints.R'
     'f2Pedigree.R'
