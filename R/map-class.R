@@ -20,6 +20,10 @@ checkMap <- function(object)
 	{
 		return("Marker names must be unique")
 	}
+	if(any(unlist(lapply(object, function(x) order(x) != 1:length(x)))))
+	{
+		return("Marker positions must be in ascending order within every chromosome")
+	}
 	return(TRUE)
 }
 .map4 <- setClass("map4", contains = "list", validity = checkMap)

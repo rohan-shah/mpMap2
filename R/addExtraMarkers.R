@@ -152,12 +152,16 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 			if(min(withinReestimatedMapRange) == 1) updatedChromosomeMap <- c()
 			else updatedChromosomeMap <- finalMap[[bestChromosome]][names(relevantChromosomeMap)[setdiff(1:markerIndex, smallerMarkerRange+1)]]
 			#Then the updated bit
-			updatedChromosomeMap <- c(updatedChromosomeMap, newMap[[1]][withinReestimatedMapRange] + finalMap[[bestChromosome]][head(names(newMap[[1]]), 1)])
+			updatedChromosomeMap <- c(updatedChromosomeMap, newMap[[1]][withinReestimatedMapRange] + finalMap[[bestChromosome]][head(names(newMap[[1]][withinReestimatedMapRange]), 1)] - head(newMap[[1]][withinReestimatedMapRange], 1))
 			#Then for the last bit the distances between adjacent markers stays the same, but the offset has to change. 
 			finalPart <- finalMap[[bestChromosome]][setdiff(names(relevantChromosomeMap)[(markerIndex+1):length(relevantChromosomeMap)], names(relevantChromosomeMap)[smallerMarkerRange])]
 			firstUnchanged <- head(names(finalPart), 1)
 			finalPart <- finalPart - finalPart[1] + tail(updatedChromosomeMap, 1) + finalMap[[bestChromosome]][firstUnchanged] - finalMap[[bestChromosome]][match(firstUnchanged, names(finalMap[[bestChromosome]])) - 1]
-			updatedChromosomeMap <- c(updatedChromosomeMap, finalPart) 
+			updatedChromosomeMap <- c(updatedChromosomeMap, finalPart)
+			#if(any(order(updatedChromosomeMap) != 1:length(updatedChromosomeMap)))
+			#{
+			#	stop("Internal error")
+			#}
 			finalMap[[bestChromosome]] <- updatedChromosomeMap
 		}
 		else

@@ -31,7 +31,7 @@ test_that("Test that markers go to the right place",
 	map <- sim.map(len = 200, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(200)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
-	for(relevantMarker in c(1, 10, 90, 101))
+	for(relevantMarker in c(1, 10, 50, 90, 101))
 	{
 		subset1 <- subset(cross, markers = (1:101)[-relevantMarker], keepMap = TRUE)
 		subset2 <- subset(cross, markers = relevantMarker)
