@@ -2,34 +2,36 @@ context("Test estimateMapFromImputation")
 test_that("Check that estimation of gap sizes is approximately correct, for four parent designs", 
 	{
 		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 2000, selfingGenerations = 5, intercrossingGenerations = 0)
-		pedigree@selfing <- "infinite"
+		pedigree@selfing <- "finite"
 		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
 		cross <- subset(cross, markers = c(1:30, 70:100))
-		rf <- estimateRF(cross)
+		capture.output(rf <- estimateRF(cross))
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
 		estimated.map <- estimateMap(grouped, maxOffset = 10)
 
 		mapped <- new("mpcrossMapped", grouped, map = estimated.map)
-		imputed <- imputeFounders(mapped, errorProb = 0.1)
+		mapped@geneticData[[1]]@pedigree@selfing <- "infinite"
+		suppressWarnings(imputed <- imputeFounders(mapped, errorProb = 0.01))
 		reestimated <- estimateMapFromImputation(imputed)
-		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.05, check.attributes = FALSE)
+		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.10, check.attributes = FALSE)
 	})
 test_that("Check that estimation of gap sizes is approximately correct, for eight parent designs", 
 	{
 		pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 3000, selfingGenerations = 5, intercrossingGenerations = 0)
-		pedigree@selfing <- "infinite"
+		pedigree@selfing <- "finite"
 		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
 		cross <- subset(cross, markers = c(1:30, 70:100))
-		rf <- estimateRF(cross)
+		capture.output(rf <- estimateRF(cross))
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")
 		estimated.map <- estimateMap(grouped, maxOffset = 10)
 
 		mapped <- new("mpcrossMapped", grouped, map = estimated.map)
-		imputed <- imputeFounders(mapped, errorProb = 0.1)
+		mapped@geneticData[[1]]@pedigree@selfing <- "infinite"
+		suppressWarnings(imputed <- imputeFounders(mapped, errorProb = 0.01))
 		reestimated <- estimateMapFromImputation(imputed)
-		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.05, check.attributes = FALSE)
+		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.10, check.attributes = FALSE)
 	})
 #test_that("Check that estimation of gap sizes is approximately correct, for eight parent designs", 
 #	{
