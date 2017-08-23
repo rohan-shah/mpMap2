@@ -91,14 +91,22 @@ bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInt
 	markerPatternConversionArgs.recodedFounders = recodedFounders;
 	markerPatternConversionArgs.recodedHetData = recodedHetData;
 	markerPatternsToUniqueValues(markerPatternConversionArgs);
-	
+
+	unsigned int maxAlleles = 0;
 	for(std::vector<int>::const_iterator i = internal_args.markerRows->begin(); i != internal_args.markerRows->end(); i++) 
 	{
 		markerPatternID currentMarkerID = markerPatternConversionArgs.markerPatternIDs[*i];
+		maxAlleles = std::max(maxAlleles, (unsigned int)markerPatternConversionArgs.allMarkerPatterns[currentMarkerID].nObservedValues);
 	}
 	for(std::vector<int>::const_iterator i = internal_args.markerColumns->begin(); i != internal_args.markerColumns->end(); i++)
 	{
 		markerPatternID currentMarkerID = markerPatternConversionArgs.markerPatternIDs[*i];
+		maxAlleles = std::max(maxAlleles, (unsigned int)markerPatternConversionArgs.allMarkerPatterns[currentMarkerID].nObservedValues);
+	}
+	if(maxAlleles > 64)
+	{
+		error = "To limit compilation time, cannot have more than 64 alleles per marker. Contact the author if you need this limit relaxed. ";
+		return false;
 	}
 
 	//map containing encodings of the funnels involved in the experiment (as key), and an associated unique index (again, using the encoded values directly is no good because they'll be all over the place). Unique indices are contiguous again.
@@ -327,7 +335,6 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 									for(int intercrossingGenerations = minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 									{
 										int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
-									        if(count == 0) continue;
 									        bool allowable = thisMarkerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
 									        if(allowable)
 									        {
@@ -338,7 +345,6 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 									for(int funnelID = 0; funnelID < (int)nDifferentFunnels; funnelID++)
 									{
 										int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
-										if(count == 0) continue;
 										bool allowable = thisMarkerPairData.allowableFunnel(funnelID, selfingGenerations - minSelfing);
 										if(allowable)
 										{

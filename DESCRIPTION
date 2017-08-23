@@ -54,6 +54,7 @@ Collate:
     'eightWayPedigreeImproperFunnels.R'
     'eightWayPedigreeRandomFunnels.R'
     'eightWayPedigreeSingleFunnel.R'
+    'estimateMapFromImputation.R'
     'estimateMap.R'
     'estimateRF.R'
     'estimateRFSingleDesign.R'

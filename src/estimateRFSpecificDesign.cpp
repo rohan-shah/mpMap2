@@ -236,7 +236,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 							for(int intercrossingGenerations = minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 							{
 								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
-								if(count == 0) continue;
 								bool allowable = markerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
 								if(allowable)
 								{
@@ -247,7 +246,6 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 							for(int funnelID = 0; funnelID < (int)nDifferentFunnels; funnelID++)
 							{
 								int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
-								if(count == 0) continue;
 								bool allowable = markerPairData.allowableFunnel(funnelID, selfingGenerations - minSelfing);
 								if(allowable)
 								{
@@ -651,7 +649,7 @@ bool toInternalArgs(estimateRFSpecificDesignArgs&& args, rfhaps_internal_args& i
 	}
 	if(maxAlleles > 64)
 	{
-		error = "Internal error - Cannot have more than 64 alleles per marker";
+		error = "To limit compilation time, cannot have more than 64 alleles per marker. Contact the author if you need this limit relaxed. ";
 		return false;
 	}
 
