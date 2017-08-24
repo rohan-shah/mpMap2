@@ -1,6 +1,6 @@
 #' Form linkage groups
 #' @export
-formGroups <- function(mpcrossRF, groups, clusterBy="combined", method="average", preCluster = FALSE)
+formGroups <- function(mpcrossRF, groups, clusterBy="theta", method="average", preCluster = FALSE)
 {
 	if(!(clusterBy %in% c("combined", "theta", "lod")))
 	{

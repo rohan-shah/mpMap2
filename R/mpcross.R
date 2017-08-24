@@ -1,3 +1,5 @@
+#' @include mpcross-class.R
+#' @include geneticData-class.R
 #' @export
 fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 {

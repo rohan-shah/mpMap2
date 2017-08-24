@@ -1,3 +1,5 @@
+#' @include mpcross-class.R
+#' @include geneticData-class.R
 setClass("assignFounderPattern", slots = list(data = "matrix"))
 #' @export
 assignFounderPattern <- function(founderMatrix)
