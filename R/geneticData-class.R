@@ -4,35 +4,14 @@
 checkGeneticData <- function(object)
 {
 	errors <- c()
-	if(!is.numeric(object@founders))
+	if(!is.integer(object@founders))
 	{
-		errors <- c(errors, "Slot founders must be a numeric matrix")
-	}
-	#Error if all founders are NA (because the next condition after this involves max(,na.rm=T), which requires at least one non-NA val)
-	else if(all(is.na(object@founders)))
-	{
-		errors <- c(errors, "Slot founders cannot contain only NA")
-	}
-	else if(max(abs(round(object@founders) - object@founders), na.rm=TRUE) > 0)
-	{
-		errors <- c(errors, "Slot founders must contain integer values")
+		errors <- c(errors, "Slot founders must be an integer matrix (which is different from a *numeric* matrix). ")
 	}
 	
-	if(!is.numeric(object@finals))
+	if(!is.integer(object@finals))
 	{
-		errors <- c(errors, "Slot finals must be a numeric matrix")
-	}
-	#Don't do the next two checks if there is no data.
-	else if(length(object@finals) > 0)
-	{
-		if(all(is.na(object@finals)))
-		{
-			errors <- c(errors, "Slot finals cannot contain only NA")
-		}
-		else if(max(abs(round(object@finals) - object@finals), na.rm=TRUE) > 0)
-		{
-			errors <- c(errors, "Slot finals must contain integer values")
-		}
+		errors <- c(errors, "Slot finals must be an integer matrix (which is different from a *numeric* matrix). ")
 	}
 
 	if(length(dim(object@finals)) != 2)

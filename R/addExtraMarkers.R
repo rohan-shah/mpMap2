@@ -38,8 +38,7 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		stop("Input reorderRadius must be at least 2*maxOffset + 3")
 	}
 	newMarkers <- estimateRF(newMarkers, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
-	marginalNewMarker <- table(finals(newMarkers)[,1])
-	nObservations <- sum(marginalNewMarker)
+	founders <- nFounders(mpcrossMapped)
 	if(useOnlyExtraImputationPoints)
 	{
 		if(length(extraImputationPoints(mpcrossMapped)) == 0)
@@ -55,14 +54,18 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		names(flattenedImputationMapPositions) <- flattenedImputationMapNames
 		#Get out imputation results only for the grid points
 		imputationGridResults <- imputationData(mpcrossMapped)[,extraImputationPoints(mpcrossMapped)]
+		finalSubset <- finals(newMarkers)[,1]
+		finalSubsetIsNA <- is.na(finalSubset)
+		finalSubsetOmitNA <- na.omit(finalSubset)
 		#Compute chi squared statistics
 		chiSquared <- apply(imputationGridResults, 2, function(x)
 		{
-			x[x > 8] <- NA
-			subsettedX <- x[!is.na(finals(newMarkers)[,1])]
-			observed <- table(subsettedX, na.omit(finals(newMarkers)[,1]))
+			x[x > founders] <- NA
+			subsettedX <- x[!finalSubsetIsNA]
+			observed <- table(subsettedX, finalSubsetOmitNA)
 			marginalImputed <- table(subsettedX)
-			expected <- outer(marginalImputed, marginalNewMarker) / nObservations
+			marginalNewMarker <- apply(observed, 2, sum)
+			expected <- outer(marginalImputed, marginalNewMarker) / sum(marginalImputed)
 			return(sum((observed - expected)^2 / expected))
 		})
 		if(onlyStatistics)
