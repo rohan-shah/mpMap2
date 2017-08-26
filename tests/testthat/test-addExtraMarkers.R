@@ -31,13 +31,14 @@ test_that("Test that markers go to the right place",
 	map <- sim.map(len = 200, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(200)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
+	wholeRF <- estimateRF(cross)
 	for(relevantMarker in c(1, 10, 50, 90, 101))
 	{
 		subset1 <- subset(cross, markers = (1:101)[-relevantMarker], keepMap = TRUE)
 		subset2 <- subset(cross, markers = relevantMarker)
+		subset1RF <- subset(wholeRF, markers = markers(subset1))
 
-		rf <- estimateRF(subset1)
-		grouped <- formGroups(rf, groups = 1, clusterBy = "theta", method = "average")
+		grouped <- formGroups(subset1RF, groups = 1, clusterBy = "theta", method = "average")
 		estimatedMap <- estimateMap(grouped, maxOffset = 15)
 		mapped <- new("mpcrossMapped", grouped, map = estimatedMap, rf = grouped@rf)
 
@@ -47,5 +48,9 @@ test_that("Test that markers go to the right place",
 		expect_gt(cor(1:101, permutation), 0.99)
 		reestimatedMap <- estimateMap(added$object, maxOffset = 15)
 		expect_gt(cor(reestimatedMap[[1]], added$object@map[[1]]), 0.99)
+
+		#Check that adding the RF data has worked
+		reorderedRF <- subset(wholeRF@rf, markers = markers(added$object))
+		expect_identical(reorderedRF, added$object@rf)
 	}
 })

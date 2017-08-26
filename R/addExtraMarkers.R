@@ -63,8 +63,8 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 			x[x > founders] <- NA
 			subsettedX <- x[!finalSubsetIsNA]
 			observed <- table(subsettedX, finalSubsetOmitNA)
-			marginalImputed <- table(subsettedX)
-			marginalNewMarker <- apply(observed, 2, sum)
+			marginalImputed <- .rowSums(observed, m = nrow(observed), n = ncol(observed))
+			marginalNewMarker <- .colSums(observed, m = nrow(observed), n = ncol(observed))
 			expected <- outer(marginalImputed, marginalNewMarker) / sum(marginalImputed)
 			return(sum((observed - expected)^2 / expected))
 		})
