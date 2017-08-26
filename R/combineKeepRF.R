@@ -1,5 +1,5 @@
 #' @export 
-combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEstimateRF = TRUE)
+combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEstimateRF = TRUE, skipValidity = FALSE)
 {
 	if(length(intersect(markers(object1), markers(object2))) != 0)
 	{
@@ -22,13 +22,13 @@ combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEs
 		stop("Input callEstimateRF must be TRUE, FALSE, or a numeric vector")
 	}
 	#Not worried about lineWeights warning
-	suppressWarnings(combined <- object1 + object2)
+	suppressWarnings(combined <- addMpMap2(object1, object2, skipValidity = skipValidity))
 	if(length(combined@geneticData) > 1)
 	{
 		stop("Could not combined objects into a single experiment")
 	}
 	newRF <- .Call("combineRFDisjoint", object1@rf, object2@rf, PACKAGE="mpMap2")
-	combined <- new("mpcrossRF", combined, rf = newRF)
+	combined <- new("mpcrossRF", combined, rf = newRF, skipValidity = skipValidity)
 	combined@rf@gbLimit <- gbLimit
 	#Not worried about warning for changing RF of existing object
 	if(is.logical(callEstimateRF) && callEstimateRF)

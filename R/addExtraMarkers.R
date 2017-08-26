@@ -94,10 +94,10 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		cat("Reordering markers [", min(markerRange), ":", max(markerRange), "] of the chromosome, total nmuber of markers for this chromosome was ", length(relevantChromosomeMap), "\n", sep = "")
 
 		#Combine and keep recombination fractions
-		combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = match(names(mpcrossMapped@map[[bestChromosome]]), markers(mpcrossMapped)))
+		combined <- combineKeepRF(mpcrossMapped, newMarkers, verbose = verbose, gbLimit = mpcrossMapped@rf@gbLimit, callEstimateRF = match(names(mpcrossMapped@map[[bestChromosome]]), markers(mpcrossMapped)), skipValidity = TRUE)
 		#Put the new subset of markers in the right place.
 		splitResults <- splitVector(names(relevantChromosomeMap)[markerRange], names(relevantChromosomeMap)[markerIndex])
-		relevantSubset <- subset(combined, markers = c(splitResults$before, markers(newMarkers), splitResults$after))
+		relevantSubset <- subset(combined, markers = c(splitResults$before, markers(newMarkers), splitResults$after), skipValidity = TRUE)
 		grouped <- formGroups(relevantSubset, groups = 1, clusterBy = "theta")
 		if(reorder)
 		{
@@ -128,10 +128,10 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		if(lastMarkerRange != nMarkers(mpcrossMapped)) newMarkerOrder <- c(newMarkerOrder, markers(mpcrossMapped)[(lastMarkerRange+1):nMarkers(mpcrossMapped)])
 
 		#Put original object (Plus extra marker) in the new order. 
-		objectInNewOrder <- subset(combined, markers = newMarkerOrder)
+		objectInNewOrder <- subset(combined, markers = newMarkerOrder, skipValidity = TRUE)
 		newChromosomeMarkers <- newMarkerOrder[(newMarkerOrder %in% names(mpcrossMapped@map[[bestChromosome]])) | (newMarkerOrder %in% markers(newMarkers))]
 		#Get out just the chromosome that's been changed. We only need to recompute the map for these markers.
-		changedChromosomeInNewOrder <- subset(objectInNewOrder, markers = newChromosomeMarkers)
+		changedChromosomeInNewOrder <- subset(objectInNewOrder, markers = newChromosomeMarkers, skipValidity = TRUE)
 
 		#Estimate RF fractions for the changed chromosome
 		changedChromosomeInNewOrder <- formGroups(changedChromosomeInNewOrder, groups = 1, clusterBy = "theta")
@@ -176,13 +176,13 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 			finalMap[[bestChromosome]] <- newMap[[1]]
 		}
 		#Put the new map into the new object
-		objectInNewOrder <- new("mpcrossMapped", objectInNewOrder, map = finalMap, rf = objectInNewOrder@rf)
+		objectInNewOrder <- new("mpcrossMapped", objectInNewOrder, map = finalMap, rf = objectInNewOrder@rf, skipValidity = TRUE)
 
 		#Update the imputation data, so we don't have to run the entire thing all over again. 
 		if(!is.null(imputationArgs))
 		{
 			previousKey <- mpcrossMapped@geneticData[[1]]@imputed@key
-			mappedChangedChromosomeInNewOrder <- new("mpcrossMapped", changedChromosomeInNewOrder, rf = changedChromosomeInNewOrder@rf, map = finalMap[bestChromosome])
+			mappedChangedChromosomeInNewOrder <- new("mpcrossMapped", changedChromosomeInNewOrder, rf = changedChromosomeInNewOrder@rf, map = finalMap[bestChromosome], skipValidity = TRUE)
 			changedChromosomeInNewOrder <- do.call(imputeFounders, c(list(mappedChangedChromosomeInNewOrder), imputationArgs))
 			if(!identical(previousKey, changedChromosomeInNewOrder@geneticData[[1]]@imputed@key))
 			{

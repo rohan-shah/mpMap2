@@ -2,6 +2,7 @@
 #' @include lg-class.R
 #' @include map-class.R
 #' @include geneticData-class.R
+#' @include canSkipValidity.R
 checkCompatibleGeneticData <- function(objects)
 {
 	expectedMarkers <- markers(objects[[1]])
@@ -57,7 +58,7 @@ checkMpcross <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
-.mpcross <- setClass("mpcross", slots = list(geneticData = "geneticDataList"), validity=checkMpcross)
+.mpcross <- setClass("mpcross", slots = list(geneticData = "geneticDataList"), validity=checkMpcross, contains = "canSkipValidity")
 
 checkMpcrossRF <- function(object)
 {
@@ -174,85 +175,4 @@ infiniteSelfing <- function(founders, finals, pedigree)
 	hetData <- new("hetData", hetData)
 	return(hetData)
 }
-#' @export
-mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCodingErrors = FALSE)
-{
-	if(!isS4(pedigree) || !inherits(pedigree, "pedigree"))
-	{
-		stop("Input pedigree must be an S4 object of class peigree")
-	}
-	if(is.character(founders) || is.null(dim(founders)) || length(dim(founders)) != 2)
-	{
-		stop("Input founders must be a numeric matrix")
-	}
-	if(is.data.frame(founders)) founders <- as.matrix(founders)
-	mode(founders) <- "integer"
-	if(is.character(finals) || is.null(dim(finals)) || length(dim(finals)) != 2)
-	{
-		stop("Input finals must be a numeric matrix")
-	}
-	if(is.data.frame(finals)) finals <- as.matrix(finals)
-	if(is.null(rownames(finals)) || is.null(colnames(finals)) || is.null(rownames(founders)) || is.null(colnames(founders)))
-	{
-		stop("Inputs founders and finals must have row and column names")
-	}
-	mode(finals) <- "integer"
-	if(is.function(hetData))
-	{
-		hetData <- hetData(founders, finals, pedigree)
-	}
-	else if(!isS4(hetData) || !inherits(hetData, "hetData"))
-	{
-		stop("Input hetData must be an object of class hetData")
-	}
-	if(ncol(founders) != ncol(finals) || ncol(finals) != length(hetData))
-	{
-		stop("Inputs hetData, founders and finals must have the same number of markers")
-	}
-	sortedFounderMarkers <- sort(colnames(founders))
-	sortedFinalMarkers <- sort(colnames(finals))
-	sortedHetDataMarkers <- sort(names(hetData))
-	if(any(sortedFounderMarkers != sortedFinalMarkers) || any(sortedFinalMarkers != sortedHetDataMarkers))
-	{
-		stop("Inputs founders, finals and hetData must have the same markers")
-	}
-	#Standardise marker order, if required
-	if(any(colnames(founders) != colnames(finals)) || any(colnames(finals) != names(hetData)))
-	{
-		finals <- finals[,sortedFounderMarkers]
-		hetData <- hetData[sortedFounderMarkers]
-	}
-	codingErrors <- listCodingErrors(founders = founders, finals = finals, hetData = hetData)
-	if(length(codingErrors$null))
-	{
-		hetData[codingErrors$null] <- list(matrix(0L, 0, 3))
-		finals[,codingErrors$null] <- NA
-		warning(paste0("Removing data for ", length(codingErrors$null), " markers, because these markers have NA founder alleles"))
-	}
 
-	if(fixCodingErrors)
-	{
-		uniqueMarkers <- unique(codingErrors$finals[,"Column"])
-		finals[, uniqueMarkers] <- NA
-		warning(paste0("Removing data for ", length(uniqueMarkers), " markers, because fixCodingErrors = TRUE was specified. For less aggressive removal, use listCodingErrors"))
-	}
-	geneticData <- new("geneticData", founders = founders, hetData = hetData, finals = finals, pedigree = pedigree)
-	mpcross <- new("mpcross", geneticData = new("geneticDataList", list(geneticData)))
-	return(mpcross)
-}
-#' @export
-mpcrossMapped <- function(cross, map, rf=NULL)
-{
-	if(inherits(cross, "mpcrossRF"))
-	{
-		if(!is.null(rf))
-		{
-			stop("Two objects of class rf were specified")
-		}
-		return(new("mpcrossMapped", as(cross, "mpcross"), rf = cross@rf, map = map))
-	}
-	else
-	{
-		return(new("mpcrossMapped", cross, map = map, rf = rf))
-	}
-}

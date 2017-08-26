@@ -115,6 +115,11 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
 {
 	arguments <- list(...)
+
+	skipValidity <- FALSE
+	if("skipValidity" %in% names(arguments)) skipValidity <- arguments$skipValidity
+	arguments$skipValidity <- NULL
+
 	if("groups" %in% names(arguments))
 	{
 		stop("Cannot subset a map by linkage groups")
@@ -130,7 +135,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 			arguments$markers <- markers(x)[arguments$markers]
 		}
 		subsettedRF <- NULL
-		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
+		if(!is.null(x@rf)) subsettedRF <- do.call(subset, c(list(x@rf), arguments))
 		if("keepMap" %in% names(arguments) && arguments$keepMap)
 		{
 			if(is.numeric(arguments$markers)) arguments$markers <- markers(x)[arguments$markers]
@@ -198,6 +203,11 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {
 	arguments <- list(...)
+
+	skipValidity <- FALSE
+	if("skipValidity" %in% names(arguments)) skipValidity <- arguments$skipValidity
+	arguments$skipValidity <- NULL
+
 	if(sum(c("groups", "markers", "lines") %in% names(arguments)) != 1)
 	{
 		stop("Exactly one of arguments markers, lines and groups is required for function subset.mpcrossRF")
@@ -209,12 +219,17 @@ setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 	}
 	else
 	{
-		return(new("mpcrossRF", callNextMethod(), "rf" = subset(x@rf, ...)))
+		return(new("mpcrossRF", callNextMethod(), "rf" = do.call(subset, c(list(x@rf), arguments)), skipValidity = skipValidity))
 	}
 })
 setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 {
 	arguments <- list(...)
+
+	skipValidity <- FALSE
+	if("skipValidity" %in% names(arguments)) skipValidity <- arguments$skipValidity
+	arguments$skipValidity <- NULL
+
 	if(sum(c("groups", "markers", "lines") %in% names(arguments)) != 1)
 	{
 		stop("Exactly one of arguments markers, lines and groups is required for function subset.mpcross")
@@ -252,8 +267,8 @@ setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 	else
 	{
 		subsettedRF <- NULL
-		if(!is.null(x@rf)) subsettedRF <- subset(x@rf, ...)
-		return(new("mpcrossLG", callNextMethod(), "lg" = subset(x@lg, ...), "rf" = subsettedRF))
+		if(!is.null(x@rf)) subsettedRF <- do.call(subset, c(list(x@rf), arguments))
+		return(new("mpcrossLG", callNextMethod(), "lg" = do.call(subset, c(list(x@lg), arguments)), "rf" = subsettedRF))
 	}
 })
 setMethod(f = "subset", signature = "lg", definition = function(x, ...)
@@ -294,6 +309,9 @@ setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 {
 	arguments <- list(...)
+	skipValidity <- FALSE
+	if("skipValidity" %in% names(arguments)) skipValidity <- arguments$skipValidity
+
 	if(sum(c("markers", "lines") %in% names(arguments)) != 1)
 	{
 		stop("Exactly one of arguments markers and lines is required for function subset.geneticData")
@@ -325,7 +343,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 			warning("When subsetting by markers, probabilities and imputation data is discarded")
 		}
 	
-		return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = subset(x@hetData, ...), pedigree = x@pedigree))
+		return(new("geneticData", founders = x@founders[,markerIndices,drop=FALSE], finals = x@finals[,markerIndices,drop=FALSE], hetData = do.call(subset, c(list(x@hetData), arguments)), pedigree = x@pedigree, skipValidity = skipValidity))
 	}
 	else
 	{
@@ -338,7 +356,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		{
 			stop("Input lines must be a vector of line names")
 		}
-		retVal <- new("geneticData", founders = x@founders, finals = x@finals[rownames(x@finals)%in% lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree"))
+		retVal <- new("geneticData", founders = x@founders, finals = x@finals[rownames(x@finals)%in% lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree"), skipValidity = skipValidity)
 		if(!is.null(x@imputed))
 		{
 			retVal@imputed <- subset(x@imputed, lines = lines)

@@ -1,6 +1,7 @@
 #' @include hetData-class.R
 #' @include pedigree-class.R
 #' @include map-class.R
+#' @include canSkipValidity.R
 checkGeneticData <- function(object)
 {
 	errors <- c()
@@ -232,19 +233,14 @@ checkProbabilities <- function(object)
 .probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkProbabilities)
 setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
 setClassUnion("data.frameOrNULL", c("data.frame", "NULL"))
-.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", pheno = "data.frameOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData)
+.geneticData <- setClass("geneticData", slots=list(finals = "matrix", founders = "matrix", hetData = "hetData", pedigree = "pedigree", imputed = "imputedOrNULL", pheno = "data.frameOrNULL", probabilities = "probabilitiesOrNULL"), validity = checkGeneticData, contains = "canSkipValidity")
 checkGeneticDataList <- function(object)
 {
 	if(any(unlist(lapply(object, class)) != "geneticData"))
 	{
 		return("An object of class geneticDataList must contain objects of class geneticData")
 	}
-	errors <- lapply(object, validObject)
-	if(sum(unlist(lapply(errors, is.logical))) == length(object))
-	{
-		return(TRUE)
-	}
-	sapply(1:length(object), function(x) errors[[x]] <<- paste0("Error in geneticData object ", x, ": ", errors[[x]]))
-	return(unlist(errors))
+	return(TRUE)
 }
 .geneticDataList <- setClass("geneticDataList", "list", validity = checkGeneticDataList)
+setMethod(f = "initialize", signature = "geneticDataList", definition = canSkipValidityInitialize)
