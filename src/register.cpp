@@ -22,7 +22,7 @@
 #include "mpMap2_openmp.h"
 #include "order.h"
 #include "arsa.h"
-#include "arsaRaw.h"
+#include "arsaRawREntryPoint.h"
 #include "impute.h"
 #include "multiparentSNP.h"
 #include "imputeFounders.h"
@@ -131,7 +131,7 @@ extern "C"
 #endif
 		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
 		R_RegisterCCallable(package_name, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
-		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRawExported);
+		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRawREntryPoint);
 		R_RegisterCCallable(package_name, "arsa", (DL_FUNC)&arsa);
 	}
 }

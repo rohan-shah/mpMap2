@@ -336,7 +336,7 @@ BEGIN_RCPP
 				return false;
 			};
 		}
-		arsaRawArgs args(levels, currentGroupPermutation);
+		arsaRaw::arsaRawArgs args(levels, currentGroupPermutation);
 		args.n = nMarkersCurrentGroup;
 		args.rawDist = &(distMatrix[0]);
 		args.cool = cool;
@@ -349,12 +349,12 @@ BEGIN_RCPP
 #ifdef USE_OPENMP
 		if(omp_get_max_threads() > 1)
 		{
-			arsaRawParallel(args);
+			arsaRaw::arsaRawParallel(args);
 		}
 		else
 #endif
 		{
-			arsaRaw(args);
+			arsaRaw::arsaRaw(args);
 		}
 
 		if(verbose)
