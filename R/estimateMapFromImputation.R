@@ -36,12 +36,12 @@ estimateMapFromImputation <- function(mpcrossMapped, gapSize = 5, recombinationF
 		}
 	)
 	subsets <- sapply(intercrossingGenerations, function(x) subset(mpcrossMapped, lines = which(intercrossingSelfingData[,"intercrossing"] == x)), simplify = FALSE)
-	jointLikelihood <- numeric(length(recombinationFractions))
 	for(rightHandMarker in gaps)
 	{
 		chromosome <- names(mpcrossMapped@map)[unlist(lapply(mpcrossMapped@map, function(x) rightHandMarker %in% names(x)))]
 		rightHandMarkerIndex <- match(rightHandMarker, names(mpcrossMapped@map[[chromosome]]))
 		leftHandMarker <- names(mpcrossMapped@map[[chromosome]])[rightHandMarkerIndex-1]
+		jointLikelihood <- numeric(length(recombinationFractions))
 		for(subsetIndex in 1:length(subsets))
 		{
 			leftHandData <- factor(imputationData(subsets[[subsetIndex]])[,leftHandMarker], levels = 1:nFounders)
