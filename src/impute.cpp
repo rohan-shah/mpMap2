@@ -28,7 +28,6 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 {
 	unsigned long done = 0;
 	unsigned long total = (unsigned long)markersThisGroup.size();
-	unsigned long doneThreadZero = 0;
 	bool hasError = false;
 	int nLevels = (int)levels.size(), nMarkersThisGroup = (int)markersThisGroup.size();
 	std::vector<double> absoluteDifferences(0x100*0x100, 0);
@@ -96,7 +95,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 	{
 		differenceSetType differenceSet;
 #ifdef USE_OPENMP
-		#pragma omp parallel for schedule(dynamic)
+		#pragma omp for schedule(dynamic)
 #endif
 		//row
 		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
@@ -180,7 +179,6 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 			if(omp_get_thread_num() == 0)
 #endif
 			{
-				doneThreadZero++;
 				statusFunction(done, total);
 			}
 		}
