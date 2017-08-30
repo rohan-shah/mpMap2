@@ -7,96 +7,145 @@
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
+struct rowColumnDifference
+{
+public:
+	rowColumnDifference(bool isRow, int index, double difference)
+		: isRow(isRow), index(index), difference(difference)
+	{}
+	bool isRow;
+	int index;
+	double difference;
+};
 struct differenceSetComp
 {
-	bool operator()(const std::pair<float, int>& a, const std::pair<float, int>& b) const
+	bool operator()(const rowColumnDifference& a, const rowColumnDifference& b) const
 	{
-		return a.second < b.second;
+		return a.difference < b.difference;
 	}
 };
-template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
+template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
 	unsigned long done = 0;
 	unsigned long total = (unsigned long)markersThisGroup.size();
 	unsigned long doneThreadZero = 0;
 	bool hasError = false;
-	typedef std::set<std::pair<float, int>, differenceSetComp> differenceSetType;
-	//This is a marker row
-#ifdef USE_OPENMP
-	#pragma omp parallel for schedule(dynamic)
-#endif
-	for(std::vector<int>::iterator marker1 = markersThisGroup.begin(); marker1 < markersThisGroup.end(); marker1++)
+	int nLevels = (int)levels.size(), nMarkersThisGroup = (int)markersThisGroup.size();
+	std::vector<double> absoluteDifferences(0x100*0x100, 0);
+	for(int i = 0; i < nLevels; i++)
 	{
-		bool missing = false;
-		for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
+		for(int j = 0; j < nLevels; j++)
 		{
-			unsigned long long copiedMarker1 = *marker1;
-			unsigned long long copiedMarker2 = *marker2;
-			if(copiedMarker1 > copiedMarker2) std::swap(copiedMarker1, copiedMarker2);
-			//record whether there's a missing value for marker1 anywhere.
-			float val = theta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
-			if(val == 0xff) 
-			{
-				missing = true;
-				break;
-			}
+			absoluteDifferences[i * 0x100 + j] = fabs(levels[i] - levels[j]);
 		}
-		if(missing)
+	}
+	std::vector<int> copiedMarkersThisGroup = markersThisGroup;
+	std::sort(copiedMarkersThisGroup.begin(), copiedMarkersThisGroup.end());
+	std::vector<double> similarityMatrix(nMarkersThisGroup * nMarkersThisGroup, 0);
+	std::vector<int> usablePoints(nMarkersThisGroup * nMarkersThisGroup, 0);
+#ifdef USE_OPENMP
+	#pragma omp parallel
+#endif
+	{
+		std::vector<int> table(0x100 * 0x100, 0);
+#ifdef USE_OPENMP
+		#pragma omp parallel for schedule(dynamic)
+#endif
+		//First marker
+		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
 		{
-			//There's a missing value for *marker1. So find the closest matching column and overwrite any missing values from that column.
-			//Set with the difference and the marker index. These are sorted internally so we can go from smallest difference to lowest difference
-			differenceSetType averageDifferences;
-			//marker 2 is the candidate other marker (another row)
-			for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
+			int markerI = copiedMarkersThisGroup[i];
+			//Second marker
+			for(unsigned long long j = 0; j < i; j++)
 			{
-				if(marker2 == marker1) continue;
-				
-				float totalDifference = 0;
-				int usableLocations = 0;
-				//This iterates over the other markers in the column/row
-				for(std::vector<int>::iterator marker3 = markersThisGroup.begin(); marker3 != markersThisGroup.end(); marker3++)
+				unsigned long long markerJ = copiedMarkersThisGroup[j];
+				std::fill(table.begin(), table.end(), 0);
+				unsigned long long usableSum = 0;
+				for(unsigned long long k = 0; k <= j; k++)
 				{
-					unsigned long long pair1Row = *marker1, pair1Column = *marker3;
-					unsigned long long pair2Row = *marker2, pair2Column = *marker3;
-					if(pair1Row > pair1Column) std::swap(pair1Row, pair1Column);
-					if(pair2Row > pair2Column) std::swap(pair2Row, pair2Column);
-					unsigned char value1 = theta[(pair1Column * (pair1Column + 1ULL))/2ULL + pair1Row];
-					unsigned char value2 = theta[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
-					if(value1 != 0xff && value2 != 0xff)
+					table[originalTheta[i * (i + 1ULL) / 2ULL + k] * 0x100 + originalTheta[j * (j + 1ULL) / 2ULL + k]]++;
+					usableSum += (originalTheta[i * (i + 1ULL) / 2ULL + k] != 0xff && originalTheta[j * (j + 1ULL) / 2ULL + k] != 0xff);
+				}
+				for(unsigned long long k = j+i; k <= i; k++)
+				{
+					table[originalTheta[i * (i + 1ULL) / 2ULL + k] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
+					usableSum += (originalTheta[i * (i + 1ULL) / 2ULL + k] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
+				}
+				for(unsigned long long k = i+1; k < nMarkersThisGroup; k++)
+				{
+					table[originalTheta[k * (k + 1ULL) / 2ULL + i] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
+					usableSum += (originalTheta[k * (k + 1ULL) / 2ULL + i] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
+				}
+				double sum = 0;
+				for(int k1 = 0; k1 < nLevels; k1++)
+				{
+					for(int k2 = 0; k2 < nLevels; k2++)
 					{
-						float val = (float)fabs(levels[value1] - levels[value2]);
-						totalDifference += val;
-						usableLocations++;
+						sum += table[k1 * 0x100 + k2] * absoluteDifferences[k1 * 0x100 + k2];
 					}
 				}
-				if(usableLocations != 0)
-				{
-					averageDifferences.insert(std::make_pair(totalDifference/usableLocations, *marker2));
-				}
-				else averageDifferences.insert(std::make_pair(std::numeric_limits<float>::quiet_NaN(), *marker2));
+				similarityMatrix[j * nMarkersThisGroup + i] = similarityMatrix[i * nMarkersThisGroup + j] = sum;
+				usablePoints[i*nMarkersThisGroup + j] = usablePoints[j * nMarkersThisGroup + i] = usableSum;
 			}
-			for(std::vector<int>::iterator marker2 = markersThisGroup.begin(); marker2 != markersThisGroup.end(); marker2++)
+		}
+	}
+	typedef std::set<rowColumnDifference, differenceSetComp> differenceSetType;
+#ifdef USE_OPENMP
+	#pragma omp parallel
+#endif
+	{
+		differenceSetType differenceSet;
+#ifdef USE_OPENMP
+		#pragma omp parallel for schedule(dynamic)
+#endif
+		//row
+		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
+		{
+			int marker1 = copiedMarkersThisGroup[i];
+			//column
+			for(unsigned long long j = i; j < nMarkersThisGroup; j++)
 			{
-				unsigned long long pair1Row = *marker1;
-				unsigned long long pair1Column = *marker2;
-				if(pair1Row > pair1Column) std::swap(pair1Row, pair1Column);
-				unsigned char& toReplace = theta[(pair1Column*(pair1Column + 1ULL))/2ULL+ pair1Row];
-				//if this is missing, we need to impute it
-				if(toReplace == 0xff) 
+				int marker2 = copiedMarkersThisGroup[j];
+				unsigned long long copiedMarker1 = marker1;
+				unsigned long long copiedMarker2 = marker2;
+				if(copiedMarker1 > copiedMarker2) std::swap(copiedMarker1, copiedMarker2);
+				//record whether there's a missing value for marker1 anywhere.
+				float val = originalTheta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
+				unsigned char& toReplace = imputedTheta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
+				if(val == 0xff && toReplace == 0xff)
 				{
-					//go through the other markers from most similar to least similar, looking for something which has a value here. So marker3 is the 
-					bool replacementFound = false;
-					for(differenceSetType::iterator marker3 = averageDifferences.begin(); marker3 != averageDifferences.end(); marker3++)
+					differenceSet.clear();
+					//There's a missing value for (i, j). So find the closest matching column or column, and overwrite with the value from that column.
+					//i is the row, j is the column, k is the candidate other marker to use for the imputation
+					for(unsigned long long k = 0; k < nMarkersThisGroup; k++)
 					{
-						unsigned long long pair2Row = marker3->second;
-						unsigned long long pair2Column = *marker2;
+						if(k == i || k == j) continue;
+						int marker3 = copiedMarkersThisGroup[k];
+						if(usablePoints[i * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(true, k, similarityMatrix[i * nMarkersThisGroup + k]));
+						if(usablePoints[j * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(false, k, similarityMatrix[j * nMarkersThisGroup + k]));
+					}
+					//go through the other markers from most similar to least similar, looking for something which has a value here. So marker3 is the marker which is similar to marker1
+					bool replacementFound = false;
+					for(differenceSetType::iterator marker3 = differenceSet.begin(); marker3 != differenceSet.end(); marker3++)
+					{
+						unsigned long long pair2Row, pair2Column;
+						if(marker3->isRow)
+						{
+							pair2Row = marker3->index;
+							pair2Column = marker2;
+						}
+						else
+						{
+							pair2Row = marker1;
+							pair2Column = marker3->index;
+						}
 						if(pair2Row > pair2Column) std::swap(pair2Row, pair2Column);
-						unsigned char& newValue = theta[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
+						const unsigned char& newValue = originalTheta[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
 						if(newValue != 0xff)
 						{
 							toReplace = newValue;
-							if(hasLOD) lod[(pair1Column*(pair1Column + 1ULL))/2ULL + pair1Row] = lod[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
-							if(hasLKHD) lkhd[(pair1Column*(pair1Column + 1ULL))/2ULL + pair1Row] = lkhd[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
+							if(hasLOD) lod[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1] = lod[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
+							if(hasLKHD) lkhd[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1] = lkhd[(pair2Column * (pair2Column + 1ULL))/2ULL + pair2Row];
 							//We only need to copy the value from the best other similar marker, so we can break here
 							replacementFound = true;
 							break;
@@ -104,51 +153,57 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(unsigned char* theta, st
 					}
 					if(!replacementFound)
 					{
-						std::stringstream ss;
-						ss << "Unable to impute a value for marker " << (*marker1+1) << " and marker " << (*marker2+1);
-						error = ss.str();
-						hasError = true;
-#ifndef USE_OPENMP
-						//We can't return early if we're using openmp
-						return false;
+						//critical section, due to assignment to the shared error variable. 
+#ifdef USE_OPENMP
+						#pragma omp critical
 #endif
+						{
+							std::stringstream ss;
+							ss << "Unable to impute a value for marker " << (marker1+1) << " and marker " << (marker2+1);
+							error = ss.str();
+							hasError = true;
+#ifndef USE_OPENMP
+							//We can't return early if we're using openmp
+							return false;
+#endif
+						}
 					}
 				}
 			}
-		}
 #ifdef USE_OPENMP
-		#pragma omp critical
+			#pragma omp critical
 #endif
-		{
-			done++;
-		}
+			{
+				done++;
+			}
 #ifdef USE_OPENMP
-		if(omp_get_thread_num() == 0)
+			if(omp_get_thread_num() == 0)
 #endif
-		{
-			doneThreadZero++;
-			statusFunction(done, total);
+			{
+				doneThreadZero++;
+				statusFunction(done, total);
+			}
 		}
 	}
 	return !hasError;
 }
-bool impute(unsigned char* theta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
+bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
 {
 	if(lod != NULL && lkhd != NULL)
 	{
-		return imputeInternal<true, true>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<true, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else if(lod != NULL && lkhd == NULL)
 	{
-		return imputeInternal<true, false>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<true, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else if(lod == NULL && lkhd != NULL)
 	{
-		return imputeInternal<false, true>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<false, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 	else
 	{
-		return imputeInternal<false, false>(theta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<false, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
 	}
 }
 SEXP imputeWholeObject(SEXP mpcrossLG_sexp, SEXP verbose_sexp)
@@ -341,7 +396,9 @@ BEGIN_RCPP
 		}
 
 		std::string error;
-		bool ok = impute(&(copiedThetaData[0]), levels, lodPtr, lkhdPtr, markersCurrentGroup, error, progressFunction);
+		unsigned char* originalTheta = &(thetaData[0]);
+		unsigned char* imputedTheta = &(copiedThetaData[0]);
+		bool ok = impute(originalTheta, imputedTheta, levels, lodPtr, lkhdPtr, markersCurrentGroup, error, progressFunction);
 		if(!ok)
 		{
 			std::stringstream ss;
@@ -529,6 +586,8 @@ BEGIN_RCPP
 			if(copiedLkhdPtr) copiedLkhdPtr[(marker1Counter*(marker1Counter+1))/2 + marker2Counter] = lkhdS4Data[((unsigned long long)markersCurrentGroup[marker1Counter] *((unsigned long long)markersCurrentGroup[marker1Counter] + 1ULL))/2ULL + (unsigned long long)markersCurrentGroup[marker2Counter]];
 		}
 	}
+	Rcpp::RawVector originalTheta(copiedTheta.size());
+	memcpy(&(originalTheta[0]), &(copiedTheta[0]), sizeof(Rbyte) * copiedTheta.size());
 
 	std::function<void(unsigned long, unsigned long)> progressFunction = [](unsigned long, unsigned long){};
 	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
@@ -552,7 +611,9 @@ BEGIN_RCPP
 		markersCurrentGroup[i] = i;
 	}
 	std::string error;
-	bool ok = impute(&(copiedTheta[0]), levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
+	unsigned char* originalThetaPtr = &(originalTheta[0]);
+	unsigned char* imputedThetaPtr = &(copiedTheta[0]);
+	bool ok = impute(originalThetaPtr, imputedThetaPtr, levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
 	if(!ok)
 	{
 		std::stringstream ss;

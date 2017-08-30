@@ -294,7 +294,8 @@ BEGIN_RCPP
 #endif
 				};
 			}
-			bool imputationResult = impute(imputedRawPtr, levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
+			unsigned char* originalRawPtr = &(thetaRawData[0]);
+			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
 			if(verbose)
 			{
 				close(barHandle);
