@@ -1,4 +1,3 @@
-#' @export
 setClass("canSkipValidity")
 canSkipValidityInitialize <- function (.Object, ...)
 {

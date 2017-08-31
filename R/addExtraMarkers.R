@@ -7,7 +7,7 @@ splitVector <- function(vector, splitValue)
 #' @export
 addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoints = TRUE, reorderRadius = 103, maxOffset = 50, knownChromosome, imputationArgs = NULL, onlyStatistics = FALSE, orderCrossArgs = list(), attemptMpMap2Interactive = TRUE, verbose = TRUE, reorder = TRUE)
 {
-	hasMpMapInteractive2 <- attemptMpMap2Interactive && require(mpMapInteractive2, quietly = TRUE)
+	hasMpMapInteractive2 <- attemptMpMap2Interactive && requireNamespace("mpMapInteractive2", quietly = TRUE)
 	if(!inherits(newMarkers, "mpcross"))
 	{
 		stop("Input newMarkers must be an object of class mpcross")
@@ -103,7 +103,7 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		{
 			if(hasMpMapInteractive2)
 			{
-				reorderedGrouped <- mpMapInteractive2(grouped)$object
+				reorderedGrouped <- mpMapInteractive2::mpMapInteractive2(grouped)$object
 			}
 			else
 			{

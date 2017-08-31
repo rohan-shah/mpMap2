@@ -18,7 +18,7 @@ changeMarkerPosition <- function(mpcrossMapped, marker, newChromosome, newPositi
 	originalPosition <- match(marker, originalMarkerOrder)
 	if(is.na(originalPosition)) stop("Could not find marker")
 
-	originalChromosome <- getChromosomes(mpcrossMapped, marker = marker)
+	originalChromosome <- getChromosomes(mpcrossMapped, markers = marker)
 	#Remove marker from map
 	newMap <- mpcrossMapped@map
 	newMap[[originalChromosome]] <- newMap[[originalChromosome]][-match(marker, names(newMap[[originalChromosome]]))]
