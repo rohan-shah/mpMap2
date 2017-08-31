@@ -1,18 +1,3 @@
-#' Estimate recombination fractions
-#' 
-#' This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.
-#' @param object The input mpcross object
-#' @param recombValues a vector of test values to use for the numeric maximum likelihood step. Must contain 0 and 0.5, and must have less than 255 values in total. The default value is \code{c(0:20/200, 11:50/100)}. 
-#' @param keepLod Set to \code{TRUE} to compute the likelihood ratio score statistics for testing whether the estimate is different from 0.5. Due to memory constraints this should generally be left as \code{FALSE}. 
-#' @param keepLkhd Set to \code{TRUE} to compute the maximum value of the likelihood. Due to memory constraints this should generally be left as \code{FALSE}.
-#' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation
-#' @export
-#' @examples map <- qtl::sim.map(len = 100, n.mar = 11, include.x=FALSE)
-#' f2Pedigree <- f2Pedigree(1000)
-#' cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
-#' rf <- estimateRF(cross)
-#' #Print the estimated recombination fraction values
-#' rf@@rf@@theta[1:11, 1:11]
 estimateRFSingleDesign <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 {
 	inheritsNewMpcrossArgument(object)

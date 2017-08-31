@@ -31,7 +31,7 @@ splitVector <- function(vector, splitValue)
 #' If a threshold is to be applied to the maximum value of the test statistics, this function should be called twice. For the first call, \code{onlyStatistics} should be set to \code{FALSE}. If the resulting test statistics exceed the threshold, then \code{addExtrMarkers} should be called again with \code{onlyStatistics} set to \code{TRUE}. It is recommended that only single markers be added at a time, unless you are extremely confident that all the extra markers should be located at the same position. 
 #'
 #' @examples
-#' #construct F2 pedigree
+#' #construct four-parent pedigree
 #' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, 
 #' 	selfingGenerations = 6, intercrossingGenerations = 0)
 #' #Assume infinite generations of selfing in subsequent analysis
@@ -52,7 +52,7 @@ splitVector <- function(vector, splitValue)
 #' #Get out the extra marker to add
 #' extraMarker <- subset(cross, markers = 50)
 #' #Add the extra marker, without doing any local reordering. After the marker is added, 
-#' 	recompute the imputation data, using the same arguments as previously. 
+#' #	recompute the imputation data, using the same arguments as previously. 
 #' withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 
 #' 	reorder = FALSE, imputationArgs = list(errorProb = 0.02, 
 #' 	extraPositions = generateGridPositions(1)))$object

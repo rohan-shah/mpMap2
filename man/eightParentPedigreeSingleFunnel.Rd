@@ -20,7 +20,8 @@ eightParentPedigreeSingleFunnel(initialPopulationSize, selfingGenerations,
 Generate a eight-parent pedigree starting from inbred founders, using a single funnel
 }
 \examples{
-pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, 
+	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 #convert the pedigree to a graph
 pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #Plot it

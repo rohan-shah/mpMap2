@@ -41,7 +41,8 @@ father <- c(0, 0, 2, rep(2, 7))
 initial <- 1:2
 lineNames <- paste0("L", 1:10)
 observed <- c(rep(FALSE, 3), rep(TRUE, 7))
-detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initial = initial, observed = observed, lineNames = lineNames, selfing = "finite")
+detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initial = initial, 
+	observed = observed, lineNames = lineNames, selfing = "finite")
 }
 \seealso{
 \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
