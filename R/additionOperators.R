@@ -1,6 +1,18 @@
 #' @include mpcross-class.R
 #' @include geneticData-class.R
 setGeneric("addMpMap2", function(e1, e2, skipValidity = FALSE) standardGeneric("addMpMap2"))
+#' @title Combine mpcross objects
+#' @description Combine two mpcross objects into a single object
+#' @rdname combineMpcross
+#' @param e1 An mpcross object
+#' @param e2 Another mpcross object
+#' @details 
+#' This function combines multiple mpcross objects into a single object. The input objects may contain recombination fraction data, or may have associated genetic maps. The function tries to keep whatever extra data is in the input objects, and will warn if data is discarded. This happens, for example, if one of the objects contains recombination fraction data, and the other does not.
+#' 
+#' In general, the combined object will contain the input objects as separate datasets. In special cases, the datasets may be combined. For example, if the input objects contains disjoint sets of markers, but the same genetic lines, then the datasets will be combined. Similarly, if the input objects contain the same genetic markers, but disjoint sets of genetic lines, then the datasets will be combined.
+#'
+#' Internally this function redirects to another generic named \code{addMpMap2}, because this generic allows for optional named arguments. 
+#' @return A combined object that contains the data from both \code{e1} and \code{e2}. 
 setMethod(f = "+", signature = c("mpcrossMapped", "mpcrossMapped"), definition = function(e1, e2)
 {
 	addMpMap2(e1, e2)
@@ -43,6 +55,7 @@ setMethod(f = "addMpMap2", signature = c("mpcrossMapped", "mpcrossMapped"), defi
     stop("Cannot combine these objects")
   }
 })
+#' @rdname combineMpcross
 setMethod(f = "+", signature = c("mpcross", "mpcross"), definition = function(e1, e2)
 {
 	addMpMap2(e1, e2)
@@ -96,6 +109,7 @@ setMethod(f = "addMpMap2", signature = c("mpcross", "mpcross"), definition = fun
     return(new("mpcross", geneticData = new("geneticDataList", c(e1ExpandedGeneticData@geneticData, e2ExpandedGeneticData@geneticData))))
   }
 })
+#' @rdname combineMpcross
 setMethod(f = "+", signature = c("mpcrossRF", "mpcrossRF"), definition = function(e1, e2)
 {
 	addMpMap2(e1, e2)
@@ -182,11 +196,12 @@ setMethod(f = "addMpMap2", signature = c("mpcrossRF", "mpcrossRF"), definition =
   newRF <- new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd, gbLimit = newGbLimit)
   return(new("mpcrossRF", combined, rf = newRF))
 })
-#Generally we drop the RF data, unless the sets of markers are disjoint
+#' @rdname combineMpcross
 setMethod(f = "+", signature = c("mpcrossRF", "mpcross"), definition = function(e1, e2)
 {
 	addMpMap2(e1, e2)
 })
+#Generally we drop the RF data, unless the sets of markers are disjoint
 setMethod(f = "addMpMap2", signature = c("mpcrossRF", "mpcross"), definition = function(e1, e2, skipValidity = FALSE)
 {
   #If the sets of markers are disjoint, then we re-run the RF computation (the alternative is to drop the existing RF computations which seems computationally wasteful)
