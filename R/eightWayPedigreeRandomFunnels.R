@@ -11,7 +11,8 @@
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
 #' @export
 #' @examples 
-#' pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 10, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 10)
+#' pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 10, 
+#' 	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 10)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it

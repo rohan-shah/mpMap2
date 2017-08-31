@@ -26,6 +26,7 @@ checkRawSymmetricMatrix <- function(object)
 	return(errors)
 }
 .rawSymmetricMatrix <- setClass("rawSymmetricMatrix", slots = list(data = "raw", markers = "character", levels = "numeric"), validity = checkRawSymmetricMatrix)
+#' @rdname internalOperators
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", drop = "logical"),
 	function(x, i, j, ..., drop)
 	{
@@ -33,6 +34,7 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", dro
 		if(any(i > nMarkers) || any(j > nMarkers) || any(i < 1) || any(j < 1)) stop("Indices were out of range")
 		return(.Call("rawSymmetricMatrixSubsetIndices", x, i, j, drop, PACKAGE="mpMap2"))
 	})
+#' @rdname internalOperators
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", drop = "missing"),
 	function(x, i, j, ..., drop)
 	{
@@ -40,6 +42,7 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", dro
 		if(any(i > nMarkers) || any(j > nMarkers) || any(i < 1) || any(j < 1)) stop("Indices were out of range")
 		return(.Call("rawSymmetricMatrixSubsetIndices", x, i, j, TRUE, PACKAGE="mpMap2"))
 	})
+#' @rdname internalOperators
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "missing", j = "missing", drop = "missing"), 
 	function(x, i, j, ..., drop)
 	{
@@ -47,6 +50,7 @@ setMethod("[", signature(x = "rawSymmetricMatrix", i = "missing", j = "missing",
 		rownames(data) <- colnames(data) <- x@markers
 		return(data)
 	})
+#' @rdname internalOperators
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "matrix", j = "missing", drop = "missing"), 
 	function(x, i, j, ..., drop)
 	{

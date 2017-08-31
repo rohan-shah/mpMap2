@@ -10,7 +10,8 @@
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @export
 #' @examples 
-#' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10, selfingGenerations = 0, nSeeds = 1)
+#' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10, 
+#' 	selfingGenerations = 0, nSeeds = 1)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it

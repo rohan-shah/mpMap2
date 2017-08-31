@@ -69,7 +69,8 @@ checkDetailedPedigree <- function(object)
 #' initial <- 1:2
 #' lineNames <- paste0("L", 1:10)
 #' observed <- c(rep(FALSE, 3), rep(TRUE, 7))
-#' detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initial = initial, observed = observed, lineNames = lineNames, selfing = "finite")
+#' detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initial = initial, 
+#' 	observed = observed, lineNames = lineNames, selfing = "finite")
 NULL
 .detailedPedigree <- setClass("detailedPedigree", contains = "pedigree", slots = list(initial = "integer", observed = "logical"), validity = checkDetailedPedigree)
 #' @export

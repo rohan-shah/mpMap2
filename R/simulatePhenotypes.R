@@ -1,4 +1,5 @@
 setClass("normalPhenotype", contains="NULL", slots = list("means" = "numeric", "standardDeviations" = "numeric", phenotypeName = "character", marker = "character"))
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "normalPhenotype"), definition = function(e1, e2)
 {
 	if(!(e2@marker %in% colnames(e1@finals)))

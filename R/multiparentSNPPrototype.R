@@ -5,6 +5,7 @@ multiparentSNPPrototype <- function(keepHets)
 {
 	return(new("multiparentSNPPrototype", keepHets = keepHets))
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "multiparentSNPPrototype"), definition = function(e1, e2)
 {
 	nFounders <- nFounders(e1)
@@ -89,6 +90,7 @@ multiparentSNPPrototypeKeepHets <- function(e1)
 	})
 	return(copied)
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "multiparentSNPPrototype"), definition = function(e1, e2)
 {
 	if(class(e1) != "mpcross")

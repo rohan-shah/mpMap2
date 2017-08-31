@@ -24,6 +24,7 @@ biparentalDominant <- function()
 {
 	return(new("biparentalDominant"))
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "biparentalDominant"), definition = function(e1, e2)
 {
 	#We only want to be able to apply this to a dataset that's fully informative. This is equivalent to the hetData having three unique values in the third column.
@@ -46,6 +47,7 @@ setMethod(f = "+", signature = c("geneticData", "biparentalDominant"), definitio
 	})
 	return(copied)
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "biparentalDominant"), definition = function(e1, e2)
 {
 	if(class(e1) != "mpcross")

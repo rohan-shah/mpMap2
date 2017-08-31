@@ -6,11 +6,14 @@ assignFounderPattern <- function(founderMatrix)
 {
 	return(new("assignFounderPattern", data = founderMatrix))
 }
+#' @rdname internalOperators
+#' @title Internal operators for mpMap2
 setMethod(f = "+", signature = c("geneticData", "assignFounderPattern"), definition = function(e1, e2)
 {
 	result <- .Call("assignFounderPattern", e1, founderPattern = e2@data)
 	return(result)
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "assignFounderPattern"), definition = function(e1, e2)
 {
 	if(length(e1@geneticData) != 1)
@@ -22,6 +25,7 @@ setMethod(f = "+", signature = c("mpcross", "assignFounderPattern"), definition 
 	geneticDataList <- new("geneticDataList", list(geneticData))
 	return(new("mpcross", geneticData = geneticDataList))
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcrossMapped", "assignFounderPattern"), definition = function(e1, e2)
 {
 	if(length(e1@geneticData) != 1)

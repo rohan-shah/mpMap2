@@ -7,6 +7,7 @@ fixedNumberOfFounderAlleles <- function(alleles)
 	if(!is.numeric(alleles) || length(alleles) != 1) stop("Input alleles must be a single integer")
 	return(new("fixedNumberOfFounderAlleles", alleles = as.integer(alleles)))
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "fixedNumberOfFounderAlleles"), definition = function(e1, e2)
 {
 	nFounders <- nFounders(e1)
@@ -56,6 +57,7 @@ setMethod(f = "+", signature = c("geneticData", "fixedNumberOfFounderAlleles"), 
 		})
 	return(e1)
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "fixedNumberOfFounderAlleles"), definition = function(e1, e2)
 {
 	if(class(e1) != "mpcross")

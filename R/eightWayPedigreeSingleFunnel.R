@@ -10,7 +10,8 @@
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
 #' @export
-#' @examples pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+#' @examples pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, 
+#' 	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it

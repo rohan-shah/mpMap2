@@ -4,6 +4,7 @@ removeHets <- function()
 {
 	return(new("removeHets"))
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "removeHets"), definition = function(e1, e2)
 {
 	if(class(e1) != "mpcross")
