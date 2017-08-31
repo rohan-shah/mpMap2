@@ -81,7 +81,6 @@ Collate:
     'impute.R'
     'imputeFounders.R'
     'jitterMap.R'
-    'jitterMap_rewrite.R'
     'lineNames.R'
     'listCodingErrors.R'
     'mapFunctions.R'
