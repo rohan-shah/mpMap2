@@ -8,11 +8,15 @@ estimateMap(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1,
   maxMarkers = 2000, verbose = FALSE)
 }
 \arguments{
+\item{mpcrossLG}{The dataset to use for map construction. This object must contain data about recombination fractions and linkage groups.}
+
 \item{mapFunction}{The map function to use to compute recombination fractions to centiMorgan distances.}
 
 \item{maxOffset}{The maximum separation between the pairs of markers, in terms of position within the ordering. Recombination fractions between pairs of markers, which are further apart than this, will not be used to estimate the map distances.}
 
 \item{maxMarkers}{The (approximate) number of markers for which distances are estimated simultaneously.}
+
+\item{verbose}{Should verbose output be produced?}
 }
 \description{
 Estimate map distances based on the estimated recombination fractions

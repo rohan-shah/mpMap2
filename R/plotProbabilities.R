@@ -58,7 +58,7 @@ plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 		combined <- do.call(rbind, dataSets[alleles])
 		combined$founder <- factor(combined$founder)
 		lineData <- data.frame(position = tail(cumsumOffsetVector, -1))
-		ggplot(combined, aes_string(x = 'position', y = 'value', colour = 'founder')) + geom_line() + xlab("Distance (cM)") + ylab("Probability") + geom_vline(data = lineData, mapping = aes(xintercept = 'position')) + facet_wrap(~ founder, ncol = 1) + theme(legend.position="none")
+		ggplot(combined, aes_string(x = 'position', y = 'value', colour = 'founder')) + geom_line() + xlab("Distance (cM)") + ylab("Probability") + geom_vline(data = lineData, mapping = aes_string(xintercept = 'position')) + facet_wrap(~ founder, ncol = 1) + theme(legend.position="none")
 	}
 	else if(geneticData@pedigree@selfing == "finite")
 	{
@@ -79,7 +79,7 @@ plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 		combined <- do.call(rbind, dataSets[alleles])
 		combined$allele <- factor(combined$allele)
 		lineData <- data.frame(position = tail(cumsumOffsetVector, -1))
-		ggplot(combined, aes_string(x = 'position', y = 'value', colour = 'allele')) + geom_line() + xlab("Distance (cM)") + ylab("Probability") + geom_vline(data = lineData, mapping = aes(xintercept = 'position')) + facet_wrap(~ allele, ncol = 1) + theme(legend.position="none")
+		ggplot(combined, aes_string(x = 'position', y = 'value', colour = 'allele')) + geom_line() + xlab("Distance (cM)") + ylab("Probability") + geom_vline(data = lineData, mapping = aes_string(xintercept = 'position')) + facet_wrap(~ allele, ncol = 1) + theme(legend.position="none")
 	}
 	else
 	{

@@ -22,6 +22,15 @@ kosambiToRf(x)
 
 kosambi(x)
 }
+\arguments{
+\item{x}{centiMorgan distance}
+
+\item{r}{recombination fraction}
+
+\item{r}{recombination fraction}
+
+\item{x}{centiMorgan distance}
+}
 \section{Functions}{
 \itemize{
 \item \code{haldaneToRf}: Convert from Haldane distance to recombination fraction

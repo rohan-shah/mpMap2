@@ -22,6 +22,12 @@ estimateRF(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE,
 \item{keepLkhd}{Set to \code{TRUE} to compute the maximum value of the likelihood. Due to memory constraints this should generally be left as \code{FALSE}.}
 
 \item{verbose}{Output diagnostic information, such as the amount of memory required, and the progress of the computation}
+
+\item{markerRows}{Used to estimate only a subset of the full matrix of pairwise recombination fractions.}
+
+\item{markerColumns}{Used to estimate only a subset of the full matrix of pairwise recombination fractions.}
+
+\item{lineWeights}{Used to correct for the effects of segregation distortion.}
 }
 \description{
 This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.
