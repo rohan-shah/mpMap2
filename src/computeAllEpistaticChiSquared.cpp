@@ -1,5 +1,9 @@
 #include "computeAllEpistaticChiSquared.h"
-SEXP computeAllEpistaticChiSquared(SEXP probabilities_sexp, SEXP nFounders_sexp, SEXP infiniteSelfing_sexp)
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
+#include <functional>
+SEXP computeAllEpistaticChiSquared(SEXP probabilities_sexp, SEXP nFounders_sexp, SEXP infiniteSelfing_sexp, SEXP showProgress_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 probabilities;
@@ -52,6 +56,16 @@ BEGIN_RCPP
 		throw std::runtime_error("Input nFounders must be a boolean");
 	}
 
+	bool showProgress;
+	try
+	{
+		showProgress = Rcpp::as<bool>(showProgress_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input showProgress must be a boolean");
+	}
+
 	std::vector<int> allAlleles;
 	for(int i = 0; i < key.nrow(); i++)
 	{
@@ -68,6 +82,31 @@ BEGIN_RCPP
 	int nMarkers = data.ncol();
 	int nLines = data.nrow() / nAlleles;
 	Rcpp::NumericMatrix returnValue(nMarkers, nMarkers);
+	
+	Rcpp::Function txtProgressBar("txtProgressBar");
+	Rcpp::Function setTxtProgressBar("setTxtProgressBar");
+	Rcpp::Function close("close");
+	Rcpp::RObject barHandle;
+	std::function<void(unsigned long long)> progressFunction = [](unsigned long long){};
+	if(showProgress)
+	{
+		barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+		progressFunction = [barHandle,nMarkers,setTxtProgressBar](unsigned long long value)
+			{
+				try
+				{
+#ifdef CUSTOM_STATIC_RCPP
+					setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*value) / (double)nMarkers));
+#else
+					setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)nMarkers));
+#endif
+				}
+				catch(...)
+				{
+				}
+			};
+	}
+	unsigned long long done = 0;
 #ifdef USE_OPENMP
 	#pragma omp parallel
 #endif
@@ -122,6 +161,18 @@ BEGIN_RCPP
 				if(fabs(sumExpected - sumObs) > 1e-4) throw std::runtime_error("Internal error");
 #endif
 				returnValue(marker1, marker2) = returnValue(marker2, marker1) = accumulated;
+			}
+#ifdef USE_OPENMP
+			#pragma omp critical
+#endif
+			{
+				done++;
+			}
+#ifdef USE_OPENMP
+			if(omp_get_thread_num() == 0)
+#endif
+			{
+				progressFunction(done);
 			}
 		}
 	}

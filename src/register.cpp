@@ -97,7 +97,7 @@ extern "C"
 		{"computeGenotypeProbabilities", (DL_FUNC)&computeGenotypeProbabilities, 6},
 		{"transformForMPWGAIM", (DL_FUNC)&transformForMPWGAIM, 1},
 		{"parsePurdy", (DL_FUNC)&parsePurdy, 2}, 
-		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 3},
+		{"computeAllEpistaticChiSquared", (DL_FUNC)&computeAllEpistaticChiSquared, 4},
 		{"getAllFunnels", (DL_FUNC)&getAllFunnels, 2}, 
 		{"getAllFunnelsIncAIC", (DL_FUNC)&getAllFunnelsIncAIC, 2}, 
 		{"rawSymmetricMatrixUncompress", (DL_FUNC)&rawSymmetricMatrixUncompress, 1},
