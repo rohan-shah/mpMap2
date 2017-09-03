@@ -50,6 +50,7 @@ Collate:
     'combineGenotypes.R'
     'combineKeepRF.R'
     'compressedProbabilities.R'
+    'computeAllEpistaticChiSquared.R'
     'computeGenotypeProbabilities.R'
     'createSNPTemplate.R'
     'detailedPedigree-class.R'
