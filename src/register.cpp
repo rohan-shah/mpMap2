@@ -46,6 +46,7 @@
 #include "combineRFDisjoint.h"
 #include "estimateRFSingleDesign.h"
 #include "expandedProbabilities_RInterface.h"
+#include "arsaRaw.h"
 extern "C"
 {
 	char* package_name = "mpMap2";
@@ -131,7 +132,7 @@ extern "C"
 #endif
 		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
 		R_RegisterCCallable(package_name, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
-		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRawREntryPoint);
+		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRaw::arsaRawExported);
 		R_RegisterCCallable(package_name, "arsa", (DL_FUNC)&arsa);
 	}
 }
