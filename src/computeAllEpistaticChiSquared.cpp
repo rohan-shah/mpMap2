@@ -3,7 +3,7 @@
 #include <omp.h>
 #endif
 #include <functional>
-SEXP computeAllEpistaticChiSquared(SEXP probabilities_sexp, SEXP nFounders_sexp, SEXP infiniteSelfing_sexp, SEXP showProgress_sexp)
+SEXP computeAllEpistaticChiSquared(SEXP probabilities_sexp, SEXP nFounders_sexp, SEXP infiniteSelfing_sexp, SEXP verbose_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 probabilities;
@@ -25,6 +25,7 @@ BEGIN_RCPP
 	{
 		throw std::runtime_error("Input probabilities@data must be a numeric matrix");
 	}
+	std::vector<float> floatData = Rcpp::as<std::vector<float> >(data);
 
 	Rcpp::IntegerMatrix key;
 	try
@@ -56,14 +57,18 @@ BEGIN_RCPP
 		throw std::runtime_error("Input nFounders must be a boolean");
 	}
 
-	bool showProgress;
+	Rcpp::List verboseList;
+	bool verbose;
+	int progressStyle;
 	try
 	{
-		showProgress = Rcpp::as<bool>(showProgress_sexp);
+		verboseList = Rcpp::as<Rcpp::List>(verbose_sexp);
+		verbose = Rcpp::as<bool>(verboseList("verbose"));
+		progressStyle = Rcpp::as<int>(verboseList("progressStyle"));
 	}
 	catch(...)
 	{
-		throw std::runtime_error("Input showProgress must be a boolean");
+		throw std::runtime_error("Input verbose must be a boolean or a list with entries verbose and progressStyle");
 	}
 
 	std::vector<int> allAlleles;
@@ -88,9 +93,9 @@ BEGIN_RCPP
 	Rcpp::Function close("close");
 	Rcpp::RObject barHandle;
 	std::function<void(unsigned long long)> progressFunction = [](unsigned long long){};
-	if(showProgress)
+	if(verbose)
 	{
-		barHandle = txtProgressBar(Rcpp::Named("style") = 3, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
+		barHandle = txtProgressBar(Rcpp::Named("style") = progressStyle, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
 		progressFunction = [barHandle,nMarkers,setTxtProgressBar](unsigned long long value)
 			{
 				try
@@ -111,7 +116,7 @@ BEGIN_RCPP
 	#pragma omp parallel
 #endif
 	{
-		std::vector<double> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
+		std::vector<float> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
 #ifdef USE_OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
@@ -126,29 +131,29 @@ BEGIN_RCPP
 				{
 					for(int lineCounter = 0; lineCounter < nLines; lineCounter++)
 					{
-						sums1[allele1] += data(lineCounter * nAlleles + allele1, marker1);
-						sums2[allele1] += data(lineCounter * nAlleles + allele1, marker2);
+						sums1[allele1] += floatData[lineCounter * nAlleles + allele1 + marker1 * nLines * nAlleles];
+						sums2[allele1] += floatData[lineCounter * nAlleles + allele1 + marker2 * nLines * nAlleles];
 					}
 					for(int allele2 = 0; allele2 < nAlleles ; allele2++)
 					{
 						for(int lineCounter = 0; lineCounter < nLines; lineCounter++)
 						{
-							obs[allele1*nAlleles + allele2] += data(lineCounter * nAlleles + allele1, marker1) * data(lineCounter * nAlleles + allele2, marker2);
+							obs[allele1*nAlleles + allele2] += floatData[lineCounter * nAlleles + allele1 + marker1 * nLines * nAlleles] * floatData[lineCounter * nAlleles + allele2 + marker2 * nLines * nAlleles];
 						}
 					}
 				}
-				double accumulated = 0;
+				float accumulated = 0;
 #ifdef INTERNAL_CHECKS
-				double sumExpected = 0, sumObs = 0;
+				float sumExpected = 0, sumObs = 0;
 #endif
 				for(int allele1 = 0; allele1 < nAlleles; allele1++)
 				{
 					for(int allele2 = 0; allele2 < nAlleles; allele2++)
 					{
-						double expected = sums1[allele1] * sums2[allele2] / nLines;
+						float expected = sums1[allele1] * sums2[allele2] / nLines;
 						if(expected != 0)
 						{
-							double absDifference = fabs(expected - obs[allele1*nAlleles + allele2]);
+							float absDifference = fabs(expected - obs[allele1*nAlleles + allele2]);
 							accumulated += (absDifference - 0.5) * (absDifference - 0.5) / expected;
 						}
 #ifdef INTERNAL_CHECKS
