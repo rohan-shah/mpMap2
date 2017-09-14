@@ -73,6 +73,8 @@ Collate:
     'fourParentPedigreeRandomFunnels.R'
     'fourParentPedigreeSingleFunnel.R'
     'fullHetData.R'
+    'generateGridPositions.R'
+    'generateIntervalMidPoints.R'
     'getAllFunnels.R'
     'getChromosomes.R'
     'getIntercrossingAndSelfingGenerations.R'
