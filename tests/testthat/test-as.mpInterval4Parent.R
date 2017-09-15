@@ -27,6 +27,11 @@ if(couldLoadPackages)
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
+		
+		#Add duplicated positions
+		map[[1]] <- c("Extra1" = 0, map[[1]], "Extra2" = 200)
+		map[[2]] <- c("Extra3" = 0, map[[2]], "Extra4" = 200)
+
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(keepHets = FALSE)
 		mapped <- new("mpcrossMapped", cross2, map = map)
@@ -44,7 +49,7 @@ if(couldLoadPackages)
 		old$id <- which(old$pedigree[,4] == 1)
 		old$fid <- 1:4
 		class(old) <- "mpcross"
-		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0))
+		suppressWarnings(capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0)))
 
 		#They may disagree on the marker encoding, so fix that up
 		for(chr in 1:2)
@@ -71,6 +76,11 @@ if(couldLoadPackages)
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
+
+		#Add duplicated positions
+		map[[1]] <- c("Extra1" = 0, map[[1]], "Extra2" = 200)
+		map[[2]] <- c("Extra3" = 0, map[[2]], "Extra4" = 200)
+
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + removeHets()
 		mapped <- new("mpcrossMapped", cross2, map = map)
@@ -87,7 +97,7 @@ if(couldLoadPackages)
 		old$id <- which(old$pedigree[,4] == 1)
 		old$fid <- 1:4
 		class(old) <- "mpcross"
-		capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0))
+		suppressWarnings(capture.output(oldConverted <- mpcross2int(old, gen.type="mpMarker", method = "qtl", geprob = 0)))
 
 		expect_identical(newConverted$nfounders, 4L)
 		for(chr in 1:2)
