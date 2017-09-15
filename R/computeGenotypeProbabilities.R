@@ -1,3 +1,21 @@
+computeGenotypeProbabilitiesInternal <- function(geneticData, map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions)
+{
+	results <- .Call("computeGenotypeProbabilities", geneticData, map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, PACKAGE="mpMap2")
+	resultsMatrix <- results$data
+	founderNames <- rownames(geneticData@founders)
+	if(geneticData@pedigree@selfing == "infinite")
+	{
+		rownames(resultsMatrix) <- unlist(lapply(rownames(geneticData@finals), function(lineName) paste0(lineName, " - ", founderNames)))
+	}
+	else
+	{
+		nAlleles <- nrow(resultsMatrix) / nrow(geneticData@finals)
+		rownames(resultsMatrix) <- unlist(lapply(rownames(geneticData@finals), function(lineName) paste0(lineName, " - ", 1:nAlleles)))
+	}
+	class(results$map) <- "map"
+	names(results$map) <- names(map)
+	return(new("probabilities", data = resultsMatrix, key = results$key, map = results$map))
+}
 #' @export
 computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list())
 {
@@ -45,21 +63,7 @@ computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 
 	}
 	for(i in 1:length(mpcrossMapped@geneticData))
 	{
-		results <- .Call("computeGenotypeProbabilities", mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions, PACKAGE="mpMap2")
-		resultsMatrix <- results$data
-		founderNames <- rownames(mpcrossMapped@geneticData[[i]]@founders)
-		if(mpcrossMapped@geneticData[[i]]@pedigree@selfing == "infinite")
-		{
-			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", founderNames)))
-		}
-		else
-		{
-			nAlleles <- nrow(resultsMatrix) / nrow(mpcrossMapped@geneticData[[i]]@finals)
-			rownames(resultsMatrix) <- unlist(lapply(rownames(mpcrossMapped@geneticData[[i]]@finals), function(lineName) paste0(lineName, " - ", 1:nAlleles)))
-		}
-		class(results$map) <- "map"
-		names(results$map) <- names(map)
-		mpcrossMapped@geneticData[[i]]@probabilities <- new("probabilities", data = resultsMatrix, key = results$key, map = results$map)
+		mpcrossMapped@geneticData[[i]]@probabilities <- computeGenotypeProbabilitiesInternal(mpcrossMapped@geneticData[[i]], mpcrossMapped@map, homozygoteMissingProb, heterozygoteMissingProb, errorProb, extraPositions)
 	}
 	return(mpcrossMapped)
 }

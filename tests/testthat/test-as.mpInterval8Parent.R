@@ -2,28 +2,28 @@ context("Conversion of 8-way cross to mpwgaim object")
 suppressWarnings(capture.output(couldLoadPackages <- require(mpwgaim, quietly=T) && require(mpMap, quietly=T)))
 if(couldLoadPackages)
 {
-	test_that("Require probabilities", 
+	test_that("Require probabilities, with type = mpMarker", 
 	{
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(keepHets = FALSE)
 		mapped <- new("mpcrossMapped", cross2, map = map)
-		expect_error(suppressWarnings(newConverted <- as.mpInterval(mapped, positions = "all")), "not have genotype probabilities")
+		expect_error(suppressWarnings(newConverted <- as.mpInterval(mapped, positions = "all", type = "mpMarker")), "not have genotype probabilities")
 
 		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
-		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all"))
+		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all", type = "mpMarker"))
 		
 		prob <- computeGenotypeProbabilities(mapped)
-		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all"))
+		suppressWarnings(newConverted <- as.mpInterval(prob, positions = "all", type = "mpMarker"))
 
 		prob <- computeGenotypeProbabilities(mapped, extraPositions = generateGridPositions(10))
-		newConverted <- as.mpInterval(prob, positions = "marker")
+		newConverted <- as.mpInterval(prob, positions = "marker", type = "mpMarker")
 		
 		prob <- computeGenotypeProbabilities(mapped)
-		newConverted <- as.mpInterval(prob, positions = "marker")
+		newConverted <- as.mpInterval(prob, positions = "marker", type = "mpMarker")
 	})
-	test_that("Conversion of 8-way object agrees with old code",
+	test_that("Conversion of 8-way object agrees with old code, with type = mpMarker",
 	{
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
 		map <- sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
@@ -37,8 +37,7 @@ if(couldLoadPackages)
 		mapped <- new("mpcrossMapped", cross2, map = map)
 		#This error probability is chosen to match the one in mpcross2int. It seems the one in mpcross2int can't be easily changed. 
 		prob <- computeGenotypeProbabilities(mapped)
-		newConverted <- as.mpInterval(prob, positions = "marker")
-		newConverted <- newConverted[[1]]
+		newConverted <- as.mpInterval(prob, positions = "marker", type = "mpMarker")
 
 		old <- list()
 		old$finals <- finals(cross2)
