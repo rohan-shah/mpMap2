@@ -19,7 +19,7 @@ test_that("Test validation",
 	
 	#Now it works
 	statistics <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, onlyStatistics = TRUE, verbose = FALSE)
-	expect_true(is.numeric(statistics))
+	expect_true(is.numeric(statistics@data))
 
 	#Check that the resulting objcet is correct. 
 	capture.output(results <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, verbose = FALSE))

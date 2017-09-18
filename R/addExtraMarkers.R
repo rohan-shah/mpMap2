@@ -4,6 +4,16 @@ splitVector <- function(vector, splitValue)
 	if(index == length(vector)) return(list(before = vector[1:length(vector)], after = c()))
 	return(list(before = vector[1:index], after = vector[(index+1):length(vector)]))
 }
+.addExtraMarkersStatistics <- setClass("addExtraMarkersStatistics", slots=list(data = "numeric", map = "map"))
+setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = function(x, ...)
+{
+	offsetVector <- c(0, head(unlist(lapply(x@map, max)), -1))
+	cumsumOffsetVector <- cumsum(offsetVector)
+	offsetVector <- rep(cumsumOffsetVector, times = unlist(lapply(x@map, length)))
+	data <- data.frame(position = offsetVector + unlist(x@map), statistic = x@data)
+	verticalLineData <- data.frame(position = tail(cumsumOffsetVector, -1))
+	return(ggplot(data, mapping = aes_string(x = 'position', y = 'statistic')) + geom_line() + xlab("Distance (cM)") + ylab("Test statistic") + geom_vline(data = verticalLineData, mapping = aes_string(xintercept = 'position')))
+})
 #' @title Add extra markers
 #' @description Add extra markers to a map, using a QTL-mapping style approach. 
 #' @param mpcrossMapped An existing dataset with a map, which must include imputation data and recombination fraction data. 
@@ -126,7 +136,10 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		})
 		if(onlyStatistics)
 		{
-			return(chiSquared)
+			testMap <- imputationMap
+			testMap <- lapply(testMap, function(x) x[names(x) %in% extraImputationPoints(mpcrossMapped)])
+			class(testMap) <- "map"
+			return(new("addExtraMarkersStatistics", data = chiSquared, map = testMap))
 		}
 		chromosomeAssignments <- rep(names(imputationMap), times = unlist(lapply(imputationMap, length)))
 		#Name of the best location
