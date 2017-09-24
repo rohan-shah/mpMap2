@@ -2,6 +2,7 @@
 
 export("lineNames<-")
 export("selfing<-")
+export(addExtraMarkerFromRawCall)
 export(addExtraMarkers)
 export(as.mpInterval)
 export(assignFounderPattern)

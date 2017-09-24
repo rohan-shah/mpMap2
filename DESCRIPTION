@@ -30,6 +30,7 @@ LinkingTo: Rcpp
 RoxygenNote: 5.0.1
 Collate:
     'Rcpp_exceptions.R'
+    'addExtraMarkerFromRawCall.R'
     'addExtraMarkers.R'
     'canSkipValidity.R'
     'map-class.R'

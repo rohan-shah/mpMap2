@@ -12,7 +12,7 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 	offsetVector <- rep(cumsumOffsetVector, times = unlist(lapply(x@map, length)))
 	data <- data.frame(position = offsetVector + unlist(x@map), statistic = x@data)
 	verticalLineData <- data.frame(position = tail(cumsumOffsetVector, -1))
-	return(ggplot(data, mapping = aes_string(x = 'position', y = 'statistic')) + geom_line() + xlab("Distance (cM)") + ylab("Test statistic") + geom_vline(data = verticalLineData, mapping = aes_string(xintercept = 'position')))
+	return(ggplot(data, mapping = aes_string(x = 'position', y = 'statistic')) + geom_line(color = "red") + xlab("Distance (cM)") + ylab("Test statistic") + geom_vline(data = verticalLineData, mapping = aes_string(xintercept = 'position')))
 })
 #' @title Add extra markers
 #' @description Add extra markers to a map, using a QTL-mapping style approach. 
@@ -103,7 +103,10 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 	{
 		stop("Input reorderRadius must be at least 2*maxOffset + 3")
 	}
-	newMarkers <- estimateRF(newMarkers, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
+	if(!onlyStatistics)
+	{
+		newMarkers <- estimateRF(newMarkers, gbLimit = mpcrossMapped@rf@gbLimit, recombValues = mpcrossMapped@rf@theta@levels)
+	}
 	founders <- nFounders(mpcrossMapped)
 	if(useOnlyExtraImputationPoints)
 	{
@@ -132,7 +135,7 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 			marginalImputed <- .rowSums(observed, m = nrow(observed), n = ncol(observed))
 			marginalNewMarker <- .colSums(observed, m = nrow(observed), n = ncol(observed))
 			expected <- outer(marginalImputed, marginalNewMarker) / sum(marginalImputed)
-			return(sum((observed - expected)^2 / expected))
+			return(sum((observed - expected)^2 / expected, na.rm=TRUE))
 		})
 		if(onlyStatistics)
 		{
