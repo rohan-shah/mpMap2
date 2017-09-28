@@ -63,7 +63,10 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	endif()
 	message(STATUS "Generating import library for R.dll - done")
 
-	add_definitions(-Dsnprintf=_snprintf)
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.0")
+		#Add a define to account for different name of certain function
+		add_definitions(-Dsnprintf=_snprintf)
+	endif()
 
 	#Put a Makefile.win in the source directory
 	find_program(FULL_MAKE_PROGRAM nmake)
