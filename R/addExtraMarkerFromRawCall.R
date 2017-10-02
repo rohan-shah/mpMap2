@@ -1,3 +1,4 @@
+#' @include map-class.R
 splitVector <- function(vector, splitValue)
 {
 	index <- match(splitValue, vector)

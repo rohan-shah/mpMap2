@@ -11,7 +11,7 @@ public:
 		: data(mat.data), nRow(mat.nRow), nCol(mat.nCol)
 	{}
 	integerMatrix()
-		: data(NULL), nRow(nRow), nCol(nCol)
+		: data(NULL), nRow(0), nCol(0)
 	{}
 	integerMatrix(int* data, int nRow, int nCol)
 		: data(data), nRow(nRow), nCol(nCol)
@@ -50,6 +50,7 @@ public:
 		data = &(mat[0]);
 		nRow = mat.nrow();
 		nCol = mat.ncol();
+		return *this;
 	}
 	numericMatrix(Rcpp::NumericMatrix mat)
 		: data(&(mat[0])), nRow(mat.nrow()), nCol(mat.ncol())

@@ -204,7 +204,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 	rowMajorMatrix<compressedProbabilitiesType> funnelHaplotypeProbabilities(nRecombLevels, maxSelfing - minSelfing + 1);
 	for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)
 	{
-		for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+		for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
 		{
 			genotypeProbabilitiesNoIntercross<nFounders, infiniteSelfing>(funnelHaplotypeProbabilities(recombCounter, selfingGenerations - minSelfing), args.recombinationFractions[recombCounter], selfingGenerations, nDifferentFunnels);
 		}
@@ -221,7 +221,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 	{
 		for(int aiCounter = minAIGenerations; aiCounter <= maxAIGenerations; aiCounter++)
 		{
-			for(int recombCounter = 0; recombCounter < nRecombLevels; recombCounter++)
+			for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
 			{
 				genotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingHaplotypeProbabilities(recombCounter, aiCounter-minAIGenerations, selfingGenerations-minSelfing), aiCounter, args.recombinationFractions[recombCounter], selfingGenerations, nDifferentFunnels);
 			}
@@ -258,7 +258,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 			for(int selfingCounter = minSelfing; selfingCounter <= maxSelfing; selfingCounter++)
 			{
 				//Compute marker probabilities for a finer grid. If me seem to see a repeated probability model (numerically, up to a tolerance), then in that particular situtation this pair of markers is no good
-				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
+				for(int funnelCounter = 0; funnelCounter < (int)nDifferentFunnels; funnelCounter++)
 				{
 					funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<false>(finerFunnelHaplotypeProbabilities, &(markerProbabilities[0]), args.lineFunnelEncodings[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);
 					thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing) = isValid<maxAlleles>(markerProbabilities, nFinerPoints, firstMarkerPatternData.nObservedValues, secondMarkerPatternData.nObservedValues, finerRecombLevels);
@@ -277,7 +277,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 						intercrossingHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(intercrossingHaplotypeProbabilities, markerProbabilitiesThisIntercrossing, intercrossingGeneration-minAIGenerations, firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing, args.allFunnelEncodings[0]);
 					}
 				}
-				for(int funnelCounter = 0; funnelCounter < nDifferentFunnels; funnelCounter++)
+				for(int funnelCounter = 0; funnelCounter < (int)nDifferentFunnels; funnelCounter++)
 				{
 					array2<maxAlleles>* markerProbabilitiesThisFunnel = &(thisMarkerPairData.perFunnelData(0, funnelCounter, selfingCounter - minSelfing));
 					memset(markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
