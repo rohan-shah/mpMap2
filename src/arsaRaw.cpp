@@ -641,5 +641,5 @@ namespace arsaRaw
 		}
 		PutRNGstate();
 	}
-}
 #endif
+}

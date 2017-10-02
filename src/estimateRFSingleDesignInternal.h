@@ -24,6 +24,7 @@ public:
 		data = &(mat[0]);
 		nRow = mat.nrow();
 		nCol = mat.ncol();
+		return *this;
 	}
 	int& operator()(int row, int column)
 	{

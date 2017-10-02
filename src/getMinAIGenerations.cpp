@@ -1,4 +1,5 @@
 #include "getMinAIGenerations.h"
+#include <algorithm>
 int getMinAIGenerations(const std::vector<int>* intercrossingGenerations)
 {
 	int minAIGenerations = 0;
