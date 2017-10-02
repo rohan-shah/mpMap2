@@ -22,7 +22,7 @@ combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEs
 		stop("Input callEstimateRF must be TRUE, FALSE, or a numeric vector")
 	}
 	#Not worried about lineWeights warning
-	suppressWarnings(combined <- addMpMap2(object1, object2, skipValidity = skipValidity))
+	suppressWarnings(combined <- addMpMap2(as(object1, "mpcross"), as(object2, "mpcross"), skipValidity = skipValidity))
 	if(length(combined@geneticData) > 1)
 	{
 		stop("Could not combined objects into a single experiment")
