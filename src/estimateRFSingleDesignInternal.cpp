@@ -231,6 +231,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 			}
 		}
 	}
+	const std::vector<markerPatternID>& markerPatternIDs = args.markerPatternData.markerPatternIDs;
 
 	unsigned long long done = 0;
 	const R_xlen_t product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
@@ -287,7 +288,15 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 					}
 				}
 			}
-			triangularIterator currentPosition(*args.markerRows, *args.markerColumns);
+			std::function<bool(int)> predicate = [&markerPatternIDs,markerPatternID1,&markerPatternID2](int row)
+			{
+				return markerPatternIDs[row] == markerPatternID1 || markerPatternIDs[row] == markerPatternID2;
+			};
+			std::function<bool(int, int)> jointPredicate = [&markerPatternIDs,markerPatternID1,&markerPatternID2](int row, int column)
+			{
+				return (markerPatternIDs[row] == markerPatternID1 && markerPatternIDs[column] == markerPatternID2) || (markerPatternIDs[column] == markerPatternID1 && markerPatternIDs[row] == markerPatternID2);
+			};
+			triangularIteratorPredicates currentPosition(*args.markerRows, *args.markerColumns, predicate, jointPredicate);
 			unsigned long long destinationCounter = 0, doneThisThread = 0;
 			while(!currentPosition.isDone())
 			{
@@ -299,89 +308,92 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 				bool swap = markerPatternIDRow > markerPatternIDColumn;
 				if(swap) std::swap(markerPatternIDRow, markerPatternIDColumn);
 				
-				if(markerPatternID1 == markerPatternIDRow && markerPatternID2 == markerPatternIDColumn)
+#ifndef NDEBUG
+				if(markerPatternID1 != markerPatternIDRow || markerPatternID2 != markerPatternIDColumn)
 				{
-					std::fill(table.begin(), table.end(), 0);
-					for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
+					throw std::runtime_error("Internal error");
+				}
+#endif
+				std::fill(table.begin(), table.end(), 0);
+				for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
+				{
+					int marker1Value = args.finals(finalCounter, markerCounterRow);
+					int marker2Value = args.finals(finalCounter, markerCounterColumn);
+					//If necessary swap the data
+					if(swap) std::swap(marker1Value, marker2Value);
+					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
 					{
-						int marker1Value = args.finals(finalCounter, markerCounterRow);
-						int marker2Value = args.finals(finalCounter, markerCounterColumn);
-						//If necessary swap the data
-						if(swap) std::swap(marker1Value, marker2Value);
-						if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
+						int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
+						int selfingGenerations = args.selfingGenerations[finalCounter];
+						if(intercrossingGenerations == 0)
 						{
-							int intercrossingGenerations = args.intercrossingGenerations[finalCounter];
-							int selfingGenerations = args.selfingGenerations[finalCounter];
-							if(intercrossingGenerations == 0)
-							{
-								funnelID currentLineFunnelID = args.lineFunnelIDs[finalCounter];
-								table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + currentLineFunnelID]++;
-							}
-							else
-							{
-								table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations]++;
-							}
+							funnelID currentLineFunnelID = args.lineFunnelIDs[finalCounter];
+							table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + currentLineFunnelID]++;
+						}
+						else
+						{
+							table[marker1Value*product1 + marker2Value*product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations]++;
 						}
 					}
-					for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
+				}
+				for(int recombCounter = 0; recombCounter < (int)nRecombLevels; recombCounter++)
+				{
+					double contribution = 0;
+					for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)
 					{
-						double contribution = 0;
-						for(int selfingGenerations = minSelfing; selfingGenerations <= maxSelfing; selfingGenerations++)
+						for(int marker1Value = 0; marker1Value < firstMarkerPatternData.nObservedValues; marker1Value++)
 						{
-							for(int marker1Value = 0; marker1Value < maxAlleles; marker1Value++)
+							for(int marker2Value = 0; marker2Value < secondMarkerPatternData.nObservedValues; marker2Value++)
 							{
-								for(int marker2Value = 0; marker2Value < maxAlleles; marker2Value++)
+								for(int intercrossingGenerations = minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 								{
-									for(int intercrossingGenerations = minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+									int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
+									//This continue statement is important, because otherwise we may end up with 0 * -Inf, which results in -Inf
+									if(count == 0) continue;
+									bool allowable = thisMarkerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
+									if(allowable)
 									{
-										int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + nDifferentFunnels + intercrossingGenerations - minAIGenerations];
-										//This continue statement is important, because otherwise we may end up with 0 * -Inf, which results in -Inf
-										if(count == 0) continue;
-									        bool allowable = thisMarkerPairData.allowableAI(intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
-									        if(allowable)
-									        {
-										        array2<maxAlleles>& perMarkerGenotypeValues = thisMarkerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
-					        					contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
-									        }
+										array2<maxAlleles>& perMarkerGenotypeValues = thisMarkerPairData.perAIGenerationData(recombCounter, intercrossingGenerations-minAIGenerations, selfingGenerations - minSelfing);
+										contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
 									}
-									for(int funnelID = 0; funnelID < (int)nDifferentFunnels; funnelID++)
+								}
+								for(int funnelID = 0; funnelID < (int)nDifferentFunnels; funnelID++)
+								{
+									int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
+									//This continue statement is important, because otherwise we may end up with 0 * -Inf, which results in -Inf
+									if(count == 0) continue;
+									bool allowable = thisMarkerPairData.allowableFunnel(funnelID, selfingGenerations - minSelfing);
+									if(allowable)
 									{
-										int count = table[marker1Value*product1 + marker2Value * product2 + (selfingGenerations - minSelfing)*product3 + funnelID];
-										//This continue statement is important, because otherwise we may end up with 0 * -Inf, which results in -Inf
-										if(count == 0) continue;
-										bool allowable = thisMarkerPairData.allowableFunnel(funnelID, selfingGenerations - minSelfing);
-										if(allowable)
-										{
-											array2<maxAlleles>& perMarkerGenotypeValues = thisMarkerPairData.perFunnelData(recombCounter, funnelID, selfingGenerations - minSelfing);
-											contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
-										}
+										array2<maxAlleles>& perMarkerGenotypeValues = thisMarkerPairData.perFunnelData(recombCounter, funnelID, selfingGenerations - minSelfing);
+										contribution += count * perMarkerGenotypeValues.values[marker1Value][marker2Value];
 									}
 								}
 							}
 						}
-						if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) results[recombCounter] = -std::numeric_limits<double>::infinity();
-						else results[recombCounter] = contribution;
 					}
-					std::vector<double>::iterator maxIterator = std::max_element(results.begin(), results.end());
-					double max = *maxIterator;
-					double min = *std::min_element(results.begin(), results.end());
-					double currentLod;
-					int currentTheta = 0;
-					if(max == 0 && min == 0)
-					{
-						max = currentLod = std::numeric_limits<double>::quiet_NaN();
-						currentTheta = 0xff;
-					}
-					else
-					{
-						currentTheta = (int)std::distance(results.begin(), maxIterator);
-						currentLod = max - results[halfIndex];
-					}
-					args.theta[destinationCounter] = currentTheta;
-					if(args.lod) args.lod[destinationCounter] = currentLod;
-					if(args.lkhd) args.lkhd[destinationCounter] = max;
-					doneThisThread++;
+					if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) results[recombCounter] = -std::numeric_limits<double>::infinity();
+					else results[recombCounter] = contribution;
 				}
+				std::vector<double>::iterator maxIterator = std::max_element(results.begin(), results.end());
+				double max = *maxIterator;
+				double min = *std::min_element(results.begin(), results.end());
+				double currentLod;
+				int currentTheta = 0;
+				if(max == 0 && min == 0)
+				{
+					max = currentLod = std::numeric_limits<double>::quiet_NaN();
+					currentTheta = 0xff;
+				}
+				else
+				{
+					currentTheta = (int)std::distance(results.begin(), maxIterator);
+					currentLod = max - results[halfIndex];
+				}
+				args.theta[destinationCounter] = currentTheta;
+				if(args.lod) args.lod[destinationCounter] = currentLod;
+				if(args.lkhd) args.lkhd[destinationCounter] = max;
+				doneThisThread++;
 				currentPosition.next();
 				destinationCounter++;
 			}

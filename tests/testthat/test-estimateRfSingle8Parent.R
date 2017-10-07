@@ -1,5 +1,31 @@
 context("estimateRF vs estimateRFSingle, 8-parent tests")
 
+test_that("Test actual maps",
+{
+	testFunc <- function(pedigree, map)
+	{
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
+		suppressWarnings(capture.output(rf1 <- estimateRF(cross)))
+		suppressWarnings(capture.output(rf2 <- mpMap2:::estimateRFSingleDesign(cross)))
+		expect_identical(rf1, rf2)
+	}
+	map1 <- sim.map(len = 100, n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map2 <- sim.map(len = c(100, 100), n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+	maps <- list(map1, map2)
+
+	pedigree1 <- eightParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+	pedigree1@selfing <- "infinite"
+	pedigree2 <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+	pedigree2@selfing <- "infinite"
+	pedigrees <- list(pedigree1, pedigree2)
+	for(map in maps)
+	{
+		for(pedigree in pedigrees)
+		{
+			testFunc(pedigree, map)
+		}
+	}
+}
 test_that("Using randomly chosen funnels, with finite generations of selfing", 
 	{
 		distances <- c(1, 5, 10, 20, 50)

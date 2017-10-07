@@ -34,6 +34,44 @@ bool triangularIterator::isDone() const
 {
 	return markerColumn == markerColumns.end();
 }
+triangularIteratorPredicates::triangularIteratorPredicates(const std::vector<int>& markerRows, const std::vector<int>& markerColumns, std::function<bool(int)> predicate, std::function<bool(int, int)> jointPredicate)
+	: markerRows(markerRows), markerColumns(markerColumns), markerRow(markerRows.begin()), markerColumn(markerColumns.begin()), predicate(predicate), jointPredicate(jointPredicate)
+{
+	if(*markerRow > *markerColumn || !jointPredicate(*markerRow, *markerColumn)) next();
+}
+std::pair<int, int> triangularIteratorPredicates::get() const
+{
+	return std::make_pair(*markerRow, *markerColumn);
+}
+triangularIteratorPredicates& triangularIteratorPredicates::operator=(const triangularIteratorPredicates& other)
+{
+	if(&markerRows != &other.markerRows || &markerColumns != &other.markerColumns) throw std::runtime_error("Internal error");
+	markerRow = other.markerRow;
+	markerColumn = other.markerColumn;
+	predicate = other.predicate;
+	jointPredicate = other.jointPredicate;
+	return *this;
+}
+void triangularIteratorPredicates::next()
+{
+	if(markerColumn == markerColumns.end()) throw std::runtime_error("Tried to increment iterator past the end");
+	do
+	{
+		markerRow++;
+		if(markerRow == markerRows.end())
+		{
+			markerRow = markerRows.begin();
+			markerColumn++;
+			while(!predicate(*markerColumn) && markerColumn != markerColumns.end()) markerColumn++;
+			if(markerColumn == markerColumns.end()) break;
+		}
+	}
+	while(*markerRow > *markerColumn || !jointPredicate(*markerRow, *markerColumn));
+}
+bool triangularIteratorPredicates::isDone() const
+{
+	return markerColumn == markerColumns.end();
+}
 SEXP countValuesToEstimateExported(SEXP markerRows_, SEXP markerColumns_)
 {
 BEGIN_RCPP

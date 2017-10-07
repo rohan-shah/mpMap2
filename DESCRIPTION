@@ -32,10 +32,10 @@ LinkingTo: Rcpp
 RoxygenNote: 5.0.1
 Collate:
     'Rcpp_exceptions.R'
+    'map-class.R'
     'addExtraMarkerFromRawCall.R'
     'addExtraMarkers.R'
     'canSkipValidity.R'
-    'map-class.R'
     'pedigree-class.R'
     'hetData-class.R'
     'geneticData-class.R'
