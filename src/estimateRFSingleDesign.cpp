@@ -221,23 +221,27 @@ SEXP estimateRFSingleDesign(SEXP object_, SEXP recombinationFractions_, SEXP mar
 		}
 		internalArgs.theta = &(theta[0]);
 
-		Rcpp::Function txtProgressBar("txtProgressBar");
-		Rcpp::Function setTxtProgressBar("setTxtProgressBar");
-		Rcpp::Function close("close");
-		Rcpp::RObject barHandle;
+		Rcpp::Environment progress("package:progress");
+		Rcpp::Environment progressBar = progress.get("progress_bar");
+		Rcpp::Function newProgressBar = progressBar["new"];
+		Rcpp::Environment barHandle;
 		std::function<void(unsigned long long)> updateProgress = [](unsigned long long){};
 		if(verbose)
 		{
-			barHandle = txtProgressBar(Rcpp::Named("style") = progressStyle, Rcpp::Named("min") = 0, Rcpp::Named("max") = 1000, Rcpp::Named("initial") = 0);
-			updateProgress = [barHandle,nValuesToEstimate,setTxtProgressBar](unsigned long long value)
+			barHandle = newProgressBar(Rcpp::Named("format") = "Estimating [:bar] :percent eta :eta", Rcpp::Named("total") = (double)nValuesToEstimate, Rcpp::Named("clear") = true);
+			Rcpp::Function tick = barHandle["tick"];
+			unsigned long long previousValue = 0;
+			updateProgress = [barHandle, tick, &previousValue](unsigned long long value)
 				{
 					try
 					{
+						int increment = (int)(value - previousValue);
 #ifdef CUSTOM_STATIC_RCPP
-						setTxtProgressBar.topLevelExec(barHandle, (int)((double)(1000*value) / (double)(nValuesToEstimate)));
+						tick.topLevelExec(increment);
 #else
-						setTxtProgressBar(barHandle, (int)((double)(1000*value) / (double)(nValuesToEstimate)));
+						tick(increment);
 #endif
+						previousValue = value;
 					}
 					catch(...)
 					{
@@ -246,10 +250,6 @@ SEXP estimateRFSingleDesign(SEXP object_, SEXP recombinationFractions_, SEXP mar
 		}
 		internalArgs.updateProgress = updateProgress;
 		estimateRFSingleDesignInternal(internalArgs);
-		if(verbose)
-		{
-			close(barHandle);
-		}
 		Rcpp::RObject lodRet, lkhdRet;
 		
 		if(keepLod) lodRet = lod;
