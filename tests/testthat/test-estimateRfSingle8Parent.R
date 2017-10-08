@@ -25,7 +25,7 @@ test_that("Test actual maps",
 			testFunc(pedigree, map)
 		}
 	}
-}
+})
 test_that("Using randomly chosen funnels, with finite generations of selfing", 
 	{
 		distances <- c(1, 5, 10, 20, 50)
