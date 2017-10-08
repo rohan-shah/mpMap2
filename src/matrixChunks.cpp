@@ -62,7 +62,7 @@ void triangularIteratorPredicates::next()
 		{
 			markerRow = markerRows.begin();
 			markerColumn++;
-			while(!predicate(*markerColumn) && markerColumn != markerColumns.end()) markerColumn++;
+			while(markerColumn != markerColumns.end() && !predicate(*markerColumn)) markerColumn++;
 			if(markerColumn == markerColumns.end()) break;
 		}
 	}

@@ -85,7 +85,7 @@ struct estimateRFSingleDesignInternalArgs
 	estimateRFSingleDesignInternalArgs(estimateRFSingleDesignInternalArgs&& other)
 		:finals(other.finals), founders(other.founders), pedigree(other.pedigree), recombinationFractions(other.recombinationFractions), intercrossingGenerations(std::move(other.intercrossingGenerations)), selfingGenerations(std::move(other.selfingGenerations)), lineWeights(std::move(other.lineWeights)), markerPatternData(std::move(other.markerPatternData)), hasAI(other.hasAI), lineFunnelIDs(std::move(other.lineFunnelIDs)), lineFunnelEncodings(std::move(other.lineFunnelEncodings)), allFunnelEncodings(std::move(other.allFunnelEncodings)), rowPatterns(std::move(other.rowPatterns)), columnPatterns(std::move(other.columnPatterns)), markerRows(other.markerRows), markerColumns(other.markerColumns), lod(other.lod), lkhd(other.lkhd)
 	{}
-	integerMatrix finals, founders;
+	Rcpp::IntegerMatrix finals, founders;
 	Rcpp::S4 pedigree;
 	const std::vector<double>& recombinationFractions;
 	

@@ -177,7 +177,9 @@ bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInt
 }
 template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInternal2(estimateRFSingleDesignInternalArgs& args)
 {
-	int nFinals = args.finals.nRow;
+	integerMatrix founders = args.founders;
+	integerMatrix finals = args.finals;
+	int nFinals = finals.nRow;
 
 	int maxAIGenerations = *std::max_element(args.intercrossingGenerations.begin(), args.intercrossingGenerations.end());
 	int minAIGenerations = getMinAIGenerations(&args.intercrossingGenerations);
@@ -317,8 +319,8 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 				std::fill(table.begin(), table.end(), 0);
 				for(int finalCounter = 0; finalCounter < (int)nFinals; finalCounter++)
 				{
-					int marker1Value = args.finals(finalCounter, markerCounterRow);
-					int marker2Value = args.finals(finalCounter, markerCounterColumn);
+					int marker1Value = finals(finalCounter, markerCounterRow);
+					int marker2Value = finals(finalCounter, markerCounterColumn);
 					//If necessary swap the data
 					if(swap) std::swap(marker1Value, marker2Value);
 					if(marker1Value != NA_INTEGER && marker2Value != NA_INTEGER)
@@ -415,7 +417,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 }
 template<bool infiniteSelfing> bool estimateRFSingleDesignInternal1(estimateRFSingleDesignInternalArgs& args)
 {
-	int nFounders = args.founders.nRow;
+	int nFounders = args.founders.nrow();
 	if(nFounders == 2)
 	{
 		return estimateRFSingleDesignInternal2<2, infiniteSelfing>(args);
