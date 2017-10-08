@@ -72,6 +72,12 @@ bool triangularIteratorPredicates::isDone() const
 {
 	return markerColumn == markerColumns.end();
 }
+unsigned long long triangularIteratorPredicates::getFlatIndex() const
+{
+	unsigned long long column = std::distance(markerColumns.begin(), markerColumn);
+	unsigned long long row = std::distance(markerRows.begin(), markerRow);
+	return (column * (column + 1ULL) / 2ULL) + row;
+}
 SEXP countValuesToEstimateExported(SEXP markerRows_, SEXP markerColumns_)
 {
 BEGIN_RCPP

@@ -299,7 +299,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 				return (markerPatternIDs[row] == markerPatternID1 && markerPatternIDs[column] == markerPatternID2) || (markerPatternIDs[column] == markerPatternID1 && markerPatternIDs[row] == markerPatternID2);
 			};
 			triangularIteratorPredicates currentPosition(*args.markerRows, *args.markerColumns, predicate, jointPredicate);
-			unsigned long long destinationCounter = 0, doneThisThread = 0;
+			unsigned long long doneThisThread = 0;
 			while(!currentPosition.isDone())
 			{
 				std::pair<int, int> markerIndices = currentPosition.get();
@@ -392,6 +392,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 					currentTheta = (int)std::distance(results.begin(), maxIterator);
 					currentLod = max - results[halfIndex];
 				}
+				unsigned long long destinationCounter = currentPosition.getFlatIndex();
 				args.theta[destinationCounter] = currentTheta;
 				if(args.lod) args.lod[destinationCounter] = currentLod;
 				if(args.lkhd) args.lkhd[destinationCounter] = max;

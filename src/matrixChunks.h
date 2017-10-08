@@ -23,6 +23,7 @@ public:
 	void next();
 	bool isDone() const;
 	triangularIteratorPredicates& operator=(const triangularIteratorPredicates& other);
+	unsigned long long getFlatIndex() const;
 private:
 	const std::vector<int>& markerRows;
 	const std::vector<int>& markerColumns;
