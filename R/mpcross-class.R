@@ -175,4 +175,28 @@ infiniteSelfing <- function(founders, finals, pedigree)
 	hetData <- new("hetData", hetData)
 	return(hetData)
 }
-
+#' @export
+hetsForSNPMarkers <- function(founders, finals, pedigree)
+{
+	hetData <- lapply(1:ncol(founders), function(x)
+	{
+		founderCol <- founders[,x]
+		finalCol <- finals[,x]
+		uniqueFinals <- unique(finalCol)
+		uniqueFounders <- unique(founderCol)
+		if(length(uniqueFounders) == 2 && length(uniqueFinals) == 3)
+		{
+			hetEncoding <- setdiff(uniqueFinals, uniqueFounders)
+			matrix <- rbind(cbind(uniqueFounders, uniqueFounders, uniqueFounders), c(uniqueFounders, hetEncoding), c(rev(uniqueFounders), hetEncoding))
+		}
+		else
+		{
+			matrix <- cbind(uniqueFounders, uniqueFounders, uniqueFounders)
+		}
+		dimnames(matrix) <- NULL
+		return(matrix)
+	})
+	names(hetData) <- colnames(founders)
+	hetData <- new("hetData", hetData)
+	return(hetData)
+}
