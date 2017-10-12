@@ -17,7 +17,6 @@ SEXP estimateRFSingleDesign(SEXP object_, SEXP recombinationFractions_, SEXP mar
 		{
 			throw Rcpp::not_compatible("Input recombinationFractions must be a numeric vector");
 		}
-		R_xlen_t nRecombLevels = recombinationFractions.size();
 		Rcpp::NumericVector::iterator halfIterator = std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.5);
 		if(halfIterator == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0.5");
 		if(std::find(recombinationFractions.begin(), recombinationFractions.end(), 0.0) == recombinationFractions.end()) throw std::runtime_error("Input recombinationFractions did not contain the value 0");
