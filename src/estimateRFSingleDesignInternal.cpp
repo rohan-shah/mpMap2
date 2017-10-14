@@ -18,6 +18,7 @@
 #include "mpMap2_openmp.h"
 #include <omp.h>
 #endif
+#include "matrix.h"
 bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInternalArgs& internal_args, std::string& error)
 {
 	error = "";

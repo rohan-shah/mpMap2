@@ -15,12 +15,12 @@
 #include "funnelHaplotypeToMarker.hpp"
 #include <limits>
 #include "joinMapWithExtra.h"
+#include "matrix.h"
 template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 {
 	typedef typename expandedProbabilities<nFounders, true>::type expandedProbabilitiesType;
-	Rcpp::List recodedHetData;
-	Rcpp::IntegerMatrix recodedFounders, recodedFinals;
-	Rcpp::NumericMatrix results;
+	integerMatrix recodedFounders, recodedFinals;
+	numericMatrix results;
 	xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities;
 	rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities;
 	markerPatternsToUniqueValuesArgs& markerData;
@@ -30,7 +30,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 	std::vector<int>* selfingGenerations;
 	int minAIGenerations, maxAIGenerations;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
-	Rcpp::IntegerMatrix key;
+	integerMatrix key;
 	rowMajorMatrix<double> forwardProbabilities, backwardProbabilities;
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
@@ -48,7 +48,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, true>
 		{
 			throw std::runtime_error("Internal error");
 		}
-		int nFinals = recodedFinals.nrow();
+		int nFinals = recodedFinals.nRow;
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)

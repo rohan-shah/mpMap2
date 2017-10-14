@@ -15,12 +15,12 @@
 #include "funnelHaplotypeToMarker.hpp"
 #include <limits>
 #include "joinMapWithExtra.h"
+#include "matrix.h"
 template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 {
 	typedef typename expandedProbabilities<nFounders, false>::type expandedProbabilitiesType;
-	Rcpp::List recodedHetData;
-	Rcpp::IntegerMatrix recodedFounders, recodedFinals;
-	Rcpp::NumericMatrix results;
+	integerMatrix recodedFounders, recodedFinals;
+	numericMatrix results;
 	xMajorMatrix<expandedProbabilitiesType>& intercrossingHaplotypeProbabilities;
 	rowMajorMatrix<expandedProbabilitiesType>& funnelHaplotypeProbabilities;
 	markerPatternsToUniqueValuesArgs& markerData;
@@ -32,7 +32,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 	int maxSelfingGenerations;
 	int minAIGenerations, maxAIGenerations;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
-	Rcpp::IntegerMatrix key;
+	integerMatrix key;
 	rowMajorMatrix<double> forwardProbabilities, backwardProbabilities;
 	std::vector<array2<nFounders> >* intercrossingSingleLociHaplotypeProbabilities;
 	std::vector<array2<nFounders> >* funnelSingleLociHaplotypeProbabilities;
@@ -52,7 +52,7 @@ template<int nFounders> struct forwardsBackwardsAlgorithm<nFounders, false>
 		}
 		minSelfingGenerations = *std::min_element(selfingGenerations->begin(), selfingGenerations->end());
 		maxSelfingGenerations = *std::max_element(selfingGenerations->begin(), selfingGenerations->end());
-		int nFinals = recodedFinals.nrow();
+		int nFinals = recodedFinals.nRow;
 		for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 		{
 			if((*intercrossingGenerations)[finalCounter] == 0)

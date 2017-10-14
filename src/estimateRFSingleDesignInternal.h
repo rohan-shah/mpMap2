@@ -4,64 +4,6 @@
 #include "markerPatternsToUniqueValues.h"
 #include "funnelsToUniqueValues.h"
 #include <set>
-struct integerMatrix
-{
-public:
-	integerMatrix(const integerMatrix& mat)
-		: data(mat.data), nRow(mat.nRow), nCol(mat.nCol)
-	{}
-	integerMatrix()
-		: data(NULL), nRow(0), nCol(0)
-	{}
-	integerMatrix(int* data, int nRow, int nCol)
-		: data(data), nRow(nRow), nCol(nCol)
-	{}
-	integerMatrix(Rcpp::IntegerMatrix mat)
-		: data(&(mat[0])), nRow(mat.nrow()), nCol(mat.ncol())
-	{}
-	integerMatrix& operator=(Rcpp::IntegerMatrix& mat)
-	{
-		data = &(mat[0]);
-		nRow = mat.nrow();
-		nCol = mat.ncol();
-		return *this;
-	}
-	int& operator()(int row, int column)
-	{
-		return data[column*nRow + row];
-	}
-	int* data;
-	int nRow, nCol;
-};
-struct numericMatrix
-{
-public:
-	numericMatrix(const numericMatrix& mat)
-		: data(mat.data), nRow(mat.nRow), nCol(mat.nCol)
-	{}
-	numericMatrix()
-		: data(NULL), nRow(-1), nCol(-1)
-	{}
-	numericMatrix(double* data, int nRow, int nCol)
-		: data(data), nRow(nRow), nCol(nCol)
-	{}
-	numericMatrix& operator=(Rcpp::NumericMatrix& mat)
-	{
-		data = &(mat[0]);
-		nRow = mat.nrow();
-		nCol = mat.ncol();
-		return *this;
-	}
-	numericMatrix(Rcpp::NumericMatrix mat)
-		: data(&(mat[0])), nRow(mat.nrow()), nCol(mat.ncol())
-	{}
-	double& operator()(int row, int column)
-	{
-		return data[column*nRow + row];
-	}
-	double* data;
-	int nRow, nCol;
-};
 struct estimateRFSingleDesignArgs
 {
 	estimateRFSingleDesignArgs(std::vector<double>& recombinationFractions)

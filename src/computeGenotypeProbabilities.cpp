@@ -19,6 +19,7 @@
 #include "generateKeys.h"
 #include "joinMapWithExtra.h"
 #include "getMinAIGenerations.h"
+#include "mapFunctions.h"
 template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of markers per chromosome
@@ -32,8 +33,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	typedef typename expandedProbabilities<nFounders, infiniteSelfing>::type expandedProbabilitiesType;
 	//expandedProbabilitiesType haplotypeProbabilities;
 
-	Rcpp::Function diff("diff"), haldaneToRf("haldaneToRf");
-
+	Rcpp::Function diff("diff");
 	//Get out generations of selfing and intercrossing
 	std::vector<int> intercrossingGenerations, selfingGenerations;
 	getIntercrossingAndSelfingGenerations(pedigree, finals, nFounders, intercrossingGenerations, selfingGenerations);
@@ -119,10 +119,6 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	markerPatternData.recodedHetData = recodedHetData;
 	markerPatternsToUniqueValues(markerPatternData);
 
-	//Intermediate results. These give the most likely paths from the start of the chromosome to a marker, assuming some value for the underlying founder at the marker
-	xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomePositions-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
-	rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomePositions-1, maxSelfing - minSelfing + 1);
-
 	//The single loci probabilities are different depending on whether there are zero or one generations of intercrossing. But once you have non-zero generations, it doesn't matter how many
 	std::vector<array2<nFounders> > intercrossingSingleLociHaplotypeProbabilities(maxSelfing - minSelfing+1);
 	std::vector<array2<nFounders> > funnelSingleLociHaplotypeProbabilities(maxSelfing - minSelfing + 1);
@@ -137,54 +133,73 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 		singleLocusGenotypeProbabilitiesWithIntercross<nFounders, infiniteSelfing>(intercrossingArray, selfingGenerationCounter, nFunnels);
 	}
 
-	//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
-	forwardsBackwardsAlgorithm<nFounders, infiniteSelfing> forwardsBackwards(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomePositions, allPositions);
-	forwardsBackwards.recodedHetData = recodedHetData;
-	forwardsBackwards.recodedFounders = recodedFounders;
-	forwardsBackwards.recodedFinals = recodedFinals;
-	forwardsBackwards.lineFunnelIDs = &lineFunnelIDs;
-	forwardsBackwards.lineFunnelEncodings = &lineFunnelEncodings;
-	forwardsBackwards.intercrossingGenerations = &intercrossingGenerations;
-	forwardsBackwards.selfingGenerations = &selfingGenerations;
-	forwardsBackwards.results = results;
-	forwardsBackwards.errorProb = errorProb;
-	forwardsBackwards.key = key;
-	forwardsBackwards.homozygoteMissingProb = homozygoteMissingProb;
-	forwardsBackwards.heterozygoteMissingProb = heterozygoteMissingProb;
-	forwardsBackwards.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
-	forwardsBackwards.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
-	forwardsBackwards.minAIGenerations = minAIGenerations;
-	forwardsBackwards.maxAIGenerations = maxAIGenerations;
 
-	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
-	for(std::size_t chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
+	//Avoid any direct access to R objects inside openMP code. Instead refer by pointer. 
+	integerMatrix recodedFounders_pointer = recodedFounders;
+	integerMatrix recodedFinals_pointer = recodedFinals;
+	integerMatrix key_pointer = key;
+	numericMatrix results_pointer = results;
+	//Now actually run the Viterbi algorithm
+#ifdef USE_OPENMP
+	#pragma omp parallel
+#endif
 	{
-		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
-		//Take differences
-		std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
-		for(int i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
+		//Intermediate results. These give the most likely paths from the start of the chromosome to a marker, assuming some value for the underlying founder at the marker
+		xMajorMatrix<expandedProbabilitiesType> intercrossingHaplotypeProbabilities(maxChromosomePositions-1, maxAIGenerations - minAIGenerations + 1, maxSelfing - minSelfing+1);
+		rowMajorMatrix<expandedProbabilitiesType> funnelHaplotypeProbabilities(maxChromosomePositions-1, maxSelfing - minSelfing + 1);
 
-		//Convert to recombination fractions
-		std::vector<double> recombinationFractions= Rcpp::as<std::vector<double> >(haldaneToRf(differences));
-		//Generate haplotype probability data. 
-		for(std::size_t markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
+		//We'll do a dispath based on whether or not we have infinite generations of selfing. Which requires partial template specialization, which requires a struct/class
+		forwardsBackwardsAlgorithm<nFounders, infiniteSelfing> forwardsBackwards(markerPatternData, intercrossingHaplotypeProbabilities, funnelHaplotypeProbabilities, maxChromosomePositions, allPositions);
+		forwardsBackwards.recodedFounders = recodedFounders_pointer;
+		forwardsBackwards.recodedFinals = recodedFinals_pointer;
+		forwardsBackwards.lineFunnelIDs = &lineFunnelIDs;
+		forwardsBackwards.lineFunnelEncodings = &lineFunnelEncodings;
+		forwardsBackwards.intercrossingGenerations = &intercrossingGenerations;
+		forwardsBackwards.selfingGenerations = &selfingGenerations;
+		forwardsBackwards.results = results_pointer;
+		forwardsBackwards.errorProb = errorProb;
+		forwardsBackwards.key = key_pointer;
+		forwardsBackwards.homozygoteMissingProb = homozygoteMissingProb;
+		forwardsBackwards.heterozygoteMissingProb = heterozygoteMissingProb;
+		forwardsBackwards.intercrossingSingleLociHaplotypeProbabilities = &intercrossingSingleLociHaplotypeProbabilities;
+		forwardsBackwards.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
+		forwardsBackwards.minAIGenerations = minAIGenerations;
+		forwardsBackwards.maxAIGenerations = maxAIGenerations;
+#ifdef USE_OPENMP
+		#pragma omp for schedule(dynamic)
+#endif
+		for(int chromosomeCounter = 0; chromosomeCounter < (int)allPositions.chromosomes.size(); chromosomeCounter++)
 		{
-			double recombination = recombinationFractions[markerCounter];
-			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
-			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
-			}
-			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
-			{
-				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
-				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
-				}
-			}
 
+
+			positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
+			//Take differences
+			std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
+			for(int i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
+			//Convert to recombination fractions
+			std::vector<double> recombinationFractions(differences.size());
+			std::transform(differences.begin(), differences.end(), recombinationFractions.begin(), haldaneToRf);
+
+			//Generate haplotype probability data. 
+			for(std::size_t markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
+			{
+				double recombination = recombinationFractions[markerCounter];
+				for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
+				{
+					expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
+				}
+				for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
+				{
+					for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
+					{
+						expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
+					}
+				}
+
+			}
+			//dispatch based on whether we have infinite generations of selfing or not. 
+			forwardsBackwards.apply(currentChromosome.start, currentChromosome.end);
 		}
-		//dispatch based on whether we have infinite generations of selfing or not. 
-		forwardsBackwards.apply(currentChromosome.start, currentChromosome.end);
 	}
 	Rcpp::colnames(results) = Rcpp::wrap(allPositions.names);
 }
