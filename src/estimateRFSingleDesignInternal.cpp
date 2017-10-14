@@ -178,7 +178,6 @@ bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInt
 }
 template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInternal2(estimateRFSingleDesignInternalArgs& args)
 {
-	integerMatrix founders = args.founders;
 	integerMatrix finals = args.finals;
 	int nFinals = finals.nRow;
 
