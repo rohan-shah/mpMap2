@@ -11,6 +11,7 @@
 #' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation
 #' @param markerRows Used to estimate only a subset of the full matrix of pairwise recombination fractions.
 #' @param markerColumns Used to estimate only a subset of the full matrix of pairwise recombination fractions.
+#' @return An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data. 
 #' @export
 #' @examples map <- qtl::sim.map(len = 100, n.mar = 11, include.x=FALSE)
 #' f2Pedigree <- f2Pedigree(1000)

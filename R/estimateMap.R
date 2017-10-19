@@ -5,6 +5,7 @@
 #' @param mapFunction The map function to use to compute recombination fractions to centiMorgan distances.
 #' @param maxOffset The maximum separation between the pairs of markers, in terms of position within the ordering. Recombination fractions between pairs of markers, which are further apart than this, will not be used to estimate the map distances. 
 #' @param verbose Should verbose output be produced?
+#' @return A map object, in the format specified by the \code{\link[qtl]{qtl-package}} package. This format is a list of chromosomes, with each entry being a named numeric vector of marker positions. 
 #' @details 
 #' Once an optimal marker order has been chosen, one possible way of estimating a genetic map is to convert the recombination fractions between adjacent markers into centiMorgan distances. This tends not to work well, because individual recombination fraction estimates can be highly variable, depending on the experimental design used, and the distribution of the marker alleles among the founders. It also wastes much of the information contained in the data; we can estimate recombination fractions between all pairs of markers, rather than just adjacent markers, and this information should be used in the estimation of map distances
 #' 

@@ -29,6 +29,9 @@ estimateRF(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE,
 
 \item{lineWeights}{Used to correct for the effects of segregation distortion.}
 }
+\value{
+An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data.
+}
 \description{
 This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.
 }

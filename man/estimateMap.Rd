@@ -18,6 +18,9 @@ estimateMap(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1,
 
 \item{verbose}{Should verbose output be produced?}
 }
+\value{
+A map object, in the format specified by the \code{\link[qtl]{qtl-package}} package. This format is a list of chromosomes, with each entry being a named numeric vector of marker positions.
+}
 \description{
 Estimate map distances based on the estimated recombination fractions
 }
