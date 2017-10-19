@@ -8,7 +8,7 @@ splitVector <- function(vector, splitValue)
 #' @title Add an extra marker from raw calling data
 #' @description Add an extra marker to a map, based on raw calling data, using a QTL-mapping style approach. 
 #' @param mpcrossMapped An existing dataset with a map, which must include imputation data and recombination fraction data. 
-#' @param newData A data.frame object containing the raw data for the marker to add
+#' @param newMarker A data.frame object containing the raw data for the marker to add
 #' @param useOnlyExtraImputationPoints Use only the additional points at which imputation data has been generated? Currently this must be \code{TRUE}. 
 #' @return A vector containing the test statistic values. 
 #' 

@@ -26,8 +26,6 @@ estimateRF(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE,
 \item{markerRows}{Used to estimate only a subset of the full matrix of pairwise recombination fractions.}
 
 \item{markerColumns}{Used to estimate only a subset of the full matrix of pairwise recombination fractions.}
-
-\item{lineWeights}{Used to correct for the effects of segregation distortion.}
 }
 \value{
 An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data.

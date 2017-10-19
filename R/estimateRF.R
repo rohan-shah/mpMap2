@@ -6,7 +6,6 @@
 #' @param lineWeights Values to use to correct for segregation distortion. This parameter should in general be left unspecified. 
 #' @param gbLimit The maximum amount of working memory this estimation step should be allowed to use at any one time, in gigabytes. Smaller values may increase the computation time. A value of -1 indicates no limit.  
 #' @param keepLod Set to \code{TRUE} to compute the likelihood ratio score statistics for testing whether the estimate is different from 0.5. Due to memory constraints this should generally be left as \code{FALSE}. 
-#' @param lineWeights Used to correct for the effects of segregation distortion. 
 #' @param keepLkhd Set to \code{TRUE} to compute the maximum value of the likelihood. Due to memory constraints this should generally be left as \code{FALSE}.
 #' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation
 #' @param markerRows Used to estimate only a subset of the full matrix of pairwise recombination fractions.

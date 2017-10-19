@@ -42,6 +42,7 @@ setMethod(f = "+", signature = c("geneticData", "normalPhenotype"), definition =
 	}
 	return(e1)
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "normalPhenotype"), definition = function(e1, e2)
 {
 	lapply(1:length(e1@geneticData), function(x) e1@geneticData[[x]] <<- e1@geneticData[[x]] + e2)

@@ -2,6 +2,7 @@
 #' @name mapFunctions
 NULL
 #' @describeIn mapFunctions Convert from Haldane distance to recombination fraction
+#' @description Functions used to convert between recombination fractions and centiMorgan distances. 
 #' @param x centiMorgan distance
 #' @export
 haldaneToRf <- function(x)
@@ -19,14 +20,12 @@ rfToHaldane <- function(r)
 	return(-50*log(1-2*r))
 }
 #' @describeIn mapFunctions Convert from recombination fraction to Kosambi distance
-#' @param r recombination fraction
 #' @export
 rfToKosambi <- function(r) 
 {
 	return(50*atanh(2*r))
 }
 #' @describeIn mapFunctions Convert from Kosambi distance to recombination fraction
-#' @param x centiMorgan distance
 #' @export
 kosambiToRf <- function(x)
 {

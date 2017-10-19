@@ -9,6 +9,7 @@
 #' @param initialPopulationSize The number of F1 lines generated
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
+#' @param intercrossingGenerations The number of generations of intercrossing, after each F2 line is generated. 
 #' @export
 fourParentPedigreeSingleFunnel <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {

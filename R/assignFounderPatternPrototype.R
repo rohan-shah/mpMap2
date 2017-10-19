@@ -3,10 +3,12 @@ assignFounderPatternPrototype <- function(founderMatrix)
 {
 	return(new("assignFounderPatternPrototype", data = founderMatrix))
 }
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "assignFounderPatternPrototype"), definition = function(e1, e2)
 {
 	assignFounderPatternPrototypeInternal(geneticData = e1, founderPattern = e2@data)
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcross", "assignFounderPatternPrototype"), definition = function(e1, e2)
 {
 	if(length(e1@geneticData) != 1)
@@ -18,6 +20,7 @@ setMethod(f = "+", signature = c("mpcross", "assignFounderPatternPrototype"), de
 	geneticDataList <- new("geneticDataList", list(geneticData))
 	return(new("mpcross", geneticData = geneticDataList))
 })
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("mpcrossMapped", "assignFounderPatternPrototype"), definition = function(e1, e2)
 {
 	if(length(e1@geneticData) != 1)

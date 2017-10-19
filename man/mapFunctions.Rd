@@ -26,10 +26,9 @@ kosambi(x)
 \item{x}{centiMorgan distance}
 
 \item{r}{recombination fraction}
-
-\item{r}{recombination fraction}
-
-\item{x}{centiMorgan distance}
+}
+\description{
+Functions used to convert between recombination fractions and centiMorgan distances.
 }
 \section{Functions}{
 \itemize{

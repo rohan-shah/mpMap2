@@ -13,6 +13,8 @@ fourParentPedigreeSingleFunnel(initialPopulationSize, selfingGenerations,
 \item{selfingGenerations}{The number of selfing generations at the end of the pedigree}
 
 \item{nSeeds}{The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations}
+
+\item{intercrossingGenerations}{The number of generations of intercrossing, after each F2 line is generated.}
 }
 \description{
 Generate a four-parent pedigree starting from inbred founders, using a single funnel

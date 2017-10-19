@@ -8,6 +8,8 @@ rilPedigree(populationSize, selfingGenerations)
 }
 \arguments{
 \item{populationSize}{The size of the generated population}
+
+\item{selfingGenerations}{Number of generations of selfing. Specifying one generation leads to an F2 design.}
 }
 \description{
 Generate a two-parent RIL pedigree which starts from inbred founders

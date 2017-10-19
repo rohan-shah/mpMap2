@@ -10,9 +10,9 @@ addExtraMarkerFromRawCall(mpcrossMapped, newMarker,
 \arguments{
 \item{mpcrossMapped}{An existing dataset with a map, which must include imputation data and recombination fraction data.}
 
-\item{useOnlyExtraImputationPoints}{Use only the additional points at which imputation data has been generated? Currently this must be \code{TRUE}.}
+\item{newMarker}{A data.frame object containing the raw data for the marker to add}
 
-\item{newData}{A data.frame object containing the raw data for the marker to add}
+\item{useOnlyExtraImputationPoints}{Use only the additional points at which imputation data has been generated? Currently this must be \code{TRUE}.}
 }
 \value{
 A vector containing the test statistic values.
