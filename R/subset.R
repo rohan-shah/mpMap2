@@ -55,6 +55,13 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 	if("positions" %in% names(arguments))
 	{
 		positions <- arguments$positions
+		allPositions <- unlist(lapply(x@map, names))
+		if(length(setdiff(positions, allPositions)) > 0)
+		{
+			stop("One of the named positions did not exist")
+		}
+		#Reorder the positions to be in map order. 
+		positions <- allPositions[allPositions %in% positions]
 		newMap <- lapply(x@map, function(y) y[names(y) %in% positions])
 		#Omit empty chromosomes
 		newMap <- newMap[unlist(lapply(newMap, function(x) length(x) > 0))]

@@ -37,7 +37,7 @@ addExtraMarkerFromRawCall <- function(mpcrossMapped, newMarker, useOnlyExtraImpu
 	}
 	if(inherits(newMarker, "data.frame"))
 	{
-		stop("Input newMarker must be a data.frame")
+		stop("Input newMarker must be a matrix")
 	}
 	founders <- nFounders(mpcrossMapped)
 	if(useOnlyExtraImputationPoints)
