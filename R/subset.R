@@ -363,7 +363,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		{
 			stop("Input lines must be a vector of line names")
 		}
-		retVal <- new("geneticData", founders = x@founders, finals = x@finals[rownames(x@finals)%in% lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree"), skipValidity = skipValidity)
+		retVal <- new("geneticData", founders = x@founders, finals = x@finals[lines,,drop=FALSE], hetData = x@hetData, pedigree = as(x@pedigree, "pedigree"), skipValidity = skipValidity)
 		if(!is.null(x@imputed))
 		{
 			retVal@imputed <- subset(x@imputed, lines = lines)

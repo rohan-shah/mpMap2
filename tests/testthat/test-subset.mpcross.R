@@ -102,3 +102,13 @@ test_that("Checking subset on object of class mpcross by markers, with two datas
 		subsetted <- subset(crossDominant, markers = 4)
 		testPair(crossDominant, subsetted, 4)
 	})
+test_that("Checking subset by lines when imputation data is present",
+	{
+		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		pedigree <- f2Pedigree(500)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		mapped <- new("mpcrossMapped", cross, map = map)
+		suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))
+		subsetted <- subset(result, lines = sample(lineNames(result)))
+		validObject(subsetted, complete = TRUE)
+	})
