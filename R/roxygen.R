@@ -4,6 +4,8 @@
 #' @import utils
 #' @import stats
 #' @import ggplot2
+#' @import graphics
+#' @importFrom graphics plot
 #' @importFrom stats as.dist cutree pchisq rnorm
 #' @importFrom utils combn head tail
 #' @importFrom pryr address
@@ -15,7 +17,7 @@
 #' @exportClass pedigreeGraph
 #' @exportClass probabilities
 #' @exportMethod subset 
-#' @exportMethod plot
+#' @exportClass mpcross
 #' @exportMethod imputationMap
 #' @exportMethod flatImputationMapNames
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
