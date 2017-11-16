@@ -18,7 +18,9 @@
 #' @exportClass probabilities
 #' @exportMethod subset 
 #' @exportClass mpcross
+#' @exportClass pedigreeGraph
 #' @exportMethod imputationMap
+#' @exportMethod plot
 #' @exportMethod flatImputationMapNames
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @importFrom methods setClass
