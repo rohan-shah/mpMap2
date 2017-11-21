@@ -24,7 +24,7 @@ struct differenceSetComp
 		return a.difference < b.difference;
 	}
 };
-template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
+template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
 {
 	unsigned long done = 0;
 	unsigned long total = (unsigned long)markersThisGroup.size();
@@ -157,13 +157,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 						#pragma omp critical
 #endif
 						{
-							std::stringstream ss;
-							ss << "Unable to impute a value for marker " << (marker1+1) << " and marker " << (marker2+1);
-							error = ss.str();
+							reportedErrors.push_back(std::make_pair(marker1+1, marker2+1));
 							hasError = true;
 #ifndef USE_OPENMP
 							//We can't return early if we're using openmp
-							return false;
+							if(!allErrors) return false;
 #endif
 						}
 					}
@@ -185,26 +183,26 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 	}
 	return !hasError;
 }
-bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction)
+bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
 {
 	if(lod != NULL && lkhd != NULL)
 	{
-		return imputeInternal<true, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<true, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else if(lod != NULL && lkhd == NULL)
 	{
-		return imputeInternal<true, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<true, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else if(lod == NULL && lkhd != NULL)
 	{
-		return imputeInternal<false, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<false, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else
 	{
-		return imputeInternal<false, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, error, statusFunction);
+		return imputeInternal<false, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 }
-SEXP imputeWholeObject(SEXP mpcrossLG_sexp, SEXP verbose_sexp)
+SEXP imputeWholeObject(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP allErrors_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 mpcrossLG;
@@ -341,6 +339,16 @@ BEGIN_RCPP
 		throw std::runtime_error("Slot mpcross@lg@allGroups must be an integer vector");
 	}
 
+	bool allErrors;
+	try
+	{
+		allErrors = Rcpp::as<bool>(allErrors_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input allErrors must be a boolean");
+	}
+
 	Rcpp::List verboseList;
 	bool verbose;
 	int progressStyle;
@@ -366,7 +374,7 @@ BEGIN_RCPP
 		lkhdPtr = &(copiedLkhd[0]);
 	}
 
-	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close"), condition = Rcpp::Environment::namespace_env("mpMap2").get("condition"), signalCondition("signalCondition");
 	Rcpp::RObject barHandle;
 	std::function<void(unsigned long, unsigned long)> progressFunction = [](unsigned long, unsigned long){};
 	for(std::vector<int>::iterator group = allGroups.begin(); group != allGroups.end(); group++)
@@ -396,12 +404,27 @@ BEGIN_RCPP
 		std::string error;
 		unsigned char* originalTheta = &(thetaData[0]);
 		unsigned char* imputedTheta = &(copiedThetaData[0]);
-		bool ok = impute(originalTheta, imputedTheta, levels, lodPtr, lkhdPtr, markersCurrentGroup, error, progressFunction);
+		std::vector<std::pair<int, int> > reportedErrors;
+		bool ok = impute(originalTheta, imputedTheta, levels, lodPtr, lkhdPtr, markersCurrentGroup, progressFunction, allErrors, reportedErrors);
 		if(!ok)
 		{
-			std::stringstream ss;
-			ss << "Error performing imputation for group " << *group << ": " << error;
-			throw std::runtime_error(ss.str().c_str());
+			if(reportedErrors.size() > 0)
+			{
+				if(allErrors)
+				{
+					Rcpp::IntegerMatrix convertedImputationErrors(reportedErrors.size(), 2);
+					for(int i = 0; i < reportedErrors.size(); i++)
+					{
+						convertedImputationErrors(i, 0) = reportedErrors[i].first;
+						convertedImputationErrors(i, 1) = reportedErrors[i].second;
+					}
+					signalCondition(condition("imputationErrors", convertedImputationErrors));
+				}
+				std::stringstream ss;
+				ss << "Error performing imputation for group " << *group << ": Unable to impute a value for marker " << reportedErrors[0].first << " and marker "<< reportedErrors[1].second;
+				throw std::runtime_error(ss.str().c_str());
+			}
+			else throw std::runtime_error("Internal error");
 		}
 		if(verbose)
 		{
@@ -411,7 +434,7 @@ BEGIN_RCPP
 	return Rcpp::List::create(Rcpp::Named("theta") = copiedThetaData, Rcpp::Named("lod") = copiedLod, Rcpp::Named("lkhd") = copiedLkhd);
 END_RCPP
 }
-SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp)
+SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp, SEXP allErrors_sexp)
 {
 BEGIN_RCPP
 	Rcpp::S4 mpcrossLG;
@@ -558,6 +581,16 @@ BEGIN_RCPP
 		throw std::runtime_error("No markers belonged to the specified group");
 	}
 
+	bool allErrors;
+	try
+	{
+		allErrors = Rcpp::as<bool>(allErrors_sexp);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("Input allErrors must be a boolean");
+	}
+
 	Rcpp::List verboseList;
 	bool verbose;
 	int progressStyle;
@@ -588,7 +621,7 @@ BEGIN_RCPP
 	memcpy(&(originalTheta[0]), &(copiedTheta[0]), sizeof(Rbyte) * copiedTheta.size());
 
 	std::function<void(unsigned long, unsigned long)> progressFunction = [](unsigned long, unsigned long){};
-	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close");
+	Rcpp::Function txtProgressBar("txtProgressBar"), setTxtProgressBar("setTxtProgressBar"), close("close"), condition = Rcpp::Environment::namespace_env("mpMap2").get("condition"), signalCondition("signalCondition");
 	Rcpp::RObject barHandle;
 	if(verbose)
 	{
@@ -611,12 +644,30 @@ BEGIN_RCPP
 	std::string error;
 	unsigned char* originalThetaPtr = &(originalTheta[0]);
 	unsigned char* imputedThetaPtr = &(copiedTheta[0]);
-	bool ok = impute(originalThetaPtr, imputedThetaPtr, levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, error, progressFunction);
+	std::vector<std::pair<int, int> > reportedErrors;
+	bool ok = impute(originalThetaPtr, imputedThetaPtr, levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, progressFunction, allErrors, reportedErrors);
 	if(!ok)
 	{
-		std::stringstream ss;
-		ss << "Error performing imputation for group " << group << ": " << error;
-		throw std::runtime_error(ss.str().c_str());
+		if(reportedErrors.size() > 0)
+		{
+			if(allErrors)
+			{
+				Rcpp::IntegerMatrix convertedImputationErrors(reportedErrors.size(), 2);
+				for(int i = 0; i < reportedErrors.size(); i++)
+				{
+					convertedImputationErrors(i, 0) = reportedErrors[i].first;
+					convertedImputationErrors(i, 1) = reportedErrors[i].second;
+				}
+				signalCondition(condition("imputationErrors", convertedImputationErrors));
+			}
+			std::stringstream ss;
+			ss << "Error performing imputation for group " << group << ": Unable to impute a value for marker " << reportedErrors[0].first << " and marker "<< reportedErrors[1].second;
+			throw std::runtime_error(ss.str().c_str());
+		}
+		else
+		{
+			throw std::runtime_error("Internal error");
+		}
 	}
 	if(verbose)
 	{

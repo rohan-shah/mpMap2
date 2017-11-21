@@ -295,7 +295,8 @@ BEGIN_RCPP
 				};
 			}
 			unsigned char* originalRawPtr = &(thetaRawData[0]);
-			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, contiguousIndices, error, imputationProgressFunction);
+			std::vector<std::pair<int, int> > reportedErrors;
+			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, contiguousIndices, imputationProgressFunction, false, reportedErrors);
 			if(verbose)
 			{
 				close(barHandle);
@@ -303,7 +304,16 @@ BEGIN_RCPP
 
 			if(!imputationResult)
 			{
-				throw std::runtime_error(error.c_str());
+				if(reportedErrors.size() > 0)
+				{
+					std::stringstream ss;
+					ss << "Error performing imputation for group " << *currentGroup << ": Unable to impute a value for marker " << reportedErrors[0].first << " and marker "<< reportedErrors[1].second;
+					throw std::runtime_error(ss.str().c_str());
+				}
+				else
+				{
+					throw std::runtime_error("Internal error");
+				}
 			}
 		}
 		else

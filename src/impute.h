@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 #include <Rcpp.h>
-bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::string& error, std::function<void(unsigned long, unsigned long)> statusFunction);
-SEXP imputeWholeObject(SEXP mpcrossLG, SEXP verbose);
-SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp);
+bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors);
+SEXP imputeWholeObject(SEXP mpcrossLG, SEXP verbose, SEXP allErrors);
+SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp, SEXP allErrors);
 #endif

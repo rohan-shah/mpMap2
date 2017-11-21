@@ -1,5 +1,11 @@
+condition <- function(subclass, message, call = sys.call(-1), ...) {
+  structure(
+    class = c(subclass, "condition"),
+    list(message = message, call = call, ...)
+  )
+}
 #' @export
-impute <- function(mpcrossLG, verbose = FALSE)
+impute <- function(mpcrossLG, verbose = FALSE, allErrors = FALSE, extractErrorsFunction = function(e) e)
 {
 	isNewMpcrossLGArgument(mpcrossLG)
 	if(!is.null(mpcrossLG@lg@imputedTheta))
@@ -43,7 +49,7 @@ impute <- function(mpcrossLG, verbose = FALSE)
 	for(counter in 1:length(mpcrossLG@lg@allGroups))
 	{
 		group <- mpcrossLG@lg@allGroups[counter]
-		rawData <- .Call("imputeGroup", mpcrossLG, verbose, group)$theta
+		withCallingHandlers({rawData <- .Call("imputeGroup", mpcrossLG, verbose, group, allErrors)$theta}, imputationErrors = extractErrorsFunction)
 		mpcrossLG@lg@imputedTheta[[counter]] <- new("rawSymmetricMatrix", data = rawData, markers = names(which(mpcrossLG@lg@groups == group)), levels = mpcrossLG@rf@theta@levels)
 	}
 	names(mpcrossLG@lg@imputedTheta) <- as.character(mpcrossLG@lg@allGroups)
