@@ -55,12 +55,6 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 		
 		R_xlen_t nMarkers = recombinationFractions.length() + 1, nPedRows = lineNames.size();
-		if((std::size_t)lineNames.size() *(std::size_t)(2 * nMarkers) > std::numeric_limits<int>::max())
-		{
-			std::stringstream ss;
-			ss << "Simulation of genotypes requires a matrix with " << (std::size_t)lineNames.size() *(std::size_t)(2 * nMarkers) << " entries. Matrices this large cannot be constructed in R"; 
-			throw std::runtime_error(ss.str());
-		}
 		//Columns 0 and nMarkers correspond to the the pair of alleles at the first marker
 		Rcpp::IntegerMatrix result((int)lineNames.size(), (int)(2*nMarkers));
 		//once we encounter a line with parents which are not set to zero we set this to true. And subsequently don't allow any zero-values for mother or father
