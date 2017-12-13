@@ -108,6 +108,7 @@ extern "C"
 		{"combineRFDisjoint", (DL_FUNC)&combineRFDisjoint, 2},
 		{"estimateRFSingleDesign", (DL_FUNC)&estimateRFSingleDesign, 8},
 		{"expandedProbabilitiesInfinite", (DL_FUNC)&expandedProbabilitiesInfinite_RInterface, 4},
+		{"expandedProbabilitiesFinite", (DL_FUNC)&expandedProbabilitiesFinite_RInterface, 5},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
