@@ -41,7 +41,9 @@
 				{
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log(2);
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
 		}
@@ -57,7 +59,9 @@
 					int markerEncodingTheseFounders = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths1[encodingTheseFounders] = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log(2);
+					pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{}
 					else if(startMarkerValue == NA_INTEGER && recodedFounders(funnel[founderCounter2], startMarkerIndex) == recodedFounders(funnel[founderCounter], startMarkerIndex))
@@ -237,7 +241,9 @@ stopIdenticalSearch:
 				{
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log(2);
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
 		}
@@ -256,7 +262,9 @@ stopIdenticalSearch:
 					int markerEncodingTheseFounders = startMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths1[encodingTheseFounders] = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log(2);
+					pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					bool isError;
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{
@@ -322,8 +330,9 @@ stopIdenticalSearch:
 						int bestPrevious = (int)std::distance(working.begin(), longest);
 						
 						memcpy(&(intermediate2(encodingTheseFounders, identicalIndex)), &(intermediate1(bestPrevious, identicalIndex)), sizeof(int)*(positionCounter - startPosition + 1 - identicalIndex));
-						std::copy(intermediate1.iterator(bestPrevious, identicalIndex), intermediate1.iterator(bestPrevious, positionCounter - startPosition + 1), intermediate2.iterator(encodingTheseFounders, identicalIndex));
+						std::copy(error1.iterator(bestPrevious, identicalIndex), error1.iterator(bestPrevious, positionCounter - startPosition + 1), error2.iterator(encodingTheseFounders, identicalIndex));
 						intermediate2(encodingTheseFounders, positionCounter-startPosition+1) = encodingTheseFounders;
+						error2(encodingTheseFounders, positionCounter-startPosition+1) = false;
 						pathLengths2[encodingTheseFounders] = *longest;
 					}
 				}
