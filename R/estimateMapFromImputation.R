@@ -31,7 +31,7 @@ estimateMapFromImputation <- function(mpcrossMapped, gapSize = 5, recombinationF
 			sapply(recombinationFractions, 
 				function(r)
 				{
-					expandedProbabilities(nFounders = nFounders(mpcrossMapped), r = r, nFunnels = nFunnels, intercrossingGenerations = nIntercrossing)
+					expandedProbabilitiesInfinite(nFounders = nFounders(mpcrossMapped), r = r, nFunnels = nFunnels, intercrossingGenerations = nIntercrossing)
 				}, simplify=FALSE)
 		}
 	)
