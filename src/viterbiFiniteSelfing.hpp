@@ -28,6 +28,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	std::vector<double> working;
 	xMajorMatrix<expandedProbabilitiesType>* logIntercrossingHaplotypeProbabilities;
 	rowMajorMatrix<expandedProbabilitiesType>* logFunnelHaplotypeProbabilities;
+	xMajorMatrix<expandedProbabilitiesType>* intercrossingHaplotypeProbabilities;
+	rowMajorMatrix<expandedProbabilitiesType>* funnelHaplotypeProbabilities;
 	markerPatternsToUniqueValuesArgs& markerData;
 	std::vector<funnelID>* lineFunnelIDs;
 	std::vector<funnelEncoding>* lineFunnelEncodings;
@@ -40,8 +42,8 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 	int maxAlleles;
 	Rcpp::IntegerMatrix key;
 	double heterozygoteMissingProb, homozygoteMissingProb, errorProb;
-	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities;
-	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logIntercrossingSingleLociHaplotypeProbabilities, *intercrossingSingleLociHaplotypeProbabilities;
+	std::vector<array2<nFounders> >* logFunnelSingleLociHaplotypeProbabilities, *funnelSingleLociHaplotypeProbabilities;
 	const positionData& allPositions;
 	std::function<void(unsigned long long)> updateProgress;
 	viterbiAlgorithm(markerPatternsToUniqueValuesArgs& markerData, int maxChromosomeSize, const positionData& allPositions)

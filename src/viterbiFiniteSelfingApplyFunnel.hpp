@@ -15,6 +15,7 @@
 		{
 			throw std::runtime_error("Internal error");
 		}
+		const double log2 = log(2.0);
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHeterozygoteMissingProb = log(heterozygoteMissingProb);
 
@@ -42,7 +43,7 @@
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 					double multiple = 0;
-					if(founderCounter != founderCounter2) multiple = log(2);
+					if(founderCounter != founderCounter2) multiple = log2;
 					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
@@ -60,7 +61,7 @@
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 					double multiple = 0;
-					if(founderCounter != founderCounter2) multiple = log(2);
+					if(founderCounter != founderCounter2) multiple = log2;
 					pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{}
@@ -94,7 +95,7 @@
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
 						//Account for the fact that each heterozygote is only counted once, so the probabilities are half what they should really be. 
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
@@ -105,9 +106,7 @@
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
-									double multiplePreviousMarker = 0;
-									if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiplePreviousMarker + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 								}
 							}
 						}
@@ -136,7 +135,7 @@
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
 						//Account for the fact that each heterozygote is only counted once, so the probabilities are half what they should really be. 
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(markerValue == encodingMarker)
 						{}
 						else if(markerValue == NA_INTEGER && founderCounter == founderCounter2)
@@ -161,15 +160,13 @@
 									int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 									{
-										double multiplePreviousMarker = 0;
-										if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiplePreviousMarker + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 									}
 								}
 							}
-							//Get the shortest one, and check that it's not negative infinity.
+							//Get the longest one, and check that it's not negative infinity.
 							std::vector<double>::iterator longest = std::max_element(working.begin(), working.end());
-							//This error is no longer valid, because some states are impossible to ever be in - E.g. heterozygote {1,2} with funnel {1,2,3,4} and no intercrossing. In this case all the probabilities are zero and all the log probabilities are -inf. So *longest == -std::numeric_limits<double>::infinity() doesn't indicate that there is no valid next state. It indicates that the state for the previous marker is impossible. 
+							//It's not an error for the longest path to be -Inf, because some states are impossible to ever be in - E.g. heterozygote {1,2} with funnel {1,2,3,4} and no intercrossing. In this case all the probabilities are zero and all the log probabilities are -inf. So *longest == -std::numeric_limits<double>::infinity() doesn't indicate that there is no valid next state. It indicates that the state for the previous marker is impossible. 
 							//if(*longest == -std::numeric_limits<double>::infinity()) throw std::runtime_error("Internal error");
 							int bestPrevious = (int)std::distance(working.begin(), longest);
 							
@@ -218,6 +215,7 @@ stopIdenticalSearch:
 		{
 			throw std::runtime_error("Internal error");
 		}
+		const double log2 = log(2.0);
 
 		//Initialise the algorithm
 		funnelEncoding enc = (*lineFunnelEncodings)[(*lineFunnelIDs)[finalCounter]];
@@ -242,7 +240,7 @@ stopIdenticalSearch:
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 					double multiple = 0;
-					if(founderCounter != founderCounter2) multiple = log(2);
+					if(founderCounter != founderCounter2) multiple = log2;
 					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
@@ -263,7 +261,7 @@ stopIdenticalSearch:
 					int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
 					double multiple = 0;
-					if(founderCounter != founderCounter2) multiple = log(2);
+					if(founderCounter != founderCounter2) multiple = log2;
 					pathLengths1[encodingTheseFounders] = multiple + (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					bool isError;
 					if(markerEncodingTheseFounders == startMarkerValue)
@@ -306,7 +304,7 @@ stopIdenticalSearch:
 					{
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						//Founder at the previous marker. 
@@ -317,9 +315,7 @@ stopIdenticalSearch:
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
-									double multiplePreviousMarker = 0;
-									if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + multiplePreviousMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 								}
 							}
 						}
@@ -353,7 +349,7 @@ stopIdenticalSearch:
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
 						bool isError = false;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(encodingMarker == markerValue)
 						{
 							multipleNextMarker += errorTermCurrentMarker1;
@@ -384,9 +380,7 @@ stopIdenticalSearch:
 									int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
 									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 									{
-										double multiplePreviousMarker = 0;
-										if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + multiplePreviousMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 									}
 								}
 							}
@@ -439,3 +433,4 @@ stopIdenticalSearch:
 			;
 		}
 	}
+

@@ -17,6 +17,7 @@
 		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHeterozygoteMissingProb = log(heterozygoteMissingProb);
+		const double log2 = log(2.0);
 	
 		//Initialise the algorithmi
 		int startMarkerIndex = allPositions.markerIndices[startPosition];
@@ -80,7 +81,7 @@
 					{
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
@@ -90,9 +91,7 @@
 								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
-									double multiplePreviousMarker = 0;
-									if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiplePreviousMarker + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 								}
 							}
 						}
@@ -118,7 +117,7 @@
 						int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(encodingMarker == markerValue)
 						{}
 						else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, markerIndex) == recodedFounders(founderCounter, markerIndex))
@@ -143,9 +142,7 @@
 									int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 									{
-										double multiplePreviousMarker = 0;
-										if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multiplePreviousMarker + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 									}
 								}
 							}
@@ -276,7 +273,7 @@ stopIdenticalSearch:
 					{
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						//Founder at the previous marker. 
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
@@ -286,9 +283,7 @@ stopIdenticalSearch:
 								int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 								{
-									double multiplePreviousMarker = 0;
-									if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + multiplePreviousMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 								}
 							}
 						}
@@ -319,7 +314,7 @@ stopIdenticalSearch:
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
 						bool isError;
-						if(founderCounter != founderCounter2) multipleNextMarker += log(2);
+						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(encodingMarker == markerValue)
 						{
 							multipleNextMarker += errorTermCurrentMarker1;
@@ -353,9 +348,7 @@ stopIdenticalSearch:
 									int encodingPreviousTheseFounders = key(founderPreviousCounter, founderPreviousCounter2)-1;
 									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
 									{
-										double multiplePreviousMarker = 0;
-										if(founderPreviousCounter != founderPreviousCounter2) multiplePreviousMarker += log(2);
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + multiplePreviousMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logIntercrossingHaplotypeProbabilities)(positionCounter-startPosition, intercrossingGeneration - minAIGenerations, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
 									}
 								}
 							}
