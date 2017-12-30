@@ -197,6 +197,7 @@ stopIdenticalSearch:
 		}
 		double logHomozygoteMissingProb = log(homozygoteMissingProb);
 		double logHeterozygoteMissingProb = log(heterozygoteMissingProb);
+		const double log2 = log(2.0);
 
 		//Initialise the algorithm
 		int startMarkerIndex = allPositions.markerIndices[startPosition];

@@ -7,7 +7,18 @@
 formGroups(mpcrossRF, groups, clusterBy = "theta", method = "average",
   preCluster = FALSE)
 }
+\arguments{
+\item{mpcrossRF}{An object of class mpcrossRF}
+
+\item{groups}{The number of groups to form}
+
+\item{clusterBy}{The matrix to use for clustering. The three choices are theta (recombination fractions), lod (log-odds ratio) or combined (a combination of both).}
+
+\item{method}{The method to use for hierarchical cluster. Choices are average, complete and single. -}
+
+\item{preCluster}{Before clustering is performed, should we form groups of markers which are completely linked?}
+}
 \description{
-Form linkage groups
+Group markers into linkage groups using hierarchical clustering.
 }
 
