@@ -116,6 +116,7 @@ Collate:
     'show.R'
     'simulateMPCross.R'
     'simulatePhenotypes.R'
+    'singleLocusProbabilities.R'
     'sixteenParentPedigreeRandomFunnels.R'
     'stripPedigree.R'
     'subset.R'

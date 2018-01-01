@@ -1,13 +1,6 @@
 #ifndef MATRICES_HEADER_GUARD
 #define MATRICES_HEADER_GUARD
 #include <vector>
-template<int n> struct array2
-{
-public:
-	array2()
-	{}
-	double values[n][n];
-};
 template<typename T> class rowMajorMatrix
 {
 public:

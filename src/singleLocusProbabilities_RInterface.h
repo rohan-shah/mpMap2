@@ -1,0 +1,6 @@
+#ifndef SINGLE_LOCUS_PROBABILITIES_HEADER_GUARD_R_INTERFACE
+#define SINGLE_LOCUS_PROBABILITIES_HEADER_GUARD_R_INTERFACE
+#include <Rcpp.h>
+SEXP singleLocusProbabilitiesInfinite_RInterface(SEXP nFounders, SEXP nFunnels, SEXP intercrossingGenerations);
+SEXP singleLocusProbabilitiesFinite_RInterface(SEXP nFounders_sexp, SEXP nFunnels_sexp, SEXP intercrossingGenerations_sexp, SEXP selfingGenerations_sexp);
+#endif

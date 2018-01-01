@@ -223,8 +223,7 @@ template<> void genotypeProbabilitiesWithIntercross<4, false>(std::array<double,
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<4, true>(array2<4>&data, int selfingGenerations, std::size_t nFunnels)
 {
 	data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25;
-	data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] =
-		data.values[3][0] = data.values[3][1] = data.values[3][2] = 0;
+	data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] = data.values[3][0] = data.values[3][1] = data.values[3][2] = 0;
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<4, false>(array2<4>&data, int selfingGenerations, std::size_t nFunnels)
 {
@@ -232,23 +231,20 @@ template<> void singleLocusGenotypeProbabilitiesNoIntercross<4, false>(array2<4>
 	{
 		double pow2 = std::pow(0.5, selfingGenerations);
 		data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25*(1 - pow2);
-		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] =
-			data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 6;
+		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] = data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 12;
 	}
 	else
 	{
 		double pow2 = std::pow(0.5, selfingGenerations);
 		data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25*(1 - pow2);
 		data.values[0][1] = data.values[1][0] = data.values[2][3] = data.values[3][2] = 0;
-		data.values[0][2] = data.values[0][3] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = 
-			data.values[3][0] = data.values[3][1] = pow2 / 4;
+		data.values[0][2] = data.values[0][3] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[3][0] = data.values[3][1] = pow2 / 8;
 	}
 }
 template<> void singleLocusGenotypeProbabilitiesWithIntercross<4, true>(array2<4>& data, int selfingGenerations, std::size_t nFunnels)
 {
 	data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25;
-	data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] =
-		data.values[3][0] = data.values[3][1] = data.values[3][2] = 0;
+	data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] = data.values[3][0] = data.values[3][1] = data.values[3][2] = 0;
 }
 template<> void singleLocusGenotypeProbabilitiesWithIntercross<4, false>(array2<4>& data, int selfingGenerations, std::size_t nFunnels)
 {
@@ -256,14 +252,12 @@ template<> void singleLocusGenotypeProbabilitiesWithIntercross<4, false>(array2<
 	{
 		double pow2 = std::pow(0.5, selfingGenerations);
 		data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25 - 3.0 * pow2 / 16.0;
-		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] =
-			data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 8;
+		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] = data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 16;
 	}
 	else
 	{
 		double pow2 = std::pow(0.5, selfingGenerations);
 		data.values[0][0] = data.values[1][1] = data.values[2][2] = data.values[3][3] = 0.25 - 3.0 * pow2 / 16.0;
-		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] =
-			data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 8;
+		data.values[0][1] = data.values[0][2] = data.values[0][3] = data.values[1][0] = data.values[1][2] = data.values[1][3] = data.values[2][0] = data.values[2][1] = data.values[2][3] = data.values[3][0] = data.values[3][1] = data.values[3][2] = pow2 / 16;
 	}
 }

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <limits>
 #include <array>
+#include "array2.hpp"
 /*
  * Struct that will contain arrays relevant for probability calculations
  */
