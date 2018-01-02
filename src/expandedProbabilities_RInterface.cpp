@@ -40,7 +40,7 @@ template<int nFounders> Rcpp::NumericVector getCompressedProbabilitiesFinite(dou
 		genotypeProbabilitiesNoIntercross<nFounders, false>(result, r, selfingGenerations, nFunnels);
 		expandedGenotypeProbabilities<nFounders, false, false>::noIntercross(expandedProbabilities, r, selfingGenerations, nFunnels);
 	}
-	Rcpp::NumericVector retVal(nFounders * nFounders * nFounders * nFounders);
+	Rcpp::NumericMatrix retVal(nFounders * nFounders, nFounders * nFounders);
 	for(int i = 0; i < nFounders; i++)
 	{
 		for(int j = 0; j < nFounders; j++)
