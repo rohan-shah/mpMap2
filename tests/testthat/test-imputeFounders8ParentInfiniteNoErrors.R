@@ -17,7 +17,7 @@ test_that("Test zero generations of intercrossing",
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			result <- imputeFounders(mapped, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.9)
+			expect_true(sum(diag(tmp)) / sum(tmp) > 0.93)
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}

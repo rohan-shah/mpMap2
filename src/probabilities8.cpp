@@ -2,6 +2,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <cstring>
+//Matrix used to turn a pair of genotypes into a probability. 
 const int probabilityData<8>::intermediateProbabilitiesMask[][64] = 
 {{0, 1, 2, 2, 3, 3, 3, 3, 1, 4, 5, 5, 6, 6, 6, 6, 2, 5, 7, 8, 9, 9, 9,
    9, 2, 5, 8, 7, 9, 9, 9, 9, 3, 6, 9, 9, 10, 11, 12, 12, 3, 6, 9, 9, 
@@ -239,6 +240,7 @@ const int probabilityData<8>::intermediateProbabilitiesMask[][64] =
    3, 11, 10, 12, 12, 9, 9, 6, 3, 12, 12, 10, 11, 9, 9, 6, 3, 12, 12, 
   11, 10, 9, 9, 6, 3, 9, 9, 9, 9, 7, 8, 5, 2, 9, 9, 9, 9, 8, 7, 5, 2, 
   6, 6, 6, 6, 5, 5, 4, 1, 3, 3, 3, 3, 2, 2, 1, 0}};
+//Matrix used to encode a pair of founders into a genotype.
 const int probabilityData<8>::intermediateAllelesMask[][8] = 
 			/*Range[#1, #1 + 7] & /@ Range[0, 63, 8]*/
 			{ { 0, 1, 2, 3, 4, 5, 6, 7 }, { 8, 9, 10, 11, 12, 13, 14, 15 }, { 16, 17,
@@ -246,6 +248,7 @@ const int probabilityData<8>::intermediateAllelesMask[][8] =
 			34, 35, 36, 37, 38, 39 }, { 40, 41, 42, 43, 44, 45, 46, 47 }, { 48, 49,
 			50, 51, 52, 53, 54, 55 }, { 56, 57, 58, 59, 60, 61, 62, 63 } };
 
+//In the case of infinite generations of selfing, this table is used to turn the computed probabilities (there are three unique values) into a 8 x 8 probability matrix (containing only those two unique values)
 const int probabilityData<8>::infiniteMask[][8] = 
 		{
 			{0, 1, 2, 2, 2, 2, 2, 2},

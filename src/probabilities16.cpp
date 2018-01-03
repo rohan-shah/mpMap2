@@ -4,6 +4,7 @@
 const int probabilityData<16>::intermediateProbabilitiesMask[][256] = 
 #include "probabilities16IntermediateProbabilitiesMask.h"
 ;
+//Matrix used to encode a pair of founders into a genotype.
 const int probabilityData<16>::intermediateAllelesMask[][16] = 
   {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, {16, 17, 18, 
   19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}, {32, 33, 34, 
@@ -24,6 +25,7 @@ const int probabilityData<16>::intermediateAllelesMask[][16] =
   227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 
   239}, {240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 
   252, 253, 254, 255}};
+//In the case of infinite generations of selfing, this table is used to turn the computed probabilities (there are four unique values) into a 16 x 16 probability matrix (containing only those three unique values)
 const int probabilityData<16>::infiniteMask[][16] = 
 		{{0, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
 		{1, 0, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},

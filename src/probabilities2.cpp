@@ -1,17 +1,21 @@
 #include "probabilities2.h"
 #include <cmath>
 #include <stdexcept>
-const int probabilityData<2>::intermediateProbabilitiesMask[][3] = 
+//Matrix used to turn a pair of genotypes into a probability. 
+const int probabilityData<2>::intermediateProbabilitiesMask[][4] = 
 		{
-			{0, 1, 2},
-			{1, 0, 2},
-			{2, 2, 3}
+			{0, 2, 2, 1},
+			{2, 3, 4, 2},
+			{2, 4, 3, 2}, 
+			{1, 2, 2, 0}
 		};
+//Matrix used to encode a pair of founders into a genotype.
 const int probabilityData<2>::intermediateAllelesMask[][2] = 
 		{
-			{0, 2},
-			{2, 1}
+			{0, 1},
+			{2, 3}
 		};
+//In the case of infinite generations of selfing, this table is used to turn the computed probabilities (there are two unique values) into a 2 x 2 probability matrix (containing only those two unique values)
 const int probabilityData<2>::infiniteMask[][2] = 
 		{
 			{0, 1},
@@ -32,12 +36,12 @@ template<> void genotypeProbabilitiesNoIntercross<2, false>(std::array<double, 5
 	prob[1] = (r/(1 + 2*r)) -std::pow(0.5, selfingGenerations+2)*(2 - quadraticPower - oneMinusTwoRPower*(1 - 2 *r)/ ( 1 + 2*r));
 	//One homozygote, one heterozygote
 	prob[2] = std::pow(0.5, selfingGenerations+1) * (1 - quadraticPower);
-	//Two heterozygotes. We don't distinguish between the two different heterozygote combinations
-	prob[3] = std::pow(0.5, selfingGenerations) * quadraticPower;
-	//But we might want to allow us to get back to the seperate probabilities in code that calls this function, so compute the probability for state 4 by itself. 
-	prob[4] = std::pow(0.5, selfingGenerations-1) * (quadraticPower - oneMinusTwoRPower);
+	//Two heterozygotes, same phase
+	prob[3] = std::pow(0.5, selfingGenerations) * (quadraticPower + oneMinusTwoRPower);
+	//Two heterozygotes, different phase
+	prob[4] = std::pow(0.5, selfingGenerations) * (quadraticPower - oneMinusTwoRPower);
 
-	//The heterozygotes will be counted twice, so divide by two (or four if there are two heterozygotes). 
+	//Computations were done with aggregated states
 	prob[2] /= 2;
 	prob[3] /= 4;
 	prob[4] /= 4;
@@ -86,8 +90,8 @@ template<> void genotypeProbabilitiesWithIntercross<2, false>(std::array<double,
 	0.25*(-2*powOneMinus2R*powOneMinusR 
    		+ (oneMinusRSquared + oneMinusTwoRSquared*powOneMinusRSquared)*quadraticPower
    	)/(8*pow2*oneMinusRSquared);
-	//We don't distinguish between the two heterozygote combinations
-   	prob[3] += prob[4];
+	prob[3] *= 2;
+	prob[4] *= 2;
 }
 template<> void singleLocusGenotypeProbabilitiesNoIntercross<2, true>(array2<2>&data, int selfingGenerations, std::size_t nFunnels)
 {

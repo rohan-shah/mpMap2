@@ -1,6 +1,7 @@
 #include "probabilities4.h"
 #include <cmath>
 #include <stdexcept>
+//Matrix used to turn a pair of genotypes into a probability. 
 const int probabilityData<4>::intermediateProbabilitiesMask[][16] =
 { { 0, 1, 2, 2, 1, 3, 4, 4, 2, 4, 5, 6, 2, 4, 6, 5 }, { 1, 7, 8, 8, 9, 1,
 10, 10, 10, 8, 6, 11, 10, 8, 11, 6 }, { 2, 8, 12, 13, 10, 4, 13, 14,
@@ -16,6 +17,7 @@ const int probabilityData<4>::intermediateProbabilitiesMask[][16] =
 8, 17, 16, 10, 2, 16, 15, 14, 13, 4, 10, 13, 12, 8, 2 }, { 6, 11, 8,
 10, 11, 6, 8, 10, 10, 10, 1, 9, 8, 8, 7, 1 }, { 5, 6, 4, 2, 6, 5, 4,
 2, 4, 4, 3, 1, 2, 2, 1, 0 } };
+//Matrix used to encode a pair of founders into a genotype.
 const int probabilityData<4>::intermediateAllelesMask[][4] = 
 		{
 			{0,  1,  2,  3},
@@ -23,6 +25,7 @@ const int probabilityData<4>::intermediateAllelesMask[][4] =
 			{8,  9,  10, 11},
 			{12, 13, 14, 15}
 		};
+//In the case of infinite generations of selfing, this table is used to turn the computed probabilities (there are three computed values, two unique) into a 4 x 4 probability matrix (containing only those three values)
 const int probabilityData<4>::infiniteMask[][4] = 
 		{
 			{0, 1, 2, 2},

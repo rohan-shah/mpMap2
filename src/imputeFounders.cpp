@@ -220,13 +220,13 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 			double recombination = recombinationFractions[markerCounter];
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
-				expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::noIntercross(logFunnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
+				expandedGenotypeProbabilitiesUnphased<nFounders, infiniteSelfing, true>::noIntercross(logFunnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
 			}
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 			{
 				for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing, true>::withIntercross(logIntercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
+					expandedGenotypeProbabilitiesUnphased<nFounders, infiniteSelfing, true>::withIntercross(logIntercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 				}
 			}
 

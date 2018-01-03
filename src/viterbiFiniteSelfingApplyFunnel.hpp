@@ -94,9 +94,7 @@
 					{
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
-						//Account for the fact that each heterozygote is only counted once, so the probabilities are half what they should really be. 
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
-
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
@@ -135,7 +133,7 @@
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
 						//Account for the fact that each heterozygote is only counted once, so the probabilities are half what they should really be. 
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						if(markerValue == encodingMarker)
 						{}
 						else if(markerValue == NA_INTEGER && founderCounter == founderCounter2)
@@ -304,8 +302,7 @@ stopIdenticalSearch:
 					{
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
-
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						//Founder at the previous marker. 
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
@@ -348,8 +345,8 @@ stopIdenticalSearch:
 						int encodingMarker = currentMarkerData.hetData(funnel[founderCounter], funnel[founderCounter2]);
 						int encodingTheseFounders = key(funnel[founderCounter], funnel[founderCounter2])-1;
 						double multipleNextMarker = 0;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						bool isError = false;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(encodingMarker == markerValue)
 						{
 							multipleNextMarker += errorTermCurrentMarker1;

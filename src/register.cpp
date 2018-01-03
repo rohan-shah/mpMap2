@@ -109,7 +109,7 @@ extern "C"
 		{"combineRFDisjoint", (DL_FUNC)&combineRFDisjoint, 2},
 		{"estimateRFSingleDesign", (DL_FUNC)&estimateRFSingleDesign, 8},
 		{"expandedProbabilitiesInfinite", (DL_FUNC)&expandedProbabilitiesInfinite_RInterface, 4},
-		{"expandedProbabilitiesFinite", (DL_FUNC)&expandedProbabilitiesFinite_RInterface, 5},
+		{"expandedProbabilitiesFinite", (DL_FUNC)&expandedProbabilitiesFinite_RInterface, 6},
 		{"singleLocusProbabilitiesFinite", (DL_FUNC)&singleLocusProbabilitiesFinite_RInterface, 4},
 		{"singleLocusProbabilitiesInfinite", (DL_FUNC)&singleLocusProbabilitiesInfinite_RInterface, 4},
 		{NULL, NULL, 0}

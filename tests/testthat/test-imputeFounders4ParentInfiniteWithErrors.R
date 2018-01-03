@@ -19,7 +19,7 @@ test_that("Test deliberate errors",
 			mapped@geneticData[[1]]@finals[errorIndices] <- sample(0:1, 0.01*length(mapped@geneticData[[1]]@finals), replace=TRUE)
 			result <- imputeFounders(mapped, errorProb = 0.01)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.94)
+			expect_true(sum(diag(tmp)) / sum(tmp) > 0.95)
 			
 			expect_gt(sum(result@geneticData[[1]]@imputed@errors), 0.25*0.01*length(mapped@geneticData[[1]]@finals))
 		}

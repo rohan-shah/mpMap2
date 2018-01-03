@@ -34,7 +34,9 @@
 				{
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log2;
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
 		}
@@ -50,7 +52,9 @@
 					int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log2;
+					pathLengths1[encodingTheseFounders] = multiple + (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{}
 					else if(startMarkerValue == NA_INTEGER && recodedFounders(founderCounter2, startMarkerIndex) == recodedFounders(founderCounter, startMarkerIndex))
@@ -81,7 +85,7 @@
 					{
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						//Founder at the previous marker. 
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
@@ -117,7 +121,7 @@
 						int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						if(encodingMarker == markerValue)
 						{}
 						else if(markerValue == NA_INTEGER && recodedFounders(founderCounter2, markerIndex) == recodedFounders(founderCounter, markerIndex))
@@ -210,11 +214,13 @@ stopIdenticalSearch:
 		{
 			for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
 			{
-				for(int founderCounter2 = 0; founderCounter2 < nFounders; founderCounter2++)
+				for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 				{
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log2;
+					pathLengths2[encodingTheseFounders] = pathLengths1[encodingTheseFounders] = multiple + (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 				}
 			}
 		}
@@ -232,7 +238,9 @@ stopIdenticalSearch:
 					int markerEncodingTheseFounders = startMarkerData.hetData(founderCounter, founderCounter2);
 					int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 					intermediate1(encodingTheseFounders, 0) = encodingTheseFounders;
-					pathLengths1[encodingTheseFounders] = (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
+					double multiple = 0;
+					if(founderCounter != founderCounter2) multiple = log2;
+					pathLengths1[encodingTheseFounders] = multiple + (*logIntercrossingSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderCounter][founderCounter2];
 					bool isError;
 					if(markerEncodingTheseFounders == startMarkerValue)
 					{
@@ -273,9 +281,9 @@ stopIdenticalSearch:
 					for(int founderCounter2 = 0; founderCounter2 <= founderCounter; founderCounter2++)
 					{
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
-						double multipleNextMarker = 0;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						std::fill(working.begin(), working.end(), -std::numeric_limits<double>::infinity());
+						double multipleNextMarker = 0;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						//Founder at the previous marker. 
 						for(int founderPreviousCounter = 0; founderPreviousCounter < nFounders; founderPreviousCounter++)
 						{
@@ -314,8 +322,8 @@ stopIdenticalSearch:
 						int encodingMarker = currentMarkerData.hetData(founderCounter, founderCounter2);
 						int encodingTheseFounders = key(founderCounter, founderCounter2)-1;
 						double multipleNextMarker = 0;
+						if(founderCounter != founderCounter2) multipleNextMarker = log2;
 						bool isError;
-						if(founderCounter != founderCounter2) multipleNextMarker += log2;
 						if(encodingMarker == markerValue)
 						{
 							multipleNextMarker += errorTermCurrentMarker1;

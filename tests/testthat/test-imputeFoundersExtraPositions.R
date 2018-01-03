@@ -39,11 +39,12 @@ test_that("Test that imputations at positions look right for F2 populations",
 		suppressWarnings(result <- imputeFounders(mapped, errorProb = 0, extraPositions = list("1" = c("P1" = 30, "P2" = 40, "P3" = 50, "P4" = 60, "P5" = 70))))
 
 		#Different homozygotes
-		indices <- which(result@geneticData[[1]]@imputed@data[,20] == 1 & result@geneticData[[1]]@imputed@data[,26] == 2)
-		indices <- c(which(result@geneticData[[1]]@imputed@data[,20] == 2 & result@geneticData[[1]]@imputed@data[,26] == 1))
+		indices1 <- which(result@geneticData[[1]]@imputed@data[,20] == 1 & result@geneticData[[1]]@imputed@data[,26] == 2)
+		indices2 <- which(result@geneticData[[1]]@imputed@data[,20] == 2 & result@geneticData[[1]]@imputed@data[,26] == 1)
 
 		#Check that everything between two homozygotes is imputed as a hetrozygote. 
-		expect_equal(as.integer(result@geneticData[[1]]@imputed@data[indices,c("P1", "P2", "P3", "P4", "P5")]), rep(3L, length(indices)*5))
+		expect_equal(as.integer(result@geneticData[[1]]@imputed@data[indices1,c("P1", "P2", "P3", "P4", "P5")]), rep(c(3L, 3L, 3L, 3L, 2L), each = length(indices1)))
+		expect_equal(as.integer(result@geneticData[[1]]@imputed@data[indices2,c("P1", "P2", "P3", "P4", "P5")]), rep(c(3L, 3L, 3L, 3L, 1L), each = length(indices2)))
 
 		#Check that everything between two identical homozygotes is imputed the same as the end-points
 		indices <- which(result@geneticData[[1]]@imputed@data[,20] == 1 & result@geneticData[[1]]@imputed@data[,26] == 1)
@@ -66,8 +67,7 @@ test_that("Test that imputations at positions look right for 4-way population us
 		#Certain different homozygotes should be seperated by hetrozygotes - E.g. (1, 3), (1, 4), (2, 3), (2, 4). 
 		indices <- which((result@geneticData[[1]]@imputed@data[,20] == 1 | result@geneticData[[1]]@imputed@data[,20] == 2) & (result@geneticData[[1]]@imputed@data[,26] == 3 | result@geneticData[[1]]@imputed@data[,26] == 4))
 		indices <- c(indices, which((result@geneticData[[1]]@imputed@data[,20] == 3 | result@geneticData[[1]]@imputed@data[,20] == 4) & (result@geneticData[[1]]@imputed@data[,26] == 1 | result@geneticData[[1]]@imputed@data[,26] == 2)))
-		#Check that everything between is imputed as a hetrozygote
-		expect_equal(as.logical(result@geneticData[[1]]@imputed@data[indices,c("P1", "P2", "P3", "P4", "P5")] >= 5), rep(TRUE, length(indices)*5))
+		expect_equal(as.logical(apply(result@geneticData[[1]]@imputed@data[indices,c("P1", "P2", "P3", "P4", "P5")], 1, function(x) any(x >= 5))), rep(TRUE, length(indices)))
 
 		#But some hetrozygotes are impossible in this pedigree. In that case the differente homozygotes are NOT seperated by a run of hets. 
 		indices <- which((result@geneticData[[1]]@imputed@data[,20] == 1 & result@geneticData[[1]]@imputed@data[,26] == 2) | (result@geneticData[[1]]@imputed@data[,20] == 2 & result@geneticData[[1]]@imputed@data[,26] == 1))

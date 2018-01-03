@@ -19,13 +19,13 @@ test_that("Test zero generations of intercrossing, with marker heterozygotes",
 			expect_identical(rownames(tmp), colnames(tmp))
 
 			endHet <- nrow(tmp)
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.95)
+			expect_gt(sum(diag(tmp)) / sum(tmp), 0.965)
 			#If a het is called, it should be correct with at least 95% chance
-			expect_true(sum(diag(tmp[5:endHet,5:endHet])) / sum(tmp[5:endHet,]) > 0.93)
+			expect_gt(sum(diag(tmp[5:endHet,5:endHet])) / sum(tmp[5:endHet,]), 0.95)
 			#If a homozygote is called, it should be correct with a higher probability
-			expect_true(sum(diag(tmp[1:4,1:4])) / sum(tmp[1:4,1:4]) > 0.95)
-			#If a het is called, it should actually be a het (any het) with at least 95% chance
-			expect_true(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]) > 0.95)
+			expect_gt(sum(diag(tmp[1:4,1:4])) / sum(tmp[1:4,1:4]), 0.95)
+			#If a het is called, it should actually be a het (any het) with at least 99% chance
+			expect_gt(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]), 0.99)
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
@@ -67,14 +67,15 @@ test_that("Test zero generations of intercrossing, without marker heterozygotes"
 			mapped <- new("mpcrossMapped", cross2, map = map)
 			result <- imputeFounders(mapped, heterozygoteMissingProb = 1, homozygoteMissingProb = 0.01, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
-			#Correct imputation rate should be 0.925
-			expect_true(sum(diag(tmp)) / sum(tmp) > 0.925)
+			#Correct imputation rate should be 0.945
+			expect_gt(sum(diag(tmp)) / sum(tmp), 0.945)
 			#If a homozygote is called, it should be correct with 95% probability
-			expect_true(sum(diag(tmp[1:4,1:4])) / sum(tmp[1:4,1:4]) > 0.95)
+			expect_gt(sum(diag(tmp[1:4,1:4])) / sum(tmp[1:4,1:4]), 0.95)
 			expect_identical(nrow(tmp), ncol(tmp))
 			expect_identical(rownames(tmp), colnames(tmp))
 			endHet <- nrow(tmp)
-			expect_true(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]) > 0.95)
+			#If a het is called, it should actually be a het (any het) with at least 99% chance
+			expect_gt(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]), 0.99)
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}

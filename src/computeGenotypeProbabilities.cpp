@@ -187,13 +187,13 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 				double recombination = recombinationFractions[markerCounter];
 				for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 				{
-					expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
+					expandedGenotypeProbabilitiesUnphased<nFounders, infiniteSelfing, false>::noIntercross(funnelHaplotypeProbabilities(markerCounter, selfingGenerationCounter - minSelfing), recombination, selfingGenerationCounter, nFunnels);
 				}
 				for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
 				{
 					for(int intercrossingGenerations =  minAIGenerations; intercrossingGenerations <= maxAIGenerations; intercrossingGenerations++)
 					{
-						expandedGenotypeProbabilities<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
+						expandedGenotypeProbabilitiesUnphased<nFounders, infiniteSelfing, false>::withIntercross(intercrossingHaplotypeProbabilities(markerCounter, intercrossingGenerations - minAIGenerations, selfingGenerationCounter - minSelfing), intercrossingGenerations, recombination, selfingGenerationCounter, nFunnels);
 					}
 				}
 
