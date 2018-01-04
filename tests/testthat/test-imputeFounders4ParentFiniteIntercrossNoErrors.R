@@ -74,8 +74,8 @@ test_that("Test non-zero generations of intercrossing, without marker heterozygo
 			expect_identical(nrow(tmp), ncol(tmp))
 			expect_identical(rownames(tmp), colnames(tmp))
 			endHet <- nrow(tmp)
-			#If a het is called, it should actually be a het (any het) with at least 99% chance
-			expect_gt(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]), 0.99)
+			#If a het is called, it should actually be a het (any het) with at least 98.5% chance
+			expect_gt(sum(tmp[5:endHet,5:endHet]) / sum(tmp[5:endHet,]), 0.985)
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}

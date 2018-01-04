@@ -102,9 +102,10 @@
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
-								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
+								double singleLocProb = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity() && singleLocProb != -std::numeric_limits<double>::infinity())
 								{
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - singleLocProb;
 								}
 							}
 						}
@@ -156,9 +157,10 @@
 								for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 								{
 									int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
-									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
+									double singleLocProb = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity() && singleLocProb != -std::numeric_limits<double>::infinity())
 									{
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - singleLocProb;
 									}
 								}
 							}
@@ -310,9 +312,10 @@ stopIdenticalSearch:
 							for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 							{
 								int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
-								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
+								double singleLocProb = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+								if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity() && singleLocProb != -std::numeric_limits<double>::infinity())
 								{
-									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+									working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - singleLocProb;
 								}
 							}
 						}
@@ -375,9 +378,10 @@ stopIdenticalSearch:
 								for(int founderPreviousCounter2 = 0; founderPreviousCounter2 <= founderPreviousCounter; founderPreviousCounter2++)
 								{
 									int encodingPreviousTheseFounders = key(funnel[founderPreviousCounter], funnel[founderPreviousCounter2])-1;
-									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity())
+									double singleLocProb = (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+									if(pathLengths1[encodingPreviousTheseFounders] != -std::numeric_limits<double>::infinity() && singleLocProb != -std::numeric_limits<double>::infinity())
 									{
-										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - (*logFunnelSingleLociHaplotypeProbabilities)[selfingGenerations - minSelfingGenerations].values[founderPreviousCounter][founderPreviousCounter2];
+										working[encodingPreviousTheseFounders] = pathLengths1[encodingPreviousTheseFounders] + multipleNextMarker + (*logFunnelHaplotypeProbabilities)(positionCounter-startPosition, selfingGenerations - minSelfingGenerations).values[founderCounter][founderCounter2][founderPreviousCounter][founderPreviousCounter2] - singleLocProb;
 									}
 								}
 							}
