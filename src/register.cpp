@@ -80,7 +80,6 @@ extern "C"
 		{"order", (DL_FUNC)&order, 9},
 		{"checkRawSymmetricMatrix", (DL_FUNC)&checkRawSymmetricMatrix, 1},
 		{"arsa", (DL_FUNC)&arsaExportedR, 8},
-		{"imputeWholeObject", (DL_FUNC)&imputeWholeObject, 3},
 		{"imputeGroup", (DL_FUNC)&imputeGroup, 4},
 		{"multiparentSNPRemoveHets", (DL_FUNC)&multiparentSNPRemoveHets, 1},
 		{"multiparentSNPKeepHets", (DL_FUNC)&multiparentSNPKeepHets, 1},
