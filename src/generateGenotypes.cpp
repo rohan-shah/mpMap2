@@ -28,6 +28,10 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		{
 			throw std::runtime_error("Input recombinationFractions must be a numeric vector");
 		}
+		for(std::size_t i = 0; i < recombinationFractions.size(); i++)
+		{
+			if(recombinationFractions[i] < 0 || recombinationFractions[i] > 0.5) throw std::runtime_error("All recombination fractions must be between 0 and 0.5, inclusive");
+		}
 		Rcpp::S4 pedigree;
 		try
 		{
@@ -55,6 +59,7 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		Rcpp::IntegerVector father = Rcpp::as<Rcpp::IntegerVector>(pedigree.slot("father"));
 		
 		R_xlen_t nMarkers = recombinationFractions.length() + 1, nPedRows = lineNames.size();
+		if(nMarkers != markerNames.size()) throw std::runtime_error("Input marker names vector had the wrong length");
 		//Columns 0 and nMarkers correspond to the the pair of alleles at the first marker
 		Rcpp::IntegerMatrix result((int)lineNames.size(), (int)(2*nMarkers));
 		//once we encounter a line with parents which are not set to zero we set this to true. And subsequently don't allow any zero-values for mother or father

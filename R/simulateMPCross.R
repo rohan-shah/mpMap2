@@ -24,6 +24,7 @@ simulateMPCross <- function(map, pedigree, mapFunction, seed)
 	{
 		if(length(diff(map[[i]])) > 0)
 		{
+			map[[i]] <- sort(map[[i]])
 			adjacentRecombination <- c(adjacentRecombination, sapply(diff(map[[i]]), mapFunction), 0.5)
 		}
 		else
