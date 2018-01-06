@@ -28,7 +28,7 @@ SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpe
 		{
 			throw std::runtime_error("Input recombinationFractions must be a numeric vector");
 		}
-		for(std::size_t i = 0; i < recombinationFractions.size(); i++)
+		for(std::size_t i = 0; i < (std::size_t)recombinationFractions.size(); i++)
 		{
 			if(recombinationFractions[i] < 0 || recombinationFractions[i] > 0.5) throw std::runtime_error("All recombination fractions must be between 0 and 0.5, inclusive");
 		}
