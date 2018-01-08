@@ -17,9 +17,18 @@ createSNPTemplate <- function(inputObject, newData, hetEncoding, markerName)
 	{
 		stop("Input object must have class mpcross or geneticData")
 	}
+	if(is.matrix(newData) || is.data.frame(newData))
+	{
+		if(ncol(newData) != 1) stop("Input newData must have a single column")
+		newData <- newData[,1]
+	}
 	if(is.null(names(newData)))
 	{
 		stop("Input data must have names")
+	}
+	if(!is.integer(newData))
+	{
+		stop("Input newData must contain integer values")
 	}
 	founders <- cbind(newData[rownames(founders(geneticData))])
 	colnames(founders) <- markerName

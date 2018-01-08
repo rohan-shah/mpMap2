@@ -37,25 +37,25 @@ BEGIN_RCPP
 		throw std::runtime_error("Levels must be identical for slot theta in both objects");
 	}
 	
-	int nMarkers1 = markers1.size();
-	int nMarkers2 = markers2.size();
-	int newMarkers = nMarkers1 + nMarkers2;
+	std::size_t nMarkers1 = (std::size_t)markers1.size();
+	std::size_t nMarkers2 = (std::size_t)markers2.size();
+	std::size_t newMarkers = (std::size_t)nMarkers1 + nMarkers2;
 
-	Rcpp::RawVector combinedRaw(newMarkers * (newMarkers+1)/2);
+	Rcpp::RawVector combinedRaw(newMarkers * (newMarkers+1ULL)/2ULL);
 	std::fill(combinedRaw.begin(), combinedRaw.end(), -1);
-	for(int columnCounter = 0; columnCounter < nMarkers1; columnCounter++)
+	for(std::size_t columnCounter = 0; columnCounter < nMarkers1; columnCounter++)
 	{
-		for(int rowCounter = 0; rowCounter <= columnCounter; rowCounter++)
+		for(std::size_t rowCounter = 0; rowCounter <= columnCounter; rowCounter++)
 		{
-			combinedRaw(columnCounter*(columnCounter+1)/2 + rowCounter) = raw1(columnCounter*(columnCounter+1)/2 + rowCounter); 
+			combinedRaw(columnCounter*(columnCounter+1ULL)/2ULL + rowCounter) = raw1(columnCounter*(columnCounter+1ULL)/2ULL + rowCounter); 
 		}
 	}
 
-	for(int columnCounter = 0; columnCounter < nMarkers2; columnCounter++)
+	for(std::size_t columnCounter = 0; columnCounter < nMarkers2; columnCounter++)
 	{
-		for(int rowCounter = 0; rowCounter <= columnCounter; rowCounter++)
+		for(std::size_t rowCounter = 0; rowCounter <= columnCounter; rowCounter++)
 		{
-			combinedRaw((columnCounter+nMarkers1)*(columnCounter+nMarkers1+1)/2 + (rowCounter + nMarkers1)) = raw2(columnCounter*(columnCounter+1)/2 + rowCounter);
+			combinedRaw((columnCounter+nMarkers1)*(columnCounter+nMarkers1+1ULL)/2ULL + (rowCounter + nMarkers1)) = raw2(columnCounter*(columnCounter+1ULL)/2ULL + rowCounter);
 		}
 	}
 	Rcpp::Function c("c");
