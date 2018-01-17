@@ -258,9 +258,6 @@ BEGIN_RCPP
 		std::size_t nMarkersCurrentGroup = (int)markersThisGroup.size();
 		if(nMarkersCurrentGroup == 0) continue;
 		
-		std::vector<int> contiguousIndices(nMarkersCurrentGroup);
-		for(std::size_t i = 0; i < nMarkersCurrentGroup; i++) contiguousIndices[i] = (int)i;
-
 		if(!hasImputedTheta)
 		{
 			//Do imputation
@@ -296,7 +293,7 @@ BEGIN_RCPP
 			}
 			unsigned char* originalRawPtr = &(thetaRawData[0]);
 			std::vector<std::pair<int, int> > reportedErrors;
-			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, contiguousIndices, imputationProgressFunction, false, reportedErrors);
+			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, nMarkersCurrentGroup, imputationProgressFunction, false, reportedErrors);
 			if(verbose)
 			{
 				close(barHandle);

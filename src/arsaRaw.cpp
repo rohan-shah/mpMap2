@@ -374,7 +374,6 @@ namespace arsaRaw
 	void makeChange(change& possibleChange, std::vector<int>& currentPermutation, const Rbyte* rawDist, const std::vector<double>& levels, double z, double zbestThisRep, std::vector<int>& bestPermutationThisRep, double temperature)
 	{
 		R_xlen_t swap1 = possibleChange.swap1, swap2 = possibleChange.swap2;
-		R_xlen_t n = currentPermutation.size();
 		double delta = possibleChange.delta;
 		if(possibleChange.isMove)
 		{

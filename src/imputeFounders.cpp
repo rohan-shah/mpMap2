@@ -200,7 +200,7 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 	viterbi.updateProgress = updateProgress;
 
 	//Now actually run the Viterbi algorithm. To cut down on memory usage we run a single chromosome at a time
-	for(int chromosomeCounter = 0; chromosomeCounter < allPositions.chromosomes.size(); chromosomeCounter++)
+	for(int chromosomeCounter = 0; chromosomeCounter < (int)allPositions.chromosomes.size(); chromosomeCounter++)
 	{
 		positionData::chromosomeDescriptor& currentChromosome = allPositions.chromosomes[chromosomeCounter];
 		if(showProgress)
@@ -209,13 +209,13 @@ template<int nFounders, bool infiniteSelfing> void imputedFoundersInternal2(Rcpp
 		}
 		//Take differences
 		std::vector<double> differences(currentChromosome.end - currentChromosome.start - 1);
-		for(std::size_t i = 1; i < currentChromosome.end - currentChromosome.start; i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
+		for(std::size_t i = 1; i < (std::size_t)(currentChromosome.end - currentChromosome.start); i++) differences[i-1] = allPositions.positions[i + currentChromosome.start] - allPositions.positions[i + currentChromosome.start -1];
 
 		//Convert to recombination fractions
 		std::vector<double> recombinationFractions;
 		haldaneToRf(differences, recombinationFractions);
 		//Generate haplotype probability data. 
-		for(int markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
+		for(std::size_t markerCounter = 0; markerCounter < recombinationFractions.size(); markerCounter++)
 		{
 			double recombination = recombinationFractions[markerCounter];
 			for(int selfingGenerationCounter = minSelfing; selfingGenerationCounter <= maxSelfing; selfingGenerationCounter++)
@@ -300,12 +300,12 @@ BEGIN_RCPP
 	//Check that there are no values of NA
 	{
 		Rcpp::CharacterVector foundersMarkers = Rcpp::as<Rcpp::CharacterVector>(Rcpp::colnames(founders));
-		for(std::size_t i = 0; i < foundersMarkers.size(); i++)
+		for(std::size_t i = 0; i < (std::size_t)foundersMarkers.size(); i++)
 		{
 			if(Rcpp::CharacterVector::is_na(foundersMarkers[i])) throw std::runtime_error("Input founders cannot have a column named NA");
 		}
 		Rcpp::CharacterVector lineNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::rownames(founders));
-		for(std::size_t i = 0; i < lineNames.size(); i++)
+		for(std::size_t i = 0; i < (std::size_t)lineNames.size(); i++)
 		{
 			if(Rcpp::CharacterVector::is_na(lineNames[i])) throw std::runtime_error("Input founders cannot have a row named NA");
 		}
@@ -339,7 +339,7 @@ BEGIN_RCPP
 			if(Rcpp::CharacterVector::is_na(finalsMarkers[i])) throw std::runtime_error("Input finals cannot have a column named NA");
 		}
 		Rcpp::CharacterVector lineNames = Rcpp::as<Rcpp::CharacterVector>(Rcpp::rownames(finals));
-		for(std::size_t i = 0; i < lineNames.size(); i++)
+		for(std::size_t i = 0; i < (std::size_t)lineNames.size(); i++)
 		{
 			if(Rcpp::CharacterVector::is_na(lineNames[i])) throw std::runtime_error("Input finals cannot have a row named NA");
 		}
