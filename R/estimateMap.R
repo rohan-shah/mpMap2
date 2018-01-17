@@ -1,23 +1,26 @@
 #' @title Estimate map distances
 #' @description Estimate map distances based on the estimated recombination fractions
-#' @param mpcrossLG The dataset to use for map construction. This object must contain data about recombination fractions and linkage groups. 
+#' @param mpcrossLG An object of class \code{mpcrossLG}, which must also contain data about recombination fractions and linkage groups. 
 #' @param maxMarkers The (approximate) number of markers for which distances are estimated simultaneously. 
 #' @param mapFunction The map function to use to compute recombination fractions to centiMorgan distances.
-#' @param maxOffset The maximum separation between the pairs of markers, in terms of position within the ordering. Recombination fractions between pairs of markers, which are further apart than this, will not be used to estimate the map distances. 
+#' @param maxOffset The maximum separation between pairs of markers used for map construction, in terms of position within the ordering. Recombination fractions between pairs of markers, which are further apart than this, will not be used to estimate the map distances. 
 #' @param verbose Should verbose output be produced?
 #' @return A map object, in the format specified by the \code{\link[qtl]{qtl-package}} package. This format is a list of chromosomes, with each entry being a named numeric vector of marker positions. 
 #' @details 
-#' Once an optimal marker order has been chosen, one possible way of estimating a genetic map is to convert the recombination fractions between adjacent markers into centiMorgan distances. This tends not to work well, because individual recombination fraction estimates can be highly variable, depending on the experimental design used, and the distribution of the marker alleles among the founders. It also wastes much of the information contained in the data; we can estimate recombination fractions between all pairs of markers, rather than just adjacent markers, and this information should be used in the estimation of map distances
+#' Once a marker order has been chosen, one possible way of estimating a genetic map is to convert the recombination fractions between adjacent markers into centiMorgan distances. This tends not to work well, because individual recombination fraction estimates can be highly variable, depending on the experimental design used, and the distribution of the marker alleles among the founders. It also wastes much of the information contained in the data; we can estimate recombination fractions between all pairs of markers, rather than just adjacent markers, and this information should be used in the estimation of map distances
 #' 
-#' This function uses non-linear least squares to estimate map distances as follows. Assume that there are \code{n} markers on a chromosome, and for all pairs of markers there is an available estimate of the recombination fraction. For every pair of markers which differ by \code{maxOffset} or less, in terms of their position within the optimal ordering, the recombination fraction between these markers is turned into a centiMorgan distance. This centiMorgan distance is expressed as a sum of distances between adjacent markers, which is a simple equation. The set of all the equations generated in this way is represented as a matrix equation, and solved via non-linear least squares. As these non-linear least squares problems can become very large, input \code{maxMarkers} allows the non-linear least squares problem to be broken into several smaller problems. 
+#' This function uses non-linear least squares to estimate map distances as follows. Assume that there are \code{n} markers on a chromosome, and for all pairs of markers there is an available estimate of the recombination fraction. For every pair of markers which differ by \code{maxOffset} or less, in terms of their position within the ordering, the recombination fraction between these markers is turned into a centiMorgan distance. This centiMorgan distance is expressed as a sum of distances between adjacent markers, which is a simple equation. The set of all the equations generated in this way is represented as a matrix equation, and solved via non-linear least squares. As these non-linear least squares problems can become very large, input \code{maxMarkers} allows the non-linear least squares problem to be broken into several smaller problems. 
 #'
-#' For example, assume that there are five markers, for which an order has been determined. The distance between markers \eqn{i} and \eqn{j}, \emph{as estimated by the recombination fractions}, is \eqn{d(i, j)}. The genetic distance between markers \eqn{i} and \eqn{i + 1} \emph{in the final genetic map} is \eqn{a(i)}. So in this case, the parameters that are to be estimated are \eqn{a(1), a(2)} and \eqn{a(3)}. If \code{maxOffset} is 3, then the set of equations generated is 
+#' For example, assume that there are five markers, for which an order has been determined. The distance between markers \eqn{i} and \eqn{j}, \emph{as estimated by the recombination fractions}, is \eqn{d(i, j)}. The genetic distance between markers \eqn{i} and \eqn{i + 1} \emph{in the final genetic map} is \eqn{a(i)}. So in this case, the parameters that are to be estimated are \eqn{a(1), a(2), a(3)} and \eqn{a(4)}. If \code{maxOffset} is 3, then the set of equations generated is 
 #' \deqn{d(1, 3) = a(1) + a(2)}
 #' \deqn{d(1, 4) = a(1) + a(2) + a(3)}
 #' \deqn{d(2, 4) = a(2) + a(3)}
 #' \deqn{d(3, 5) = a(3) + a(4)}
 #' \deqn{d(2, 5) = a(2) + a(3) + a(4)}
-#' These constraints are represented as a matrix equation and solved for \eqn{a(1), a(2), a(3)} and \eqn{a(4)} using non-linear least squares.
+#' These constraints are represented as a matrix equation and solved for \eqn{a(1), a(2), a(3)} and \eqn{a(4)} using non-linear least squares. However, if \code{maxOffset} is set to \code{2}, then the set of equations is 
+#' \deqn{d(1, 3) = a(1) + a(2)}
+#' \deqn{d(2, 4) = a(2) + a(3)}
+#' \deqn{d(3, 5) = a(3) + a(4)}
 #' @examples
 #' #construct four-parent pedigree
 #' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, 

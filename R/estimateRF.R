@@ -1,21 +1,46 @@
 #' Estimate recombination fractions
 #' 
 #' This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.
-#' @param object The input mpcross object
+#' @param object An object of class \code{mpcross}. 
 #' @param recombValues a vector of test values to use for the numeric maximum likelihood step. Must contain 0 and 0.5, and must have less than 255 values in total. The default value is \code{c(0:20/200, 11:50/100)}. 
 #' @param lineWeights Values to use to correct for segregation distortion. This parameter should in general be left unspecified. 
 #' @param gbLimit The maximum amount of working memory this estimation step should be allowed to use at any one time, in gigabytes. Smaller values may increase the computation time. A value of -1 indicates no limit.  
 #' @param keepLod Set to \code{TRUE} to compute the likelihood ratio score statistics for testing whether the estimate is different from 0.5. Due to memory constraints this should generally be left as \code{FALSE}. 
 #' @param keepLkhd Set to \code{TRUE} to compute the maximum value of the likelihood. Due to memory constraints this should generally be left as \code{FALSE}.
-#' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation
+#' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation. 
 #' @param markerRows Used to estimate only a subset of the full matrix of pairwise recombination fractions.
 #' @param markerColumns Used to estimate only a subset of the full matrix of pairwise recombination fractions.
 #' @return An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data. 
+#' @details
+#' The majority of the options for this function should \emph{not} be specified by the end user. In particular, \code{keepLkhd}, \code{keepLod} and \code{lineWeights} should not be specified without good reason.
+#'
+#' Arguments \code{markerRows} and \code{markerColumns} can be used to estimate only a subset of the full recombination matrix. Reasons for doing this could include
+#' \enumerate{
+#' 	\item Allowing the full matrix to be estimated in multiple steps, with intermediate computations being saved
+#'	\item The matrix of recombination fractions has \emph{mostly} already been estimated. This can occur when adding extra markers. 
+#' 	\item Memory limitations. Performing estimation for markers with many alleles takes a large amount of memory. It is often useful to estimate recombination fractions between all pairs of biallelic markers, and let other pairs be done using a separate call. 
+#' }
+#' If arguments \code{markerRows} and \code{markerColumns} are used, only the \emph{upper-triangular part} of the specified subset is computed. See the examples for details. 
 #' @export
 #' @examples map <- qtl::sim.map(len = 100, n.mar = 11, include.x=FALSE)
 #' f2Pedigree <- f2Pedigree(1000)
 #' cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
 #' rf <- estimateRF(cross)
+#' #Print the estimated recombination fraction values
+#' rf@@rf@@theta[1:11, 1:11]
+#' 
+#' #Now only estimate recombination fractions between the first 3 markers. The other estimates will just be marked as NA
+#' rf <- estimateRF(cross, markerRows = 1:3, markerColumns = 1:3)
+#' #Print the estimated recombination fraction values
+#' rf@@rf@@theta[1:11, 1:11]
+#' 
+#' #A more complicated example, where three values are estimated
+#' rf <- estimateRF(cross, markerRows = 1, markerColumns = 1:3)
+#' #Print the estimated recombination fraction values
+#' rf@@rf@@theta[1:11, 1:11]
+#' 
+#' #In this case only ONE value is estimated, because only one element of the requested subset lies in the upper-triangular part - The value on the diagonal. 
+#' rf <- estimateRF(cross, markerRows = 3, markerColumns = 1:3)
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
 estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))

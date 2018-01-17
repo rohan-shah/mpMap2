@@ -11,13 +11,13 @@ addExtraMarkers(mpcrossMapped, newMarkers,
   attemptMpMap2Interactive = TRUE, verbose = TRUE, reorder = TRUE)
 }
 \arguments{
-\item{mpcrossMapped}{An existing dataset with a map, which must include imputation data and recombination fraction data.}
+\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputation data and recombination fraction data.}
 
-\item{newMarkers}{A data object containing the new markers to add}
+\item{newMarkers}{An object of class \code{mpcross} containing the new markers to add.}
 
-\item{useOnlyExtraImputationPoints}{Use only the additional points at which imputation data has been generated? Currently this must be \code{TRUE}.}
+\item{useOnlyExtraImputationPoints}{Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers? Currently this must be \code{TRUE}. In future \code{FALSE} may be allowed.}
 
-\item{reorderRadius}{The width of the region in which to attempt to reorder, after the extra markers are added, in terms of number of markers.}
+\item{reorderRadius}{The width of the region (in terms of number of markers) in which to attempt to reorder, after the extra markers are added.}
 
 \item{maxOffset}{The maxOffset parameter for the call to \code{\link{estimateMap}}, which is used to re-estimate the map (locally), after the additional markers are added.}
 
@@ -42,15 +42,15 @@ A list with an entry named \code{statistics}, containing the test statistic valu
 Add extra markers to a map, using a QTL-mapping style approach.
 }
 \details{
-This function uses a QTL-mapping style approach to add extra markers to an existing map. The code uses the imputation data at a collection of points, and the marker alleles for the \emph{first} marker of the extra markers. If the imputed genotype at a point is independent from the marker allele, then that marker probably should not be mapped to that point. If the imputed genotype at a point and the marker allele are strongly dependent, then the marker should probably be mapped to that point. Dependence and independence are measured using a chi-squared test stastistic for independence. \emph{All the extra markers} are then mapped to the position where the test statistic is largest. 
+This function uses a QTL-mapping style approach to add extra markers to an existing map. The code uses the imputation data at a collection of points, and the marker alleles for the \emph{first} marker of the extra markers. If the imputed genotype at a point is \emph{independent} from the genotype at the new marker, then the new marker probably should \emph{not} be mapped to that point. If the imputed genotype at a point and the marker allele are \emph{strongly dependent}, then the new marker \emph{should} probably be mapped to that point. Dependence and independence are measured using a chi-squared test stastistic for independence. \emph{All the extra markers} are then mapped to the position where the test statistic is largest. It is recommended that only single markers be added at a time, unless you are extremely confident that all the extra markers should be located at the same position.
 
-Currently the set of points which are tested is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this has the affect of radically reducing the number of tests that are performed, as generally there are far fewer points in this grid, than there are markers. As the position chosen will need to be inspected and changed manually in any case, any loss in accuracy by using the grid of point is essentially irrelevant. In future it may be possible to use every marker position as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}. 
+Currently the set of points at which the new markers are considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduced the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. In future it may be possible to use the set of all marker positions as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}. 
 
 Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. If \code{attemptMpMap2Interactive} is \code{TRUE}, then package mpMapInteractive2 will be used to reorder the markers; this requires the user to perform reordering interactively. Otherwise, function \code{orderCross} will be used to automatically perform reordering. 
 
 Once the optional reordering step has been performed, the map is recomputed locally, to account for the addition of the extra marker. The argument \code{maxOffset} is passed through to \code{estimateMap}. Finally, the imputation data will be recomputed if \code{imputationArgs} is not \code{NULL}; in that case, \code{imputationArgs} should contain a list of arguments to \code{imputeFounders}. It is recommended that the imputation data be recomputed if further markers are to be added. 
 
-If a threshold is to be applied to the maximum value of the test statistics, this function should be called twice. For the first call, \code{onlyStatistics} should be set to \code{FALSE}. If the resulting test statistics exceed the threshold, then \code{addExtrMarkers} should be called again with \code{onlyStatistics} set to \code{TRUE}. It is recommended that only single markers be added at a time, unless you are extremely confident that all the extra markers should be located at the same position.
+In some cases the user will want to apply a threshold to the maximum value of the test statistics, and only add the marker if the test statistics exceed the threshold. In this case the function should be called twice. For the first call, \code{onlyStatistics} should be set to \code{FALSE}. If the resulting test statistics exceed the threshold, then \code{addExtrMarkers} should be called again with \code{onlyStatistics} set to \code{TRUE}.
 }
 \examples{
 #construct four-parent pedigree

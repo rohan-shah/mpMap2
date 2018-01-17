@@ -33,7 +33,7 @@ createSNPTemplate <- function(inputObject, newData, hetEncoding, markerName)
 	founders <- cbind(newData[rownames(founders(geneticData))])
 	colnames(founders) <- markerName
 	alleles <- na.omit(unique(founders))
-	if(missing(hetEncoding))
+	if(missing(hetEncoding) || is.null(hetEncoding))
 	{
 		hetData <- rbind(cbind(alleles, alleles, alleles))
 		warning("Input hetEncoding was missing, so no heterozygote encodings are generated. Was this desired?")

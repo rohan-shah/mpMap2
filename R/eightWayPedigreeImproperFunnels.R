@@ -1,17 +1,25 @@
-#' @title Generate an eight-parent pedigree
+#' @title Generate an eight-parent pedigree with improper funnels
 #'
 #' @description
-#' Generate a eight-parent pedigree starting from inbred founders, where the founders in the funnels are not necessarily distinct. 
+#' Generate a eight-parent pedigree starting from inbred founders, where the founders in the funnels are not necessarily distinct.
 #'
 #' @seealso \code{\link{eightParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
 #'
-#' @param initialPopulationSize The number of F1 lines generated
-#' @param selfingGenerations The number of selfing generations at the end of the pedigree
-#' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
+#' @param initialPopulationSize The number of initially generated lines, whose genetic material is a mosaic of the eight founding lines. These lines are generated using three generations of structured mating. 
+#' @param selfingGenerations The number of selfing generations at the end of the pedigree.
+#' @param nSeeds The number of progeny taken from each intercrossing line, or from each initially generated line (if no intercrossing is specified). These lines are then selfed according to selfingGenerations.
 #' @export
+#' @details
+#' Generate a eight-parent pedigree starting from inbred founders. The founders in the funnel for every line are chosen \emph{with replacement}. So for any line from the final population, it is likely that some founding lines are absent from the corresponding funnel, and some appear multiple times. 
 #' @examples 
 #' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10, 
 #' 	selfingGenerations = 0, nSeeds = 1)
+#' #Generate map
+#' map <- sim.map()
+#' #Simulate data
+#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
+#' #Get out a list of funnels, which are rows of this matrix. Note that, of the values 1:8, some are missing within a row, and some are repeated. 
+#' getAllFunnels(cross)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it

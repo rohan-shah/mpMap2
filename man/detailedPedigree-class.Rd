@@ -8,20 +8,20 @@
 detailedPedigree(lineNames, mother, father, initial, observed, selfing)
 }
 \arguments{
-\item{lineNames}{The names assigned to the lines}
+\item{lineNames}{The names assigned to the lines.}
 
-\item{mother}{The female parent of this line}
+\item{mother}{The female parent of this line, given by name or by index within \code{lineNames}.}
 
-\item{father}{The male parent of this line}
+\item{father}{The male parent of this line, given by name or by index within \code{lineNames}.}
 
-\item{initial}{The indices of the founder lines in the pedigree}
+\item{initial}{The founder lines, given by name or by index within lineNames.}
 
-\item{observed}{A logical vector determining which lines are observed in the final population}
+\item{observed}{The lines which are observed in the final population, given by name or by index within lineNames.}
 
 \item{selfing}{Value determining whether or not subsequent analysis of populations generated from this pedigree should assume infinite generations of selfing. Possible values are \code{"finite"} and \code{"infinite"}.}
 }
 \description{
-Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows us to simulate a data set with the given pedigree.
+Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows simulation of a data set with the given pedigree.
 }
 \section{Functions}{
 \itemize{
@@ -45,6 +45,8 @@ detailedPedigreeObj <- detailedPedigree(mother = mother, father = father, initia
 	observed = observed, lineNames = lineNames, selfing = "finite")
 }
 \seealso{
-\code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
+\code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}, \code{\link[mpMap2]{detailedPedigree}}
+
+\code{\link[mpMap2]{detailedPedigree-class}}
 }
 

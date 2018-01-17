@@ -7,7 +7,7 @@
 f2Pedigree(populationSize)
 }
 \arguments{
-\item{populationSize}{The size of the generated population}
+\item{populationSize}{The size of the generated population.}
 }
 \description{
 Generate an F2 pedigree which starts from inbred founders

@@ -1,17 +1,22 @@
-#' @title Generate an eight-parent pedigree
+#' @title Generate an eight-parent pedigree, using a single funnel
 #'
 #' @description
-#' Generate a eight-parent pedigree starting from inbred founders, using a single funnel
+#' Generate a eight-parent pedigree starting from inbred founders, using a single funnel. 
 #'
 #' @seealso \code{\link{eightParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
 #'
-#' @param initialPopulationSize The number of F1 lines generated
-#' @param selfingGenerations The number of selfing generations at the end of the pedigree
-#' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
-#' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
+#' @param initialPopulationSize The number of initially generated lines, whose genetic material is a mosaic of the eight founding lines. These lines are generated using three generations of structured mating. 
+#' @param selfingGenerations The number of selfing generations at the end of the pedigree. 
+#' @param nSeeds The number of progeny taken from each intercrossing line, or from each initially generated line (if no intercrossing is specified). These lines are then selfed according to selfingGenerations.
+#' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize. 
 #' @export
-#' @examples pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, 
+#' @examples 
+#' pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, 
 #' 	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
+#' map <- sim.map()
+#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
+#' #Get out a list of funnels, which are rows of this matrix. For this pedigree, every funnel is 1:8. 
+#' getAllFunnels(cross)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it

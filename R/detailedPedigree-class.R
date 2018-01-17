@@ -56,10 +56,10 @@ checkDetailedPedigree <- function(object)
 }
 #' Pedigree for simulation
 #' 
-#' Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows us to simulate a data set with the given pedigree. 
+#' Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows simulation of a data set with the given pedigree. 
 #' @slot initial The indices of the inbred founder lines in the pedigree. These founders lines must be the first lines in the pedigree. 
 #' @slot observed A logical vector with one value per line in the pedigree. A value of \code{TRUE} indicates that this line will be genotyped. 
-#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}
+#' @seealso \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}, \code{\link[mpMap2]{detailedPedigree}}
 #' @include pedigree-class.R
 #' @rdname detailedPedigree-class
 #' @name  detailedPedigree-class
@@ -75,17 +75,40 @@ NULL
 .detailedPedigree <- setClass("detailedPedigree", contains = "pedigree", slots = list(initial = "integer", observed = "logical"), validity = checkDetailedPedigree)
 #' @export
 #' @describeIn detailedPedigree-class Construct object of class detailedPedigree
-#' @param lineNames The names assigned to the lines
-#' @param mother The female parent of this line
-#' @param father The male parent of this line
-#' @param initial The indices of the founder lines in the pedigree
-#' @param observed A logical vector determining which lines are observed in the final population
+#' @param lineNames The names assigned to the lines.
+#' @param mother The female parent of this line, given by name or by index within \code{lineNames}.
+#' @param father The male parent of this line, given by name or by index within \code{lineNames}.
+#' @param initial The founder lines, given by name or by index within lineNames.
+#' @param observed The lines which are observed in the final population, given by name or by index within lineNames.
 #' @param selfing Value determining whether or not subsequent analysis of populations generated from this pedigree should assume infinite generations of selfing. Possible values are \code{"finite"} and \code{"infinite"}.
+#' @seealso \code{\link[mpMap2]{detailedPedigree-class}}
 detailedPedigree <- function(lineNames, mother, father, initial, observed, selfing)
 {
-	mother <- as.integer(mother)
-	father <- as.integer(father)
-	initial <- as.integer(initial)
 	lineNames <- as.character(lineNames)
+	if(is.character(mother))
+	{
+		mother <- match(mother, lineNames)
+		mother[is.na(mother)] <- 0
+	}
+	mother <- as.integer(mother)
+	if(is.character(father))
+	{
+		father <- match(father, lineNames)
+		father[is.na(father)] <- 0
+	}
+	father <- as.integer(father)
+	if(is.character(initial))
+	{
+		initial <- match(initial, lineNames)
+	}
+	initial <- as.integer(initial)
+	if(is.character(observed))
+	{
+		observed <- lineNames %in% observed
+	}
+	else if(is.integer(observed))
+	{
+		observed <- (1:length(lineNames)) %in% observed
+	}
 	return(new("detailedPedigree", lineNames = lineNames, mother = mother, father = father, initial = initial, observed = observed, selfing = selfing, warnImproperFunnels = TRUE))
 }

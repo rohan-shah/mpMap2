@@ -2,11 +2,18 @@
 #' 
 #' Group markers into linkage groups using hierarchical clustering. 
 #' @export
-#' @param mpcrossRF An object of class mpcrossRF
+#' @param mpcrossRF An object of class \code{mpcrossRF}.
 #' @param groups The number of groups to form
 #' @param clusterBy The matrix to use for clustering. The three choices are theta (recombination fractions), lod (log-odds ratio) or combined (a combination of both). 
-#' @param method The method to use for hierarchical cluster. Choices are average, complete and single. -
+#' @param method The method to use for hierarchical cluster. Choices are average, complete and single.
 #' @param preCluster Before clustering is performed, should we form groups of markers which are completely linked?
+#' 
+#' @details
+#' This function groups markers into the specified number of linkage groups, using hierarchical clustering. This can be done using three different dissimilarity matrices, specified by the \code{clusterBy} argument. If \code{"theta"} is specified, then the matrix of recombination fractions is used. If \code{"lod"} is specified, then a matrix of likelihood ratio test statistics is used. The hypothesis being tested is whether the recombination fraction is 0.5 (no linkage). If \code{"combined"} is specified, then a combination of both previous approaches is used. We recommend the default value of \code{"theta"}. 
+#'
+#' The linkage method for hierachical clustering is specified by the \code{method} argument; acceptable values are \code{"average"}, \code{"complete"} and \code{"single"}. 
+#'
+#' Argument \code{preCluster} determines whether the code combines markers that are completely linked, before performing hierarchical clustering. This can lead to speed-ups in clustering truly huge datasets. 
 formGroups <- function(mpcrossRF, groups, clusterBy="theta", method="average", preCluster = FALSE)
 {
 	if(!(clusterBy %in% c("combined", "theta", "lod")))

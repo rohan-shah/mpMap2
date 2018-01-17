@@ -8,11 +8,11 @@ addExtraMarkerFromRawCall(mpcrossMapped, newMarker,
   useOnlyExtraImputationPoints = TRUE)
 }
 \arguments{
-\item{mpcrossMapped}{An existing dataset with a map, which must include imputation data and recombination fraction data.}
+\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputation data and recombination fraction data.}
 
-\item{newMarker}{A data.frame object containing the raw data for the marker to add}
+\item{newMarker}{A matrix containing the raw data for the marker to add.}
 
-\item{useOnlyExtraImputationPoints}{Use only the additional points at which imputation data has been generated? Currently this must be \code{TRUE}.}
+\item{useOnlyExtraImputationPoints}{Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers? Currently this must be \code{TRUE}. In future \code{FALSE} may be allowed.}
 }
 \value{
 A vector containing the test statistic values.
@@ -21,8 +21,10 @@ A vector containing the test statistic values.
 Add an extra marker to a map, based on raw calling data, using a QTL-mapping style approach.
 }
 \details{
-This function uses a QTL-mapping style approach to test for where an extra marker should be added to an existing map. The code uses the imputation data at a collection of points, and the \emph{raw calling data} for the extra marker. Test statistics are computed using a multivariate analysis of variance approach. If the imputed genotype at a point is independent of the calling data, then that marker probably should not be mapped to that point. If the imputed genotype at a point and the calling data are strongly dependent, then the marker should probably be mapped to that point. Dependence and independence are measured using an F-test. 
+This function uses a QTL-mapping style approach to test for where an extra marker should be added to an existing map. The code uses the imputation data at a collection of points, and the \emph{raw calling data} for the extra marker. The raw calling data should must be bivariate.
 
-Currently the set of points which are tested is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this has the affect of radically reducing the number of tests that are performed, as generally there are far fewer points in this grid, than there are markers. As the position chosen will need to be inspected and changed manually in any case, any loss in accuracy by using the grid of point is essentially irrelevant. In future it may be possible to use every marker position as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}.
+Test statistics measuring the associated of the new marker to a point are computed using a multivariate analysis of variance approach. If the imputed genotype at a point is independent of the data for the new marker, then the new marker probably should \emph{not} be mapped to that point. If the imputed genotype at a point and the data for the new marker are strongly \emph{dependent}, then the new marker \emph{should} probably be mapped to that point. Dependence and independence are measured using an F-test. 
+
+Currently the set of points at which the new marker is considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduces the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. In future it may be possible to use the set of all marker positions as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}.
 }
 

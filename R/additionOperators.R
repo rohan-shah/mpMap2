@@ -7,7 +7,7 @@ setGeneric("addMpMap2", function(e1, e2, skipValidity = FALSE) standardGeneric("
 #' @param e1 An mpcross object
 #' @param e2 Another mpcross object
 #' @details 
-#' This function combines multiple mpcross objects into a single object. The input objects may contain recombination fraction data, or may have associated genetic maps. The function tries to keep whatever extra data is in the input objects, and will warn if data is discarded. This happens, for example, if one of the objects contains recombination fraction data, and the other does not.
+#' These addition operators combine multiple mpcross objects into a single object. The input objects may contain recombination fraction data, or may have associated genetic maps. The function tries to keep whatever extra data is in the input objects, and will warn if data is discarded. This happens, for example, if one of the objects contains recombination fraction data, and the other does not.
 #' 
 #' In general, the combined object will contain the input objects as separate datasets. In special cases, the datasets may be combined. For example, if the input objects contains disjoint sets of markers, but the same genetic lines, then the datasets will be combined. Similarly, if the input objects contain the same genetic markers, but disjoint sets of genetic lines, then the datasets will be combined.
 #'
