@@ -369,7 +369,7 @@ BEGIN_RCPP
 		{
 			throw std::runtime_error("Input map must be a list of numeric vectors");
 		}
-		Rcpp::CharacterVector chromosomeMarkers = chromosome.names();
+        std::vector<std::string> chromosomeMarkers = Rcpp::as<std::vector<std::string> >(chromosome.names());
 		mapMarkers.insert(mapMarkers.end(), chromosomeMarkers.begin(), chromosomeMarkers.end());
 	}
 	if(mapMarkers.size() != foundersMarkers.size() || !std::equal(mapMarkers.begin(), mapMarkers.end(), foundersMarkers.begin()))
