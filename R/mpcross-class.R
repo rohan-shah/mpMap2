@@ -145,7 +145,7 @@ setAs("mpcrossMapped", "mpcrossRF", def = function(from, to)
 	})
 setAs("mpcrossMapped", "mpcrossLG", def = function(from, to)
 	{
-		groups <- rep(1:length(from@map), each = unlist(lapply(from@map, length)))
+		groups <- rep(1:length(from@map), times = unlist(lapply(from@map, length)))
 		names(groups) <- markers(from)
 		allGroups <- unique(groups)
 		lg <- new("lg", allGroups = allGroups, groups = groups)
