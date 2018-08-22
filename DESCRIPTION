@@ -107,6 +107,7 @@ Collate:
     'plotProbabilities.R'
     'print.R'
     'purdyToPedigree.R'
+    'redact.R'
     'removeHets.R'
     'reorderPedigree.R'
     'reverseChromosomes.R'
