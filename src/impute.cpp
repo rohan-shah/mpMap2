@@ -24,11 +24,12 @@ struct differenceSetComp
 		return a.difference < b.difference;
 	}
 };
-template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& levels, double* lod, double* lkhd, std::size_t nMarkersThisGroup, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
+template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& levels, double* lod, double* lkhd, std::vector<int>& markersThisGroup, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
 {
 	unsigned long done = 0;
+	unsigned long total = (unsigned long)markersThisGroup.size();
 	bool hasError = false;
-	int nLevels = (int)levels.size();
+	int nLevels = (int)levels.size(), nMarkersThisGroup = (int)markersThisGroup.size();
 	std::vector<double> absoluteDifferences(0x100*0x100, 0);
 	for(int i = 0; i < nLevels; i++)
 	{
@@ -37,6 +38,8 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 			absoluteDifferences[i * 0x100 + j] = fabs(levels[i] - levels[j]);
 		}
 	}
+	std::vector<int> copiedMarkersThisGroup = markersThisGroup;
+	std::sort(copiedMarkersThisGroup.begin(), copiedMarkersThisGroup.end());
 	std::vector<double> similarityMatrix(nMarkersThisGroup * nMarkersThisGroup, 0);
 	std::vector<int> usablePoints(nMarkersThisGroup * nMarkersThisGroup, 0);
 #ifdef USE_OPENMP
@@ -50,9 +53,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		//First marker
 		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
 		{
+			int markerI = copiedMarkersThisGroup[i];
 			//Second marker
 			for(unsigned long long j = 0; j < i; j++)
 			{
+				unsigned long long markerJ = copiedMarkersThisGroup[j];
 				std::fill(table.begin(), table.end(), 0);
 				unsigned long long usableSum = 0;
 				for(unsigned long long k = 0; k <= j; k++)
@@ -95,13 +100,15 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		//row
 		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
 		{
+			int marker1 = copiedMarkersThisGroup[i];
 			//column
 			for(unsigned long long j = i; j < nMarkersThisGroup; j++)
 			{
-				unsigned long long copiedMarker1 = i;
-				unsigned long long copiedMarker2 = j;
+				int marker2 = copiedMarkersThisGroup[j];
+				unsigned long long copiedMarker1 = marker1;
+				unsigned long long copiedMarker2 = marker2;
 				if(copiedMarker1 > copiedMarker2) std::swap(copiedMarker1, copiedMarker2);
-				//record whether there's a missing value for i anywhere.
+				//record whether there's a missing value for marker1 anywhere.
 				float val = originalTheta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
 				unsigned char& toReplace = imputedTheta[(copiedMarker2 * (copiedMarker2 + 1ULL))/2ULL + copiedMarker1];
 				if(val == 0xff && toReplace == 0xff)
@@ -112,10 +119,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					for(unsigned long long k = 0; k < nMarkersThisGroup; k++)
 					{
 						if(k == i || k == j) continue;
+						int marker3 = copiedMarkersThisGroup[k];
 						if(usablePoints[i * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(true, k, similarityMatrix[i * nMarkersThisGroup + k]));
 						if(usablePoints[j * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(false, k, similarityMatrix[j * nMarkersThisGroup + k]));
 					}
-					//go through the other markers from most similar to least similar, looking for something which has a value here. So marker3 is the marker which is similar to i
+					//go through the other markers from most similar to least similar, looking for something which has a value here. So marker3 is the marker which is similar to marker1
 					bool replacementFound = false;
 					for(differenceSetType::iterator marker3 = differenceSet.begin(); marker3 != differenceSet.end(); marker3++)
 					{
@@ -123,11 +131,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 						if(marker3->isRow)
 						{
 							pair2Row = marker3->index;
-							pair2Column = j;
+							pair2Column = marker2;
 						}
 						else
 						{
-							pair2Row = i;
+							pair2Row = marker1;
 							pair2Column = marker3->index;
 						}
 						if(pair2Row > pair2Column) std::swap(pair2Row, pair2Column);
@@ -149,7 +157,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 						#pragma omp critical
 #endif
 						{
-							reportedErrors.push_back(std::make_pair((int)i+1, (int)j+1));
+							reportedErrors.push_back(std::make_pair(marker1+1, marker2+1));
 							hasError = true;
 #ifndef USE_OPENMP
 							//We can't return early if we're using openmp
@@ -169,29 +177,29 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 			if(omp_get_thread_num() == 0)
 #endif
 			{
-				statusFunction(done, (int)nMarkersThisGroup);
+				statusFunction(done, total);
 			}
 		}
 	}
 	return !hasError;
 }
-bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::size_t nMarkersThisGroup, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
+bool impute(const unsigned char* originalTheta, unsigned char* imputedTheta, std::vector<double>& thetaLevels, double* lod, double* lkhd, std::vector<int>& markers, std::function<void(unsigned long, unsigned long)> statusFunction, bool allErrors, std::vector<std::pair<int, int> >& reportedErrors)
 {
 	if(lod != NULL && lkhd != NULL)
 	{
-		return imputeInternal<true, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, nMarkersThisGroup, statusFunction, allErrors, reportedErrors);
+		return imputeInternal<true, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else if(lod != NULL && lkhd == NULL)
 	{
-		return imputeInternal<true, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, nMarkersThisGroup, statusFunction, allErrors, reportedErrors);
+		return imputeInternal<true, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else if(lod == NULL && lkhd != NULL)
 	{
-		return imputeInternal<false, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, nMarkersThisGroup, statusFunction, allErrors, reportedErrors);
+		return imputeInternal<false, true>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 	else
 	{
-		return imputeInternal<false, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, nMarkersThisGroup, statusFunction, allErrors, reportedErrors);
+		return imputeInternal<false, false>(originalTheta, imputedTheta, thetaLevels, lod, lkhd, markers, statusFunction, allErrors, reportedErrors);
 	}
 }
 SEXP imputeGroup(SEXP mpcrossLG_sexp, SEXP verbose_sexp, SEXP group_sexp, SEXP allErrors_sexp)
@@ -396,11 +404,16 @@ BEGIN_RCPP
 #endif
 		};
 	}
+	//Now overwrite the markersCurrentGroup vector with consecutive numbers. Because we've extracted a subset of the matrix into its own memory. 
+	for(int i = 0; i < (int)markersCurrentGroup.size(); i++)
+	{
+		markersCurrentGroup[i] = i;
+	}
 	std::string error;
 	unsigned char* originalThetaPtr = &(originalTheta[0]);
 	unsigned char* imputedThetaPtr = &(copiedTheta[0]);
 	std::vector<std::pair<int, int> > reportedErrors;
-	bool ok = impute(originalThetaPtr, imputedThetaPtr, levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup.size(), progressFunction, allErrors, reportedErrors);
+	bool ok = impute(originalThetaPtr, imputedThetaPtr, levels, copiedLodPtr, copiedLkhdPtr, markersCurrentGroup, progressFunction, allErrors, reportedErrors);
 	if(!ok)
 	{
 		if(reportedErrors.size() > 0)
