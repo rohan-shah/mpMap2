@@ -44,5 +44,6 @@ after_failure:
 
 script: 
   - |
+    autoconf
     travis_wait 20 R CMD build . --no-manual
     travis_wait  R CMD check mpMap2*tar.gz --no-manual
