@@ -2,7 +2,7 @@ context("Test generateIntervalMidPoints")
 
 test_that("Test generateIntervalMidPoints",
 	{
-		map <- sim.map(len = c(100, 100), n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map[[1]] <- c("Extra1" = 0, map[[1]][1:5], "Extra2" = 40, map[[1]][6:11], "Extra3" = 100)
 		map[[2]] <- c("Extra4" = 0, map[[2]][1:5], "Extra5" = 40, map[[2]][6:11], "Extra6" = 100)
 		f2Pedigree <- f2Pedigree(10)

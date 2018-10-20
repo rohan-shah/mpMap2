@@ -23,8 +23,8 @@ test_that("Test zero generations of intercrossing",
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
 	})

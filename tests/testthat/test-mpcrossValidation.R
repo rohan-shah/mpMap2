@@ -1,7 +1,7 @@
 context("mpcross validation")
 
 pedigree <- twoParentPedigree(initialPopulationSize=100, selfingGenerations=0, nSeeds=3, intercrossingGenerations=1)
-map <- sim.map(len = rep(100, 1), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
+map <- qtl::sim.map(len = rep(100, 1), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
 cross <- simulateMPCross(map = map, pedigree=pedigree, mapFunction = haldaneToRf, seed=1)
 
 test_that("Simulated cross passes validation",
@@ -88,7 +88,7 @@ test_that("All geneticData entries must have the same markers",
 test_that("Object with no final lines is valid",
 	{
 		pedigree <- f2Pedigree(10)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross@geneticData[[1]]@finals <-cross@geneticData[[1]]@finals[0,,drop=F]
 		expect_identical(validObject(cross,complete=TRUE), TRUE)

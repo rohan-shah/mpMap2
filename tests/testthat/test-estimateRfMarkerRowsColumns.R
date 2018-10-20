@@ -3,7 +3,7 @@ context("markerRows and markerColumns arguments of estimateRF")
 test_that("Check markerRows and markerColumns",
 	{
 		pedigree <- f2Pedigree(100)
-		map <- sim.map(len = c(50, 50), n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + biparentalDominant()
 		rfAll <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE)
 		rfBetweenChromosomes <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE, markerRows = 1:11, markerColumns = 12:22)
@@ -21,7 +21,7 @@ test_that("Check markerRows and markerColumns",
 test_that("Check iterative computation using markerRows and markerColumns",
 	{
 		pedigree <- f2Pedigree(100)
-		map <- sim.map(len = c(50, 50), n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 11, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + biparentalDominant()
 		rfAll <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE)
 		rf1 <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE, markerRows = 1:11, markerColumns = 1:22)

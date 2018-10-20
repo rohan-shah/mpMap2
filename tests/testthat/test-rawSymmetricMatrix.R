@@ -151,7 +151,7 @@ test_that("Checking that rawSymmetricMatrixDiagonal works correctly, for in-orde
 test_that("Checking that subsetting results in objects with correct row and column names",
 	{
 		f2Pedigree <- f2Pedigree(100)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		for(i in 1:10)
 		{
 			cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
@@ -170,7 +170,7 @@ test_that("Checking that subsetting results in objects with correct row and colu
 test_that("Check that subsetting by matrices works for F2 design", 
 	{
 		f2Pedigree <- f2Pedigree(100)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 		for(counter in 1:10)
@@ -186,7 +186,7 @@ test_that("Check that subsetting by matrices works for F2 design",
 test_that("Check that subsetting by matrices works for eight-way design", 
 	{
 		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets=FALSE)
 		rf <- estimateRF(cross)
 		for(counter in 1:10)

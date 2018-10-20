@@ -4,7 +4,7 @@ if(class(try(.Call("omp_set_num_threads", 1, PACKAGE="mpMap2"), silent=TRUE)) !=
 	test_that("Test that correct ordering is generated for an F2 population", 
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)

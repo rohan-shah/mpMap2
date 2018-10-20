@@ -2,7 +2,7 @@ context("mpcrossMapped validation")
 
 pedigree <- twoParentPedigree(initialPopulationSize=100, selfingGenerations=0, nSeeds=3, intercrossingGenerations=1)
 pedigree@selfing <- "finite"
-map <- sim.map(len = rep(100, 2), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
+map <- qtl::sim.map(len = rep(100, 2), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
 cross <- simulateMPCross(map = map, pedigree=pedigree, mapFunction = haldaneToRf, seed=1)
 rf <- estimateRF(cross)
 mapped <- mpcrossMapped(rf, map = map)

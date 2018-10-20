@@ -7,8 +7,8 @@ test_that("Test use of mother / father names as input to detailedPedigree",
 		expect_identical(pedigree@initial, 1:2)
 		expect_identical(pedigree@observed, c(FALSE, FALSE, FALSE, TRUE))
 		expect_identical(pedigree@lineNames, lineNames)
-		expect_identical(pedigree@mother, c(0, 0, 1, 3))
-		expect_identical(pedigree@father, c(0, 0, 2, 3))
+		expect_identical(pedigree@mother, c(0L, 0L, 1L, 3L))
+		expect_identical(pedigree@father, c(0L, 0L, 2L, 3L))
 	})
 test_that("Test use of mother / father indices as input to detailedPedigree", 
 	{
@@ -17,6 +17,6 @@ test_that("Test use of mother / father indices as input to detailedPedigree",
 		expect_identical(pedigree@initial, 1:2)
 		expect_identical(pedigree@observed, c(FALSE, FALSE, FALSE, TRUE))
 		expect_identical(pedigree@lineNames, lineNames)
-		expect_identical(pedigree@mother, c(0, 0, 1, 3))
-		expect_identical(pedigree@father, c(0, 0, 2, 3))
+		expect_identical(pedigree@mother, c(0L, 0L, 1L, 3L))
+		expect_identical(pedigree@father, c(0L, 0L, 2L, 3L))
 	})

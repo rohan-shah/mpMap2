@@ -16,7 +16,7 @@ test_that("Test zero generations of intercrossing, codominant markers, with erro
 		
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -39,7 +39,7 @@ test_that("Test zero generations of intercrossing, dominant markers, with errors
 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.73)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 1000)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -61,7 +61,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, with 
 			
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -94,7 +94,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, with er
 		
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"D1M26"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.67)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -126,7 +126,7 @@ test_that("Test zero generations of intercrossing, codominant markers, with erro
 		
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -150,7 +150,7 @@ test_that("Test zero generations of intercrossing, dominant markers, with errors
 			#Our abilitiy to correctly impute hetrozygotes is very limited if there are no hets called!
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.5)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 1000)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -172,7 +172,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, with 
 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -206,7 +206,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, with er
 			#Our abilitiy to correctly impute hetrozygotes is very limited if there are no hets called!		
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nrow(genotypesFromProbabilities), 0.5)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)

@@ -22,9 +22,9 @@ test_that("Test zero generations of intercrossing",
 			errors <- result@geneticData[[1]]@imputed@errors
 			expect_lt(sum(errors) / length(errors), 0.01)
 		}
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
 	})
 test_that("Test non-zero generations of intercrossing",
@@ -51,9 +51,9 @@ test_that("Test non-zero generations of intercrossing",
 			errors <- result@geneticData[[1]]@imputed@errors
 			expect_lt(sum(errors) / length(errors), 0.01)
 		}
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map)
 	})	
 test_that("Test removal of deliberate errors",
@@ -92,10 +92,10 @@ test_that("Test removal of deliberate errors",
 			expect_lt(sum(errors[,-50]) / length(errors[,-50]), 0.01)
 			expect_gt(sum(errors[,50]), 100)
 		}
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map, 0)
 		testFunc(map, 2)
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		testFunc(map, 0)
 		testFunc(map, 2)
 	})	

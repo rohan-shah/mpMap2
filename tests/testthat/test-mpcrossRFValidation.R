@@ -4,11 +4,11 @@ test_that("Slot rf must have the right number of markers",
 	{
 		pedigree <- twoParentPedigree(initialPopulationSize=100, selfingGenerations=0, nSeeds=3, intercrossingGenerations=1)
 		pedigree@selfing <- "finite"
-		map1 <- sim.map(len = rep(100, 1), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
+		map1 <- qtl::sim.map(len = rep(100, 1), n.mar = 12, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
 		cross1 <- simulateMPCross(map = map1, pedigree=pedigree, mapFunction = haldaneToRf, seed=1)
 		rf1 <- estimateRF(cross1)
 
-		map2 <- sim.map(len = rep(100, 1), n.mar = 100, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
+		map2 <- qtl::sim.map(len = rep(100, 1), n.mar = 100, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
 		cross2 <- simulateMPCross(map = map2, pedigree=pedigree, mapFunction = haldaneToRf, seed=1)
 		rf2 <- estimateRF(cross2)
 

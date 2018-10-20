@@ -21,8 +21,8 @@ test_that("Test zero generations of intercrossing",
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
-		map1 <- sim.map(len = 100, n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		map2 <- sim.map(len = c(100, 100), n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map1 <- qtl::sim.map(len = 100, n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map2 <- qtl::sim.map(len = c(100, 100), n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
 		pedigree1 <- eightParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)

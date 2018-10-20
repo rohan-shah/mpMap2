@@ -106,7 +106,7 @@ detailedPedigree <- function(lineNames, mother, father, initial, observed, selfi
 	{
 		observed <- lineNames %in% observed
 	}
-	else if(is.integer(observed))
+	else if(is.numeric(observed))
 	{
 		observed <- (1:length(lineNames)) %in% observed
 	}

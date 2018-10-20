@@ -2,7 +2,7 @@ context("getAllFunnels")
 
 test_that("Checking that code to get all funnels works, for F2",
 	{
-		map <- sim.map(len = c(10), n.mar = 2, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(10), n.mar = 2, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(10)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_identical(getAllFunnels(cross, standardised = FALSE), cbind(rep(1L, 10), rep(2L, 10)))
@@ -10,7 +10,7 @@ test_that("Checking that code to get all funnels works, for F2",
 	})
 test_that("Checking that code to get all funnels works, for 4-way",
 	{
-		map <- sim.map(len = c(10), n.mar = 2, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(10), n.mar = 2, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 1, intercrossingGenerations = 0)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 

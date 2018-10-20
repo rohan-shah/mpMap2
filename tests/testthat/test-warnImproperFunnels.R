@@ -1,7 +1,7 @@
 context("Test warnImproperFunnels argument")
 test_that("Test warnImproperFunnels with four-parent single funnel design",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 10, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"

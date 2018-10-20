@@ -1,7 +1,7 @@
 context("Founder imputation with extra positions")
 test_that("Test that the positions are put in the correct order",
 	{
-		map <- sim.map(len = c(100, 100), n.mar = c(101, 101), anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = c(101, 101), anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(10)
 		pedigree@selfing <- "finite"
 
@@ -29,7 +29,7 @@ test_that("Test that the positions are put in the correct order",
 	})
 test_that("Test that imputations at positions look right for F2 populations",
 	{
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map[[1]] <- map[[1]][c(1:20, 80:101)]
 		pedigree <- f2Pedigree(500)
 		pedigree@selfing <- "finite"
@@ -55,7 +55,7 @@ test_that("Test that imputations at positions look right for F2 populations",
 	})
 test_that("Test that imputations at positions look right for 4-way population using a single funnel",
 	{
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		map[[1]] <- map[[1]][c(1:20, 80:101)]
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 1000, selfingGenerations = 1, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"

@@ -15,7 +15,7 @@ test_that("Test fully informative markers, with errors, no extra positions",
 			genotypesFromProbabilities <- do.call(rbind, genotypesFromProbabilities)
 			expect_gt(sum(diag(table(genotypesFromProbabilities, result@geneticData[[1]]@finals))) / length(genotypesFromProbabilities), 0.98)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
@@ -49,7 +49,7 @@ test_that("Test SNP markers, hets not called, and NA not assumed biased towards 
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / nLines(result), 0.7)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 2, intercrossingGenerations = 0, nSeeds = 1)
@@ -79,7 +79,7 @@ test_that("Test SNP markers, hets not called, and NA assumed biased towards hets
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / nLines(result), 0.83)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
@@ -113,7 +113,7 @@ test_that("Test SNP markers, with hets called, with errors, no extra positions",
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / nLines(result), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
@@ -146,7 +146,7 @@ test_that("Test fully informative markers, with errors, with extra positions",
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.8)
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.8)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
@@ -180,7 +180,7 @@ test_that("Test SNP markers, hets not called, and NA not assumed biased towards 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.66)
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.66)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 2, intercrossingGenerations = 0, nSeeds = 1)
@@ -210,7 +210,7 @@ test_that("Test SNP markers, hets not called, and NA assumed biased towards hets
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.67)
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.67)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)
@@ -244,7 +244,7 @@ test_that("Test SNP markers, with hets called, with errors, with extra positions
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M26"]))) / nLines(result), 0.67)
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], cross@geneticData[[1]]@finals[,"D1M27"]))) / nLines(result), 0.67)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 0, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize=500, selfingGenerations = 0, intercrossingGenerations = 1, nSeeds = 1)

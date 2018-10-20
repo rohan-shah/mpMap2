@@ -2,7 +2,7 @@ context("Test addExtraMarkers")
 
 test_that("Test validation",
 {
-	map <- sim.map(len = 20, n.mar = 21, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 20, n.mar = 21, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(200)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	cross <- new("mpcrossMapped", cross, map = map)
@@ -28,7 +28,7 @@ test_that("Test validation",
 })
 test_that("Test that markers go to the right place",
 {
-	map <- sim.map(len = 200, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 200, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(200)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	wholeRF <- estimateRF(cross)
@@ -43,7 +43,7 @@ test_that("Test that markers go to the right place",
 		mapped <- new("mpcrossMapped", grouped, map = estimatedMap, rf = grouped@rf)
 
 		imputed <- imputeFounders(mapped, errorProb = 0.1, extraPositions = generateGridPositions(1))
-		capture.output(added <- addExtraMarkers(imputed, newMarkers = subset2, reorder = FALSE, maxOffset = 15, reorderRadius = 40))
+		capture.output(added <- addExtraMarkers(imputed, newMarkers = subset2, reorder = FALSE, maxOffset = 15, reorderRadius = 40, attemptMpMap2Interactive = FALSE))
 		permutation <- sapply(markers(added$object), function(x) match(x, markers(cross)))
 		expect_gt(cor(1:101, permutation), 0.99)
 		reestimatedMap <- estimateMap(added$object, maxOffset = 15)

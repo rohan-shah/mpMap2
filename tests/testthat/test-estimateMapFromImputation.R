@@ -3,7 +3,7 @@ test_that("Check that estimation of gap sizes is approximately correct, for four
 	{
 		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 2000, selfingGenerations = 5, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"
-		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
 		cross <- subset(cross, markers = c(1:30, 70:100))
 		capture.output(rf <- estimateRF(cross))
@@ -20,7 +20,7 @@ test_that("Check that estimation of gap sizes is approximately correct, for eigh
 	{
 		pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 3000, selfingGenerations = 5, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"
-		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
 		cross <- subset(cross, markers = c(1:30, 70:100))
 		capture.output(rf <- estimateRF(cross))
@@ -37,7 +37,7 @@ test_that("Check that estimation of gap sizes is approximately correct, for eigh
 #	{
 #		pedigree <- sixteenParentPedigreeRandomFunnels(initialPopulationSize = 2000, selfingGenerations = 5, intercrossingGenerations = 0)
 #		pedigree@selfing <- "infinite"
-#		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+#		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 #		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
 #		cross <- subset(cross, markers = c(1:10, 90:100))
 #		rf <- estimateRFSingleDesign(cross, verbose = TRUE)

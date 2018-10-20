@@ -1,7 +1,7 @@
 context("Test subsetting of mpcrossMapped objects")
 test_that("Subsetting of mapped objects by markers discards map, unless keepMap is specified",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)
@@ -19,7 +19,7 @@ test_that("Subsetting of mapped objects by markers discards map, unless keepMap 
 })
 test_that("Subsetting of mapped objects by lines discards rf data",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)
@@ -33,7 +33,7 @@ test_that("Subsetting of mapped objects by lines discards rf data",
 })
 test_that("Subsetting of mapped objects by markers keeps rf data",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)
@@ -46,7 +46,7 @@ test_that("Subsetting of mapped objects by markers keeps rf data",
 })
 test_that("Subsetting of mapped objects by chromosomes keeps map and rf data",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)
@@ -59,7 +59,7 @@ test_that("Subsetting of mapped objects by chromosomes keeps map and rf data",
 })
 test_that("Subsetting of mapped objects by line names works for probabilities, with infinite selfing",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 2, selfingGenerations = 1, intercrossingGenerations = 0)
 	pedigree@selfing <- "infinite"
 	cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -77,7 +77,7 @@ test_that("Subsetting of mapped objects by line names works for probabilities, w
 })
 test_that("Subsetting of mapped objects by line names works for probabilities, with finite selfing",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 2, selfingGenerations = 1, intercrossingGenerations = 0)
 	pedigree@selfing <- "finite"
 	cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)

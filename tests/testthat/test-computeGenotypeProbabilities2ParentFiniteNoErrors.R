@@ -15,7 +15,7 @@ test_that("Test zero generations of intercrossing, codominant markers, no errors
 			expect_true(all(genotypesFromProbabilities == result@geneticData[[1]]@finals))
 			expect_true(all(result@geneticData[[1]]@probabilities@data[1:30, 1:30] == 1 | result@geneticData[[1]]@probabilities@data[1:30, 1:30] == 0))
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 100)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -37,7 +37,7 @@ test_that("Test zero generations of intercrossing, dominant markers, no errors, 
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities), 0.9)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = 500)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -58,7 +58,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 			#The most probable founders should agree with the actual data, except for the case where the line really is hetrozygous. 
 			expect_true(all(genotypesFromProbabilities == result@geneticData[[1]]@finals))
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 100, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -90,7 +90,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 			#The most probable founders should agree with the actual data, most of the time. It won't be exact. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities, cross@geneticData[[1]]@finals))) / length(genotypesFromProbabilities), 0.83)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -124,7 +124,7 @@ test_that("Test zero generations of intercrossing, codominant markers, no errors
 			#In this particular scenario recombinations are marked as occuring between extra and D1M27, rather than the first pair. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.75)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = sampleSize)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -149,7 +149,7 @@ test_that("Test zero generations of intercrossing, dominant markers, no errors, 
 			#In this particular scenario recombinations are marked as occuring between extra and D1M27, rather than the first pair. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.75)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(populationSize = sampleSize)
 		pedigree@selfing <- "finite"
 		testFunc(map, pedigree)
@@ -173,7 +173,7 @@ test_that("Test non-zero generations of intercrossing, codominant markers, no er
 			#In this particular scenario recombinations are marked as occuring between extra and D1M27, rather than the first pair. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.75)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)
@@ -208,7 +208,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 			#In this particular scenario recombinations are marked as occuring between extra and D1M27, rather than the first pair. 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.75)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 2)

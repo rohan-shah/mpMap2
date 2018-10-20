@@ -2,7 +2,7 @@ context("multiparentSNP")
 test_that("Check that multiparentSNP respects NA values",
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 0)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		indicesNA <- sort(sample(1:(nMarkers(cross) * nLines(cross)), nMarkers(cross)*nLines(cross)/2, replace=FALSE))
 		cross@geneticData[[1]]@finals[indicesNA] <- NA
@@ -19,7 +19,7 @@ test_that("Check that multiparentSNP works for multiple designs",
 {
 	pedigree1 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 50, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
 	pedigree2 <- fourParentPedigreeSingleFunnel(initialPopulationSize = 50, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 0)
-	map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	cross1 <- simulateMPCross(map=map, pedigree=pedigree1, mapFunction = haldane)
 	cross2 <- simulateMPCross(map=map, pedigree=pedigree2, mapFunction = haldane)
 	combined <- cross1 + cross2
@@ -33,7 +33,7 @@ test_that("Check that multiparentSNP works for multiple designs",
 test_that("Check that multiparentSNP works for a 4-way intercross",
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 0)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(TRUE)
 		cross3 <- cross + multiparentSNP(FALSE)
@@ -41,7 +41,7 @@ test_that("Check that multiparentSNP works for a 4-way intercross",
 test_that("Check that multiparentSNP doesn't work for an F2 or RIL",
 	{
 		pedigree <- f2Pedigree(500)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		expect_that(cross+ multiparentSNP(keepHets = TRUE), throws_error())
 		expect_that(cross+ multiparentSNP(keepHets = FALSE), throws_error())
@@ -60,7 +60,7 @@ test_that("Check that multiparentSNP C code works the same as R code for four-wa
 			for(selfingGenerations in c(0, 6))
 			{
 				pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = selfingGenerations, nSeeds = 1, intercrossingGenerations = intecrossingGenerations)
-				map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+				map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 				for(keepHets in c(FALSE, TRUE))
 				{
 					for(seed in 1:3)
@@ -83,7 +83,7 @@ test_that("Check that multiparentSNP C code works the same as R code for eight-w
 			for(selfingGenerations in c(0, 6))
 			{
 				pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = selfingGenerations, nSeeds = 1, intercrossingGenerations = intecrossingGenerations)
-				map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+				map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 				for(keepHets in c(FALSE, TRUE))
 				{
 					for(seed in 1:3)

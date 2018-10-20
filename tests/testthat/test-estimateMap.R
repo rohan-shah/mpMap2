@@ -2,7 +2,7 @@ context("Test estimateMap")
 test_that("Check that argument maxMarkers works correctly", 
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")

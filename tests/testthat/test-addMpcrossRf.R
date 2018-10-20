@@ -2,7 +2,7 @@ context("Test addition of mpcrossRf objects")
 
 test_that("Cannot combine object with itself",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(10)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
@@ -10,7 +10,7 @@ test_that("Cannot combine object with itself",
 	})
 test_that("Checking f2 pedigree split into 10 different datasets gives the same answer",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		separateRf <- estimateRF(subset(cross, lines = 1:50))
@@ -25,7 +25,7 @@ test_that("Checking f2 pedigree split into 10 different datasets gives the same 
 	})
 test_that("Checking that f2 experiment split into two different subsets gives the same answer",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(1000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross@geneticData[[1]]@finals[1:500,1:3] <- cross@geneticData[[1]]@finals[501:1000,9:11] <- NA

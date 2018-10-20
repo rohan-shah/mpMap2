@@ -1,7 +1,7 @@
 context("Test subsetting of mpcrossLG objects")
 test_that("Subsetting of mpcrossLG objects by lines discards rf data, and warns about retaining linkage group data",
 {
-	map <- sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = rep(100, 2), n.mar = rep(11, 2), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)

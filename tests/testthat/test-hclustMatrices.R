@@ -3,7 +3,7 @@ functionNames <- c("hclustThetaMatrix", "hclustCombinedMatrix", "hclustLodMatrix
 requiresLod <- c("hclustCombinedMatrix", "hclustLodMatrix")
 test_that("hclustMatrices throws appropriate exceptions",
 {
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(10)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	#Throws, wrong class
@@ -51,7 +51,7 @@ test_that("hclustMatrices throws appropriate exceptions",
 })
 test_that("hclustThetaMatrix call gives expected results",
 {
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(10)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)
@@ -104,7 +104,7 @@ test_that("hclustThetaMatrix call gives expected results",
 })
 test_that("hclustLodMatrix call gives expected results",
 {
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(10)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross, keepLod = TRUE)
@@ -157,7 +157,7 @@ test_that("hclustLodMatrix call gives expected results",
 })
 test_that("hclustCombinedMatrix call gives expected results",
 {
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(10)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross, keepLod = TRUE)

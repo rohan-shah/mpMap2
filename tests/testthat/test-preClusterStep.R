@@ -2,7 +2,7 @@ context("Test pre cluster call to aggregate markers")
 
 test_that("preClusterStep throws appropriate exceptions",
 {
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(500)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	#Throws, wrong class
@@ -18,7 +18,7 @@ test_that("preClusterStep throws appropriate exceptions",
 test_that("preClusterStep call gives expected results",
 {
 	#We only need the rawSymmetricMatrix object, but it's easiest to construct it this way. 
-	map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+	map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 	f2Pedigree <- f2Pedigree(1)
 	cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 	rf <- estimateRF(cross)

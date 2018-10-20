@@ -12,7 +12,7 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 			expect_identical(length(subsetted@geneticData[[1]]@hetData), 1L)
 			expect_identical(cross@geneticData[[1]]@hetData[[marker]], subsetted@geneticData[[1]]@hetData[[1]])
 		}
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		
@@ -37,7 +37,7 @@ test_that("Checking subset on object of class mpcross by markers, with a single 
 	})
 test_that("Subset refuses to duplicate markers and lines",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(1000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		expect_that(subset(cross, markers = rep(1:nMarkers(cross), each = 2)), throws_error("Duplicates detected"))
@@ -45,7 +45,7 @@ test_that("Subset refuses to duplicate markers and lines",
 	})
 test_that("Subset changes the pedigree from detailedPedigree to pedigree when subsetting by lines",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(1000)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		expect_that(cross@geneticData[[1]]@pedigree, is_a("detailedPedigree"))
@@ -58,7 +58,7 @@ test_that("Subset changes the pedigree from detailedPedigree to pedigree when su
 	})
 test_that("Checking subset on object of class mpcross by markers, with two datasets",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(1000)
 
 		#Test function for an object with a pair of datasets
@@ -104,7 +104,7 @@ test_that("Checking subset on object of class mpcross by markers, with two datas
 	})
 test_that("Checking subset by lines when imputation data is present",
 	{
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		mapped <- new("mpcrossMapped", cross, map = map)

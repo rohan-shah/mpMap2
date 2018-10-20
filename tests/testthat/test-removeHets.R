@@ -3,7 +3,7 @@ context("removeHets")
 test_that("Check that removeHets works in F2",
 	{
 		pedigree <- f2Pedigree(100)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		withoutHets <- cross + removeHets()
 		expect_equal(sum(is.na(withoutHets@geneticData[[1]]@finals)), sum(cross@geneticData[[1]]@finals == 3))
@@ -14,7 +14,7 @@ test_that("Check that removeHets works in F2",
 test_that("Check that removeHets correctly handles the biparental case where the encodings don't start at 1",
 	{
 		pedigree <- rilPedigree(100, 5)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
 
 		#Alter everything by adding 10
@@ -30,7 +30,7 @@ test_that("Check that removeHets correctly handles the biparental case where the
 test_that("Check that removeHets correctly handles the 4-parent case where the encodings don't start at 1",
 	{
 		pedigree <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 1, nSeeds = 1, intercrossingGenerations = 0)
-		map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
 		expect_identical(cross, cross + removeHets())
 

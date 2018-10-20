@@ -2,7 +2,7 @@ context("genotype probability computation, two parents, infinite selfing, with e
 test_that("Test zero generations of intercrossing, with errors, no extra positions",
 	{
 		sampleSize <- 500
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- rilPedigree(populationSize = sampleSize, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -51,7 +51,7 @@ test_that("Test non-zero generations of intercrossing, with errors, no extra pos
 			expect_gt(cor(genotypesFromProbabilities[,"D1M26"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.86)
 			expect_true(all(result@geneticData[[1]]@probabilities@data[1:10,1:20] != 1 & result@geneticData[[1]]@probabilities@data[1:10,1:20] != 0))
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
@@ -66,7 +66,7 @@ test_that("Test zero generations of intercrossing, with errors, with extra posit
 	{
 		sampleSize <- 500
 
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- rilPedigree(populationSize = sampleSize, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -114,7 +114,7 @@ test_that("Test non-zero generations of intercrossing, with errors, with extra p
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.85)
 			expect_gt(cor(genotypesFromProbabilities[,"D1M27"], genotypesFromProbabilities[,"extra"], method = "spearman"), 0.85)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)

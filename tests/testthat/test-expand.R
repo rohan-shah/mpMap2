@@ -1,6 +1,6 @@
 context("expand")
 pedigree <- f2Pedigree(10)
-map <- sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 rf <- estimateRF(cross, keepLod = TRUE, keepLkhd=TRUE)
 

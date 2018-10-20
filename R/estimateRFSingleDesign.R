@@ -1,3 +1,4 @@
+#' @export
 estimateRFSingleDesign <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 {
 	inheritsNewMpcrossArgument(object)

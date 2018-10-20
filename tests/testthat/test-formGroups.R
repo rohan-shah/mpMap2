@@ -2,7 +2,7 @@ context("Test formGroups")
 test_that("Check that formGroups can be applied multiple times", 
 	{
 		f2Pedigree <- f2Pedigree(100)
-		map <- sim.map(len = rep(100, 2), n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 2), n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 		formGroups <- formGroups(mpcrossRF = rf, groups = 2, method = "average", clusterBy = "theta")
@@ -13,7 +13,7 @@ test_that("Check that formGroups can be applied multiple times",
 test_that("Check that formGroups requires lod entry if clusterBy is \"combined\" or \"lod\"",
 	{
 		f2Pedigree <- f2Pedigree(100)
-		map <- sim.map(len = rep(100, 2), n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 2), n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross)
 
@@ -33,7 +33,7 @@ test_that("Check that formGroups requires lod entry if clusterBy is \"combined\"
 test_that("Check that formGroups works for an f2 design",
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = rep(100, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
 
@@ -58,7 +58,7 @@ test_that("Check that formGroups works for an f2 design",
 test_that("Check that formGroups works for an f2 design with small chromosomes",
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = rep(5, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(5, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE)
 
@@ -84,7 +84,7 @@ test_that("Check that formGroups works for an f2 design with small chromosomes",
 test_that("Check that formGroups works for a ril design",
 	{
 		f2Pedigree <- rilPedigree(1000, selfingGenerations = 10)
-		map <- sim.map(len = rep(100, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 2), n.mar = 100, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		suppressWarnings(rf <- estimateRF(cross, keepLod = TRUE, keepLkhd = TRUE))
 

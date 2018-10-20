@@ -15,7 +15,7 @@ test_that("Test zero generations of intercrossing",
 			#The most probable founders should agree with the actual data, except for the case where the line really is hetrozygous. 
 			expect_true(all((genotypesFromProbabilities == result@geneticData[[1]]@finals) | is.na(result@geneticData[[1]]@finals)))
 		}
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 6, intercrossingGenerations = 1, nSeeds = 1)
 		pedigrees[[2]] <- fourParentPedigreeSingleFunnel(initialPopulationSize = 500, selfingGenerations = 6, intercrossingGenerations = 1, nSeeds = 1)
@@ -41,7 +41,7 @@ test_that("Test non-zero generations of intercrossing",
 			#The most probable founders should agree with the actual data, except for the case where the line really is hetrozygous. 
 			expect_true(all((genotypesFromProbabilities == result@geneticData[[1]]@finals) | is.na(result@geneticData[[1]]@finals)))
 		}
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigrees <- list()
 		pedigrees[[1]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigrees[[2]] <- fourParentPedigreeRandomFunnels(initialPopulationSize = 500, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)

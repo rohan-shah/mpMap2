@@ -2,7 +2,7 @@ context("Test ordering function")
 test_that("Test that not having rf data generates an error",
 	{
 		f2Pedigree <- f2Pedigree(100)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)
@@ -17,7 +17,7 @@ test_that("Test that not having rf data generates an error",
 test_that("Test that correct ordering is generated for an F2 population", 
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)
@@ -30,7 +30,7 @@ test_that("Test that correct ordering is generated for an F2 population",
 test_that("Test that identical orderings are generate with and without imputedTheta slot", 
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross <- subset(cross, markers = sample(1:101))
 		rf <- estimateRF(cross)
@@ -47,7 +47,7 @@ test_that("Test that identical orderings are generate with and without imputedTh
 test_that("Test that correct ordering is generated for an F2 population with two chromosomes", 
 	{
 		f2Pedigree <- f2Pedigree(1000)
-		map <- sim.map(len = rep(100, 2), n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = rep(100, 2), n.mar = 101, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=f2Pedigree, mapFunction = haldane)
 		cross <- subset(cross, markers = sample(1:202))
 		rf <- estimateRF(cross)
@@ -62,7 +62,7 @@ test_that("Test that correct ordering is generated for an F2 population with two
 test_that("Test that we can order a single marker group",
 	{
 		pedigree <- f2Pedigree(100)
-		map <- sim.map(len = 100, n.mar = 1, anchor.tel=FALSE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 1, anchor.tel=FALSE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		rf <- estimateRF(cross, verbose = FALSE)
 		grouped <- new("mpcrossLG", rf, rf = rf@rf, lg = new ("lg", groups = c("D1M1" = 1L), allGroups = 1L))

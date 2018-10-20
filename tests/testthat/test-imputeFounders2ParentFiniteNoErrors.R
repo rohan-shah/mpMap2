@@ -17,8 +17,8 @@ test_that("Test zero generations of intercrossing",
 
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
-		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map1 <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map2 <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 		pedigree1 <- f2Pedigree(500)
 		pedigree1@selfing <- "finite"
@@ -51,8 +51,8 @@ test_that("Test non-zero generations of intercrossing",
 			
 			expect_true(all(result@geneticData[[1]]@imputed@errors == 0))
 		}
-		map1 <- sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
-		map2 <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map1 <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map2 <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 500, selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "finite"

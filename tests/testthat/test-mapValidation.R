@@ -1,6 +1,6 @@
 context("map validation")
 
-map <- sim.map(len = rep(100, 3), n.mar = 11, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
+map <- qtl::sim.map(len = rep(100, 3), n.mar = 11, anchor.tel = T, include.x=FALSE, sex.sp=FALSE, eq.spacing=T)
 
 test_that("Generated map passes validation", 
 	{

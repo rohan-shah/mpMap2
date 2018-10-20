@@ -1,7 +1,7 @@
 context("Test that lineWeights argument works")
 test_that("Checking that value of lineWeights option doesn't change results for f2",
 	{
-		map <- sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = 100, n.mar = 11, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		f2Pedigree <- f2Pedigree(50)
 		nReps <- 4
 		for(i in 1:nReps)

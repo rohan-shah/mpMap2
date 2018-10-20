@@ -2,7 +2,7 @@ context("getPositions")
 
 test_that("Checking that code to get marker positions works",
 	{
-		map <- sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(100, 100), n.mar = 101, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- f2Pedigree(500)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		mapped <- new("mpcrossMapped", cross, map = map)

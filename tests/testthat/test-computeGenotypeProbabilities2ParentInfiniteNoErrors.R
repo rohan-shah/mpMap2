@@ -1,7 +1,7 @@
 context("genotype probability computation, two parents, infinite selfing, no errors")
 test_that("Test zero generations of intercrossing, no errors, no extra positions",
 	{
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- rilPedigree(populationSize = 1000, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		#First check that with fully informative markers we get back the original data. 
@@ -38,7 +38,7 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 			booleans <- result@geneticData[[1]]@probabilities@data[1:100,1:20] == 1 | result@geneticData[[1]]@probabilities@data[1:100,1:20] == 0
 			expect_gt(sum(booleans) / length(booleans), 0.92)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)
@@ -51,7 +51,7 @@ test_that("Test non-zero generations of intercrossing, no errors, no extra posit
 	})
 test_that("Test zero generations of intercrossing, no errors, with extra positions",
 	{
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree <- rilPedigree(populationSize = 1000, selfingGenerations = 6)
 		pedigree@selfing <- "infinite"
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + removeHets()
@@ -92,7 +92,7 @@ test_that("Test non-zero generations of intercrossing, no errors, with extra pos
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"], method = "spearman"), 0.91)
 			expect_gt(cor(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"], method = "spearman"), 0.91)
 		}
-		map <- sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
+		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 1)
 		pedigree1@selfing <- "infinite"
 		pedigree2 <- twoParentPedigree(initialPopulationSize = 1000, selfingGenerations = 6, nSeeds = 1, intercrossingGenerations = 2)

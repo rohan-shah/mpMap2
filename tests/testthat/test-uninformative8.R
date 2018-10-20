@@ -4,7 +4,7 @@ test_that("Check that the eight-parent uninformative marker combination gives an
 		testInfiniteSelfing <- function(pedigree)
 		{
 			pedigree@selfing <- "infinite"
-			map <- sim.map(len = 10, n.mar = 2, anchor.tel=TRUE, include.x=FALSE, sex.sp=FALSE, eq.spacing=TRUE)
+			map <- qtl::sim.map(len = 10, n.mar = 2, anchor.tel=TRUE, include.x=FALSE, sex.sp=FALSE, eq.spacing=TRUE)
 			cross <- simulateMPCross(pedigree = pedigree, map = map, mapFunction = haldane)
 
 			firstColumnFunction <- function(x)
@@ -33,7 +33,7 @@ test_that("Check that the eight-parent uninformative marker combination gives an
 		testFiniteSelfing <- function(pedigree)
 		{
 			pedigree@selfing <- "finite"
-			map <- sim.map(len = 10, n.mar = 2, anchor.tel=TRUE, include.x=FALSE, sex.sp=FALSE, eq.spacing=TRUE)
+			map <- qtl::sim.map(len = 10, n.mar = 2, anchor.tel=TRUE, include.x=FALSE, sex.sp=FALSE, eq.spacing=TRUE)
 			cross <- simulateMPCross(pedigree = pedigree, map = map, mapFunction = haldane)
 			firstHetData <- cross@geneticData[[1]]@hetData[[1]]
 			secondHetData <- cross@geneticData[[1]]@hetData[[2]]
