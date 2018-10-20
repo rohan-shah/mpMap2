@@ -14,7 +14,7 @@
 #' pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 10, 
 #' 	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 10)
 #' #Generate map
-#' map <- sim.map()
+#' map <- qtl::sim.map()
 #' #Simulate data
 #' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
 #' #Get out a list of funnels, which are rows of this matrix. For this pedigree, every funnel is a random ordering of 1:8. 

@@ -13,7 +13,7 @@
 #' @examples 
 #' pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 10, 
 #' 	selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)
-#' map <- sim.map()
+#' map <- qtl::sim.map()
 #' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
 #' #Get out a list of funnels, which are rows of this matrix. For this pedigree, every funnel is 1:8. 
 #' getAllFunnels(cross)
