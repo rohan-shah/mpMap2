@@ -1,6 +1,7 @@
 context("Test estimateMapFromImputation")
 test_that("Check that estimation of gap sizes is approximately correct, for four parent designs", 
 	{
+		set.seed(1)
 		pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 2000, selfingGenerations = 5, intercrossingGenerations = 0)
 		pedigree@selfing <- "finite"
 		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
@@ -14,7 +15,7 @@ test_that("Check that estimation of gap sizes is approximately correct, for four
 		mapped@geneticData[[1]]@pedigree@selfing <- "infinite"
 		suppressWarnings(imputed <- imputeFounders(mapped, errorProb = 0.01))
 		reestimated <- estimateMapFromImputation(imputed)
-		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.04, check.attributes = FALSE)
+		expect_equal(reestimated@map[[1]]["D1M70"] - reestimated@map[[1]]["D1M30"], 40, tolerance = 0.06, check.attributes = FALSE)
 	})
 test_that("Check that estimation of gap sizes is approximately correct, for eight parent designs", 
 	{
