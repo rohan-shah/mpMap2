@@ -19,7 +19,7 @@ test_that("Test non-zero generations of intercrossing, with marker heterozygotes
 			endHet <- nrow(tmp)
 			expect_gt(sum(diag(tmp)) / sum(tmp), 0.945)
 			#If a het is called, it should be correct with at least 95% chance
-			expect_gt(sum(diag(tmp[5:endHet,5:endHet])) / sum(tmp[5:endHet,]), 0.95)
+			expect_gt(sum(diag(tmp[5:endHet,5:endHet])) / sum(tmp[5:endHet,]), 0.945)
 			#If a het is called, and the true genotype is a het, then the called het should be correct with at least 94% chance
 			expect_gt(sum(diag(tmp[5:endHet,5:endHet])) / sum(tmp[5:endHet,5:endHet]), 0.94)
 			#If a homozygote is called, it should be correct with a higher probability

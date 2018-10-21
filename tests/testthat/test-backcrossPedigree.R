@@ -8,5 +8,5 @@ test_that("Test that genetic data is as expected",
 		#Expect that there are only two genotypes
 		expect_identical(length(proportions), 2L)
 		#Expect that proportions are close to half. 
-		expect_true(all(abs(proportions - 0.5) < 0.02))
+		expect_true(all(abs(proportions - 0.5) < 0.03))
 	})

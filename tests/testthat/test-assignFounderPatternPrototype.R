@@ -127,6 +127,10 @@ test_that("Check that works with random SNP markers, 4-way design",
 	manuallyChanged <- cross + mpMap2:::assignFounderPatternPrototype(changed@geneticData[[1]]@founders) + removeHets()
 	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders) + removeHets()
 	expect_identical(manuallyChanged, manuallyChanged_cpp)
+	
+	manuallyChanged <- manuallyChanged + removeHets()
+	manuallyChanged_cpp <- manuallyChanged_cpp + removeHets()
+	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
 	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 0L, 0L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
