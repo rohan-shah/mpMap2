@@ -171,7 +171,7 @@ namespace arsaRaw
 		std::vector<double>& levels = args.levels;
 		if(std::find(rawDist, rawDist + n*n, (Rbyte)255) != rawDist+n*n)
 		{
-			throw std::runtime_error("Internal error: Missing values must be imputed before calling arsaRawParallel");
+			throw std::runtime_error("Internal error: Missing values must be imputed before calling arsaRaw");
 		}
 		double cool = args.cool;
 		double temperatureMin = args.temperatureMin;
