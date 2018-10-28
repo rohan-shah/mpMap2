@@ -294,9 +294,14 @@ BEGIN_RCPP
 #endif
 				};
 			}
-			unsigned char* originalRawPtr = &(thetaRawData[0]);
+			std::vector<unsigned char> thetaRawDataCopied = imputedRaw;
+			unsigned char* originalRawPtr = &(thetaRawDataCopied[0]);
 			std::vector<std::pair<int, int> > reportedErrors;
 			bool imputationResult = impute(originalRawPtr, imputedRawPtr, levels, NULL, NULL, contiguousIndices, imputationProgressFunction, false, reportedErrors);
+			if(std::find(imputedRaw.begin(), imputedRaw.end(), 255) != imputedRaw.end())
+			{
+				throw std::runtime_error("Internal error in order.cpp");
+			}
 			if(verbose)
 			{
 				close(barHandle);
