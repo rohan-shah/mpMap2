@@ -86,13 +86,16 @@ as.mpInterval.mpInterval <- function(object, homozygoteMissingProb, heterozygote
 		{
 			currentChrMap <- object@map[[chromosome]]
 
-			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrMap
-			wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrMap)]
-			wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrMap)]
-
 			positionIndices <- match(names(midPoints[[chromosome]]), flattenedProbabilitiesMap)
 			probabilityPositionIndices <- unlist(sapply(positionIndices, function(x) (x*currentDataFounders - (currentDataFounders - 1)):(x*currentDataFounders)))
 			wgaimObject$geno[[chromosome]]$intval <- transformed$probabilities[,probabilityPositionIndices]
+
+			currentChrUnique <- currentChrMap[!duplicated(currentChrMap)]
+			#There is a class attribute that needs to be kept
+			class(currentChrUnique) <- class(currentChrMap)
+			wgaimObject$geno[[chromosome]]$map <- wgaimObject$geno[[chromosome]]$dist <- currentChrUnique
+			wgaimObject$geno[[chromosome]]$data <- transformed$finals[,names(currentChrUnique)]
+			wgaimObject$geno[[chromosome]]$founders <- transformed$founders[,names(currentChrUnique)]
 		}
 		class(wgaimObject) <- c("mpInterval", "cross", "interval")
 		wgaimObject$gen.type <- "mpInterval"

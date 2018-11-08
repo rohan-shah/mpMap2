@@ -24,7 +24,7 @@ test_that("Test validation",
 	#Check that the resulting objcet is correct. 
 	capture.output(results <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, verbose = FALSE))
 	permutation <- match(markers(results$object), markers(cross))
-	expect_gt(abs(cor(permutation, 1:nMarkers(cross))), 0.95)
+	expect_gt(abs(cor(permutation, 1:nMarkers(cross))), 0.94)
 })
 test_that("Test that markers go to the right place",
 {

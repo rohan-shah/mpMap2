@@ -70,4 +70,30 @@ if(couldLoadPackages)
 			expect_true(all.equal(oldConverted$geno[[chr]]$data, newConverted$geno[[chr]]$data, check.attributes = FALSE))
 		}
 	})
+	test_that("Conversion removes co-located markers, with type = mpInterval",
+	{
+		pedigree <- eightParentPedigreeSingleFunnel(initialPopulationSize = 100, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
+		map <- qtl::sim.map(len=rep(200,2), n.mar=rep(101,2), eq.spacing=TRUE, include.x=FALSE)
+		map[[1]] <- c("added_1_1" = 0, "added_1_2" = 0, map[[1]])
+		map[[2]] <- c("added_2_1" = 0, "added_2_2" = 0, "added_2_3" = 0, map[[2]])
+
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		cross2 <- cross + removeHets()
+		mapped <- new("mpcrossMapped", cross2, map = map)
+		#This error probability is chosen to match the one in mpcross2int. It seems the one in mpcross2int can't be easily changed. 
+		expect_warning(newConverted <- as.mpInterval(mapped, type = "mpInterval", errorProb = 0.01, homozygoteMissingProb = 1, heterozygoteMissingProb = 1))
+
+		expectedMarkers <- length(unique(map[[1]]))
+		expectedIntervals <- length(unique(map[[1]])) - 1L
+		expectedColumns <- expectedIntervals*8L
+		expect_identical(ncol(newConverted$geno[[1]]$founders), expectedMarkers)
+		expect_identical(length(newConverted$geno[[1]]$map), expectedMarkers)
+		expect_identical(ncol(newConverted$geno[[1]]$intval), expectedColumns)
+		expect_identical(ncol(newConverted$geno[[1]]$data), expectedMarkers)
+
+		expect_identical(ncol(newConverted$geno[[2]]$founders), expectedMarkers)
+		expect_identical(length(newConverted$geno[[2]]$map), expectedMarkers)
+		expect_identical(ncol(newConverted$geno[[2]]$intval), expectedColumns)
+		expect_identical(ncol(newConverted$geno[[2]]$data), expectedMarkers)
+	})
 }
