@@ -1,8 +1,8 @@
 Package: mpMap2
 Type: Package
 Title: Multi-parent RIL genetic analysis
-Version: 0.0.5
-Date: 2018-11-27
+Version: 0.0.4
+Date: 2018-01-05
 Author: Rohan Shah and Emma Huang
 Maintainer: Rohan Shah <cran@bookshah.com>
 Description: Tools for constructing linkage maps, reconstructing haplotypes,
@@ -16,7 +16,7 @@ Depends:
 Suggests:
     testthat,
     mpMapInteractive2
-Imports:
+Imports: 
     ggplot2,
     Matrix,
     methods,
@@ -28,101 +28,3 @@ Imports:
     Heatplus,
     RColorBrewer,
     jsonlite
-LinkingTo: Rcpp
-RoxygenNote: 5.0.1
-Collate:
-    'Rcpp_exceptions.R'
-    'map-class.R'
-    'addExtraMarkerFromRawCall.R'
-    'addExtraMarkers.R'
-    'canSkipValidity.R'
-    'pedigree-class.R'
-    'hetData-class.R'
-    'geneticData-class.R'
-    'lg-class.R'
-    'rawSymmetricMatrix.R'
-    'rf-class.R'
-    'mpcross-class.R'
-    'additionOperators.R'
-    'as.mpInterval.R'
-    'assignFounderPattern.R'
-    'assignFounderPatternPrototype.R'
-    'backcrossPedigree.R'
-    'biparentalDominant.R'
-    'changeMarkerPosition.R'
-    'combineGenotypes.R'
-    'combineKeepRF.R'
-    'compressedProbabilities.R'
-    'computeAllEpistaticChiSquared.R'
-    'computeGenotypeProbabilities.R'
-    'createSNPTemplate.R'
-    'detailedPedigree-class.R'
-    'eightWayPedigreeImproperFunnels.R'
-    'eightWayPedigreeRandomFunnels.R'
-    'eightWayPedigreeSingleFunnel.R'
-    'estimateMap.R'
-    'estimateMapFromImputation.R'
-    'estimateRF.R'
-    'estimateRFSingleDesign.R'
-    'expand.R'
-    'expandedProbabilities.R'
-    'exportMapToPretzl.R'
-    'extraImputationPoints.R'
-    'f2Pedigree.R'
-    'finals.R'
-    'fixedNumberOfFounderAlleles.R'
-    'formGroups.R'
-    'founders.R'
-    'fourParentPedigreeRandomFunnels.R'
-    'fourParentPedigreeSingleFunnel.R'
-    'fullHetData.R'
-    'generateGridPositions.R'
-    'generateIntervalMidPoints.R'
-    'getAllFunnels.R'
-    'getChromosomes.R'
-    'getIntercrossingAndSelfingGenerations.R'
-    'getPositions.R'
-    'hetData.R'
-    'imputationGenerics.R'
-    'impute.R'
-    'imputeFounders.R'
-    'jitterMap.R'
-    'lineNames.R'
-    'listCodingErrors.R'
-    'mapFunctions.R'
-    'markers.R'
-    'mpcross.R'
-    'multiparentSNP.R'
-    'multiparentSNPPrototype.R'
-    'nFounders.R'
-    'nLines.R'
-    'nMarkers.R'
-    'orderCross.R'
-    'pedigree.R'
-    'pedigreeGraph-class.R'
-    'pedigreeGraph.R'
-    'pedigreeToGraph.R'
-    'plot.R'
-    'plotMosaic.R'
-    'plotProbabilities.R'
-    'print.R'
-    'purdyToPedigree.R'
-    'redact.R'
-    'removeHets.R'
-    'reorderPedigree.R'
-    'reverseChromosomes.R'
-    'rilPedigree.R'
-    'roxygen.R'
-    'selfing.R'
-    'show.R'
-    'simulateMPCross.R'
-    'simulatePhenotypes.R'
-    'singleLocusProbabilities.R'
-    'sixteenParentPedigreeRandomFunnels.R'
-    'stripPedigree.R'
-    'subset.R'
-    'testDistortion.R'
-    'toMpMap.R'
-    'transposeProbabilities.R'
-    'twoParentPedigree.R'
-    'validation.R'
