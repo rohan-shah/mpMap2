@@ -32,7 +32,7 @@ before_install:
  - mkdir -p ~/.R
  - echo "VkVSPS01DQpDQz1nY2MkKFZFUikgDQpDWFg9ZysrJChWRVIpDQpTSExJQl9DWFhMRD1nKyskKFZFUikNCkZDPWdmb3J0cmFuJChWRVIpDQpGNzc9Z2ZvcnRyYW4kKFZFUik=" | base64 -d > ~/.R/Makevars
  - cat ~/.R/Makevars
- - Rscript -e 'source("https://bioconductor.org/biocLite.R");  biocLite("Heatplus")'
+ - Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)){install.packages("BiocManager")}; BiocManager::install("Heatplus")'
 
 notifications:
   email:
