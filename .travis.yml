@@ -1,38 +1,16 @@
-language: r
-cache: packages
 sudo: required
-warnings_are_errors: false
-latex: false
 dist: trusty
+services: docker
 
-matrix:
-  include:
-   - os: linux
-     compiler: gcc 
-     addons: 
-       apt:
-         sources: ['ubuntu-toolchain-r-test']
-         packages:
-          - g++-5
-          - gfortran-5
-     env:
-      - COMPILER=g++-5
-      - CC=gcc-5
-      - CXX=g++-5
-      - FC=gfortran-5
-      - F77=gfortran-5
-      - _R_CHECK_FORCE_SUGGESTS_=0
-      - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
-      - _R_CHECK_TESTS_NLINES_=100
+env:
+  global:
+   - DOCKER_OPTS="--rm -ti -v $(pwd):/mnt -w /mnt"
 
 before_install:
- - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 100
- - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 100
- - sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-5 100
- - mkdir -p ~/.R
- - echo "VkVSPS01DQpDQz1nY2MkKFZFUikgDQpDWFg9ZysrJChWRVIpDQpTSExJQl9DWFhMRD1nKyskKFZFUikNCkZDPWdmb3J0cmFuJChWRVIpDQpGNzc9Z2ZvcnRyYW4kKFZFUik=" | base64 -d > ~/.R/Makevars
- - cat ~/.R/Makevars
- - Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)){install.packages("BiocManager")}; BiocManager::install("Heatplus")'
+ - docker pull rohanshahcsiro/mpmap2-ci
+
+install: 
+ - docker run ${DOCKER_OPTS} rohanshahcsiro/mpmap2-ci R CMD build .
 
 notifications:
   email:
@@ -44,7 +22,5 @@ after_failure:
 - find *Rcheck -name '00install.out' -print -exec tail -n 100 '{}' \;
 - find *Rcheck -name '00check.log' -print -exec tail -n 100 '{}' \;
 
-script: 
-  - |
-    travis_wait 20 R CMD build . --no-manual
-    travis_wait  R CMD check mpMap2*tar.gz --no-manual
+script:
+ - docker run ${DOCKER_OPTS} rohanshahcsiro/mpmap2-ci R CMD check --no-vignettes --no-manual mpMap2_*.tar.gz
