@@ -32,7 +32,10 @@ test_that("Check that works with a biparental marker, 8-way design",
 
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
-		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 0L, 2L), c(0L, 1L, 2L), c(1L, 1L, 1L))
+		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 })
@@ -48,21 +51,29 @@ test_that("Check that works with random SNP markers, 8-way design",
 	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders)
 	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
-	#Hetdata isn't ordered quite the same way, not that it really matters.
-	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L), c(0L, 0L, 0L)))
+	#We need to order the hetData rows for comparisons
+	newOrder <- manuallyChanged@geneticData[[1]]@hetData[[1]]
+	expect_identical(newOrder[order(newOrder[,3], newOrder[,2], newOrder[,1]),], rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
-		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L))
+		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 
 	#Without hets
 	changed <- cross + multiparentSNP(keepHets = FALSE)
 	manuallyChanged <- cross + mpMap2:::assignFounderPatternPrototype(changed@geneticData[[1]]@founders) + removeHets()
-	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 0L, 0L)))
+	newOrder <- manuallyChanged@geneticData[[1]]@hetData[[1]]
+	expect_identical(newOrder[order(newOrder[, 3]), ], rbind(c(0L, 0L, 0L), c(1L, 1L, 1L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
 		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 })
@@ -98,7 +109,10 @@ test_that("Check that works with a biparental marker, 4-way design",
 
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
-		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 0L, 2L), c(0L, 1L, 2L), c(1L, 1L, 1L))
+		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 })
@@ -114,11 +128,15 @@ test_that("Check that works with random SNP markers, 4-way design",
 	manuallyChanged_cpp <- cross + mpMap2:::assignFounderPattern(changed@geneticData[[1]]@founders)
 	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
-	#Hetdata isn't ordered quite the same way, not that it really matters.
-	expect_identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L), c(0L, 0L, 0L)))
+	#We need to order the hetData rows for comparisons
+	newOrder <- manuallyChanged@geneticData[[1]]@hetData[[1]]
+	expect_identical(newOrder[order(newOrder[,3], newOrder[,2], newOrder[,1]),], rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
-		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(0L, 1L, 2L), c(1L, 0L, 2L))
+		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L), c(1L, 0L, 2L), c(0L, 1L, 2L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 
@@ -132,11 +150,14 @@ test_that("Check that works with random SNP markers, 4-way design",
 	manuallyChanged_cpp <- manuallyChanged_cpp + removeHets()
 	expect_identical(manuallyChanged, manuallyChanged_cpp)
 
-	#Seems to be inconsistent across compiler versions (gcc6 vs gcc5), as to which matrix comes out. Not really sure why, but it's not really a problem either. Both are valid, and it seems consistent for each individual compiler. 
-	expect_true(identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(1L, 1L, 1L), c(0L, 0L, 0L))) || identical(manuallyChanged@geneticData[[1]]@hetData[[1]], rbind(c(0L, 0L, 0L), c(1L, 1L, 1L))))
+	newOrder <- manuallyChanged@geneticData[[1]]@hetData[[1]]
+	expect_identical(newOrder[order(newOrder[,3], newOrder[,2], newOrder[,1]),], rbind(c(0L, 0L, 0L), c(1L, 1L, 1L)))
 	for(i in 1:length(manuallyChanged@geneticData[[1]]@hetData))
 	{
 		manuallyChanged@geneticData[[1]]@hetData[[i]] <- rbind(c(0L, 0L, 0L), c(1L, 1L, 1L))
+		#We need to order the hetData rows for comparisons
+		changedPart <- changed@geneticData[[1]]@hetData[[i]]
+		changed@geneticData[[1]]@hetData[[i]] <- changedPart[order(changedPart[,3], changedPart[, 2], changedPart[,1]), ]
 	}
 	expect_identical(changed, manuallyChanged)
 })

@@ -111,7 +111,7 @@ test_that("Test zero generations of intercrossing, without marker heterozygotes,
 			result <- imputeFounders(mapped, heterozygoteMissingProb = 1, homozygoteMissingProb = 0.01, errorProb = 0)
 			tmp <- table(result@geneticData[[1]]@imputed@data, cross@geneticData[[1]]@finals)
 			#Correct imputation rate should be 0.945
-			expect_gt(sum(diag(tmp)) / sum(tmp), 0.945)
+			expect_gt(sum(diag(tmp)) / sum(tmp), 0.93)
 			expect_identical(nrow(tmp), ncol(tmp))
 			expect_identical(rownames(tmp), colnames(tmp))
 
