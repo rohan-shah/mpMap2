@@ -48,13 +48,6 @@ addExtraMarkerFromRawCall <- function(mpcrossMapped, newMarker, useOnlyExtraImpu
 		{
 			stop("There were no additional imputation points")
 		}
-		#Get out the imputation map
-		imputationMap <- imputationMap(mpcrossMapped)
-		#Flatten the imputation map
-		flattenedImputationMapNames <- flatImputationMapNames(mpcrossMapped)
-
-		flattenedImputationMapPositions <- unlist(imputationMap)
-		names(flattenedImputationMapPositions) <- flattenedImputationMapNames
 		#Get out imputation results only for the grid points
 		imputationGridResults <- imputationData(mpcrossMapped)[,extraImputationPoints(mpcrossMapped)]
 		#Compute chi squared statistics
@@ -63,13 +56,22 @@ addExtraMarkerFromRawCall <- function(mpcrossMapped, newMarker, useOnlyExtraImpu
 			model <- manova(newMarker ~ factor(x))
 			return(summary(model)$stats[1, 3])
 		})
-		testMap <- imputationMap
+		testMap <- imputationMap(mpcrossMapped)
 		testMap <- lapply(testMap, function(x) x[names(x) %in% extraImputationPoints(mpcrossMapped)])
 		class(testMap) <- "map"
 		return(new("addExtraMarkersStatistics", data = testStatistics, map = testMap))
 	}
 	else
 	{
+		imputationResults <- imputationData(mpcrossMapped)[, flatImputationMapNames(mpcrossMapped)]
+		#Compute chi squared statistics
+		testStatistics <- apply(imputationResults, 2, function(x)
+		{
+			model <- manova(newMarker ~ factor(x))
+			return(summary(model)$stats[1, 3])
+		})
+		testMap <- imputationMap(mpcrossMapped)
+		return(new("addExtraMarkersStatistics", data = testStatistics, map = testMap))
 		stop("This code path is not implemented yet")
 	}
 }
