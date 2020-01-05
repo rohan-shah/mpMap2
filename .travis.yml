@@ -23,4 +23,4 @@ after_failure:
 - find *Rcheck -name '00check.log' -print -exec tail -n 100 '{}' \;
 
 script:
- - docker run ${DOCKER_OPTS} rohanshahcsiro/mpmap2-ci R CMD check --no-vignettes --no-manual mpMap2_*.tar.gz
+ - docker run ${DOCKER_OPTS} rohanshahcsiro/mpmap2-ci _R_CHECK_FORCE_SUGGESTS_=false R CMD check --no-vignettes --no-manual mpMap2_*.tar.gz
