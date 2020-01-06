@@ -1,5 +1,5 @@
 #' @import qtl
-#' @importFrom igraph plot.igraph V E graph.empty vertices edges layout.reingold.tilford
+#' @importFrom igraph plot.igraph V E "E<-" graph.empty vertices edges layout.reingold.tilford
 #' @import methods
 #' @import utils
 #' @import ggplot2

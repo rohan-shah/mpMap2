@@ -220,7 +220,7 @@ SEXP estimateRFSingleDesign(SEXP object_, SEXP recombinationFractions_, SEXP mar
 		}
 		internalArgs.theta = &(theta[0]);
 
-		Rcpp::Environment progress("package:progress");
+		Rcpp::Environment progress = Rcpp::Environment::namespace_env("progress");
 		Rcpp::Environment progressBar = progress.get("progress_bar");
 		Rcpp::Function newProgressBar = progressBar["new"];
 		Rcpp::Environment barHandle;
