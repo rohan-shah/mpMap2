@@ -1,10 +1,10 @@
 #' @import qtl
-#' @import igraph
+#' @importFrom igraph plot.igraph V E graph.empty vertices edges layout.reingold.tilford
 #' @import methods
 #' @import utils
-#' @import stats
 #' @import ggplot2
 #' @import graphics
+#' @importFrom progress progress_bar
 #' @importFrom graphics plot
 #' @importFrom stats as.dist cutree pchisq rnorm
 #' @importFrom utils combn head tail

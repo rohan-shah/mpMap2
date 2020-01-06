@@ -12,8 +12,7 @@ License: GPL-2
 SystemRequirements: C++11
 LazyLoad: yes
 Depends:
-    R (>= 3.5.0),
-    progress
+    R (>= 3.5.0)
 LinkingTo: Rcpp
 Suggests:
     testthat,
@@ -29,7 +28,9 @@ Imports:
     nnls,
     Heatplus,
     RColorBrewer,
-    jsonlite
+    jsonlite,
+    progress,
+    stats
 RoxygenNote: 6.1.1
 Collate: 
     'Rcpp_exceptions.R'

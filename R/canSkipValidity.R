@@ -9,8 +9,6 @@ canSkipValidityInitialize <- function (.Object, ...)
     }
     if (length(args)) {
         Class <- class(.Object)
-        if (!is.na(match(Class, methods:::.BasicClasses)))
-            return(do.call(newBasic, c(list(Class), args)))
         ClassDef <- getClass(Class)
         snames <- allNames(args)
         which <- nzchar(snames)
