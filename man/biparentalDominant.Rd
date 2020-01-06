@@ -25,4 +25,3 @@ finals(dominantCross)[1:10,]
 #The heterozygotes are now coded the same as one of the homozygotes
 hetData(dominantCross)[1:4]
 }
-

@@ -19,7 +19,7 @@ This class describes a pedigree for an experimental design. Although package mpM
 
 \item{\code{warnImproperFunnels}}{A value indicating whether to warn the user about funnels with repeated founders.}
 }}
+
 \seealso{
 \code{\link[mpMap2]{pedigree-class}}, \code{\link[mpMap2]{simulateMPCross}}, \code{\link[mpMap2]{detailedPedigree-class}}, \code{\link[mpMap2]{rilPedigree}}, \code{\link[mpMap2]{f2Pedigree}}, \code{\link[mpMap2]{fourParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{fourParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{eightParentPedigreeRandomFunnels}}, \code{\link[mpMap2]{eightParentPedigreeSingleFunnel}}, \code{\link[mpMap2]{sixteenParentPedigreeRandomFunnels}}
 }
-

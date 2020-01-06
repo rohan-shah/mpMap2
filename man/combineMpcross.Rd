@@ -2,10 +2,10 @@
 % Please edit documentation in R/additionOperators.R
 \docType{methods}
 \name{+,mpcrossMapped,mpcrossMapped-method}
-\alias{+,mpcross,mpcross-method}
 \alias{+,mpcrossMapped,mpcrossMapped-method}
-\alias{+,mpcrossRF,mpcross-method}
+\alias{+,mpcross,mpcross-method}
 \alias{+,mpcrossRF,mpcrossRF-method}
+\alias{+,mpcrossRF,mpcross-method}
 \title{Combine mpcross objects}
 \usage{
 \S4method{+}{mpcrossMapped,mpcrossMapped}(e1, e2)
@@ -34,4 +34,3 @@ In general, the combined object will contain the input objects as separate datas
 
 Internally this function redirects to another generic named \code{addMpMap2}, because this generic allows for optional named arguments.
 }
-

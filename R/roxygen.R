@@ -6,7 +6,7 @@
 #' @import graphics
 #' @importFrom progress progress_bar
 #' @importFrom graphics plot
-#' @importFrom stats as.dist cutree pchisq rnorm
+#' @importFrom stats as.dist cutree pchisq rnorm cor manova na.omit
 #' @importFrom utils combn head tail
 #' @importFrom pryr address
 #' @importFrom fastcluster hclust

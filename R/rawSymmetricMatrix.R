@@ -27,6 +27,10 @@ checkRawSymmetricMatrix <- function(object)
 }
 .rawSymmetricMatrix <- setClass("rawSymmetricMatrix", slots = list(data = "raw", markers = "character", levels = "numeric"), validity = checkRawSymmetricMatrix)
 #' @rdname internalOperators
+#' @param i,j indices specifying elements to extract or replace
+#' @param x object from which to extract element(s)
+#' @param drop If TRUE the result is coerced to the lowest possible dimension
+#' @param ... Currently unused
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", drop = "logical"),
 	function(x, i, j, ..., drop)
 	{

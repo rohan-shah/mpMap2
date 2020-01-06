@@ -5,8 +5,8 @@
 \title{Impute underlying genotypes}
 \usage{
 imputeFounders(mpcrossMapped, homozygoteMissingProb = 1,
-  heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list(),
-  showProgress = FALSE)
+  heterozygoteMissingProb = 1, errorProb = 0,
+  extraPositions = list(), showProgress = FALSE)
 }
 \arguments{
 \item{mpcrossMapped}{An object containing genetic data and a genetic map}
@@ -33,4 +33,3 @@ This property (a stochastic semigroup property) fails to hold because the HMM is
 \description{
 Impute the most likely sequence of underlying genotypes, using the Viterbi algorithm
 }
-

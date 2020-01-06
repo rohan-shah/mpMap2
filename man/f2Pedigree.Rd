@@ -17,4 +17,3 @@ pedigree <- f2Pedigree(1000)
 #This pedigree is automatically marked as involving finite generations of selfing. 
 pedigree@selfing
 }
-

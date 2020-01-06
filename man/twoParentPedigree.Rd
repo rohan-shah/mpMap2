@@ -69,4 +69,3 @@ pedigree <- twoParentPedigree(initialPopulationSize = 10, selfingGenerations = 1
 graph <- pedigreeToGraph(pedigree)
 plotWOptions(graph)
 }
-

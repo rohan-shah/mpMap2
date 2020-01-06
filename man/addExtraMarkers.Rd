@@ -79,4 +79,3 @@ withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMa
 	reorder = FALSE, imputationArgs = list(errorProb = 0.02, 
 	extraPositions = generateGridPositions(1)))$object
 }
-

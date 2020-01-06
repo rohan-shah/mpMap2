@@ -22,4 +22,3 @@ Generate a four-parent pedigree starting from inbred founders, using a random fu
 \seealso{
 \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{twoParentPedigree}}
 }
-

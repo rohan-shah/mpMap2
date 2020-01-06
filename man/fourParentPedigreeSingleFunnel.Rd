@@ -25,4 +25,3 @@ Note that unlike \code{\link{fourParentPedigreeRandomFunnels}}, there is no inte
 \seealso{
 \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
 }
-

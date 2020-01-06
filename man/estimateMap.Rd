@@ -59,4 +59,3 @@ estimatedMap <- estimateMap(grouped, maxOffset = 10)
 #Create object that includes the map
 mapped <- new("mpcrossMapped", grouped, map = estimatedMap)
 }
-

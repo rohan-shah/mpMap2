@@ -14,4 +14,3 @@ rilPedigree(populationSize, selfingGenerations)
 \description{
 Generate a two-parent RIL pedigree which starts from inbred founders
 }
-

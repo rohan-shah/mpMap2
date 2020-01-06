@@ -37,4 +37,3 @@ pedigreeAsGraph <- pedigreeToGraph(pedigree)
 \seealso{
 \code{\link{eightParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
 }
-

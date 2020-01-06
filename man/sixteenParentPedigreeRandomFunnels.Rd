@@ -4,8 +4,8 @@
 \alias{sixteenParentPedigreeRandomFunnels}
 \title{Generate a sixteen-parent pedigree}
 \usage{
-sixteenParentPedigreeRandomFunnels(initialPopulationSize, selfingGenerations,
-  nSeeds = 1L, intercrossingGenerations)
+sixteenParentPedigreeRandomFunnels(initialPopulationSize,
+  selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 }
 \arguments{
 \item{initialPopulationSize}{The number of F1 lines generated}
@@ -22,4 +22,3 @@ Generate a sixteen-parent pedigree starting from inbred founders, using a random
 \seealso{
 \code{\link{eightParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
 }
-

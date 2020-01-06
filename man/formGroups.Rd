@@ -28,4 +28,3 @@ The linkage method for hierachical clustering is specified by the \code{method} 
 
 Argument \code{preCluster} determines whether the code combines markers that are completely linked, before performing hierarchical clustering. This can lead to speed-ups in clustering truly huge datasets.
 }
-

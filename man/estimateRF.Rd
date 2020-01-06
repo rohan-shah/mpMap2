@@ -4,9 +4,9 @@
 \alias{estimateRF}
 \title{Estimate recombination fractions}
 \usage{
-estimateRF(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE,
-  keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object),
-  markerColumns = 1:nMarkers(object))
+estimateRF(object, recombValues, lineWeights, gbLimit = -1,
+  keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE,
+  markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 }
 \arguments{
 \item{object}{An object of class \code{mpcross}.}
@@ -67,4 +67,3 @@ rf <- estimateRF(cross, markerRows = 3, markerColumns = 1:3)
 #Print the estimated recombination fraction values
 rf@rf@theta[1:11, 1:11]
 }
-

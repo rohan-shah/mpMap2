@@ -21,4 +21,3 @@ Object of class \code{mpcross}.
 \description{
 Data is simulated according to a pedigree, map and QTL model
 }
-
