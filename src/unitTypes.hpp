@@ -24,3 +24,4 @@ typedef Unique<funnelEncoding_imp, std::size_t> funnelEncoding;
 struct funnelID_imp;
 typedef Unique<funnelID_imp, int> funnelID;
 #endif
+

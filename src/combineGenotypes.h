@@ -3,3 +3,4 @@
 #include <Rcpp.h>
 RcppExport SEXP combineGenotypes(SEXP Rfinals, SEXP RhetData);
 #endif
+

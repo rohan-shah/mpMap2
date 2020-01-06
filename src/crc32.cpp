@@ -43,3 +43,4 @@ uint32_t crc32(const void* data, size_t length, uint32_t previousCrc32)
     crc = (crc >> 8) ^ crc32Lookup[(crc & 0xFF) ^ *current++];
   return ~crc;
 }
+

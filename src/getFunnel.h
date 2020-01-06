@@ -3,3 +3,4 @@
 #include <Rcpp.h>
 void getFunnel(long line, Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father, int* funnel, int nFounders);
 #endif
+

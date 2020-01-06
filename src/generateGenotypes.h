@@ -3,3 +3,4 @@
 #include <Rcpp.h>
 RcppExport SEXP generateGenotypes(SEXP RrecombinationFractions, SEXP RmarkerNames, SEXP Rpedigree);
 #endif
+

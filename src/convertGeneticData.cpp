@@ -21,3 +21,4 @@ void convertGeneticData(Rcpp::S4 obj)
 		}
 	}
 }
+

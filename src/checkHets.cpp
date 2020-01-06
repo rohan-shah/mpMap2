@@ -75,3 +75,4 @@ SEXP checkHets(SEXP hets)
 	}
 	return Rcpp::wrap(true);
 }
+

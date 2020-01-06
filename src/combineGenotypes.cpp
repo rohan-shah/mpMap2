@@ -49,3 +49,4 @@ SEXP combineGenotypes(SEXP Rfinals, SEXP RhetData)
 		return Rcpp::wrap(result);
 	END_RCPP
 }
+
