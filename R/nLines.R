@@ -6,6 +6,7 @@
 #' Return the number of genotyped lines in an object.
 #'
 #' This includes only the number of final lines genotyped in the population, and does not include the founding lines. If an \code{mpcross} object contains multiple experiments, one number is returned per experiment. 
+#' @param object The \code{mpcross} object from which to extract the number of genotyped lines.
 #' @rdname nLines
 #' @export
 setGeneric(name = "nLines", def = function(object){standardGeneric("nLines")})

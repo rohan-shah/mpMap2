@@ -11,6 +11,8 @@ orderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
   verbose = FALSE)
 }
 \arguments{
+\item{mpcrossLG}{An object of class \code{mpcrossLG}, containing genetic data and linkage groups.}
+
 \item{cool}{Rate of cooling}
 
 \item{tmin}{Minimum temperature}

@@ -11,6 +11,7 @@
 #' Parameter \code{effortMultiplier} simply increases or decreases the amount of computational effort. A value of 0.5 requires half as much effort, a value of 1.0 uses the default amount of effort, and a value of 2.0 requires twice as much computational effort. 
 #'
 #' Parameter \code{randomStart} controls the starting point of each replication of the algorithm. If this parameter is TRUE, then every replication starts form an independent random ordering. If this parameter is FALSE, then every replication starts from the marker ordering given in the input object. 
+#' @param mpcrossLG An object of class \code{mpcrossLG}, containing genetic data and linkage groups. 
 #' @param cool Rate of cooling
 #' @param tmin Minimum temperature
 #' @param nReps Number of independent replications of the simulated annealing algorithm

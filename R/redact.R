@@ -6,6 +6,7 @@
 #' This function redacts possibly sensitive information from objects, resulting in an object that is safe to publish. 
 #'
 #' @description Sensitive information includes names of genetic lines (both founding lines and final population lines) and marker names. All actual data (marker genotypes, imputed IBD genotypes, IBD probabilities, etc) are preserved. 
+#' @param object The object of class \code{mpcross} to redact.
 #' @export
 setGeneric(name = "redact", def = function(object){standardGeneric("redact")})
 #' @rdname redact

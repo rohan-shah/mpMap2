@@ -1,3 +1,7 @@
+#' @title Convert to mpMap format
+#' @description Convert to the format used by the original mpMap package. 
+#' @details Converts an \code{mpcross} object to the format used by the original mpMap, the predecessor of this package. It is unlikely that this function will ever need to be used. 
+#' @param mpcross The object of class \code{mpcross} to convert. 
 #' @export
 toMpMap <- function(mpcross)
 {

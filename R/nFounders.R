@@ -8,20 +8,25 @@
 #'
 #' If an \code{mpcross} object contains multiple experiments, one number is returned per experiment. 
 #' @rdname nFounders
+#' @param object The \code{mpcross} object from which to extract the number of founders
 #' @export
 setGeneric(name = "nFounders", def = function(object){standardGeneric("nFounders")})
+#' @rdname nFounders
 setMethod(f = "nFounders", signature = "detailedPedigree", definition = function(object)
 {
 	return(length(object@initial))
 })
+#' @rdname nFounders
 setMethod(f = "nFounders", signature = "pedigree", definition = function(object)
 {
 	return(sum(object@mother == 0 & object@father == 0))
 })
+#' @rdname nFounders
 setMethod(f = "nFounders", signature = "mpcross", definition = function(object)
 {
 	return(unlist(lapply(object@geneticData, nFounders)))
 })
+#' @rdname nFounders
 setMethod(f = "nFounders", signature = "geneticData", definition = function(object)
 {
 	return(nrow(object@founders))

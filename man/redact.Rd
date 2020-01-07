@@ -24,6 +24,9 @@ redact(object)
 
 \S4method{redact}{geneticData}(object)
 }
+\arguments{
+\item{object}{The object of class \code{mpcross} to redact.}
+}
 \description{
 Sensitive information includes names of genetic lines (both founding lines and final population lines) and marker names. All actual data (marker genotypes, imputed IBD genotypes, IBD probabilities, etc) are preserved.
 }
