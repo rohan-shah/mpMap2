@@ -2,6 +2,12 @@
 #' @include pedigree-class.R
 #' @include mpcross-class.R
 #' @include geneticData-class.R
+#' @title Number of genotyped markers
+#'
+#' Return the number of genotyped markers in an object.
+#'
+#' If an \code{mpcross} object contains multiple experiments, one number is returned per experiment. 
+#' @rdname nFounders
 #' @export
 setGeneric(name = "nFounders", def = function(object){standardGeneric("nFounders")})
 setMethod(f = "nFounders", signature = "detailedPedigree", definition = function(object)

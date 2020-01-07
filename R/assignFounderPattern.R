@@ -6,12 +6,14 @@ assignFounderPattern <- function(founderMatrix)
 {
 	return(new("assignFounderPattern", data = founderMatrix))
 }
-#' @rdname internalOperators
 #' @title Internal operators for mpMap2
+#'
+#' @description Internal operators, used to modify mpcross objects. 
 #' 
-#' These operators are used to combine objects in order to apply a function. For example, \code{e1 + biparentalDominant()} returns the biparental design \code{e1}, with all markers converted to dominant markers. Consult the documentation on the individual functions, rather than this list of operators. 
+#' @details These operators are used to combine objects in order to apply a function. For example, \code{e1 + biparentalDominant()} returns the biparental design \code{e1}, with all markers converted to dominant markers. Consult the documentation on the individual functions, rather than this list of operators. 
 #' @param e1 Object one
 #' @param e2 Object two
+#' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "assignFounderPattern"), definition = function(e1, e2)
 {
 	result <- .Call("assignFounderPattern", e1, founderPattern = e2@data)

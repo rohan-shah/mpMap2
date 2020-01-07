@@ -7,7 +7,6 @@ multiparentSNP <- function(keepHets)
 	return(new("multiparentSNP", keepHets = keepHets))
 }
 #' @rdname internalOperators
-#' @description Internal operators, used to modify mpcross objects. 
 setMethod(f = "+", signature = c("geneticData", "multiparentSNP"), definition = function(e1, e2)
 {
 	nFounders <- nFounders(e1)

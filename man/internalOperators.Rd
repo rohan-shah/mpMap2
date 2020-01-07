@@ -26,9 +26,7 @@
 \alias{+,mpcross,removeHets-method}
 \alias{+,geneticData,normalPhenotype-method}
 \alias{+,mpcross,normalPhenotype-method}
-\title{Internal operators for mpMap2
-
-These operators are used to combine objects in order to apply a function. For example, \code{e1 + biparentalDominant()} returns the biparental design \code{e1}, with all markers converted to dominant markers. Consult the documentation on the individual functions, rather than this list of operators.}
+\title{Internal operators for mpMap2}
 \usage{
 \S4method{[}{rawSymmetricMatrix,index,index,logical}(x, i, j, ...,
   drop = TRUE)
@@ -91,4 +89,7 @@ These operators are used to combine objects in order to apply a function. For ex
 }
 \description{
 Internal operators, used to modify mpcross objects.
+}
+\details{
+These operators are used to combine objects in order to apply a function. For example, \code{e1 + biparentalDominant()} returns the biparental design \code{e1}, with all markers converted to dominant markers. Consult the documentation on the individual functions, rather than this list of operators.
 }

@@ -2,7 +2,7 @@
 #' 
 #' Order markers within linkage groups using simulated annealing
 #' 
-#' This function orders markers within linkage groups using a simulated annealing heuristic. The underlying implementation is a C++ reimplementation of the fortran code \code{arsa.f} from the \code{seriation} package. The reimplementation allows for multithreading, and is therefore much faster. It also fixes a couple of bugs in the original code. 
+#' @description This function orders markers within linkage groups using a simulated annealing heuristic. The underlying implementation is a C++ reimplementation of the fortran code \code{arsa.f} from the \code{seriation} package. The reimplementation allows for multithreading, and is therefore much faster. It also fixes a couple of bugs in the original code. 
 #'
 #' Parameters \code{cool} and \code{tmin} are standard simulated annealing parameters, and decreasing \code{cool} increases the amount of computation effort. Parameter \code{nReps} gives the number of independent replications of the simulated annealing algorithm to be used. The result of the best replication is then chosen. 
 #'

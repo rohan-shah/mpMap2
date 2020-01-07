@@ -1,27 +1,38 @@
 #' @include mpcross-class.R
 #' @include geneticData-class.R
+#' @rdname redact
+#' @title Redact sensitive information
+#' 
+#' This function redacts possibly sensitive information from objects, resulting in an object that is safe to publish. 
+#'
+#' @description Sensitive information includes names of genetic lines (both founding lines and final population lines) and marker names. All actual data (marker genotypes, imputed IBD genotypes, IBD probabilities, etc) are preserved. 
 #' @export
 setGeneric(name = "redact", def = function(object){standardGeneric("redact")})
+#' @rdname redact
 setMethod(f = "redact", signature = "mpcross", definition = function(object)
 {
 	object@geneticData <- new("geneticDataList", lapply(object@geneticData, redact))
 	return(object)
 })
+#' @rdname redact
 setMethod(f = "redact", signature = "mpcrossRF", definition = function(object)
 {
 	redactedMpcross <- callNextMethod()
 	return(new("mpcrossRF", redactedMpcross, rf = object@rf))
 })
+#' @rdname redact
 setMethod(f = "redact", signature = "mpcrossLG", definition = function(object)
 {
 	redactedMpcross <- callNextMethod()
 	return(new("mpcrossLG", redactedMpcross, lg = object@lg))
 })
+#' @rdname redact
 setMethod(f = "redact", signature = "mpcrossMapped", definition = function(object)
 {
 	redactedMpcross <- callNextMethod()
 	return(new("mpcrossMapped", redactedMpcross, rf = object@rf, map = object@map))
 })
+#' @rdname redact
 setMethod(f = "redact", signature = "geneticData", definition = function(object)
 {
 	nFounders <- nFounders(object)

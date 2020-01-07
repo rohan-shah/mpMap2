@@ -4,17 +4,7 @@
 \alias{orderCross}
 \title{Order markers
 
-Order markers within linkage groups using simulated annealing
-
-This function orders markers within linkage groups using a simulated annealing heuristic. The underlying implementation is a C++ reimplementation of the fortran code \code{arsa.f} from the \code{seriation} package. The reimplementation allows for multithreading, and is therefore much faster. It also fixes a couple of bugs in the original code. 
-
-Parameters \code{cool} and \code{tmin} are standard simulated annealing parameters, and decreasing \code{cool} increases the amount of computation effort. Parameter \code{nReps} gives the number of independent replications of the simulated annealing algorithm to be used. The result of the best replication is then chosen. 
-
-Parameter \code{maxMove} gives the maximum number of positions by which to shift a marker, as part of a step within the simulated annealing algorithm. The computational effort of determining whether a proposed move of a particular marker should be accepted, depends on the number of positions by which it is moved. So if the ordering is already approximately correct at the start of the algorithm, proposals that move markers by large distances are expensive, and also unneccessary. These types of proposed changes to the ordering can be avoided by setting \code{maxMove} to some positive value, maybe one tenth of the number of markers. 
-
-Parameter \code{effortMultiplier} simply increases or decreases the amount of computational effort. A value of 0.5 requires half as much effort, a value of 1.0 uses the default amount of effort, and a value of 2.0 requires twice as much computational effort. 
-
-Parameter \code{randomStart} controls the starting point of each replication of the algorithm. If this parameter is TRUE, then every replication starts form an independent random ordering. If this parameter is FALSE, then every replication starts from the marker ordering given in the input object.}
+Order markers within linkage groups using simulated annealing}
 \usage{
 orderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
   maxMove = 0, effortMultiplier = 1, randomStart = TRUE,
@@ -36,10 +26,6 @@ orderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
 \item{verbose}{If TRUE, generate more detailed output}
 }
 \description{
-Order markers
-
-Order markers within linkage groups using simulated annealing
-
 This function orders markers within linkage groups using a simulated annealing heuristic. The underlying implementation is a C++ reimplementation of the fortran code \code{arsa.f} from the \code{seriation} package. The reimplementation allows for multithreading, and is therefore much faster. It also fixes a couple of bugs in the original code. 
 
 Parameters \code{cool} and \code{tmin} are standard simulated annealing parameters, and decreasing \code{cool} increases the amount of computation effort. Parameter \code{nReps} gives the number of independent replications of the simulated annealing algorithm to be used. The result of the best replication is then chosen. 
