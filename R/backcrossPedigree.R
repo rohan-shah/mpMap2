@@ -1,3 +1,13 @@
+#' @title Generate a backcross pedigree which starts from inbred founders
+#'
+#' @description
+#' Generate a backcross pedigree which starts from inbred founders
+#' 
+#' @param populationSize The size of the generated population. 
+#' @examples 
+#' pedigree <- backcrossPedigree(1000)
+#' #This pedigree is automatically marked as involving finite generations of selfing. 
+#' selfing(pedigree)
 #' @export
 backcrossPedigree <- function(populationSize)
 {

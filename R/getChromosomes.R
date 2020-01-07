@@ -1,3 +1,15 @@
+#' @title Get chromosome assignment per marker
+#' @description Get chromosome assignment per marker from an \code{mpcross} object.
+#' @details Extract a character vector, with names corresponding to markers, and values corresponding to the chromosome on which the named marker is located.
+#' @param markers The markers for which we want the chromosomes
+#' @param mpcrossMapped The object containing the map of interest
+#' @examples
+#' map <- qtl::sim.map()
+#' pedigree <- f2Pedigree(1000)
+#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1)
+#' mappedCross <- mpcrossMapped(cross = cross, map = map)
+#' chromosomeAssignment <- getChromosomes(mappedCross, markers(mappedCross))
+#' chromosomeAssignment
 #' @export
 getChromosomes <- function(mpcrossMapped, markers)
 {

@@ -108,6 +108,7 @@ Collate:
     'plotMosaic.R'
     'plotProbabilities.R'
     'print.R'
+    'probabilityData.R'
     'purdyToPedigree.R'
     'redact.R'
     'removeHets.R'

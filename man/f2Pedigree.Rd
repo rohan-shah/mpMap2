@@ -15,5 +15,5 @@ Generate an F2 pedigree which starts from inbred founders
 \examples{
 pedigree <- f2Pedigree(1000)
 #This pedigree is automatically marked as involving finite generations of selfing. 
-pedigree@selfing
+selfing(pedigree)
 }

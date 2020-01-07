@@ -17,6 +17,9 @@ nMarkers(object)
 
 \S4method{nMarkers}{geneticData}(object)
 }
+\arguments{
+\item{object}{The \code{mpcross} object from which to extract the marker names}
+}
 \description{
 Number of genotyped markers
 

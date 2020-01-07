@@ -8,7 +8,7 @@
 #' @examples 
 #' pedigree <- f2Pedigree(1000)
 #' #This pedigree is automatically marked as involving finite generations of selfing. 
-#' pedigree@@selfing
+#' selfing(pedigree)
 f2Pedigree <- function(populationSize)
 {
 	pedigree <- twoParentPedigree(initialPopulationSize = 1, selfingGenerations = 1, intercrossingGenerations = 0, nSeeds = populationSize)

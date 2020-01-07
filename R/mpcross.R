@@ -1,5 +1,11 @@
 #' @include mpcross-class.R
 #' @include geneticData-class.R
+#' @title Convert from mpMap format to mpMap2 format
+#' @description Convert an object from mpMap format into mpMap2 format
+#' @details Convert an object from mpMap format (the predecessor to mpMap2) into mpMap2 format. It is unlikely that this function will ever need to be used. 
+#' @param mpcross Object to convert
+#' @param selfing Number of generations of selfing to put in the pedigree, for the converted object. Must be \code{"finite"} or \code{"infinite"}. 
+#' @param fixCodingErrors Should we attempt to fix coding errors, by replacing invalid values by NA? Defaults to FALSE. 
 #' @export
 fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 {

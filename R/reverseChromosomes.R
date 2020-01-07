@@ -1,3 +1,16 @@
+#' @title Reverse the order of the specified chromosomes
+#' @description Create a new object, with the specified chromosomes reversed
+#' @details Create a new object, with the specified chromosomes reversed
+#' @param mpcrossMapped The initial object, for which we want to reverse some of the chromosomes
+#' @param chromosomes The names of the chromosomes to reverse
+#' @examples
+#' map <- qtl::sim.map()
+#' pedigree <- f2Pedigree(1000)
+#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1)
+#' mappedCross <- mpcrossMapped(cross = cross, map = map)
+#' reversedX <- reverseChromosomes(mappedCross, "X")
+#' reversedX@map[["X"]]
+#' mappedCross@map[["X"]]
 #' @export
 reverseChromosomes <- function(mpcrossMapped, chromosomes)
 {
