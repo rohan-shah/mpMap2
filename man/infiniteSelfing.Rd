@@ -6,6 +6,13 @@
 \usage{
 infiniteSelfing(founders, finals, pedigree)
 }
+\arguments{
+\item{founders}{The genetic data for the founding lines, which are assumed to be inbred}
+
+\item{finals}{The genetic data for the lines genotyped at the end of the experiment.}
+
+\item{pedigree}{The pedigree for the experiment}
+}
 \description{
 Create allele encoding corresponding to infinite generations of selfing
 }

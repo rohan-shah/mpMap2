@@ -168,6 +168,9 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 #' @details In many experiments (particularly those that are significantly inbred), only marker homozygotes are observed, which means that the relationship between marker genotypes and marker alleles is particularly simple. In such cases, generally a marker genotype of some value (say 0) indicates that the individual is homozygous for marker allele 0. 
 #' 
 #' This function takes in genetic data for the founding lines, genetic data for the final population, and the pedigree. It returns an encoding for marker genotypes where every genotype is homozygous for the marker allele with the same value. 
+#' @param founders The genetic data for the founding lines, which are assumed to be inbred
+#' @param finals The genetic data for the lines genotyped at the end of the experiment. 
+#' @param pedigree The pedigree for the experiment
 #' @examples
 #' map <- qtl::sim.map()
 #' pedigree <- f2Pedigree(1000)

@@ -1,3 +1,8 @@
+#' @title Expand markers contained within object
+#' @description Expand set of markers within object, adding extra markers with missing observations as necessary. 
+#' @details This function expands the set of markres within an \code{mpcross} object. The new set of marker names must contain all the existing marker names, with any desired extra marker names. Any added markers will have all observations marked as missing. Any existing non-genetic information (genetic map, assignment of linkage groups, IBD genotypes, IBD probabilitieS) will be removed. 
+#' @param mpcross The input \code{mpcross} object
+#' @param newMarkers The names of the new markers to add
 #' @export
 expand <- function(mpcross, newMarkers)
 {

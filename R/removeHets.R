@@ -1,5 +1,20 @@
 setClass("removeHets", contains="NULL")
 #' @export
+#' @title Remove heterozygotes
+#' @description Remove all heterozygotes from dataset
+#' @details This function can be used to remove all heterozygotes from an \code{mpcross} object. Information about how pairs of different marker alleles are encoded as genotypes is discarded, and all observations of heterozygotes will be marked as \code{NA}. Any information calculated based on the genetic data (imputed IBD genotypes, IBD probabilities) will be discarded.
+#' @examples
+#' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10,
+#'      selfingGenerations = 1, nSeeds = 1)
+#' #Generate map
+#' map <- qtl::sim.map()
+#' #Simulate data
+#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
+#' finals(cross)[1:5, 1:5]
+#' hetData(cross)[[1]]
+#' cross <- cross + removeHets()
+#' finals(cross)[1:5, 1:5]
+#' hetData(cross)[[1]]
 removeHets <- function()
 {
 	return(new("removeHets"))
