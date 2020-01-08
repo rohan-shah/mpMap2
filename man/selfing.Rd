@@ -16,6 +16,11 @@ selfing(object) <- value
 
 \S4method{selfing}{pedigree}(object) <- value
 }
+\arguments{
+\item{object}{The pedigree object for which to get or set the generations of selfing, as finite or infinite.}
+
+\item{value}{The new value}
+}
 \description{
 Get or set a pedigree to have finite or infinite generations of selfing
 }

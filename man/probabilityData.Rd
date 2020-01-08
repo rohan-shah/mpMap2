@@ -13,6 +13,11 @@ probabilityData(object, ...)
 
 \S4method{probabilityData}{mpcrossMapped}(object, ...)
 }
+\arguments{
+\item{object}{The \code{mpcross} object from which to extract the probability data.}
+
+\item{...}{Additional options. Only \code{design} is supported, and gets the probability data for only a single experiment.}
+}
 \description{
 Get the identity-by-descent probability data from an mpcross object.
 }

@@ -1,3 +1,7 @@
+#' @title Identify number of generations of intercrossing and selfing, per genetic line
+#' @description Identify number of generations of intercrossing and selfing, per genetic line
+#' @details Many structured populations consist of a number of generations of mixing, followed by a number of generations of intercrossing, followed by inbreeding. This function identifies the number of generations of selfing and intercrossing, for each genetic line, in the case of 4-way, 8-way or 16-way multi-parent design. 
+#' @param cross The \code{mpcross} object containing the pedigree to be analysed. 
 #' @export
 getIntercrossingAndSelfingGenerations <- function(cross)
 {

@@ -6,6 +6,8 @@
 #'
 #' This can be an inconvenient layout for some operations. This function returns a matrix where the alleles appear as part of the columns, rather than the rows. For example, after applying this function to the given example, the first four values in the first row will be the probabilities that genetic line 1 carries alleles from specific founders, at a specific position. 
 #' @rdname probabilityData
+#' @param object The \code{mpcross} object from which to extract the probability data.
+#' @param ... Additional options. Only \code{design} is supported, and gets the probability data for only a single experiment. 
 #' @examples
 #' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0)
 #' selfing(pedigree) <- "infinite"

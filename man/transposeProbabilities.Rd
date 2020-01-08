@@ -6,6 +6,9 @@
 \usage{
 transposeProbabilities(inputObject)
 }
+\arguments{
+\item{inputObject}{The \code{mpcross} object containing the probability data.}
+}
 \description{
 Transpose the IBD probabilities matrix, so that the different alleles or founders appear on the columns, rather than the rows
 }

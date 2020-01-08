@@ -3,6 +3,7 @@
 #' @details mpMap2 stores IBD probabilities in a matrix where the number of rows is the number of alleles times the number of genetic lines, and the columns are the positions at which probabilities are calculated. In the example below, the row names are \code{L115 - L1, L115 - L2, L115 - L3, L115 - L4, L120 - L1}, etc, and the column names are \code{DXM1, DXM2, DXM3}, etc. So, for example, for a population generated from four founders and assumed to be totally inbred, the first four values in the first column are the probabilities that genetic line 1 carries alleles from specific founders, at a specific position. The first four columns give the probabilities for genetic line 2 at the next position, etc. 
 #'
 #' This can be an inconvenient layout for some operations. This function returns a matrix where the alleles appear as part of the columns, rather than the rows. For example, after applying this function to the given example, the first four values in the first row will be the probabilities that genetic line 1 carries alleles from specific founders, at a specific position. 
+#' @param inputObject The \code{mpcross} object containing the probability data. 
 #' @examples
 #' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0)
 #' selfing(pedigree) <- "infinite"
