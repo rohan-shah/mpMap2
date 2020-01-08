@@ -106,6 +106,20 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	//vector giving the encoded value for each value in allFunnels
 	std::vector<funnelEncoding> allFunnelEncodings;
 	funnelsToUniqueValues(funnelTranslation, lineFunnelIDs, lineFunnelEncodings, allFunnelEncodings, lineFunnels, allFunnels, nFounders);
+	for(std::vector<funnelEncoding>::iterator i = allFunnelEncodings.begin(); i != allFunnelEncodings.end(); i++)
+	{
+		funnelEncoding enc = *i;
+		int funnel[16];
+		for(int founderCounter = 0; founderCounter < nFounders; founderCounter++)
+		{
+			funnel[founderCounter] = ((enc & (15 << (4*founderCounter))) >> (4*founderCounter));
+		}
+		std::sort(funnel, funnel + nFounders);
+		if(std::unique(funnel, funnel + nFounders) != funnel + nFounders)
+		{
+			throw std::runtime_error("Duplicate founders in a funnel. The code for this case is not yet written");
+		}
+	}
 	
 	unsigned int maxAlleles = recoded.maxAlleles;
 	if(maxAlleles > 64)
