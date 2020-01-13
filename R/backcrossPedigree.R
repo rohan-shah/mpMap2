@@ -1,7 +1,7 @@
 #' @title Generate a backcross pedigree which starts from inbred founders
 #'
-#' @description
-#' Generate a backcross pedigree which starts from inbred founders
+#' @description Generate a backcross pedigree which starts from inbred founders
+#' @details Generate a backcross pedigree which starts from inbred founders
 #' 
 #' @param populationSize The size of the generated population. 
 #' @examples 

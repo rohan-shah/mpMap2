@@ -11,7 +11,7 @@ addExtraMarkers(mpcrossMapped, newMarkers,
   attemptMpMap2Interactive = TRUE, verbose = TRUE, reorder = TRUE)
 }
 \arguments{
-\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputation data and recombination fraction data.}
+\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputed IBD genotypes and recombination fraction data.}
 
 \item{newMarkers}{An object of class \code{mpcross} containing the new markers to add.}
 
@@ -36,7 +36,7 @@ addExtraMarkers(mpcrossMapped, newMarkers,
 \item{reorder}{Should local reordering be performed after the extra markers are added?}
 }
 \value{
-A list with an entry named \code{statistics}, containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, then the list also contains an entry named \code{object}, containing the input object and the extra markers.
+A list with an entry named \code{statistics}, containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, then the list also contains an entry named \code{object}, which is a new object containing the input object with the new markers added.
 }
 \description{
 Add extra markers to a map, using a QTL-mapping style approach.
@@ -48,7 +48,7 @@ Currently the set of points at which the new markers are considered for addition
 
 Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. If \code{attemptMpMap2Interactive} is \code{TRUE}, then package mpMapInteractive2 will be used to reorder the markers; this requires the user to perform reordering interactively. Otherwise, function \code{orderCross} will be used to automatically perform reordering. 
 
-Once the optional reordering step has been performed, the map is recomputed locally, to account for the addition of the extra marker. The argument \code{maxOffset} is passed through to \code{estimateMap}. Finally, the imputation data will be recomputed if \code{imputationArgs} is not \code{NULL}; in that case, \code{imputationArgs} should contain a list of arguments to \code{imputeFounders}. It is recommended that the imputation data be recomputed if further markers are to be added. 
+Once the optional reordering step has been performed, the map is recomputed locally, to account for the addition of the extra markers. The argument \code{maxOffset} is passed through to \code{estimateMap}. Finally, the imputation data will be recomputed if \code{imputationArgs} is not \code{NULL}; in that case, \code{imputationArgs} should contain a list of arguments to \code{imputeFounders}. It is recommended that the imputation data be recomputed if further markers are to be added. 
 
 In some cases the user will want to apply a threshold to the maximum value of the test statistics, and only add the marker if the test statistics exceed the threshold. In this case the function should be called twice. For the first call, \code{onlyStatistics} should be set to \code{FALSE}. If the resulting test statistics exceed the threshold, then \code{addExtrMarkers} should be called again with \code{onlyStatistics} set to \code{TRUE}.
 }

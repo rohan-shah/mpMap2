@@ -8,11 +8,11 @@ addExtraMarkerFromRawCall(mpcrossMapped, newMarker,
   useOnlyExtraImputationPoints = TRUE)
 }
 \arguments{
-\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputation data and recombination fraction data.}
+\item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputed IBD genotypes and recombination fraction data.}
 
 \item{newMarker}{A matrix containing the raw data for the marker to add.}
 
-\item{useOnlyExtraImputationPoints}{Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers? Currently this must be \code{TRUE}. In future \code{FALSE} may be allowed.}
+\item{useOnlyExtraImputationPoints}{Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers?}
 }
 \value{
 A vector containing the test statistic values.
@@ -21,9 +21,9 @@ A vector containing the test statistic values.
 Add an extra marker to a map, based on raw calling data, using a QTL-mapping style approach.
 }
 \details{
-This function uses a QTL-mapping style approach to test for where an extra marker should be added to an existing map. The code uses the imputation data at a collection of points, and the \emph{raw calling data} for the extra marker. The raw calling data should must be bivariate.
+This function uses a QTL-mapping style approach to test for where an extra marker should be added to an existing map. The code uses the imputation data at a collection of points, and the \emph{raw calling data} for the extra marker. The raw calling data must be bivariate.
 
-Test statistics measuring the associated of the new marker to a point are computed using a multivariate analysis of variance approach. If the imputed genotype at a point is independent of the data for the new marker, then the new marker probably should \emph{not} be mapped to that point. If the imputed genotype at a point and the data for the new marker are strongly \emph{dependent}, then the new marker \emph{should} probably be mapped to that point. Dependence and independence are measured using an F-test. 
+Test statistics measuring the association of the new marker to a point are computed using a multivariate analysis of variance approach. If the imputed genotype at a point is independent of the data for the new marker, then the new marker probably should \emph{not} be mapped to that point. If the imputed genotype at a point and the data for the new marker are strongly \emph{dependent}, then the new marker \emph{should} probably be mapped to that point. Dependence and independence are measured using an F-test. 
 
-Currently the set of points at which the new marker is considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduces the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. In future it may be possible to use the set of all marker positions as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}.
+By default the set of points at which the new marker is considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduces the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. Setting \code{useOnlyExtraImputationPoints} to \code{FALSE} means that every marker position will also be used as a possible position for the new marker (this is not recommended).
 }

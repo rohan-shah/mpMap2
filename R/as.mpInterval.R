@@ -1,4 +1,13 @@
 #' @export
+#' @title Convert mpcross object to MPWGAIM format
+#' @description Convert an object of class \code{mpcrossMapped} to the format used by MPWGAIM. 
+#' @details MPWGAIM is a package for performing QTL analysis using multi-parent populations. This function outputs a data object suitable for input to MPWGAIM. The output object can be in MPWGAIMs \code{mpMarker} or \code{mpInterval} formats. See the documentation of MPWGAIM for further information. 
+#' @param object The object of class \code{mpcrossMapped} to convert
+#' @param type The type of MPWGAIM object to output. Must be \code{"mpMarker"} or \code{"mpInterval"}
+#' @param positions In the case of \code{mpMarker} format, the positions at which the IBD probabilities should be output. Must be either \code{"all"} (all positions for which IBD probabilities are available) or \code{"marker"} (only marker positions). 
+#' @param homozygoteMissingProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
+#' @param heterozygoteMissingProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
+#' @param errorProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
 as.mpInterval <- function(object, type = "mpMarker", positions, homozygoteMissingProb, heterozygoteMissingProb, errorProb)
 {
 	if(!isS4(object) || !is(object, "mpcrossMapped"))

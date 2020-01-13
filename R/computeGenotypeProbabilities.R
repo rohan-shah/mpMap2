@@ -16,6 +16,25 @@ computeGenotypeProbabilitiesInternal <- function(geneticData, map, homozygoteMis
 	names(results$map) <- names(map)
 	return(new("probabilities", data = resultsMatrix, key = results$key, map = results$map))
 }
+#' @title Compute IBD genotype probabilities
+#' @description Compute IBD genotype probabilities
+#' @details This function computes the IBD genotype probabilities using a Hidden Marker Model (HMM) and the forward-backward algorithm. The HMM model is only an approximation to the underlying genetics, but it is a very good one. 
+#' 
+#' There are a number of parameters to this model. \code{homozygoteMissingProb} gives the "probability" that a marker homozygote will be marked a missing. \code{heterozygoteMissingProb} gives the "probability" that a marker heterozygote will be marked as missing. We say "probability" because really the important thing is the difference these two parameters, not the values themselves. If they are equal then a missing marker genotype contains no information. If code{heterozygoteMissingProb} is relatively larger than \code{homozygoteMissingProb}, then missing marker genotypes suggests that the underlying genotype is heterozygous, provided enough missing marker values occur sequentially. 
+#' 
+#' The key reason for introducing these paramters is that if \code{heterozygoteMissingProb} is relatively larger, then a dataset with no observed marker heterozygotes can still be used to estimate positions of underlying heterozygous genotypes, provided that heterozygous genotypes lead to consecutive missing marker genotype values.
+#' 
+#' The \code{errorProb} parameter gives the probability that a marker genotype is actually incorrect. In this case, it is assumed that the correct value for this marker genotype is random and uniformly distributed. This is different from assuming that the underlying genotype itself is random. If \code{errorProb} is zero, then it is not possible to have co-located markers with inconsistent genotypes, and if this occurs an error will be generated. \code{jitterMap} can be used to avoid this, but setting \code{errorProb} to some non-zero value is a much better solution. 
+#' 
+#' It is also possible to generate IBD probabilities at non-marker positions. These extra positions are specified by the \code{extraPositions} options, which can be specified two ways. The first is by specifying a list with name entries, where the names correspond to chromosomes. Each named entry should be a named vector, with names corresponding to the names of the positions, and values corresponding to the positions in cM on that chromosome. 
+#'
+#' The second possibility is to specify a function, which will be applied to the input object of class \code{mpcrossMapped} to generate the extra positions. Two helper options are provided for this - \code{\link{generateGridPositions}} and \code{link{generateIntervalMidPoints}}. 
+#' 
+#' @param mpcrossMapped An object of class \code{mpcrossMapped}, for which to compute the IBD genotype probabilities.
+#' @param homozygoteMissingProb The "probability" that a marker genotype that is truly homozygous will be marked as missing.
+#' @param heterozygoteMissingProb The "probability" that a marker genotype that is truly heterozygous will be marked as missing.
+#' @param errorProb The probability that a marker genotype is incorrect.
+#' @param extraPositions The extra positions at which to compute the IBD genotype probabilities. May be either a list with named components corresponding to chromosomes (simialr to a map) or a function which will be applied to the input object to generate the extra positions.
 #' @export
 computeGenotypeProbabilities <- function(mpcrossMapped, homozygoteMissingProb = 1, heterozygoteMissingProb = 1, errorProb = 0, extraPositions = list())
 {

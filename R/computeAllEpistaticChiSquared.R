@@ -1,3 +1,9 @@
+#' @title Compute chi-squared test statistics for independence
+#' @description Compute chi-squared test statistics for independence
+#' @details This function computes what are (approximately) chi-squared test statistics for independence of the genotypes at different points on the genome. This computation is done using the IBD probability data. Significant non-independence between IBD probabilities at distant points on the same chromosome, or points on different chromosomes, can indicate non-standard genetic inheritance or selective pressure. 
+#' @param mpcrossMapped An object of class \code{mpcrossMapped} with IBD probability data. 
+#' @param verbose If this is \code{TRUE} a progress bar is generated
+#' @return A square matrix with rows and columns corresponding to genetic locations, and values corresponding to test statistics.
 #' @export
 computeAllEpistaticChiSquared <- function(mpcrossMapped, verbose = TRUE)
 {

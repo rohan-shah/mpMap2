@@ -1,3 +1,11 @@
+#' @title Change the position of a single marker
+#' @description Change the position of a single marker
+#' @details For an object of class \code{mpcrossMapped}, change the position of a single marker
+#' @param mpcrossMapped The object of class \code{mpcrossMapped}, containing a marker to be modified
+#' @param marker The name of the marker to change
+#' @param newChromosome The new chromosome for the specified marker
+#' @param newPosition The new position for the specified marker in cM, on the new chromosome
+#' @return A copy of the input object, with the specified marker shifted to the new position and chromosome. 
 #' @export
 changeMarkerPosition <- function(mpcrossMapped, marker, newChromosome, newPosition)
 {

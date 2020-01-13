@@ -12,6 +12,9 @@ backcrossPedigree(populationSize)
 \description{
 Generate a backcross pedigree which starts from inbred founders
 }
+\details{
+Generate a backcross pedigree which starts from inbred founders
+}
 \examples{
 pedigree <- backcrossPedigree(1000)
 #This pedigree is automatically marked as involving finite generations of selfing. 

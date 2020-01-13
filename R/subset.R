@@ -1,6 +1,22 @@
 #' @export
+#' @title Subset data
+#' @description Subset data objects by line names, chromosomes, linkage groups, markers or positions
+#' @details mpMap2 objects can be subset in a number of different ways, depending on the particular class of the object that is contained. 
+#'
+#' Subsetting by \code{"lines"} subsets by the genetic lines in the final population. Line names or line indices can be used, although line names should be preferred. Any information about recombination fractions will be discarded. Subsetting by \code{"chromosomes"} keeps only certain chromosomes, and requires that the object have a genetic map. Subsetting by \code{"markers"} keeps only certain genetic markers. Data about imputed IBD genotypes and IBD genotype probabilities is discarded. Subsetting by \code{"positions"} only subsets the imputed IBD genotypes and IBD probability data, and does not subset the underlying markers. Subestting by \code{"groups"} retains only certain linkage groups. 
+#' 
+#' An object of class \code{mpcross} can be subset by genetic lines or markers. 
+#'
+#' An object of class \code{mpcrossLG} can be subset by genetic lines, markers or linkage groups. 
+#' 
+#' 
+#' 
+#' 
+#' @param x The object to be subset
+#' @param ... A method to use to subset (markers, lines, positions or chromosomes), and values for that method. 
 #' @include mpcross-class.R
 #' @include geneticData-class.R
+#' @rdname subset
 setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -30,6 +46,7 @@ setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 		return(new("imputed", data = x@data[,arguments$positions,drop=FALSE], key = x@key, map = newMap))
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "probabilities", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -69,6 +86,7 @@ setMethod(f = "subset", signature = "probabilities", definition = function(x, ..
 		return(new("probabilities", data = x@data[,positions], key = x@key, map = newMap))
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -119,6 +137,7 @@ setMethod(f = "subset", signature = "mpcross", definition = function(x, ...)
 		})
 	return(new("mpcross", geneticData = new("geneticDataList", newGeneticData)))
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -207,6 +226,7 @@ setMethod(f = "subset", signature = "mpcrossMapped", definition = function(x, ..
 		return(new("mpcrossMapped", callNextMethod(), map = x@map, rf = NULL))
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -229,6 +249,7 @@ setMethod(f = "subset", signature = "mpcrossRF", definition = function(x, ...)
 		return(new("mpcrossRF", callNextMethod(), "rf" = do.call(subset, c(list(x@rf), arguments)), skipValidity = skipValidity))
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -278,6 +299,7 @@ setMethod(f = "subset", signature = "mpcrossLG", definition = function(x, ...)
 		return(new("mpcrossLG", callNextMethod(), "lg" = do.call(subset, c(list(x@lg), arguments)), "rf" = subsettedRF))
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -313,6 +335,7 @@ setMethod(f = "subset", signature = "lg", definition = function(x, ...)
 	}
 	return(new("lg", groups = groups, allGroups = allGroups, imputedTheta = imputedTheta))
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -375,6 +398,7 @@ setMethod(f = "subset", signature = "geneticData", definition = function(x, ...)
 		return(retVal)
 	}
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "hetData", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -398,6 +422,7 @@ setMethod(f = "subset", signature = "hetData", definition = function(x, ...)
 	}
 	return(new("hetData", x[markerIndices]))
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 {
 	arguments <- list(...)
@@ -441,6 +466,7 @@ setMethod(f = "subset", signature = "rf", definition = function(x, ...)
 	}
 	return(new("rf", theta = newTheta, lod = newLod, lkhd = newLkhd, gbLimit = x@gbLimit))
 })
+#' @rdname subset
 setMethod(f = "subset", signature = "rawSymmetricMatrix", definition = function(x, ...)
 {
 	arguments <- list(...)

@@ -28,9 +28,9 @@ A combined object that contains the data from both \code{e1} and \code{e2}.
 Combine two mpcross objects into a single object
 }
 \details{
-These addition operators combine multiple mpcross objects into a single object. The input objects may contain recombination fraction data, or may have associated genetic maps. The function tries to keep whatever extra data is in the input objects, and will warn if data is discarded. This happens, for example, if one of the objects contains recombination fraction data, and the other does not.
+These addition operators combine multiple objects of classes \code{mpcross} or \code{mpcrossMapped} into a single object. The input objects may contain recombination fraction data, or may have associated genetic maps. The operators try to keep whatever extra data is in the input objects, and will warn if data is discarded. Data will be discarded if, for example, one of the objects contains recombination fraction data and the other does not.
 
-In general, the combined object will contain the input objects as separate datasets. In special cases, the datasets may be combined. For example, if the input objects contains disjoint sets of markers, but the same genetic lines, then the datasets will be combined. Similarly, if the input objects contain the same genetic markers, but disjoint sets of genetic lines, then the datasets will be combined.
+In general, the combined object will contain the input objects as separate experiments. In special cases, the datasets may actually be combined as a single experiment. For example, if the input objects contains disjoint sets of markers, but the same genetic lines, then the datasets will be combined. Similarly, if the input objects contain the same genetic markers, but disjoint sets of genetic lines, then the datasets will be combined.
 
 Internally this function redirects to another generic named \code{addMpMap2}, because this generic allows for optional named arguments.
 }
