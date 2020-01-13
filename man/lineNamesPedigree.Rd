@@ -16,6 +16,11 @@ lineNames(object) <- value
 
 \S4method{lineNames}{pedigree}(object) <- value
 }
+\arguments{
+\item{object}{The object for which to get or set the line names}
+
+\item{value}{The vector of new genetic line names}
+}
 \description{
 Get or set the genetic line names of a pedigree
 }

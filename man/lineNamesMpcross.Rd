@@ -10,6 +10,9 @@
 
 \S4method{lineNames}{geneticData}(object)
 }
+\arguments{
+\item{object}{The object from which to extract the line names}
+}
 \description{
 Get the genetic line names of a population
 }

@@ -1,5 +1,5 @@
 context("Founder imputation isn't implemented for improper funnels (funnels with repeated founders)")
-test_that("Eight parent design"
+test_that("Eight parent design",
 	{
 		testFunc <- function(pedigree, map)
 		{
@@ -12,13 +12,13 @@ test_that("Eight parent design"
 		map2 <- qtl::sim.map(len = c(100, 100), n.mar = 201, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		maps <- list(map1, map2)
 
-		pedigree1 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree1 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1)
 		pedigree1@selfing <- "infinite"
-		pedigree2 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree2 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 10, nSeeds = 1)
 		pedigree2@selfing <- "infinite"
-		pedigree3 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 0)
+		pedigree3 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 5, nSeeds = 1)
 		pedigree3@selfing <- "finite"
-		pedigree4 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 5, nSeeds = 1, intercrossingGenerations = 1)
+		pedigree4 <- eightParentPedigreeImproperFunnels(initialPopulationSize = 500, selfingGenerations = 5, nSeeds = 1)
 		pedigree4@selfing <- "finite"
 		
 		pedigrees <- list(pedigree1, pedigree2, pedigree3, pedigree4)
