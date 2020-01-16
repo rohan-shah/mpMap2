@@ -1,3 +1,7 @@
+#' @title Get out non-marker positions used for IBD genotype imputation
+#' @description Get out non-marker positions used for IBD genotype imputation
+#' @details Extract non-marker positions used for IBD genotype imputation
+#' @param mpcrossMapped The object from which to extra positions
 #' @export
 extraImputationPoints <- function(mpcrossMapped)
 {

@@ -1,5 +1,6 @@
 #' @export
 #' @title Subset data
+#' @rdname subset
 #' @description Subset data objects by line names, chromosomes, linkage groups, markers or positions
 #' @details mpMap2 objects can be subset in a number of different ways, depending on the particular class of the object that is contained. 
 #'
@@ -7,16 +8,16 @@
 #' 
 #' An object of class \code{mpcross} can be subset by genetic lines or markers. 
 #'
-#' An object of class \code{mpcrossLG} can be subset by genetic lines, markers or linkage groups. 
+#' Objects of classes \code{mpcrossLG} or \code{mpcrossRF} can be subset by genetic lines, markers or linkage groups. 
 #' 
+#' An object of class \code{mprcossMapped} can be subset by genetic lines, markers or chromosomes. 
 #' 
-#' 
+#' The remainder of the subsetting methods are not expected to be called directly by the user. They subset internal components, and are used internally by the top-level methods. 
 #' 
 #' @param x The object to be subset
 #' @param ... A method to use to subset (markers, lines, positions or chromosomes), and values for that method. 
 #' @include mpcross-class.R
 #' @include geneticData-class.R
-#' @rdname subset
 setMethod(f = "subset", signature = "imputed", definition = function(x, ...)
 {
 	arguments <- list(...)

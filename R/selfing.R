@@ -1,6 +1,7 @@
 #' @include pedigree-class.R
 #' @include detailedPedigree-class.R
 #' @title Get or set a pedigree to have finite or infinite generations of selfing
+#' @rdname selfing
 #' @description Get or set a pedigree to have finite or infinite generations of selfing
 #' @details A pedigree object contains details about the genetic relationships between individuals in a population. Many experiments will include a finite number of generations of inbreeding by selfing, and this information will also be contained in the pedigree. However, when it comes time to actually analyse the poulation, it can be sensible to assume that an infinite number of generations of selfing have actually been performed, as this is computationally quicker. 
 #' 
@@ -13,7 +14,6 @@
 #' selfing(pedigree)
 #' selfing(pedigree) <- "finite"
 #' @export
-#' @rdname selfing
 setGeneric("selfing<-", function(object, value) standardGeneric("selfing<-"))
 #' @export
 setGeneric("selfing", function(object) standardGeneric("selfing"))
