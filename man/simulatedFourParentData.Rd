@@ -16,6 +16,6 @@ selfing(pedigree) <- "infinite"
 #Generate random map
 map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x = FALSE)
 #Simulate data
-cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1L)
-save(cross, file = "data/simulatedFourParentData.RData")
+simulatedFourParentData <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1L)
+#save(simulatedFourParentData, map, file = "data/simulatedFourParentData.RData")
 }

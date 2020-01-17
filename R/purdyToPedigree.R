@@ -1,4 +1,3 @@
-#' @export
 purdyToPedigree <- function(lineNames, purdy, selfing, warnImproperFunnels)
 {
 	if(!is.character(lineNames) || !is.character(purdy))

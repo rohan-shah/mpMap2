@@ -13,5 +13,8 @@ By default, simulated data is fully informative, so every founder carries its ow
 This function takes in a fully informative experiment, and changes every marker so that it has a fixed number of founder alleles. Heterozygotes are also changed, so every combination of different alleles is still distinguishable.
 }
 \examples{
-
+data(simulatedFourParentData)
+founders(simulatedFourParentData)[, 1:10]
+altered <- simulatedFourParentData + fixedNumberOfFounderAlleles(3)
+founders(altered)[, 1:10]
 }

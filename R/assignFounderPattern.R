@@ -1,6 +1,9 @@
 #' @include mpcross-class.R
 #' @include geneticData-class.R
 setClass("assignFounderPattern", slots = list(data = "matrix"))
+#' @title Set founder genotypes
+#' @description Set founder genotypes
+#' @details Set the founder genotypes to a specified matrix, for an object with fully informative markers. This can allow the same set of founder genotypes to be used for multiple simulation runs.
 #' @export
 assignFounderPattern <- function(founderMatrix)
 {
