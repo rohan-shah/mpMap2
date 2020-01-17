@@ -11,7 +11,7 @@
 #' @examples
 #' data(simulatedFourParentData)
 #' crossSNP <- simulatedFourParentData + multiparentSNP(keepHets = FALSE)
-#' mapped <- mpcrossMapped(crossSNP, map = map)
+#' mapped <- mpcrossMapped(crossSNP, map = simulatedFourParentMap)
 #' probabilities <- computeGenotypeProbabilities(mapped, error = 0.05)
 #' probabilityData <- probabilityData(probabilities)
 #' probabilityData[1:5, 1:5]

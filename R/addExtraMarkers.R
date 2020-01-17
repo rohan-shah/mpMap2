@@ -44,7 +44,7 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' @examples
 #' data(simulatedFourParentData)
 #' #Create object that includes the correct map
-#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = map)
+#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = simulatedFourParentMap)
 #' #Remove marker number 50. Normally the map is discarded, but we specify to keep it. 
 #' removedMiddle <- subset(mapped, markers = (1:101)[-50], keepMap = TRUE)
 #' #Compute imputation data, at all the markers, and an equally spaced grid of points

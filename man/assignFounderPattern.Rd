@@ -6,6 +6,9 @@
 \usage{
 assignFounderPattern(founderMatrix)
 }
+\arguments{
+\item{founderMatrix}{The new matrix of founder genotypes}
+}
 \description{
 Set founder genotypes
 }

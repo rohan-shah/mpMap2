@@ -15,7 +15,7 @@ getAllFunnelsIncAIC(cross, standardised = FALSE)
 Get every order of the founding lines, which makes a contribution to the final population
 }
 \details{
-This function is similar to \code{\link{getFunnels}}, but more useful for populations with maintenance (or AIC) generations. It returns a list of all the mixing orders in the initial generations, which make a genetic contribution to the final population. Unlike for \code{\link{getFunnels}}, rows of the returned matrix DO NOT refer to specific genetic lines.
+This function is similar to \code{\link{getAllFunnels}}, but more useful for populations with maintenance (or AIC) generations. It returns a list of all the mixing orders in the initial generations, which make a genetic contribution to the final population. Unlike for \code{\link{getAllFunnels}}, rows of the returned matrix DO NOT refer to specific genetic lines.
 }
 \examples{
 set.seed(1)

@@ -1,4 +1,5 @@
 #' @title Get funnels
+#' @rdname getAllFunnels
 #' @description Get the order of the founding lines, as they contribute to each line in the final population
 #' @details In multi-parent experimental designs, the founding lines of the population are combined together through initial mixing generations. For experiments without further intercrossing generations, the order in which these mixing crosses occur influences the genotypes of the final lines. It can be important to examine or visualise these orders, which are known as funnels. 
 #'
@@ -46,7 +47,8 @@ getAllFunnels <- function(cross, standardised = FALSE)
 }
 #' @title Get all funnels, including AIC lines
 #' @description Get every order of the founding lines, which makes a contribution to the final population
-#' @details This function is similar to \code{\link{getFunnels}}, but more useful for populations with maintenance (or AIC) generations. It returns a list of all the mixing orders in the initial generations, which make a genetic contribution to the final population. Unlike for \code{\link{getFunnels}}, rows of the returned matrix DO NOT refer to specific genetic lines. 
+#' @rdname getAllFunnelsIncAIC
+#' @details This function is similar to \code{\link{getAllFunnels}}, but more useful for populations with maintenance (or AIC) generations. It returns a list of all the mixing orders in the initial generations, which make a genetic contribution to the final population. Unlike for \code{\link{getAllFunnels}}, rows of the returned matrix DO NOT refer to specific genetic lines. 
 #' @param cross The object of class \code{mpcross} containing the pedigree of interest
 #' @param standardised Should the output funnels be standardised?
 #' @examples

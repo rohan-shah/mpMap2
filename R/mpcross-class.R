@@ -58,6 +58,10 @@ checkMpcross <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+#' @title A collection of multi-parent populations without a genetic map
+#' @description A collection of multi-parent populations without a genetic map
+#' @details An object of class \code{mpcross} contains data about one or more multi-parent populations, without a genetic map. As there is no genetic map, there is no information about IBD imputed genotypes or IBD genotype probabilities. There is also no information about estimated recombination fractions. 
+#' @slot geneticData A list of objects of class \code{geneticData}, each representing a population.
 .mpcross <- setClass("mpcross", slots = list(geneticData = "geneticDataList"), validity=checkMpcross, contains = "canSkipValidity")
 
 checkMpcrossRF <- function(object)
@@ -75,6 +79,11 @@ checkMpcrossRF <- function(object)
 	return(TRUE)
 }
 setClassUnion("rfOrNULL", c("rf", "NULL"))
+#' @title A collection of multi-parent populations with recombination fraction estimates
+#' @description A collection of multi-parent populations with recombination fraction estimates
+#' @details An object of class \code{mpcrossRF} contains data about one or more multi-parent populations, without a genetic map, but with recombination fraction estimates. As there is no genetic map, there is no information about IBD imputed genotypes or IBD genotype probabilities. 
+#' @slot geneticData A list of objects of class \code{geneticData}, each representing a population.
+#' @slot rf Estimates of recombination fractions between every pair of genetic markers. 
 .mpcrossRF <- setClass("mpcrossRF", contains = "mpcross", slots = list(rf = "rf"), validity=checkMpcrossRF)
 
 checkMpcrossLG <- function(object)
@@ -133,6 +142,12 @@ checkMpcrossMapped <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+#' @title A collection of multi-parent populations with a genetic map
+#' @description A collection of multi-parent populations with a genetic map
+#' @details An object of class \code{mpcrossMapped} contains genetic data for one or more populations, and a genetic map. It might also contain data about the recombination fractions between markers (or it might not). 
+#' @slot map The genetic map for all populations
+#' @slot rf The recombination fraction data (which might be NULL). 
+#' @slot geneticData A list of objects of class \code{geneticData}, each representing a population. 
 .mpcrossMapped <- setClass("mpcrossMapped", contains = "mpcross", slots = list(map = "map", rf = "rfOrNULL"), validity=checkMpcrossMapped)
 
 setAs("mpcrossMapped", "mpcrossRF", def = function(from, to)
@@ -201,8 +216,13 @@ infiniteSelfing <- function(founders, finals, pedigree)
 	hetData <- new("hetData", hetData)
 	return(hetData)
 }
+#' @title Create heterozygote encodings for SNP markers
+#' @description Create encoding which assumes that the single non-homozygote value for a SNP marker is the heterozygote
+#' @details This function takes in genotype data for the founding lines and the final poulation. It returns an encoding for hetorozygotes for all markers, where multiallelic markers are assumed to have no heterozygotes. For biallelic markers with three observed alleles in the final population, the extra allele is assumed to be the heterozygote. 
+#' @param founders Genetic data for the founding lines of the population
+#' @param finals Genetic data for the final genotyped lines of the population
 #' @export
-hetsForSNPMarkers <- function(founders, finals, pedigree)
+hetsForSNPMarkers <- function(founders, finals)
 {
 	hetData <- lapply(1:ncol(founders), function(x)
 	{

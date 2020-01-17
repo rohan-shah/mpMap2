@@ -7,7 +7,7 @@
 #' @examples
 #' data(simulatedFourParentData)
 #' #Create object that includes the correct map
-#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = map)
+#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = simulatedFourParentMap)
 #' #Estimate IBD genotypes at all the markers, and marker midpoints
 #' imputed <- imputeFounders(mapped, errorProb = 0.02, 
 #' 	extraPositions = generateIntervalMidPoints(mapped))

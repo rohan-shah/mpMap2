@@ -1,4 +1,3 @@
-#' @export
 createSNPTemplate <- function(inputObject, newData, hetEncoding, markerName)
 {
 	if(inherits(inputObject, "geneticData"))
