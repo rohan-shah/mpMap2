@@ -1,3 +1,9 @@
+#' @title Export genetic map to Pretzl
+#' @description Export genetic map to Pretzl
+#' @details Convert the genetic map from an object of class \code{mpcrossMapped} to the JSON format used by Pretzl. Pretzl is a web app for visualising and comparing genetic maps. 
+#' @param inputObject The object of class \code{mpcrossMapped} containing the genetic map
+#' @param name If a single JSON object is being exported, the name of the exported map. 
+#' @param separateChromosomes If \code{TRUE}, separate exports will be generated for each chromosome. The name associated with each chromosome map will contain the chromosome name as a suffix. 
 #' @export
 exportMapToPretzl <- function(inputObject, name, separateChromosomes = FALSE)
 {

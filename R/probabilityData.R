@@ -9,11 +9,8 @@
 #' @param object The \code{mpcross} object from which to extract the probability data.
 #' @param ... Additional options. Only \code{design} is supported, and gets the probability data for only a single experiment. 
 #' @examples
-#' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0)
-#' selfing(pedigree) <- "infinite"
-#' map <- qtl::sim.map(len = 100, n.mar = 101)
-#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1)
-#' crossSNP <- cross + multiparentSNP(keepHets = FALSE)
+#' data(simulatedFourParentData)
+#' crossSNP <- simulatedFourParentData + multiparentSNP(keepHets = FALSE)
 #' mapped <- mpcrossMapped(crossSNP, map = map)
 #' probabilities <- computeGenotypeProbabilities(mapped, error = 0.05)
 #' probabilityData <- probabilityData(probabilities)

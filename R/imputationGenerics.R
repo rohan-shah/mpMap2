@@ -1,11 +1,19 @@
 #' @include mpcross-class.R
 #' @include geneticData-class.R
+#' @title Get names of positions for IBD genotype imputation
+#' @rdname flatImputationMapNames
+#' @description Get the names of all positions at which IBD genotype imputation has already been performed
+#' @details Get the names of all positions at which IBD genotype imputation has already been performed
+#' @param object The object from which to get the names of positions
+#' @param ... Extra parameters, currently only \code{"experiment"} is supported. 
 #' @export
 setGeneric(name = "flatImputationMapNames", def = function(object, ...){standardGeneric("flatImputationMapNames")})
+#' @rdname flatImputationMapNames
 setMethod(f = "flatImputationMapNames", signature = "imputed", definition = function(object, ...)
 {
 	return(unlist(lapply(object@map, names)))
 })
+#' @rdname flatImputationMapNames
 setMethod(f = "flatImputationMapNames", signature = "geneticData", definition = function(object, ...)
 {
 	if(is.null(object@imputed))
@@ -14,6 +22,7 @@ setMethod(f = "flatImputationMapNames", signature = "geneticData", definition = 
 	}
 	return(flatImputationMapNames(object@imputed))
 })
+#' @rdname flatImputationMapNames
 setMethod(f = "flatImputationMapNames", signature = "mpcrossMapped", definition = function(object, ...)
 {
 	args <- list(...)

@@ -1,9 +1,16 @@
 #' @title Specify an equally spaced grid of genetic positions 
 #' @description Specify an equally spaced grid of genetic positions 
-#' @details Some functions, such as \code{imputeFounders} and \code{computeGenotypeProbabilities}, take in a set of genetic positions as one of the inputs. This function is an easy way to speify an equally spaced grid of positions. 
+#' @details Some functions, such as \code{imputeFounders} and \code{computeGenotypeProbabilities}, take in a set of genetic positions as one of the inputs. This function is an easy way to specify an equally spaced grid of positions. 
 #' 
 #' Note that the return value is itself a function, which is applied internally by \code{imputeFounders} or \code{computeGenotypeProbabilities} to an object of class \code{mpcrossMapped}. 
 #' @param spacing The spacing of the genetic positions, in cM.
+#' @examples
+#' data(simulatedFourParentData)
+#' #Create object that includes the correct map
+#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = map)
+#' #Estimate IBD genotypes at all the markers, and marker midpoints
+#' imputed <- imputeFounders(mapped, errorProb = 0.02, 
+#' 	extraPositions = generateGridPositions(1))
 #' @export
 generateGridPositions <- function(spacing)
 {

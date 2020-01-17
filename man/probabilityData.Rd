@@ -27,11 +27,8 @@ mpMap2 stores IBD probabilities in a matrix where the number of rows is the numb
 This can be an inconvenient layout for some operations. This function returns a matrix where the alleles appear as part of the columns, rather than the rows. For example, after applying this function to the given example, the first four values in the first row will be the probabilities that genetic line 1 carries alleles from specific founders, at a specific position.
 }
 \examples{
-pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 100, selfingGenerations = 5, intercrossingGenerations = 0)
-selfing(pedigree) <- "infinite"
-map <- qtl::sim.map(len = 100, n.mar = 101)
-cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1)
-crossSNP <- cross + multiparentSNP(keepHets = FALSE)
+data(simulatedFourParentData)
+crossSNP <- simulatedFourParentData + multiparentSNP(keepHets = FALSE)
 mapped <- mpcrossMapped(crossSNP, map = map)
 probabilities <- computeGenotypeProbabilities(mapped, error = 0.05)
 probabilityData <- probabilityData(probabilities)

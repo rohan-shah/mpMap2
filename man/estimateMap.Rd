@@ -41,17 +41,9 @@ These constraints are represented as a matrix equation and solved for \eqn{a(1),
 \deqn{d(3, 5) = a(3) + a(4)}
 }
 \examples{
-#construct four-parent pedigree
-pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, 
-	selfingGenerations = 6, intercrossingGenerations = 0)
-#Assume infinite generations of selfing in subsequent analysis
-selfing(pedigree) <- "infinite"
-#Generate random map
-map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x = FALSE)
-#Simulate data
-cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1L)
+data(simulatedFourParentData)
 #Estimate recombination fractions
-rf <- estimateRF(cross)
+rf <- estimateRF(simulatedFourParentData)
 #Assign all markers to one linkage group / chromosome
 grouped <- formGroups(rf, groups = 1)
 #Estimate map

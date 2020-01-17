@@ -3,12 +3,15 @@
 \docType{methods}
 \name{selfing<-}
 \alias{selfing<-}
+\alias{selfing}
 \alias{selfing,pedigree-method}
 \alias{selfing<-,detailedPedigree-method}
 \alias{selfing<-,pedigree-method}
 \title{Get or set a pedigree to have finite or infinite generations of selfing}
 \usage{
 selfing(object) <- value
+
+selfing(object)
 
 \S4method{selfing}{pedigree}(object)
 

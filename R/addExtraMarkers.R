@@ -42,17 +42,9 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' In some cases the user will want to apply a threshold to the maximum value of the test statistics, and only add the marker if the test statistics exceed the threshold. In this case the function should be called twice. For the first call, \code{onlyStatistics} should be set to \code{FALSE}. If the resulting test statistics exceed the threshold, then \code{addExtrMarkers} should be called again with \code{onlyStatistics} set to \code{TRUE}. 
 #'
 #' @examples
-#' #construct four-parent pedigree
-#' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000, 
-#' 	selfingGenerations = 6, intercrossingGenerations = 0)
-#' #Assume infinite generations of selfing in subsequent analysis
-#' selfing(pedigree) <- "infinite"
-#' #Generate random map
-#' map <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x = FALSE)
-#' #Simulate data
-#' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane, seed = 1L)
+#' data(simulatedFourParentData)
 #' #Create object that includes the correct map
-#' mapped <- new("mpcrossMapped", cross, map = map)
+#' mapped <- new("mpcrossMapped", simulatedFourParentData, map = map)
 #' #Remove marker number 50. Normally the map is discarded, but we specify to keep it. 
 #' removedMiddle <- subset(mapped, markers = (1:101)[-50], keepMap = TRUE)
 #' #Compute imputation data, at all the markers, and an equally spaced grid of points
@@ -61,7 +53,7 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' #Estimate recombination fractions
 #' removedMiddle <- estimateRF(removedMiddle)
 #' #Get out the extra marker to add
-#' extraMarker <- subset(cross, markers = 50)
+#' extraMarker <- subset(simulatedFourParentData, markers = 50)
 #' #Add the extra marker, without doing any local reordering. After the marker is added, 
 #' #	recompute the imputation data, using the same arguments as previously. 
 #' withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 

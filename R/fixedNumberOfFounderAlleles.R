@@ -1,5 +1,12 @@
 #' @include geneticData-class.R
 #' @include mpcross-class.R
+#' @title Convert fully informative experiment to one with a fixed number of alleles per marker
+#' @description Convert a fully informative experiment to one with a fixed number of alleles per marker
+#' @details By default, simulated data is fully informative, so every founder carries its own allele, and all heterozygotes are distinguishable. 
+#' 
+#' This function takes in a fully informative experiment, and changes every marker so that it has a fixed number of founder alleles. Heterozygotes are also changed, so every combination of different alleles is still distinguishable. 
+#' @examples 
+#' 
 setClass("fixedNumberOfFounderAlleles", slots = list(alleles = "integer"))
 #' @export
 fixedNumberOfFounderAlleles <- function(alleles)

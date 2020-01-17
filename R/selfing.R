@@ -16,6 +16,7 @@
 #' @export
 setGeneric("selfing<-", function(object, value) standardGeneric("selfing<-"))
 #' @export
+#' @rdname selfing
 setGeneric("selfing", function(object) standardGeneric("selfing"))
 #' @rdname selfing
 setMethod(f = "selfing", signature = "pedigree", definition = function(object)
