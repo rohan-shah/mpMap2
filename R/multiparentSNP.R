@@ -1,6 +1,10 @@
 #' @include geneticData-class.R
 #' @include mpcross-class.R
 setClass("multiparentSNP", slots = list(keepHets = "logical"))
+#' @title Convert all markers to SNP markers
+#' @description Convert all markers in an object with fully informative markers to SNP markers
+#' @details When initially generated, objects of class \code{mpcross} have markers that are fully informative - Every founder carries a different allele, and all marker heterozygotes are distinguishable. This function can be used to convert a simulated object to one with SNP markers. The resulting markers have two alleles, and the marker heterozygote might or might be observable.
+#' @param keepHets Should heterozygotes for the SNP marker be kept?
 #' @export
 multiparentSNP <- function(keepHets)
 {

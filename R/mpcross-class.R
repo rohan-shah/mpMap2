@@ -221,8 +221,9 @@ infiniteSelfing <- function(founders, finals, pedigree)
 #' @details This function takes in genotype data for the founding lines and the final poulation. It returns an encoding for hetorozygotes for all markers, where multiallelic markers are assumed to have no heterozygotes. For biallelic markers with three observed alleles in the final population, the extra allele is assumed to be the heterozygote. 
 #' @param founders Genetic data for the founding lines of the population
 #' @param finals Genetic data for the final genotyped lines of the population
+#' @param pedigree Pedigree for the population. Unused by this particular function.
 #' @export
-hetsForSNPMarkers <- function(founders, finals)
+hetsForSNPMarkers <- function(founders, finals, pedigree)
 {
 	hetData <- lapply(1:ncol(founders), function(x)
 	{

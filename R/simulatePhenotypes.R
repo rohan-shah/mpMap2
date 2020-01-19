@@ -48,6 +48,13 @@ setMethod(f = "+", signature = c("mpcross", "normalPhenotype"), definition = fun
 	lapply(1:length(e1@geneticData), function(x) e1@geneticData[[x]] <<- e1@geneticData[[x]] + e2)
 	return(e1)
 })
+#' @title Simulate normally distributed phenotype
+#' @description Add a normally distributed phenotype 
+#' @details Add a normally distributed phenotype to a given populations
+#' @param means The means of the phenotype for all the different founder alleles
+#' @param standardDeviations The standard deviations of the phenotype for all the different founder alleles
+#' @param phenotypeName The name of the new phenotype
+#' @param marker The name of the marker which controls this phenotype
 #' @export
 normalPhenotype <- function(means, standardDeviations, phenotypeName, marker)
 {

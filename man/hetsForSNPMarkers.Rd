@@ -4,12 +4,14 @@
 \alias{hetsForSNPMarkers}
 \title{Create heterozygote encodings for SNP markers}
 \usage{
-hetsForSNPMarkers(founders, finals)
+hetsForSNPMarkers(founders, finals, pedigree)
 }
 \arguments{
 \item{founders}{Genetic data for the founding lines of the population}
 
 \item{finals}{Genetic data for the final genotyped lines of the population}
+
+\item{pedigree}{Pedigree for the population. Unused by this particular function.}
 }
 \description{
 Create encoding which assumes that the single non-homozygote value for a SNP marker is the heterozygote
