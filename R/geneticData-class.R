@@ -230,6 +230,14 @@ checkProbabilities <- function(object)
 	}
 	return(TRUE)
 }
+#' @title Identity-by-descent genotype probabilities
+#' @description Identity-by-descent genotype probabilities
+#' @details This object contains the identify-by-descent genotype probabilities, as computed by \code{\link{computeGenotypeProbabilities}}. The slot \code{data} is a numeric matrix containing the actual computations, where columns correspond to genetic positions. 
+#' 
+#' Describing the rows of the data matrix is more complicated. The slot \code{key} is a matrix containing three columns, the first two being founder alleles, and the third being an encoding of that combination. If \code{k} is the number of rows in \code{key}, then the first \code{k} rows of the data matrix correspond to the first genetic line in the population. Specifically, the first row corresponds to genotype probabilities for the first line, for the combination of founder alleles encoding as 1. The second corresponds to genotype probabilities for the first line, for the combination encoded as 2, etc. 
+#' @param data An integer matrix containing the IBD genotype probabilities. Rows correspond to combinations of genetic lines and founder lines, and columns correspond to genetic positions. 
+#' @param key A matrix identifying how pairs of founder alleles are mapped to rows of the data slot. 
+#' @param map The map of positions at which IBD genotype probabilities are computed. 
 .probabilities <- setClass("probabilities", slots=list(data = "matrix", key = "matrix", map = "map"), validity = checkProbabilities)
 setClassUnion("probabilitiesOrNULL", c("probabilities", "NULL"))
 setClassUnion("data.frameOrNULL", c("data.frame", "NULL"))

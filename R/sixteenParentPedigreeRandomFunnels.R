@@ -22,7 +22,6 @@ sixteenParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGen
 	selfingGenerations <- as.integer(selfingGenerations)
 	return(.Call("sixteenParentPedigreeRandomFunnels", as.integer(initialPopulationSize), as.integer(selfingGenerations), as.integer(nSeeds), as.integer(intercrossingGenerations), PACKAGE="mpMap2"))
 }
-#' @export
 sixteenParentPedigreeRandomFunnelsPrototype <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)
 {
   nonNegativeIntegerArgument(initialPopulationSize)

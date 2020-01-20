@@ -63,7 +63,7 @@ checkMpcross <- function(object)
 #' @details An object of class \code{mpcross} contains data about one or more multi-parent populations, without a genetic map. As there is no genetic map, there is no information about IBD imputed genotypes or IBD genotype probabilities. There is also no information about estimated recombination fractions. 
 #' 
 #' A \code{mpcross} object must contain (at a minimum) genetic data about the founding lines of the population, genetic lines about the final lines of the population, a pedigree with information about how the final lines were generated from the founding lines, and information about how heterozygotes have been encoded. See \code{\link{geneticData-class}} for further information. See \code{\link{mpcross}} for the constructor function. 
-#' @slot geneticData A list of objects of class \code{\link{geneticData}}, each representing a population.
+#' @slot geneticData A list of objects of class \code{\link{geneticData-class}}, each representing a population.
 .mpcross <- setClass("mpcross", slots = list(geneticData = "geneticDataList"), validity=checkMpcross, contains = "canSkipValidity")
 
 checkMpcrossRF <- function(object)

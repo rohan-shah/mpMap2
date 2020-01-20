@@ -17,4 +17,9 @@ checkPedigreeGraph <- function(object)
 	if(length(errors) > 0) return(errors)
 	return(TRUE)
 }
+#' @title Graph for a pedigree
+#' @description Graph for a pedigree
+#' @details This class contains the directed graph corresponding to a pedigree, and data for laying out the graph on a plane.
+#' @slot graph An object of class igraph. 
+#' @slot layout A matrix where each row gives the position of a graph vertex in the plane. 
 .pedigreeGraph <- setClass("pedigreeGraph", slots = list(graph = "ANY", layout = "matrix"), validity = checkPedigreeGraph)

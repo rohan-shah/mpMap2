@@ -6,6 +6,12 @@ splitVector <- function(vector, splitValue)
 	return(list(before = vector[1:index], after = vector[(index+1):length(vector)]))
 }
 .addExtraMarkersStatistics <- setClass("addExtraMarkersStatistics", slots=list(data = "numeric", map = "map"))
+#' @title Plot chi-squared statistics for independence
+#' @description Plot the chi-squared statistics for independence, used to map a new marker to an existing genetic map
+#' @details This function plots a trace of the chi-squared test-statistics used to map a new genetic marker to an existing genetic map. This can be useful to, for example, see if a single polymorphism is present at multiple points on the genome. 
+#' @param x Object of class \code{addExtraMarkersStatistics} containing test-statistic values.
+#' @param y Unused
+#' @param ... Unused
 setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = function(x, ...)
 {
 	offsetVector <- c(0, head(unlist(lapply(x@map, max)), -1))

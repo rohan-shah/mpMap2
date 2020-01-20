@@ -16,6 +16,6 @@ A \code{mpcross} object must contain (at a minimum) genetic data about the found
 \section{Slots}{
 
 \describe{
-\item{\code{geneticData}}{A list of objects of class \code{\link{geneticData}}, each representing a population.}
+\item{\code{geneticData}}{A list of objects of class \code{\link{geneticData-class}}, each representing a population.}
 }}
 

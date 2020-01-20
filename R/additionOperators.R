@@ -67,8 +67,17 @@ setMethod(f = "addMpMap2", signature = c("mpcross", "mpcross"), definition = fun
     stop("Cannot combine an object with itself")
   }
   allMarkers <- sort(unique(c(markers(e1), markers(e2))))
-  #If e1 and e2 have exactly the same markers, this is trivial. 
-  if(nMarkers(e1) == nMarkers(e2) && all(markers(e1) == markers(e2)))
+  #If e1 and e2 have exactly the same markers and pedigree, this is trivial
+  if(length(e1@geneticData) == 1 && length(e2@geneticData) == 1 && nMarkers(e1) == nMarkers(e2) && all(markers(e1) == markers(e2)) && identical(e1@geneticData[[1]]@pedigree, e2@geneticData[[1]]@pedigree) && identical(founders(e1), founders(e2)))
+  {
+    combined <- e1@geneticData[[1]]
+    combined@imputed <- NULL
+    combined@probabilities <- NULL
+    combined@finals <- rbind(combined@finals, e2@geneticData[[1]]@finals)
+    return(new("mpcross", geneticData = new("geneticDataList", list(combined))))
+  }
+  #If e1 and e2 have exactly the same markers, still trivial
+  else if(nMarkers(e1) == nMarkers(e2) && all(markers(e1) == markers(e2)))
   {
     return(new("mpcross", geneticData = new("geneticDataList", c(e1@geneticData, e2@geneticData))))
   }

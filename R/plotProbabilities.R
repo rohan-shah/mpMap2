@@ -1,3 +1,24 @@
+#' @title Plot genetic composition across the genome
+#' @description Plot genetic composition across the genome
+#' @details Plot genetic composition of a population, across the genome. Composition is determined by using the IBD genotype probabilities, as computed by \code{\link{computeGenotypeProbabilities}}. The plot is produced by taking the average IBD genotype probability, for each founder allele and each genotpe position. Deviations from the expected proprotions (determined by the experimental design) may indicate non-standard genetic inheritance or selective pressure. 
+#' @param inputObject An object of class \code{mpcrossMapped} containing IBD genotype probabilities
+#' @param positions The genetic positions at which to plot the composition
+#' @param alleles The founder alleles which we are interested in. 
+#' @param chromosomes The chromosomes of to plot the composition. 
+#' @examples
+#' data(simulatedFourParentData)
+#' part1 <- subset(simulatedFourParentData, lines = names(which(finals(simulatedFourParentData)[, 50] == 1)))
+#' part2 <- subset(simulatedFourParentData, lines = names(which(finals(simulatedFourParentData)[, 50] != 1)))
+#' distorted <- subset(part1, lines = sample(nLines(part1), 100)) + part2
+#' distortedMapped <- mpcrossMapped(distorted, map = simulatedFourParentMap)
+#' probabilities <- computeGenotypeProbabilities(distortedMapped)
+#' #Here the composition of the population reflects the fact that we have less of founder 1 than expected, at a specific point on the genome
+#' plotProbabilities(probabilities)
+#' #Go back to the undistorted data
+#' undistortedMapped <- mpcrossMapped(simulatedFourParentData, map = simulatedFourParentMap)
+#' probabilities <- computeGenotypeProbabilities(distortedMapped)
+#' #Here the composition of the population reflects the expected inheritance; the trace corresponding to every founder is flat
+#' plotProbabilities(probabilities)
 #' @export
 plotProbabilities <- function(inputObject, positions, alleles, chromosomes)
 {

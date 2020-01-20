@@ -1,4 +1,13 @@
+#' @title Generate a list of encoding errors
+#' @description Generate a list of encoding errors from genetic data
 #' @export
+#' @details Given genetic data matrices for the founding lines and the final lines of a population, and information about the encoding of marker heterozygotes, generate a list of errors. 
+#' These errors include observed values which don't correspond to a known combination of marker alleles, missing values in the genetic data for the founding lines, etc. 
+#' 
+#' The results of this function allow human-readable lists of errors to be generated, or errors to be automatically fixed (if the errors are sufficiently simple). 
+#' @param founders Genetic data for the founding lines of the population
+#' @param finals Genetic data for the final lines of the population
+#' @param hetData Data about the encoding of marker heterozygotes
 listCodingErrors <- function(founders, finals, hetData)
 {
 	errors <- .Call("listCodingErrors", founders, finals, hetData, PACKAGE="mpMap2")
@@ -8,8 +17,13 @@ listCodingErrors <- function(founders, finals, hetData)
 	errors$null <- errors$null + 1
 	return(errors)
 }
+#' @title Generate a list of encoding errors assuming infinite selfing
+#' @description Generate a list of encoding errors assuming infinite selfing 
+#' @details Generate a list of encoding errors assuming infinite selfing. Given the infinite selfing assumption, no information about heterozygote encoding is required. 
+#' @param founders Genetic data for the founding lines of the population
+#' @param finals Genetic data for the final lines of the population
 #' @export
-listCodingErrorsMpMap <- function(founders, finals)
+listCodingErrorsInfiniteSelfing <- function(founders, finals)
 {
 	newHetDataList <- lapply(as.list(1:ncol(founders)), function(x)
 	{
