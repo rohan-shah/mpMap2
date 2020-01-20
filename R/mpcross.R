@@ -86,6 +86,21 @@ fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
     return(new("mpcross", geneticData = geneticDataList))
   }
 }
+#' @title Create object of class mpcross
+#' @description Create object of class mpcross
+#' @details This function constructs an object of class \code{mpcross} representing a multi-parent population. It takes in genetic data about the founding lines and final population line, a pedigree, and information about how marker heterozygotes have been encoded.
+#'
+#' Parameter \code{founders} is the genetic data about the founding lines of the population. It must be an integer matrix, with rows representing genetic lines, and columns representing genetic markers. Parameter \code{finals} is a similar matrix, representing data for the final genetic lines in the population. 
+#' 
+#' Parameter pedigree stores information about how the final lines in the population were generated from the founding lines. 
+#' 
+#' Parameter hetDat must be an object of class \code{hetData} containing information about how marker heterozygotes have been encoded, OR a function which generates such an object. The function must take as arguments \code{founders, finals} and \code{pedigree}. See \code{\link{infiniteSelfing}} for an example of such a function. 
+#' 
+#' @param founders The genetic data for the founding lines of the population, represented as an integer matrix.
+#' @param finals The genetic data for the final lines of the population, represented as an integer matrix. 
+#' @param pedigree An object of class \code{pedigree} 
+#' @param hetData Information about how marker heterozygotes have been encoded. Can be an object of class \code{hetData}, or a function generating such an object from the previous three inputs.
+#' @param fixCodingErrors Should we automatically fix data errors, by changing invalid values to missing?
 #' @export
 mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCodingErrors = FALSE)
 {
@@ -152,6 +167,12 @@ mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCo
 	mpcross <- new("mpcross", geneticData = new("geneticDataList", list(geneticData)))
 	return(mpcross)
 }
+#' @title Create object of class mpcrossMapped
+#' @description Create object of class mpcrossMapped
+#' @details This function constructs an object of class \code{mpcrossMapped} representing a multi-parent population with a map. It takes in an object of class \code{mpcross}, a genetic map, and optional recombination fraction data.
+#' @param cross An object of class \code{mpcross}
+#' @param map A genetic map, formatted as in the \code{qtl} package.
+#' @param rf Optional recombination fraction data. Leave as NULL if there is no such data.
 #' @export
 mpcrossMapped <- function(cross, map, rf=NULL)
 {

@@ -1,3 +1,7 @@
+#' @title Convert pedigree to a graph
+#' @description Convert pedigree to a graph
+#' @details It is often useful for visualisation purposes to generate the pedigree graph. In this graph, every genetic line is a vertex in a graph, and there is an edge from every parent to all the offspring. This function generates the graph, and lays the graph out in the plane in a way that tends to make the structure of the graph as clear as possible. 
+#' @param pedigree The pedigree to convert into a graph
 #' @export
 pedigreeToGraph <- function(pedigree)
 {
