@@ -16,7 +16,9 @@ Depends:
 LinkingTo: Rcpp
 Suggests:
     testthat,
-    mpMapInteractive2
+    mpMapInteractive2,
+    knitr,
+    rmarkdown
 Imports: 
     ggplot2,
     Matrix,
@@ -129,3 +131,4 @@ Collate:
     'transposeProbabilities.R'
     'twoParentPedigree.R'
     'validation.R'
+VignetteBuilder: knitr
