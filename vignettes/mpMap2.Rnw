@@ -630,7 +630,7 @@ grouped <- formGroups(rf, groups = 3, method = "average", clusterBy="theta")
 ordered <- orderCross(grouped, effortMultiplier = 2)
 imputedTheta <- impute(ordered, verbose = list(progressStyle = 1)) 
 @
-The next step is to estimate the map. Our estimated map is significantly longer than the true map. Note the use of the function \code{jitterMap}. This function spaces out markers that have been assigned to the same location. This is necessary for the purposes of imputation, as \code{estimateMap} is capable of estimating a map where markers which are observed to have at least one recombination event between them are assigned the same location. This makes the map incompatible with the data, and would cause problems during the imputation step, unless a non-zero \code{errorProb} is specified. . 
+The next step is to estimate the map. Our estimated map is significantly longer than the true map. Note the use of the function \code{jitterMap}. This function spaces out markers that have been assigned to the same location. This is necessary for the purposes of imputation, as \code{estimateMap} is capable of estimating a map where markers which are observed to have at least one recombination event between them are assigned the same location. This makes the map incompatible with the data, and would cause problems during the imputation step, unless a non-zero \code{errorProb} is specified. 
 <<cache=TRUE>>=
 estimatedMap <- estimateMap(imputedTheta, maxOffset = 10)
 estimatedMap <- jitterMap(estimatedMap)
