@@ -1,4 +1,16 @@
 #' @export
+#' @title Estimate pairwise recombination fractions
+#' @description Estimate pairwise recombination fractions, similar to \code{\link{estimateRF}}, but with different performance requirements in terms of compute time and storage. 
+#' @details Estimate pairwise recombination fractions, similar to \code{\link{estimateRF}}, but with different performance requirements in terms of compute time and storage. Specifically, this version is expected to perform better when there is only a single population. 
+#' @param object An object of class \code{mpcross}.
+#' @param recombValues a vector of test values to use for the numeric maximum likelihood step. Must contain 0 and 0.5, and must have less than 255 values in total. The default value is \code{c(0:20/200, 11:50/100)}.
+#' @param lineWeights Values to use to correct for segregation distortion. This parameter should in general be left unspecified.
+#' @param keepLod Set to \code{TRUE} to compute the likelihood ratio score statistics for testing whether the estimate is different from 0.5. Due to memory constraints this should generally be left as \code{FALSE}.
+#' @param keepLkhd Set to \code{TRUE} to compute the maximum value of the likelihood. Due to memory constraints this should generally be left as \code{FALSE}.
+#' @param verbose Output diagnostic information, such as the amount of memory required, and the progress of the computation.
+#' @param markerRows Used to estimate only a subset of the full matrix of pairwise recombination fractions.
+#' @param markerColumns Used to estimate only a subset of the full matrix of pairwise recombination fractions.
+#' @return An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data.
 estimateRFSingleDesign <- function(object, recombValues, lineWeights, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 {
 	inheritsNewMpcrossArgument(object)

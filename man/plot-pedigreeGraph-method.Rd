@@ -7,6 +7,13 @@
 \usage{
 \S4method{plot}{pedigreeGraph}(x, y, ...)
 }
+\arguments{
+\item{x}{pedigree graph to plot}
+
+\item{y}{unused}
+
+\item{...}{Other options to plot.igraph}
+}
 \description{
 Plot the graph of a pedigree
 }

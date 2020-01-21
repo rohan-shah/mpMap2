@@ -23,8 +23,6 @@ clusterOrderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
 \item{randomStart}{If TRUE, start from the current ordering}
 
 \item{nGroups}{The number of groups to form using hierarchical clustering}
-
-\item{verbose}{If TRUE, generate more detailed output}
 }
 \description{
 Group markers into blocks and arrange those blocks

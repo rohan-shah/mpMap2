@@ -1,3 +1,8 @@
+#' @title Extract pedigree by names
+#' @description Extract part of pedigree in human-readable format
+#' @details Pedigrees in mpMap2 are stored using indices for maternal and paternal lines, which is not a human-readable format. This function takes in a pedigree, and returns a human-readable subset.
+#' @param pedigree An object of class \code{pedigree}
+#' @param names The names of the lines for which to extract the pedigree
 #' @export
 linesByNames <- function(pedigree, names)
 {

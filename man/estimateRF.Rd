@@ -2,7 +2,9 @@
 % Please edit documentation in R/estimateRF.R
 \name{estimateRF}
 \alias{estimateRF}
-\title{Estimate recombination fractions}
+\title{Estimate pairwise recombination fractions
+
+This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.}
 \usage{
 estimateRF(object, recombValues, lineWeights, gbLimit = -1,
   keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE,
@@ -31,6 +33,8 @@ estimateRF(object, recombValues, lineWeights, gbLimit = -1,
 An object of class \code{mpcrossRF}, which contains the original genetic data, and also estimated recombination fraction data.
 }
 \description{
+Estimate pairwise recombination fractions
+
 This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.
 }
 \details{

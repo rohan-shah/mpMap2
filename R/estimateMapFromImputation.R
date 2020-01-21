@@ -1,3 +1,9 @@
+#' @title Re-estimate large gaps in a genetic map from IBD genotype imputations
+#' @description Re-estimate large gaps in a genetic map from IBD genotype imputations
+#' @details For larger gaps in a genetic map, the pairwise recombination fractions are not (by themselves) useful. An alternative is to estimate the IBD genotypes, and use the imputed IBD genotypes to re-estimate larger gaps using numerical maximum likelihood. Although the IBD genotypes are based on an existing genetic map, they may not be strongly affected by a large gap that has been poorly estimated, as the imputed IBD genotypes represent a consensus across all nearby markers, and also allow for genotyping errors. As a result, the re-estimated map may be different from the original map, and potentially more accurate. 
+#' @param mpcrossMapped An object of class \code{mpcrossMapped}
+#' @param gapSize The size of the gap to reestimate. 
+#' @param recombinationFractions The recombination fractions to use for numerical maximum likelihood estimation
 #' @export
 estimateMapFromImputation <- function(mpcrossMapped, gapSize = 5, recombinationFractions = c(0:60/600, 11:49/100))
 {

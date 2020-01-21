@@ -50,7 +50,6 @@ orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0
 #' @param maxMove Maximum number of positions by which to shift a single marker, as part of the simulated annealing. A value of zero indicates no limit. 
 #' @param effortMultiplier Multiplier for the amount of computational effort
 #' @param randomStart If TRUE, start from the current ordering
-#' @param verbose If TRUE, generate more detailed output
 #' @param nGroups The number of groups to form using hierarchical clustering
 #' @export
 clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0, effortMultiplier = 1, randomStart = TRUE, nGroups)

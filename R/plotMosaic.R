@@ -1,4 +1,12 @@
 #' @export
+#' @title Plot estimated genetic composition of lines
+#' @description Plot estimated genetic composition of lines
+#' @details This function produces a heatmap showing the genetic composition of lines, as measured by the imputed IBD genotypes. Rows correspond to genetic lines, columns correspond to genetic positions, and colours indicate founder alleles. All heterozygotes are marked in the same colour, otherwise there are generally too many colours to be useful. 
+#' @param inputObject An object of class \code{mpcrossMapped} containing imputed IBD genotypes 
+#' @param chromosomes Chromosomes to plot
+#' @param positions Genetic positions to plot
+#' @param lines Genetic lines to plot
+#' @param ... Extra inputs to \code{heatmap_2}
 plotMosaic <- function(inputObject, chromosomes, positions, lines, ...)
 {
 	if(inherits(inputObject, "mpcrossMapped"))
