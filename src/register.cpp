@@ -50,7 +50,7 @@
 #include "arsaRaw.h"
 extern "C"
 {
-	char* package_name = "mpMap2";
+	const char* package_name = "mpMap2";
 	R_CallMethodDef callMethods[] = 
 	{
 		{"checkHets", (DL_FUNC)&checkHets, 1},
@@ -133,9 +133,13 @@ extern "C"
 #ifdef CUSTOM_STATIC_RCPP
 		init_Rcpp_cache();
 #endif
-		R_RegisterCCallable(package_name, "impute", (DL_FUNC)&impute);
-		R_RegisterCCallable(package_name, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
-		R_RegisterCCallable(package_name, "arsaRaw", (DL_FUNC)&arsaRaw::arsaRawExported);
-		R_RegisterCCallable(package_name, "arsa", (DL_FUNC)&arsa);
+		//Make non-const string
+		char package_name_copy[100];
+		memset(package_name_copy, '\0', sizeof(package_name_copy));
+		strcpy(package_name_copy, package_name);
+		R_RegisterCCallable(package_name_copy, "impute", (DL_FUNC)&impute);
+		R_RegisterCCallable(package_name_copy, "constructDissimilarityMatrixInternal", (DL_FUNC)&constructDissimilarityMatrixInternal);
+		R_RegisterCCallable(package_name_copy, "arsaRaw", (DL_FUNC)&arsaRaw::arsaRawExported);
+		R_RegisterCCallable(package_name_copy, "arsa", (DL_FUNC)&arsa);
 	}
 }
