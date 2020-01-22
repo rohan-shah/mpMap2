@@ -1,3 +1,6 @@
+%\VignetteEngine{utils::Sweave}
+%\VignetteIndexEntry{mpMap2}
+%\VignetteEncoding{UTF-8}
 \pdfoutput=1
 \RequirePackage{fix-cm}
 \documentclass[a4paper, nojss, shortnames]{jss}
