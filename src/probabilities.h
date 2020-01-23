@@ -152,7 +152,7 @@ public:
 		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
 		std::array<double, nDifferentProbs> probabilities;
 		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
-		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		memset(expandedProbabilities.values, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>::values));
 		if(takeLogs)
 		{
 			for(int i = 0; i < nDifferentProbs; i++)
@@ -248,7 +248,7 @@ public:
 		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
 		std::array<double, nDifferentProbs> probabilities;
 		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels);
-		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		memset(expandedProbabilities.values, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>::values));
 #ifdef INTERNAL_CHECKS
 		double sum = 0;
 #endif
@@ -287,7 +287,7 @@ public:
 		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
 		std::array<double, nDifferentProbs> probabilities;
 		genotypeProbabilitiesWithIntercross<nFounders, false>(probabilities, nAIGenerations, r, selfingGenerations, nFunnels);
-		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		memset(expandedProbabilities.values, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>::values));
 #ifdef INTERNAL_CHECKS
 		double sum = 0;
 #endif

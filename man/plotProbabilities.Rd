@@ -23,16 +23,20 @@ Plot genetic composition of a population, across the genome. Composition is dete
 }
 \examples{
 data(simulatedFourParentData)
-part1 <- subset(simulatedFourParentData, lines = names(which(finals(simulatedFourParentData)[, 50] == 1)))
-part2 <- subset(simulatedFourParentData, lines = names(which(finals(simulatedFourParentData)[, 50] != 1)))
+part1 <- subset(simulatedFourParentData, lines = 
+	names(which(finals(simulatedFourParentData)[, 50] == 1)))
+part2 <- subset(simulatedFourParentData, lines = 
+	names(which(finals(simulatedFourParentData)[, 50] != 1)))
 distorted <- subset(part1, lines = sample(nLines(part1), 100)) + part2
 distortedMapped <- mpcrossMapped(distorted, map = simulatedFourParentMap)
 probabilities <- computeGenotypeProbabilities(distortedMapped)
-#Here the composition of the population reflects the fact that we have less of founder 1 than expected, at a specific point on the genome
+#Here the composition of the population reflects the fact that we have less of founder 1 than 
+#    expected, at a specific point on the genome
 plotProbabilities(probabilities)
 #Go back to the undistorted data
 undistortedMapped <- mpcrossMapped(simulatedFourParentData, map = simulatedFourParentMap)
 probabilities <- computeGenotypeProbabilities(distortedMapped)
-#Here the composition of the population reflects the expected inheritance; the trace corresponding to every founder is flat
+#Here the composition of the population reflects the expected inheritance; the trace 
+#    corresponding to every founder is flat
 plotProbabilities(probabilities)
 }

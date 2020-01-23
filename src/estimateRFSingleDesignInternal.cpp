@@ -283,7 +283,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 				for(int funnelCounter = 0; funnelCounter < (int)nDifferentFunnels; funnelCounter++)
 				{
 					array2<maxAlleles>* markerProbabilitiesThisFunnel = &(thisMarkerPairData.perFunnelData(0, funnelCounter, selfingCounter - minSelfing));
-					memset(markerProbabilitiesThisFunnel, 0, sizeof(array2<maxAlleles>));
+					memset(markerProbabilitiesThisFunnel->values, 0, sizeof(array2<maxAlleles>::values));
 					if(thisMarkerPairData.allowableFunnel(funnelCounter, selfingCounter - minSelfing))
 					{
 						funnelHaplotypeToMarker<nFounders, maxAlleles, infiniteSelfing>::template convert<true>(funnelHaplotypeProbabilities, markerProbabilitiesThisFunnel, args.lineFunnelEncodings[funnelCounter], firstMarkerPatternData, secondMarkerPatternData, selfingCounter - minSelfing);

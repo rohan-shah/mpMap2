@@ -29,3 +29,5 @@ Imports:
     Heatplus,
     RColorBrewer,
     jsonlite
+VignetteBuilder: knitr
+

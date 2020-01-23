@@ -16,8 +16,10 @@ pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000,
 #Assume infinite generations of selfing in subsequent analysis
 selfing(pedigree) <- "infinite"
 #Generate random map
-simulatedFourParentMap <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, include.x = FALSE)
+simulatedFourParentMap <- qtl::sim.map(len = 100, n.mar = 101, anchor.tel = TRUE, 
+	include.x = FALSE)
 #Simulate data
-simulatedFourParentData <- simulateMPCross(map = simulatedFourParentMap, pedigree = pedigree, mapFunction = haldane, seed = 1L)
+simulatedFourParentData <- simulateMPCross(map = simulatedFourParentMap, pedigree = pedigree, 
+	mapFunction = haldane, seed = 1L)
 #save(simulatedFourParentData, simulatedFourParentMap, file = "data/simulatedFourParentData.RData")
 }

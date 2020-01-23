@@ -29,7 +29,8 @@
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
 #' 
-#' #Now only estimate recombination fractions between the first 3 markers. The other estimates will just be marked as NA
+#' #Now only estimate recombination fractions between the first 3 markers. 
+#' #    The other estimates will just be marked as NA
 #' rf <- estimateRF(cross, markerRows = 1:3, markerColumns = 1:3)
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
@@ -39,7 +40,8 @@
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
 #' 
-#' #In this case only ONE value is estimated, because only one element of the requested subset lies in the upper-triangular part - The value on the diagonal. 
+#' #In this case only ONE value is estimated, because only one element of the requested subset 
+#' #    lies in the upper-triangular part - The value on the diagonal. 
 #' rf <- estimateRF(cross, markerRows = 3, markerColumns = 1:3)
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]

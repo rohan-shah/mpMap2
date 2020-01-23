@@ -115,6 +115,7 @@ extern "C"
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
 	{
+		R_useDynamicSymbols(info, FALSE);
 		std::vector<R_CallMethodDef> callMethodsVector;
 		R_CallMethodDef* mpMap2CallMethods = callMethods;
 		while(mpMap2CallMethods->name != NULL) mpMap2CallMethods++;

@@ -18,7 +18,8 @@
 #' map <- qtl::sim.map()
 #' #Simulate data
 #' cross <- simulateMPCross(map = map, pedigree = pedigree, mapFunction = haldane)
-#' #Get out a list of funnels, which are rows of this matrix. Note that, of the values 1:8, some are missing within a row, and some are repeated. 
+#' #Get out a list of funnels, which are rows of this matrix. Note that, of the values 1:8, 
+#' #    some are missing within a row, and some are repeated. 
 #' getAllFunnels(cross)
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
