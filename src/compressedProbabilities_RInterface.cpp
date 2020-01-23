@@ -1,5 +1,5 @@
 #include "compressedProbabilities_RInterface.h"
-#include "probabilities.hpp"
+#include "probabilities.h"
 template<int nFounders, bool infiniteSelfing> Rcpp::NumericVector getCompressedProbabilities2(double r, int nFunnels, int intercrossingGenerations, int selfingGenerations)
 {
 	std::array<double, compressedProbabilities<nFounders, infiniteSelfing>::nDifferentProbs> result;

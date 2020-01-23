@@ -1,4 +1,4 @@
-#include "compressedProbabilities.hpp"
+#include "compressedProbabilities.h"
 const int compressedProbabilities<2, true>::nDifferentProbs;
 const int compressedProbabilities<2, false>::nDifferentProbs;
 const int compressedProbabilities<4, true>::nDifferentProbs;

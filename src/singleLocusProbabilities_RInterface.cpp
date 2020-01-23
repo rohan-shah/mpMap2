@@ -1,5 +1,5 @@
 #include "singleLocusProbabilities_RInterface.h"
-#include "probabilities.hpp"
+#include "probabilities.h"
 #include "probabilities2.h"
 #include "probabilities4.h"
 #include "probabilities8.h"

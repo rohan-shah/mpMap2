@@ -3,6 +3,6 @@
 #include <map>
 #include <vector>
 #include "estimateRF.h"
-#include "unitTypes.hpp"
+#include "unitTypes.h"
 void funnelsToUniqueValues(std::map<funnelEncoding, funnelID>& funnelTranslation, std::vector<funnelID>& lineFunnelIDs, std::vector<funnelEncoding>& lineFunnelEncodings, std::vector<funnelEncoding>& allFunnelEncodings, std::vector<funnelType>& lineFunnels, std::vector<funnelType>& allFunnels, int nFounders);
 #endif

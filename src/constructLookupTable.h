@@ -1,10 +1,10 @@
 #ifndef CONSTRUCT_LOOKUP_TABLE_HEADER_GUARD
 #define CONSTRUCT_LOOKUP_TABLE_HEADER_GUARD
 #define N_FINER_POINTS 101
-#include "matrices.hpp"
-#include "probabilities.hpp"
-#include "intercrossingHaplotypeToMarker.hpp"
-#include "funnelHaplotypeToMarker.hpp"
+#include "matrices.h"
+#include "probabilities.h"
+#include "intercrossingHaplotypeToMarker.h"
+#include "funnelHaplotypeToMarker.h"
 #include "getMinAIGenerations.h"
 template<int maxAlleles> struct singleMarkerPairData
 {

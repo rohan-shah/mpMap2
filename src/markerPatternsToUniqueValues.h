@@ -3,8 +3,8 @@
 #include <map>
 #include <vector>
 #include <Rcpp.h>
-#include "unitTypes.hpp"
-#include "matrices.hpp"
+#include "unitTypes.h"
+#include "matrices.h"
 #include "crc32.h"
 struct markerData
 {

@@ -1,8 +1,8 @@
 #include "computeGenotypeProbabilities.h"
 #include "intercrossingAndSelfingGenerations.h"
 #include "recodeFoundersFinalsHets.h"
-#include "matrices.hpp"
-#include "probabilities.hpp"
+#include "matrices.h"
+#include "probabilities.h"
 #include "probabilities2.h"
 #include "probabilities4.h"
 #include "probabilities8.h"
@@ -10,9 +10,9 @@
 #include "funnelsToUniqueValues.h"
 #include "estimateRFCheckFunnels.h"
 #include "markerPatternsToUniqueValues.h"
-#include "intercrossingHaplotypeToMarker.hpp"
-#include "funnelHaplotypeToMarker.hpp"
-#include "forwardsBackwards.hpp"
+#include "intercrossingHaplotypeToMarker.h"
+#include "funnelHaplotypeToMarker.h"
+#include "forwardsBackwards.h"
 #include "recodeHetsAsNA.h"
 #include "impossibleDataException.h"
 #include "warnings.h"
@@ -20,7 +20,7 @@
 #include "joinMapWithExtra.h"
 #include "getMinAIGenerations.h"
 #include "mapFunctions.h"
-#include "array2.hpp"
+#include "array2.h"
 template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesInternal2(Rcpp::IntegerMatrix founders, Rcpp::IntegerMatrix finals, Rcpp::S4 pedigree, Rcpp::List hetData, Rcpp::List map, Rcpp::NumericMatrix results, double homozygoteMissingProb, double heterozygoteMissingProb, double errorProb, Rcpp::IntegerMatrix key, positionData& allPositions)
 {
 	//Work out maximum number of markers per chromosome

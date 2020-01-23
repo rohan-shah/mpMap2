@@ -1,6 +1,6 @@
 #ifndef INTERCROSSING_HAPLOTYPE_TO_MARKER_INFINITE_SELFING_HEADER_GUARD
 #define INTERCROSSING_HAPLOTYPE_TO_MARKER_INFINITE_SELFING_HEADER_GUARD
-#include "array2.hpp"
+#include "array2.h"
 template<int nFounders, int maxAlleles> struct intercrossingHaplotypeToMarker<nFounders, maxAlleles, true>
 {
 private:

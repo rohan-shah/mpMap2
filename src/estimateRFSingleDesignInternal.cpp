@@ -6,10 +6,10 @@
 #include "warnings.h"
 #include "matrixChunks.h"
 #include "estimateRFSingleDesignInternal.h"
-#include "constructLookupTable.hpp"
-#include "intercrossingHaplotypeToMarker.hpp"
-#include "funnelHaplotypeToMarker.hpp"
-#include "probabilities.hpp"
+#include "constructLookupTable.h"
+#include "intercrossingHaplotypeToMarker.h"
+#include "funnelHaplotypeToMarker.h"
+#include "probabilities.h"
 #include "probabilities2.h"
 #include "probabilities4.h"
 #include "probabilities8.h"
@@ -85,7 +85,7 @@ bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInt
 
 	//We need to assign a unique ID to each marker pattern - Where by pattern we mean the combination of hetData and founder alleles. Note that this is possible because we just recoded everything to a standardised format.
 	//Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
-	//Note that markerPatternID is defined in unitTypes.hpp. It's just an integer (and automatically convertible to an integer), but it's represented by a unique type - This stops us from confusing it with an ordinary integer.
+	//Note that markerPatternID is defined in unitTypes.h. It's just an integer (and automatically convertible to an integer), but it's represented by a unique type - This stops us from confusing it with an ordinary integer.
 	markerPatternsToUniqueValuesArgs markerPatternConversionArgs;
 	markerPatternConversionArgs.nFounders = nFounders;
 	markerPatternConversionArgs.nMarkers = nMarkers;

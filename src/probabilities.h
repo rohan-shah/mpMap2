@@ -1,11 +1,11 @@
 #ifndef PROBABILITIES_HEADER_GUARD
 #define PROBABILITIES_HEADER_GUARD
-#include "matrices.hpp"
+#include "matrices.h"
 #include <cmath>
 #include <stdexcept>
 #include <limits>
 #include <array>
-#include "array2.hpp"
+#include "array2.h"
 /*
  * Struct that will contain arrays relevant for probability calculations
  */
@@ -38,7 +38,7 @@ template<int nFounders> struct expandedProbabilities<nFounders, false>
 {
 	typedef expandedProbabilitiesFiniteSelfing<nFounders> type;
 };
-#include "compressedProbabilities.hpp"
+#include "compressedProbabilities.h"
 /*
  * Templated function to work out the two-point probabilities with the given recombination fraction (and number of AI generations). Templating allows the number of founders to be a compile-time constant
  */

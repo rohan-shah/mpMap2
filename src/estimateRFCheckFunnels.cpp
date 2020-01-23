@@ -2,7 +2,7 @@
 #include "estimateRF.h"
 #include "getFunnel.h"
 #include "orderFunnel.h"
-#include "matrices.hpp"
+#include "matrices.h"
 #include "sortPedigreeLineNames.h"
 void getAICParentLines(Rcpp::IntegerVector& mother, Rcpp::IntegerVector& father, long pedigreeRow, int intercrossingGenerations, std::vector<long>& individualsToCheckFunnels)
 {

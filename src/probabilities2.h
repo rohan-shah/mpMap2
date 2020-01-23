@@ -1,6 +1,6 @@
 #ifndef PROBABILITIES_2_HEADER_GUARD
 #define PROBABILITIES_2_HEADER_GUARD
-#include "probabilities.hpp"
+#include "probabilities.h"
 template<> struct probabilityData<2>
 {
 public:

@@ -2,8 +2,8 @@
 #define VITERBI_FINITE_SELFING_HEADER_GUARD
 #include "intercrossingAndSelfingGenerations.h"
 #include "recodeFoundersFinalsHets.h"
-#include "matrices.hpp"
-#include "probabilities.hpp"
+#include "matrices.h"
+#include "probabilities.h"
 #include "probabilities2.h"
 #include "probabilities4.h"
 #include "probabilities8.h"
@@ -11,8 +11,8 @@
 #include "funnelsToUniqueValues.h"
 #include "estimateRFCheckFunnels.h"
 #include "markerPatternsToUniqueValues.h"
-#include "intercrossingHaplotypeToMarker.hpp"
-#include "funnelHaplotypeToMarker.hpp"
+#include "intercrossingHaplotypeToMarker.h"
+#include "funnelHaplotypeToMarker.h"
 #include <limits>
 #include "joinMapWithExtra.h"
 template<int nFounders> struct viterbiAlgorithm<nFounders, false>
@@ -114,7 +114,7 @@ template<int nFounders> struct viterbiAlgorithm<nFounders, false>
 			updateProgress((unsigned long long)finalCounter);
 		}
 	}
-#include "viterbiFiniteSelfingApplyFunnel.hpp"
-#include "viterbiFiniteSelfingApplyIntercrossing.hpp"
+#include "viterbiFiniteSelfingApplyFunnel.h"
+#include "viterbiFiniteSelfingApplyIntercrossing.h"
 };
 #endif
