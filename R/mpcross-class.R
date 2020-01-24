@@ -195,7 +195,8 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 #' #Initially the object contains markers that are fully informative.
 #' #The final genetic data contains values 1, 2 and 3, while the genetic data for the founding 
 #' #    lines contains only values 1 and 2. 
-#' #A value of 1 or 2 in the final genetic data indicates a homozygote for the corresponding marker allele. 
+#' #A value of 1 or 2 in the final genetic data indicates a homozygote for the 
+#' #	corresponding marker allele. 
 #' #A value of 3 in the final genetic data indicates a heterozygote for the marker allele.
 #' #Information about this encoding is stored in the hetData slot.
 #' hetData(cross, "D1M1")
@@ -203,7 +204,8 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 #' #Now we have converted all markers to dominant.
 #' #The final genetic data contains values 1 and 2, and the genetic data for the founding 
 #' #    lines contains only values 1 and 2. 
-#' #A value of 2 indicates a homozygote for the corresponding marker allele, OR a marker heterozygote.
+#' #A value of 2 indicates a homozygote for the corresponding marker allele, OR a 
+#' #	marker heterozygote.
 #' hetData(cross, "D1M1")
 #' #But under infinite generations of selfing, the encoding is simpler. 
 #' simpleEncoding <- infiniteSelfing(founders = founders(cross), finals = finals(cross), 
