@@ -35,7 +35,14 @@ BEGIN_RCPP
 	recoded.founders = founders;
 	recoded.finals = finals;
 	recoded.hetData = hetData;
-	recodeFoundersFinalsHets(recoded);
+	try
+	{
+		recodeFoundersFinalsHets(recoded);
+	}
+	catch(std::invalid_argument& argument)
+	{
+		throw std::runtime_error("Invalid input, please run validObject on the input mpcross object for more information");
+	}
 
 	bool hasHets = false, hasHetEncodings = false;
 	for(int markerCounter = 0; markerCounter < nMarkers; markerCounter++)

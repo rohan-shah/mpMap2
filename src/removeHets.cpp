@@ -18,7 +18,14 @@ BEGIN_RCPP
 	args.recodedHetData = recodedHetData;
 	args.recodedFounders = recodedFounders;
 	args.recodedFinals = recodedFinals;
-	recodeFoundersFinalsHets(args);
+	try
+	{
+		recodeFoundersFinalsHets(args);
+	}
+	catch(std::invalid_argument& argument)
+	{
+		throw std::runtime_error("Invalid input, please run validObject on the input mpcross object for more information");
+	}
 
 	for(int i = 0; i < nMarkers; i++)
 	{

@@ -206,7 +206,7 @@ test_that("Test non-zero generations of intercrossing, dominant markers, no erro
 
 			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M26"])))/sampleSize, 0.75)
 			#In this particular scenario recombinations are marked as occuring between extra and D1M27, rather than the first pair. 
-			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.75)
+			expect_gt(sum(diag(table(genotypesFromProbabilities[,"extra"], genotypesFromProbabilities[,"D1M27"])))/sampleSize, 0.745)
 		}
 		map <- qtl::sim.map(len = c(50, 50), n.mar = 51, anchor.tel = TRUE, include.x=FALSE, eq.spacing=TRUE)
 		pedigree1 <- twoParentPedigree(initialPopulationSize = sampleSize, selfingGenerations = 0, nSeeds = 1, intercrossingGenerations = 1)

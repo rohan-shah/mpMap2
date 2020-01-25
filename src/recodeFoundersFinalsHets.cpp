@@ -48,7 +48,9 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 		{
 			for(int j = 0; j < 2; j++)
 			{
-				recodedCurrentMarkerHetData(i, j) = founderTranslations.find(currentMarkerHetData(i, j))->second;
+				std::map<int, int>::iterator searchResult = founderTranslations.find(currentMarkerHetData(i, j));
+				if(searchResult != founderTranslations.end()) recodedCurrentMarkerHetData(i, j) = searchResult->second;
+				else throw std::invalid_argument("Invalid genotype encoding");
 			}
 			if(currentMarkerHetData(i, 0) != currentMarkerHetData(i, 1)) hetValues.push_back(currentMarkerHetData(i, 2));
 			else
@@ -74,7 +76,9 @@ void recodeFoundersFinalsHets(recodeDataStruct& inputs)
 		{
 			if(inputs.finals(finalCounter, markerCounter) != NA_INTEGER)
 			{
-				inputs.recodedFinals(finalCounter, markerCounter) = finalTranslations.find(inputs.finals(finalCounter, markerCounter))->second;
+				std::map<int, int>::iterator i = finalTranslations.find(inputs.finals(finalCounter, markerCounter));
+				if(i != finalTranslations.end()) inputs.recodedFinals(finalCounter, markerCounter) = i->second;
+				else throw std::invalid_argument("Invalid genotype encoding");
 			}
 			else inputs.recodedFinals(finalCounter, markerCounter) = NA_INTEGER;
 		}

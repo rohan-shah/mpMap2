@@ -33,7 +33,14 @@ BEGIN_RCPP
 	recodeDataArgs.recodedFounders = recodedFounders;
 	recodeDataArgs.recodedFinals = recodedFinals;
 	recodeDataArgs.recodedHetData = recodedHetData;
-	recodeFoundersFinalsHets(recodeDataArgs);
+	try
+	{
+		recodeFoundersFinalsHets(recodeDataArgs);
+	}
+	catch(std::invalid_argument& argument)
+	{
+		throw std::runtime_error("Invalid input, please run validObject on the input mpcross object for more information");
+	}
 
 	//Working data
 	std::vector<int> alleles, uniqueAlleles, alleleCounts, encodings, table;

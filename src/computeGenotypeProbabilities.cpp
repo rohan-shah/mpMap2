@@ -61,7 +61,14 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	recoded.finals = finals;
 	recoded.hetData = hetData;
 	recoded.recodedHetData = recodedHetData;
-	recodeFoundersFinalsHets(recoded);
+	try
+	{
+		recodeFoundersFinalsHets(recoded);
+	}
+	catch(std::invalid_argument& argument)
+	{
+		throw std::runtime_error("Invalid input, please run validObject on the input mpcross object for more information");
+	}
 
 	if(infiniteSelfing)
 	{

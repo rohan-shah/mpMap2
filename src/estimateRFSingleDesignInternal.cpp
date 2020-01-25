@@ -81,7 +81,14 @@ bool toInternalArgs(estimateRFSingleDesignArgs&& args, estimateRFSingleDesignInt
 	recoded.finals = args.finals;
 	recoded.hetData = args.hetData;
 	recoded.recodedHetData = recodedHetData;
-	recodeFoundersFinalsHets(recoded);
+	try
+	{
+		recodeFoundersFinalsHets(recoded);
+	}
+	catch(std::invalid_argument& argument)
+	{
+		throw std::runtime_error("Invalid input, please run validObject on the input mpcross object for more information");
+	}
 
 	//We need to assign a unique ID to each marker pattern - Where by pattern we mean the combination of hetData and founder alleles. Note that this is possible because we just recoded everything to a standardised format.
 	//Marker IDs are guaranteed to be contiguous numbers starting from 0 - So the set of all valid [0, markerPatterns.size()]. 
