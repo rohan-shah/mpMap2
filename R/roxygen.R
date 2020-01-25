@@ -25,6 +25,11 @@
 #' @importClassesFrom Matrix index dspMatrix dppMatrix
 #' @importFrom methods setClass
 #' @importFrom jsonlite toJSON
+#' @importClassesFrom sn SECdistrMv
+#' @importFrom stats lm contrasts<-
+#' @importFrom sn dmst extractSECdistr selm
+#' @importMethodsFrom sn plot
+#' @importFrom igraph max_cliques graph_from_adjacency_matrix
 #' @useDynLib mpMap2
 NULL
 
@@ -50,4 +55,11 @@ NULL
 NULL
 #' @name simulatedFourParentMap
 #' @rdname simulatedFourParentData
+NULL
+
+#' @name eightWayExampleData
+#' @title Example data from an 8-parent MAGIC population. 
+#' @docType data
+#' @author Alex Whan, Matthew Morell, Rohan Shah, Colin Cavanagh
+#' This is a sample of 200 genetic markers from an 8-way MAGIC population of 4229 lines.
 NULL

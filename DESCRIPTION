@@ -53,6 +53,7 @@ Collate:
     'assignFounderPatternPrototype.R'
     'backcrossPedigree.R'
     'biparentalDominant.R'
+    'callFromMap.R'
     'changeMarkerPosition.R'
     'combineGenotypes.R'
     'combineKeepRF.R'
