@@ -28,6 +28,7 @@ Imports:
     nnls,
     Heatplus,
     RColorBrewer,
-    jsonlite
+    jsonlite,
+    sn
 VignetteBuilder: knitr
 

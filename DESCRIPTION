@@ -32,7 +32,8 @@ Imports:
     RColorBrewer,
     jsonlite,
     progress,
-    stats
+    stats,
+    sn
 RoxygenNote: 6.1.1
 Collate: 
     'Rcpp_exceptions.R'
