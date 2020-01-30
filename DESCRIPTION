@@ -34,7 +34,8 @@ Imports:
     jsonlite,
     progress,
     stats,
-    sn
+    sn,
+    car
 RoxygenNote: 7.0.2
 Collate: 
     'Rcpp_exceptions.R'

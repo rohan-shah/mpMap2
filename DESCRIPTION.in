@@ -32,6 +32,7 @@ Imports:
     Heatplus,
     RColorBrewer,
     jsonlite,
-    sn
+    sn,
+    car
 VignetteBuilder: knitr
 
