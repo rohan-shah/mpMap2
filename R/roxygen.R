@@ -86,7 +86,7 @@ NULL
 #'     guides(color=guide_legend(title="IBD genotype"))
 #' 
 #' called1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1B)) + 
-#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+#'     geom_point() + theme_bw() + ggtitle("Called genotype, 1B") + 
 #'     guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
 #' 
 #' plotImputations1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1D)) + 
@@ -94,7 +94,7 @@ NULL
 #'     guides(color=guide_legend(title="IBD genotype"))
 #' 
 #' called1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1D)) + 
-#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+#'     geom_point() + theme_bw() + ggtitle("Called genotype, 1D") + 
 #'     guides(color=guide_legend(title="Called cluster")) + 
 #'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 #' 
