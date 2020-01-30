@@ -4,8 +4,14 @@
 \alias{combineKeepRF}
 \title{Combine mpcross objects, keeping recombination fraction data}
 \usage{
-combineKeepRF(object1, object2, verbose = TRUE, gbLimit = -1,
-  callEstimateRF = TRUE, skipValidity = FALSE)
+combineKeepRF(
+  object1,
+  object2,
+  verbose = TRUE,
+  gbLimit = -1,
+  callEstimateRF = TRUE,
+  skipValidity = FALSE
+)
 }
 \arguments{
 \item{object1}{An object of class \code{mpcrossRF}}

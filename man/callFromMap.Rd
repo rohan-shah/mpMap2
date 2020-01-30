@@ -4,10 +4,15 @@
 \alias{callFromMap}
 \title{Call markers based on an existing map}
 \usage{
-callFromMap(rawData, thresholdChromosomes = 100,
+callFromMap(
+  rawData,
+  thresholdChromosomes = 100,
   thresholdAlleleClusters = c(1e-10, 1e-20, 1e-30, 1e-40),
-  maxChromosomes = 2, existingImputations, tDistributionPValue = 0.6,
-  useOnlyExtraImputationPoints = TRUE)
+  maxChromosomes = 2,
+  existingImputations,
+  tDistributionPValue = 0.6,
+  useOnlyExtraImputationPoints = TRUE
+)
 }
 \arguments{
 \item{rawData}{Raw data for a genetic marker.}
@@ -21,6 +26,8 @@ callFromMap(rawData, thresholdChromosomes = 100,
 \item{existingImputations}{An object of class mpcrossMapped from the mpMap2 package, containing data about imputed underlying genotypes.}
 
 \item{tDistributionPValue}{Paramater controlling the size of each detected cluster, ranging from 0 to 1. Small values result in small clusters, and large values result in large clusters.}
+
+\item{useOnlyExtraImputationPoints}{Should we only use the non-marker positions to identify the correct locations?}
 }
 \description{
 This function uses an existing genetic map to call genetic markers, including markers polymorphic on multiple chromosomes.

@@ -6,9 +6,16 @@
 
 Order markers within linkage groups using simulated annealing}
 \usage{
-orderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
-  maxMove = 0, effortMultiplier = 1, randomStart = TRUE,
-  verbose = FALSE)
+orderCross(
+  mpcrossLG,
+  cool = 0.5,
+  tmin = 0.1,
+  nReps = 1,
+  maxMove = 0,
+  effortMultiplier = 1,
+  randomStart = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{mpcrossLG}{An object of class \code{mpcrossLG}, containing genetic data and linkage groups.}

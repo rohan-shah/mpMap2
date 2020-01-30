@@ -4,8 +4,11 @@
 \alias{estimateMapFromImputation}
 \title{Re-estimate large gaps in a genetic map from IBD genotype imputations}
 \usage{
-estimateMapFromImputation(mpcrossMapped, gapSize = 5,
-  recombinationFractions = c(0:60/600, 11:49/100))
+estimateMapFromImputation(
+  mpcrossMapped,
+  gapSize = 5,
+  recombinationFractions = c(0:60/600, 11:49/100)
+)
 }
 \arguments{
 \item{mpcrossMapped}{An object of class \code{mpcrossMapped}}

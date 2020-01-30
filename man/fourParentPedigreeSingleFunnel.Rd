@@ -4,8 +4,12 @@
 \alias{fourParentPedigreeSingleFunnel}
 \title{Generate a four-parent pedigree}
 \usage{
-fourParentPedigreeSingleFunnel(initialPopulationSize, selfingGenerations,
-  nSeeds = 1L, intercrossingGenerations)
+fourParentPedigreeSingleFunnel(
+  initialPopulationSize,
+  selfingGenerations,
+  nSeeds = 1L,
+  intercrossingGenerations
+)
 }
 \arguments{
 \item{initialPopulationSize}{The number of F1 lines generated}

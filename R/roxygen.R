@@ -6,7 +6,8 @@
 #' @import graphics
 #' @importFrom progress progress_bar
 #' @importFrom graphics plot
-#' @importFrom stats as.dist cutree pchisq rnorm cor manova na.omit
+#' @importFrom grDevices dev.off pdf
+#' @importFrom stats as.dist cutree pchisq rnorm cor manova na.omit pf
 #' @importFrom utils combn head tail
 #' @importFrom pryr address
 #' @importFrom fastcluster hclust
@@ -57,9 +58,44 @@ NULL
 #' @rdname simulatedFourParentData
 NULL
 
-#' @name eightWayExampleData
-#' @title Example data from an 8-parent MAGIC population. 
+#' @name eightParentSubsetMap
+#' @title Genetic map and genetic data from an 8-parent MAGIC population. 
 #' @docType data
 #' @author Alex Whan, Matthew Morell, Rohan Shah, Colin Cavanagh
-#' This is a sample of 200 genetic markers from an 8-way MAGIC population of 4229 lines.
+#' This dataset contains the genetic map, genetic data, and imputed IBD genotypes for parts of chromosomes 1A, 1B and 1D, from an 8-way MAGIC population of 4229 lines.
 NULL
+
+#' @name wsnp_Ku_rep_c103074_89904851
+#' @title Raw genotyping data for marker wsnp_Ku_rep_c103074_89904851
+#' @docType data
+#' @author Alex Whan, Matthew Morell, Rohan Shah, Colin Cavanagh
+#' This dataset contains the raw genotyping data for marker wsnp_Ku_rep_c103074_89904851. This marker is interesting, because it can be mapped to both chromosome 1B (four alleles) and 1D (two alleles). 
+#' @examples
+#' data(eightParentSubsetMap)
+#' data(wsnp_Ku_rep_c103074_89904851)
+#' library(ggplot2)
+#' library(gridExtra)
+#' plotData <- wsnp_Ku_rep_c103074_89904851
+#' plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
+#' plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])
+#' plotData$genotype1D <- factor(called$classificationsPerPosition$Chr1DLoc16$finals)
+#' plotData$imputed1D <- factor(imputationData(eightParentSubsetMap)[, "Chr1DLoc16"])
+#' 
+#' plotImputations1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1B)) + 
+#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+#'     guides(color=guide_legend(title="IBD genotype"))
+#' 
+#' called1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1B)) + 
+#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+#'     guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
+#' 
+#' plotImputations1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1D)) + 
+#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1D") + 
+#'     guides(color=guide_legend(title="IBD genotype"))
+#' 
+#' called1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1D)) + 
+#'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+#'     guides(color=guide_legend(title="Called cluster")) + 
+#'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
+#' 
+#' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}

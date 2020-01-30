@@ -4,8 +4,16 @@
 \alias{clusterOrderCross}
 \title{Group markers into blocks and arrange those blocks}
 \usage{
-clusterOrderCross(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1,
-  maxMove = 0, effortMultiplier = 1, randomStart = TRUE, nGroups)
+clusterOrderCross(
+  mpcrossLG,
+  cool = 0.5,
+  tmin = 0.1,
+  nReps = 1,
+  maxMove = 0,
+  effortMultiplier = 1,
+  randomStart = TRUE,
+  nGroups
+)
 }
 \arguments{
 \item{mpcrossLG}{An object of class \code{mpcrossLG}, containing genetic data and linkage groups.}

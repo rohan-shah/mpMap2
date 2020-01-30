@@ -4,8 +4,13 @@
 \alias{mpcross}
 \title{Create object of class mpcross}
 \usage{
-mpcross(founders, finals, pedigree, hetData = infiniteSelfing,
-  fixCodingErrors = FALSE)
+mpcross(
+  founders,
+  finals,
+  pedigree,
+  hetData = infiniteSelfing,
+  fixCodingErrors = FALSE
+)
 }
 \arguments{
 \item{founders}{The genetic data for the founding lines of the population, represented as an integer matrix.}

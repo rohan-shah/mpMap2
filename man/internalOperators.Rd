@@ -3,7 +3,6 @@
 %   R/assignFounderPatternPrototype.R, R/biparentalDominant.R,
 %   R/fixedNumberOfFounderAlleles.R, R/multiparentSNP.R,
 %   R/multiparentSNPPrototype.R, R/removeHets.R, R/simulatePhenotypes.R
-\docType{methods}
 \name{[,rawSymmetricMatrix,index,index,logical-method}
 \alias{[,rawSymmetricMatrix,index,index,logical-method}
 \alias{[,rawSymmetricMatrix,index,index,missing-method}
@@ -28,17 +27,13 @@
 \alias{+,mpcross,normalPhenotype-method}
 \title{Internal operators for mpMap2}
 \usage{
-\S4method{[}{rawSymmetricMatrix,index,index,logical}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{rawSymmetricMatrix,index,index,logical}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{rawSymmetricMatrix,index,index,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{rawSymmetricMatrix,index,index,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{rawSymmetricMatrix,missing,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{rawSymmetricMatrix,missing,missing,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{rawSymmetricMatrix,matrix,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{rawSymmetricMatrix,matrix,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{+}{geneticData,assignFounderPattern}(e1, e2)
 

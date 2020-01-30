@@ -4,9 +4,13 @@
 \alias{computeGenotypeProbabilities}
 \title{Compute IBD genotype probabilities}
 \usage{
-computeGenotypeProbabilities(mpcrossMapped, homozygoteMissingProb = 1,
-  heterozygoteMissingProb = 1, errorProb = 0,
-  extraPositions = list())
+computeGenotypeProbabilities(
+  mpcrossMapped,
+  homozygoteMissingProb = 1,
+  heterozygoteMissingProb = 1,
+  errorProb = 0,
+  extraPositions = list()
+)
 }
 \arguments{
 \item{mpcrossMapped}{An object of class \code{mpcrossMapped}, for which to compute the IBD genotype probabilities.}

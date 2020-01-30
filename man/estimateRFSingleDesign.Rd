@@ -4,9 +4,16 @@
 \alias{estimateRFSingleDesign}
 \title{Estimate pairwise recombination fractions}
 \usage{
-estimateRFSingleDesign(object, recombValues, lineWeights,
-  keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE,
-  markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
+estimateRFSingleDesign(
+  object,
+  recombValues,
+  lineWeights,
+  keepLod = FALSE,
+  keepLkhd = FALSE,
+  verbose = FALSE,
+  markerRows = 1:nMarkers(object),
+  markerColumns = 1:nMarkers(object)
+)
 }
 \arguments{
 \item{object}{An object of class \code{mpcross}.}

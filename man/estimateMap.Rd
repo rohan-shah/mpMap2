@@ -4,8 +4,13 @@
 \alias{estimateMap}
 \title{Estimate map distances}
 \usage{
-estimateMap(mpcrossLG, mapFunction = rfToHaldane, maxOffset = 1,
-  maxMarkers = 2000, verbose = FALSE)
+estimateMap(
+  mpcrossLG,
+  mapFunction = rfToHaldane,
+  maxOffset = 1,
+  maxMarkers = 2000,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{mpcrossLG}{An object of class \code{mpcrossLG}, which must also contain data about recombination fractions and linkage groups.}

@@ -4,8 +4,13 @@
 \alias{formGroups}
 \title{Form linkage groups}
 \usage{
-formGroups(mpcrossRF, groups, clusterBy = "theta", method = "average",
-  preCluster = FALSE)
+formGroups(
+  mpcrossRF,
+  groups,
+  clusterBy = "theta",
+  method = "average",
+  preCluster = FALSE
+)
 }
 \arguments{
 \item{mpcrossRF}{An object of class \code{mpcrossRF}.}

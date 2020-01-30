@@ -7,6 +7,7 @@
 #' @param maxChromosomes The maximum number of chromosomes that a marker can be polymorphic on
 #' @param existingImputations An object of class mpcrossMapped from the mpMap2 package, containing data about imputed underlying genotypes. 
 #' @param tDistributionPValue Paramater controlling the size of each detected cluster, ranging from 0 to 1. Small values result in small clusters, and large values result in large clusters.
+#' @param useOnlyExtraImputationPoints Should we only use the non-marker positions to identify the correct locations?
 #' 
 #' @details
 #' This function uses an existing genetic map to call a genetic marker. There are a number of advantages to this approach

@@ -4,8 +4,11 @@
 \alias{eightParentPedigreeImproperFunnels}
 \title{Generate an eight-parent pedigree with improper funnels}
 \usage{
-eightParentPedigreeImproperFunnels(initialPopulationSize,
-  selfingGenerations, nSeeds)
+eightParentPedigreeImproperFunnels(
+  initialPopulationSize,
+  selfingGenerations,
+  nSeeds
+)
 }
 \arguments{
 \item{initialPopulationSize}{The number of initially generated lines, whose genetic material is a mosaic of the eight founding lines. These lines are generated using three generations of structured mating.}

@@ -4,8 +4,11 @@
 \alias{addExtraMarkerFromRawCall}
 \title{Add an extra marker from raw calling data}
 \usage{
-addExtraMarkerFromRawCall(mpcrossMapped, newMarker,
-  useOnlyExtraImputationPoints = TRUE)
+addExtraMarkerFromRawCall(
+  mpcrossMapped,
+  newMarker,
+  useOnlyExtraImputationPoints = TRUE
+)
 }
 \arguments{
 \item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputed IBD genotypes and recombination fraction data.}

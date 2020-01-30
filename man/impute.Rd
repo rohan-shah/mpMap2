@@ -4,8 +4,12 @@
 \alias{impute}
 \title{Impute missing recombination fraction estimates}
 \usage{
-impute(mpcrossLG, verbose = FALSE, allErrors = FALSE,
-  extractErrorsFunction = function(e) e)
+impute(
+  mpcrossLG,
+  verbose = FALSE,
+  allErrors = FALSE,
+  extractErrorsFunction = function(e) e
+)
 }
 \arguments{
 \item{mpcrossLG}{An object of class \code{mpcrossLG}, which contains estimated pairwise recombination fractions}

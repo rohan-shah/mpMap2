@@ -4,8 +4,14 @@
 \alias{as.mpInterval}
 \title{Convert mpcross object to MPWGAIM format}
 \usage{
-as.mpInterval(object, type = "mpMarker", positions,
-  homozygoteMissingProb, heterozygoteMissingProb, errorProb)
+as.mpInterval(
+  object,
+  type = "mpMarker",
+  positions,
+  homozygoteMissingProb,
+  heterozygoteMissingProb,
+  errorProb
+)
 }
 \arguments{
 \item{object}{The object of class \code{mpcrossMapped} to convert}

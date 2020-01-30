@@ -6,9 +6,17 @@
 
 This function estimates the recombination fractions between all pairs of markers in the input object. The recombination fractions are estimated using numerical maximum likelihood, and a grid search. Because every estimate will be one of the input test values, the estimates can be stored efficiently with a single byte per estimate.}
 \usage{
-estimateRF(object, recombValues, lineWeights, gbLimit = -1,
-  keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE,
-  markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
+estimateRF(
+  object,
+  recombValues,
+  lineWeights,
+  gbLimit = -1,
+  keepLod = FALSE,
+  keepLkhd = FALSE,
+  verbose = FALSE,
+  markerRows = 1:nMarkers(object),
+  markerColumns = 1:nMarkers(object)
+)
 }
 \arguments{
 \item{object}{An object of class \code{mpcross}.}

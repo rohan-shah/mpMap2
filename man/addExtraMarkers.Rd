@@ -4,11 +4,20 @@
 \alias{addExtraMarkers}
 \title{Add extra markers}
 \usage{
-addExtraMarkers(mpcrossMapped, newMarkers,
-  useOnlyExtraImputationPoints = TRUE, reorderRadius = 103,
-  maxOffset = 50, knownChromosome, imputationArgs = NULL,
-  onlyStatistics = FALSE, orderCrossArgs = list(),
-  attemptMpMap2Interactive = TRUE, verbose = TRUE, reorder = TRUE)
+addExtraMarkers(
+  mpcrossMapped,
+  newMarkers,
+  useOnlyExtraImputationPoints = TRUE,
+  reorderRadius = 103,
+  maxOffset = 50,
+  knownChromosome,
+  imputationArgs = NULL,
+  onlyStatistics = FALSE,
+  orderCrossArgs = list(),
+  attemptMpMap2Interactive = TRUE,
+  verbose = TRUE,
+  reorder = TRUE
+)
 }
 \arguments{
 \item{mpcrossMapped}{An object of class \code{mpcrossMapped} (dataset with a map), which must include imputed IBD genotypes and recombination fraction data.}

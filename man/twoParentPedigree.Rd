@@ -4,8 +4,12 @@
 \alias{twoParentPedigree}
 \title{Generate a two-parent pedigree which starts from inbred founders}
 \usage{
-twoParentPedigree(initialPopulationSize, selfingGenerations, nSeeds = 1L,
-  intercrossingGenerations)
+twoParentPedigree(
+  initialPopulationSize,
+  selfingGenerations,
+  nSeeds = 1L,
+  intercrossingGenerations
+)
 }
 \arguments{
 \item{initialPopulationSize}{The number of F1 lines generated}

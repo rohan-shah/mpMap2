@@ -16,7 +16,10 @@ Depends:
     progress
 Suggests:
     testthat,
-    mpMapInteractive2
+    mpMapInteractive2,
+    knitr,
+    rmarkdown,
+    gridExtra
 Imports: 
     ggplot2,
     Matrix,

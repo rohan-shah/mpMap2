@@ -4,9 +4,14 @@
 \alias{imputeFounders}
 \title{Impute underlying genotypes}
 \usage{
-imputeFounders(mpcrossMapped, homozygoteMissingProb = 1,
-  heterozygoteMissingProb = 1, errorProb = 0,
-  extraPositions = list(), showProgress = FALSE)
+imputeFounders(
+  mpcrossMapped,
+  homozygoteMissingProb = 1,
+  heterozygoteMissingProb = 1,
+  errorProb = 0,
+  extraPositions = list(),
+  showProgress = FALSE
+)
 }
 \arguments{
 \item{mpcrossMapped}{An object containing genetic data and a genetic map}
