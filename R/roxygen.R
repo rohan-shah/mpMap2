@@ -102,3 +102,4 @@ NULL
 #'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 #' 
 #' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
+NULL
