@@ -35,7 +35,7 @@ Imports:
     progress,
     stats,
     sn
-RoxygenNote: 7.0.1
+RoxygenNote: 7.0.2
 Collate: 
     'Rcpp_exceptions.R'
     'map-class.R'

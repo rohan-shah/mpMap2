@@ -57,3 +57,34 @@ The steps in the algorithm are as follows:
 	\item{5.}{Use these confidence regions to construct marker calls at each associated location.}
 }
 }
+\examples{
+data(eightParentSubsetMap)
+data(wsnp_Ku_rep_c103074_89904851)
+library(ggplot2)
+library(gridExtra)
+called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, thresholdChromosomes = 80)
+plotData <- wsnp_Ku_rep_c103074_89904851
+plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
+plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])
+plotData$genotype1D <- factor(called$classificationsPerPosition$Chr1DLoc16$finals)
+plotData$imputed1D <- factor(imputationData(eightParentSubsetMap)[, "Chr1DLoc16"])
+
+plotImputations1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1B)) + 
+    geom_point() + theme_bw() + ggtitle("Imputed genotype, 1B") + 
+    guides(color=guide_legend(title="IBD genotype"))
+
+called1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1B)) + 
+    geom_point() + theme_bw() + ggtitle("Called genotype, 1B") + 
+    guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
+
+plotImputations1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1D)) + 
+    geom_point() + theme_bw() + ggtitle("Imputed genotype, 1D") + 
+    guides(color=guide_legend(title="IBD genotype"))
+
+called1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1D)) + 
+    geom_point() + theme_bw() + ggtitle("Called genotype, 1D") + 
+    guides(color=guide_legend(title="Called cluster")) + 
+    scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
+
+\dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
+}
