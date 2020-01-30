@@ -38,6 +38,7 @@
 #' data(wsnp_Ku_rep_c103074_89904851)
 #' library(ggplot2)
 #' library(gridExtra)
+#' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, thresholdChromosomes = 80)
 #' plotData <- wsnp_Ku_rep_c103074_89904851
 #' plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
 #' plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])

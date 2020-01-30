@@ -73,6 +73,7 @@ NULL
 #' @examples
 #' data(eightParentSubsetMap)
 #' data(wsnp_Ku_rep_c103074_89904851)
+#' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, thresholdChromosomes = 80)
 #' library(ggplot2)
 #' library(gridExtra)
 #' plotData <- wsnp_Ku_rep_c103074_89904851
