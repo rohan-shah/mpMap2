@@ -8,6 +8,7 @@
 #' @importFrom graphics plot
 #' @importFrom grDevices dev.off pdf
 #' @importFrom stats as.dist cutree pchisq rnorm cor manova na.omit pf
+#' @importFrom car linearHypothesis
 #' @importFrom utils combn head tail
 #' @importFrom pryr address
 #' @importFrom fastcluster hclust
@@ -66,6 +67,7 @@ NULL
 NULL
 
 #' @name wsnp_Ku_rep_c103074_89904851
+#' @rdname wsnp_Ku_rep_c103074_89904851
 #' @title Raw genotyping data for marker wsnp_Ku_rep_c103074_89904851
 #' @docType data
 #' @author Alex Whan, Matthew Morell, Rohan Shah, Colin Cavanagh
