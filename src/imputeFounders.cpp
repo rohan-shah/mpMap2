@@ -529,7 +529,7 @@ BEGIN_RCPP
 			throw std::runtime_error("Number of founders must be 2, 4, 8 or 16");
 		}
 	}
-	catch(impossibleDataException err)
+	catch(impossibleDataException& err)
 	{
 		std::stringstream ss;
 		ss << "Impossible data may have been detected for markers " << mapMarkers[err.marker] << " and " << mapMarkers[err.marker+1] << " for line " << lineNames[err.line] << ". Are these markers at the same location, and if so does this line have a recombination event between these markers?"; 

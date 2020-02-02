@@ -148,7 +148,7 @@ BEGIN_RCPP
 	{
 		results(i->second, 0) = i->first;
 	}
-	for(int i = 0; i < parentIDs.size(); i++)
+	for(int i = 0; i < (int)parentIDs.size(); i++)
 	{
 		if(parentIDs[i].first != -1 && parentIDs[i].second != -1)
 		{

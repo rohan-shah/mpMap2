@@ -38,7 +38,9 @@
 #' data(wsnp_Ku_rep_c103074_89904851)
 #' library(ggplot2)
 #' library(gridExtra)
-#' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, thresholdChromosomes = 80)
+#' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = 
+#'     eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, 
+#'     thresholdChromosomes = 80)
 #' plotData <- wsnp_Ku_rep_c103074_89904851
 #' plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
 #' plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])
@@ -51,7 +53,8 @@
 #' 
 #' called1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1B)) + 
 #'     geom_point() + theme_bw() + ggtitle("Called genotype, 1B") + 
-#'     guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
+#'     guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = 
+#'     c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
 #' 
 #' plotImputations1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1D)) + 
 #'     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1D") + 
@@ -122,7 +125,7 @@ callFromMapInternal <- function(bestPositionsChromosomes, rawData, thresholdAlle
 				#Taken from print.linearHypothesis.mlm
 				SSPE.qr <- qr(testResult$SSPE)
 				eigs <- Re(eigen(qr.coef(SSPE.qr, testResult$SSPH), symmetric = FALSE)$values)
-				pillai <- car:::Pillai(eigs, testResult$df, testResult$df.residual)
+				pillai <- Pillai(eigs, testResult$df, testResult$df.residual)
 				ok <- (pillai[2] >= 0) & (pillai[3] > 0) & (pillai[4] > 0)
 				ok <- !is.na(ok) & ok
 				if(!ok)

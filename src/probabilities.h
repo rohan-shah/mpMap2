@@ -113,7 +113,7 @@ public:
 		const int nDifferentProbs = compressedProbabilities<nFounders, false>::nDifferentProbs;
 		std::array<double, nDifferentProbs> probabilities;
 		genotypeProbabilitiesNoIntercross<nFounders, false>(probabilities, r, selfingGenerations, nFunnels);
-		memset(&expandedProbabilities, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>));
+		memset(expandedProbabilities.values, 0, sizeof(expandedProbabilitiesFiniteSelfing<nFounders>::values));
 		if(takeLogs)
 		{
 			for(int i = 0; i < nDifferentProbs; i++)

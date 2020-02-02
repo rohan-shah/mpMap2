@@ -85,4 +85,5 @@ canSkipValidityInitialize <- function (.Object, ...)
     .Object
 }
 #' @export
+#' @rdname initialize
 setMethod(f = "initialize", signature = "canSkipValidity", definition = canSkipValidityInitialize)

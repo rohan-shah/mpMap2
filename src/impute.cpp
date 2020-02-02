@@ -51,13 +51,11 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		#pragma omp parallel for schedule(dynamic)
 #endif
 		//First marker
-		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
+		for(unsigned long long i = 0; i < (unsigned long long)nMarkersThisGroup; i++)
 		{
-			int markerI = copiedMarkersThisGroup[i];
 			//Second marker
 			for(unsigned long long j = 0; j < i; j++)
 			{
-				unsigned long long markerJ = copiedMarkersThisGroup[j];
 				std::fill(table.begin(), table.end(), 0);
 				unsigned long long usableSum = 0;
 				for(unsigned long long k = 0; k <= j; k++)
@@ -70,7 +68,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					table[originalTheta[i * (i + 1ULL) / 2ULL + k] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
 					usableSum += (originalTheta[i * (i + 1ULL) / 2ULL + k] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
 				}
-				for(unsigned long long k = i+1; k < nMarkersThisGroup; k++)
+				for(unsigned long long k = i+1; k < (unsigned long long)nMarkersThisGroup; k++)
 				{
 					table[originalTheta[k * (k + 1ULL) / 2ULL + i] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
 					usableSum += (originalTheta[k * (k + 1ULL) / 2ULL + i] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
@@ -98,7 +96,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		#pragma omp for schedule(dynamic)
 #endif
 		//row
-		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
+		for(unsigned long long i = 0; i < (unsigned long long)nMarkersThisGroup; i++)
 		{
 			int marker1 = copiedMarkersThisGroup[i];
 			//column

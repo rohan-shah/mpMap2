@@ -265,4 +265,10 @@ checkGeneticDataList <- function(object)
 	return(TRUE)
 }
 .geneticDataList <- setClass("geneticDataList", "list", validity = checkGeneticDataList)
+#' @title Initialize method which can skip the validity check
+#' @details Initialize method which can skip the validity check
+#' @description This is an initialization method with an optional \code{skipValidity} argument. If this argument is set to \code{TRUE}, the validity check is skipped. This is used by some internal functions within the package, as the validity check can be slow, and internal code is (presumably) guaranteed to produce valid objects. 
+#' @param .Object the object to initialize
+#' @param ... Other arguments. Only \code{skipValidity} is used.
+#' @rdname initialize
 setMethod(f = "initialize", signature = "geneticDataList", definition = canSkipValidityInitialize)

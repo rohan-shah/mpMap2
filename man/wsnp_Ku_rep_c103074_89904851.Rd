@@ -10,7 +10,9 @@ Raw genotyping data for marker wsnp_Ku_rep_c103074_89904851
 \examples{
 data(eightParentSubsetMap)
 data(wsnp_Ku_rep_c103074_89904851)
-called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, thresholdChromosomes = 80)
+called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = 
+    eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, 
+    thresholdChromosomes = 80)
 library(ggplot2)
 library(gridExtra)
 plotData <- wsnp_Ku_rep_c103074_89904851
@@ -25,7 +27,8 @@ plotImputations1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = im
 
 called1B <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1B)) + 
     geom_point() + theme_bw() + ggtitle("Called genotype, 1B") + 
-    guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
+    guides(color=guide_legend(title="Called cluster")) + scale_color_manual(values = 
+    c("black", RColorBrewer::brewer.pal(n = 4, name = "Set1")))
 
 plotImputations1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = imputed1D)) + 
     geom_point() + theme_bw() + ggtitle("Imputed genotype, 1D") + 

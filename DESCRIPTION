@@ -38,6 +38,7 @@ Imports:
     car
 RoxygenNote: 7.0.2
 Collate: 
+    'Pillai.R'
     'Rcpp_exceptions.R'
     'map-class.R'
     'addExtraMarkerFromRawCall.R'

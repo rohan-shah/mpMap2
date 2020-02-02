@@ -88,7 +88,7 @@ Rcpp::List positionData::makeUnifiedMap()
 {
 	//Put together a unified map of all the markers and extra locations
 	Rcpp::List unifiedMap(chromosomes.size());
-	for(int i = 0; i < chromosomes.size(); i++)
+	for(int i = 0; i < (int)chromosomes.size(); i++)
 	{
 		const positionData::chromosomeDescriptor& currentChromosome = chromosomes[i];
 		Rcpp::NumericVector unifiedMapCurrentChromosome(currentChromosome.end - currentChromosome.start);
