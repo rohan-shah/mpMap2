@@ -23,10 +23,10 @@ test_that("Test warnImproperFunnels with four-parent single funnel design",
 
 		pedigree@father[5] <- 1L
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), throws_error("Repeated founders are only allowed with zero generations of intercrossing"))
+		expect_error(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), "Repeated founders are only allowed with zero generations of intercrossing", class = "std::runtime_error")
 
 		pedigree@father[5] <- 1L
 		pedigree@warnImproperFunnels <- FALSE
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
-		expect_that(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), throws_error("Repeated founders are only allowed with zero generations of intercrossing"))
+		expect_error(rf <- estimateRF(cross, keepLod = FALSE, keepLkhd = FALSE), "Repeated founders are only allowed with zero generations of intercrossing", class = "std::runtime_error")
 	})

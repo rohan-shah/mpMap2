@@ -67,5 +67,5 @@ test_that("Test that we can order a single marker group",
 		rf <- estimateRF(cross, verbose = FALSE)
 		grouped <- new("mpcrossLG", rf, rf = rf@rf, lg = new ("lg", groups = c("D1M1" = 1L), allGroups = 1L))
 		imputed <- impute(grouped)
-		ordered <- orderCross(imputed)
+		expect_error(ordered <- orderCross(imputed), NA)
 	})

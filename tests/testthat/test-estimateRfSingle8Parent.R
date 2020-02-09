@@ -28,7 +28,7 @@ test_that("Test actual maps",
 })
 test_that("Using randomly chosen funnels, with finite generations of selfing", 
 	{
-		distances <- c(1, 5, 10, 20, 50)
+		distances <- c(1, 5)
 		for(intercrossingGenerations in 0:1)
 		{
 			for(selfingGenerations in 0:1)
@@ -54,7 +54,7 @@ test_that("Using randomly chosen funnels, with finite generations of selfing",
 
 test_that("Using randomly chosen funnels, with infinite generations of selfing", 
 	{
-		distances <- c(1, 5, 10, 20, 50)
+		distances <- c(1, 5)
 		for(intercrossingGenerations in 0:1)
 		{
 			pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize=100, selfingGenerations = 6, intercrossingGenerations = intercrossingGenerations, nSeeds = 1)

@@ -3,7 +3,7 @@
 %\VignetteEncoding{UTF-8}
 \pdfoutput=1
 \RequirePackage{fix-cm}
-\documentclass[a4paper, nojss, shortnames]{jss}
+\documentclass[11pt,a4paper,twoside]{article}
 \usepackage{amsthm}
 \usepackage{graphicx}
 \usepackage{amsmath, amssymb, setspace, eucal, mathrsfs}
@@ -17,6 +17,21 @@
 \usepackage{natbib}
 \usepackage[ruled, vlined]{algorithm2e}
 \usepackage{hyperref}
+\usepackage{fancyvrb}
+
+\topmargin 0pt
+\textheight 46\baselineskip
+\advance\textheight by \topskip
+\oddsidemargin 0.1in
+\evensidemargin 0.15in
+\marginparwidth 1in
+\oddsidemargin 0.125in
+\evensidemargin 0.125in
+\marginparwidth 0.75in
+\textwidth 6.125in
+%% paragraphs
+\setlength{\parskip}{0.7ex plus0.1ex minus0.1ex}
+\setlength{\parindent}{0em}
 
 \def\lcu{\left\{}
 \def\rcu{\right\}}
@@ -37,32 +52,19 @@
 \newcommand{\eqdef}{\,{\buildrel \mathrm{def} \over =}\,}
 
 \newcommand\commentFont[1]{\footnotesize\ttfamily{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\proglang}[1]{{\textsf{#1}}}
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\DefineVerbatimEnvironment{Code}{Verbatim}{}
+
 \SetCommentSty{commentFont}
 
-\author{Rohan Shah\\Agriculture \& Food\\CSIRO, Black Mountain \And B. Emma Huang\\Janssen Research \& Development
-}
-\Plainauthor{Rohan Shah, B. Emma Huang}
 \title{\pkg{mpMap2}: An R pipeline for genetic map construction}
-\Plaintitle{mpMap2 : An R pipeline for genetic map construction}
-
-\Abstract{
-Multiparent crosses of recombinant inbred lines are now being commonly generated for major crop species. Analysis of these populations typically requires construction of a genetic map, a search for quantitative trait loci (QTL) and the imputation of underlying genotypes. These steps pose a significant computational and statistical challenge. Package \pkg{mpMap2} provides a complete pipeline for the analysis of multi-parent populations with more than 100,000 markers. }
-
-\Keywords{Multiparent crosses, genetic map construction, qtl mapping, \proglang{C++}, \proglang{R}}
-\Plainkeywords{Network reliability, residual connectivity, Monte Carlo methods, R}
-
-\Address{
-  Agriculture \& Food \\
-  Commonwealth Scientific and Industrial Research Organisation \\
-  Black Mountain, Canberra, Australia\\
-  E-mail:\\
-  \email{Rohan.Shah@csiro.au}\\
-}
 
 \begin{document}
 
 \section{Introduction}
-<<echo=FALSE, include=FALSE>>=
+<<loadPackages, echo=FALSE, include=FALSE>>=
 library(mpMap2)
 library(qtl)
 @
@@ -146,7 +148,7 @@ pedigree(lineNames, mother, father, selfing, warnImproperFunnels = TRUE)
 Input \code{lineNames} contains the names of the lines in the pedigree. Inputs \code{mother} and \code{father} are integer vectors giving the indices of the parents within \code{lineNames}. Lines with \code{mother} and \code{father} set to $0$ are the initial lines of the cross, which are assumed to be inbred. The founding lines of the pedigree must appear at the start of the pedigree. Input \code{selfing} must have value \code{"finite"} or \code{"infinite"}, and determines whether any subsequent analysis using this pedigree should assume infinite generations of selfing. If input \code{warnImproperFunnels} is \code{TRUE}, then warnings will be generated about lines derived from funnels with repeated founders. 
 
 For example, consider the following pedigree with three founder lines.
-<<cache=TRUE,out.width='50%',fig.align='center'>>=
+<<pedigreeGraph, cache=TRUE,out.width='50%',fig.align='center'>>=
 p <- pedigree(lineNames = c("A", "B", "C", "F1-1", "F1-2", "F1-3", "F1-4", 
     "F2-1", "F2-2", "F3"), mother = c(0, 0, 0, 1, 1, 1, 2, 4, 6, 8), 
     father = c(0, 0, 0, 2, 2, 3, 3, 5, 7, 9), selfing = "finite")
@@ -165,7 +167,7 @@ simulateMPCross(map, pedigree, mapFunction, seed).
 Input \code{map} is a genetic map object in the format used by package \pkg{qtl}. Input \code{pedigree} is a pedigree object and input \code{mapFunction} is a function that converts centiMorgan distances into recombination fractions. The two suggested values are \code{haldane} and \code{kosambi}. Input \code{seed} is the random seed used for random number generation in the simulation of the genetic data. The output is an S4 object of class \code{mpcross}. 
 
 As an example of the functions provided so far, we simulate from two four-parent designs of $1000$ individuals with one generation of intercrossing and four generations of selfing. One set of simulated data uses randomly chosen funnels, while the other uses a single funnel. The same genetic map is used in both cases; there are $2$ chromosomes of length $300$ cM, each of which has 301 equally spaced markers. 
-<<>>=
+<<simulation1>>=
 #Generate map
 map <- qtl::sim.map(len = rep(300, 2), n.mar = 301, anchor.tel = TRUE, 
     include.x = FALSE, eq.spacing = TRUE)
@@ -189,7 +191,7 @@ crossRandomFunnels <- simulateMPCross(map = map, pedigree = pedigreeRF,
     mapFunction = haldane, seed = 1)
 @
 The simulated cross object has a single entry named \code{geneticData}, which is a list of S4 objects of class \code{geneticData}. This allows \code{mpcross} objects to contain data from multiple experiments. In the case of \code{crossSingleFunnel} and \code{crossRandomFunnels} the list has a single entry. Experiments can be combined using the addition operator to give a single object containing the data from both. The line names involved in both experiments must be different, which is the reason for the prefixes \code{"SF"} and \code{"RF"}. 
-<<cache=TRUE>>=
+<<combinedExperiments, cache=TRUE>>=
 length(crossSingleFunnel@geneticData)
 length(crossRandomFunnels@geneticData)
 combined <- crossSingleFunnel + crossRandomFunnels
@@ -199,7 +201,7 @@ length(combined@geneticData)
 
 The number of markers, founder lines and final lines can be extracted using functions \code{nMarkers}, \code{nFounders} and \code{nLines}. The number of markers is standardised once the objects are combined, so the \code{nMarkers} function outputs only a single value. Functions \code{nFounders} and \code{nLines} output a value for each contained design. 
 
-<<cache=TRUE>>=
+<<generics1, cache=TRUE>>=
 nMarkers(crossSingleFunnel)
 nFounders(crossSingleFunnel)
 nFounders(combined)
@@ -209,7 +211,7 @@ nLines(combined)
 
 A summary of an \code{mpcross} object is generated using the print function. 
 
-<<cache=TRUE>>=
+<<summaryExample, cache=TRUE>>=
 print(crossSingleFunnel)
 @
 
@@ -222,14 +224,14 @@ Input \code{markers} can be marker names of indices within \code{markers(mpcross
 \subsection{Fully informative markers}
 
 When simulating data using \code{simulateMPCross} all markers are generated as fully informative. We can see this by inspecting the contained objects of class \code{geneticData}. Slot \code{founders} contains data about the founder alleles. The founders data can be accessed by the helper function \code{founders}. In the following case, each founder line carries a unique marker allele, for all five markers. 
-<<cache=TRUE>>=
+<<fullyInformativeExample, cache=TRUE>>=
 #Equivalent to crossSingleFunnel@geneticData[[1]]@founders[,1:5]
 founders(crossSingleFunnel)[,1:5]
 @
 When simulating data using \code{simulateMPCross}, there are also marker heterozygotes, which by default are all simulated as being distinguishable. The simulated object contains information about how combinations of marker alleles from the founder lines are mapped to observed values for the final population. As the founders are assumed to be inbred, it is logical that a homozygote of each marker allele present in the founders should be encoded identically in the final population. For example, in the simulated population we are considering, there are alleles \code{1 - 4} for each marker, and values \code{1 - 4} for the final population represent homozygotes of those alleles. This restriction is enforced by the package, so it is not possible to encode a homozygote of marker allele \code{2} in the founder lines, as \code{3} in the final population. 
 
 The marker alleles for the founders do not \emph{have} to be the values \code{1 - 4}. For example, another possibility is:
-<<echo = FALSE>>=
+<<markerEncodingExample, echo = FALSE>>=
 data <- rbind(rep(1, 5), rep(10, 5), rep(100, 5), rep(200, 5))
 colnames(data) <- c("D1M1", "D1M2", "D1M3", "D1M4", "D1M5")
 rownames(data) <- c("SFL1", "SLF2", "SLF3", "SLF4")
@@ -240,23 +242,23 @@ In this case values \code{1, 10, 100} and \code{200} for the final population mu
 Data about the encoding of heterozygotes is contained in the \code{hetData} slot. Heterozygote data for a marker is formatted in three columns. The first and second are marker alleles, and the third is the encoding of that combination of marker alleles, for a line in the final population. As mentioned previously, it is required that a homozygote for a marker allele $m$ be encoded as $m$. For example, a row containing $1, 1$ and $0$  would be invalid, as it attempts to encode a homozygote of marker allele $1$ as $0$ in the final population.  
 
 Helper function \code{hetData} can be used to access the heterozygote data. For example:
-<<cache=TRUE>>=
+<<hetDataExample, cache=TRUE>>=
 #Equivalent to crossSingleFunnel@geneticData[[1]]@hetData[["D1M1"]]
 hetData(crossSingleFunnel, "D1M1")
 @
 Columns one and two give a pair of marker alleles, and the third column gives the encoding of this combination in the final poulation. So observed values $1 - 4$ correspond to homozygotes for founder lines, and values $5 - 10$ correspond to different heterozygotes. We specified $2$ generations of selfing and this is reflected in the distribution of observed values for the final population. 
-<<cache=TRUE>>=
+<<allelesDistribution, cache=TRUE>>=
 table(finals(crossSingleFunnel)[,1])
 @
 
 \subsection{Less informative markers}
 
 The most common types of markers currently used are \emph{Single Nucleotide Polymorphism} (SNP) markers. To convert our simulated data objects to these types of markers, we combine them with a call to \code{multiparentSNP}. 
-<<cache=TRUE>>=
+<<lessInformative1, cache=TRUE>>=
 combinedSNP <- combined + multiparentSNP(keepHets = TRUE)
 @
 This modification can also be applied on a per-dataset basis. 
-<<cache=TRUE>>=
+<<lessInformative2, cache=TRUE>>=
 combinedSNP <- combined
 combinedSNP@geneticData[[1]] <- combinedSNP@geneticData[[1]] +
     multiparentSNP(keepHets = TRUE)
@@ -280,7 +282,7 @@ Input \code{finals} is the matrix of marker alleles for the final population of 
 Input \code{pedigree} must be a pedigree object, as described in Section \ref{sec:pedigree}. 
 
 Input \code{hetData} describes the encoding of the marker alleles for the final population, and must have class \code{hetData}. It is list, where the names of elements are marker names, and each entry is a three-column matrix, giving the marker encodings for that marker. In the simplest case we have \code{nMarkers} SNP markers without any heterozygote calls, so the \code{hetData} object can be constructed as follows.
-<<cache=TRUE>>=
+<<hetDataConstruction1, cache=TRUE>>=
 nMarkers <- 10
 hetData <- replicate(nMarkers, rbind(rep(0, 3), rep(1, 3)), simplify=FALSE)
 names(hetData) <- paste0("M", 1:10)
@@ -288,7 +290,7 @@ hetData <- new("hetData", hetData)
 hetData[[1]]
 @
 Specifying \code{hetData = infiniteSelfing} in the call to \code{mpcross} is a shortcut for this common case. Another common case is bi-allelic SNP markers with heterozygotes called, which is specified with \code{hetData = hetsForSNPMarkers} in the call to \code{mpcross}. The encoding for the heterozygotes can be automatically be determined from the data, as there is only a single heterozygote. An example of \emph{manually} constructing the \code{hetData} object for SNP markers with heterozygotes is as follows.
-<<cache=TRUE>>=
+<<hetDataConstruction2, cache=TRUE>>=
 nMarkers <- 10
 hetData <- replicate(nMarkers, rbind(rep(0, 3), rep(1, 3), c(0, 1, 2), 
     c(1, 0, 2)), simplify=FALSE)
@@ -297,7 +299,7 @@ hetData <- new("hetData", hetData)
 hetData[[1]]
 @
 If \code{fixCodingErrors = TRUE}, then the function will remove invalid data. Invalid data is detected using the \code{listCodingErrors} function. See Section \ref{subsec:invalid_data} for further details.  The previously constructed object \code{crossSingleFunnel} can be constructed from its parts as
-<<cache=TRUE>>=
+<<construction1, cache=TRUE>>=
 founders <- founders(crossSingleFunnel)
 finals <- finals(crossSingleFunnel)
 hetData <- hetData(crossSingleFunnel)
@@ -307,7 +309,7 @@ crossSingleFunnel <- mpcross(founders = founders, finals = finals,
 
 \subsection{Invalid data}\label{subsec:invalid_data}
 Real data often contains some invalid data. \pkg{mpMap2} performs extensive checks, and will reject invalid data. 
-<<cache=TRUE, error = TRUE>>=
+<<errors1, cache=TRUE, error = TRUE>>=
 #Put in two errors for the founders
 founders[3,3] <- 10
 founders[2,2] <- NA
@@ -319,10 +321,10 @@ hetData[[5]][1,1] <- NA
 
 error <- try(crossSingleFunnel <- mpcross(founders = founders, finals = finals, 
     pedigree = pedigreeSF, hetData = hetData))
-error
+cat(error)
 @
 A more computer-friendly list of most of thees errors is available using the \code{listCodingErrors} function. 
-<<cache=TRUE>>=
+<<errors2, cache=TRUE>>=
 errors <- listCodingErrors(founders = founders, finals = finals, hetData = hetData)
 errors$invalidHetData
 errors$null
@@ -337,7 +339,7 @@ The entry \code{errors\$finals} indicates that line $1$ has an invalid value of 
 \subsection{Genetic maps}
 
 The format used for genetic maps in this package is identical to that in package \pkg{qtl}. A genetic map is a named list, where the name of each entry is the name of that chromosome. Each entry contains the names and positions of each marker, in increasing order. The overall object must have class \code{"map"}. We now give an example of the structure of a simulated map. 
-<<cache = TRUE>>=
+<<simulatedMap1, cache = TRUE>>=
 simulatedMap <- qtl::sim.map(len = rep(100, 2), n.mar = 11, anchor.tel = TRUE, 
     include.x = FALSE, eq.spacing = FALSE)
 #map object has class "map"
@@ -357,21 +359,21 @@ For any pair of genetic locations there is a probability model govering the join
 These joint distributions are governed by the \emph{identity-by-descent} (IBD) probabilities, which have been calculated for a variety of different designs \citep{Teuscher2007,Broman2005,Broman2012a,Broman2012b}. These probabilities are a function of the recombination fraction $r$ between the two markers. The relevant probabilities for more complicated designs (especially those with finite generations of selfing) are too complicated to give here, but can be calculated with the help of a computer algebra system such as Octave or Mathematica. 
 
 If two markers are fully informative, then the probability model is informative for the parameter $r$, which can be estimated using numerical maximum likelihood. However this may no longer be true when the markers are less informative. For example, assume we have a four-parent design with a single funnel and infinite generations of selfing, and markers $M_1$ and $M_2$ with the following distribution of marker alleles for the founders.
-<<echo=FALSE,cache=TRUE>>=
+<<flatExample1, echo=FALSE,cache=TRUE>>=
 cbind(M1 = c("Founder 1" = 1, "Founder 2" = 0, "Founder 3" = 0, "Founder 4" = 1), M2 = c("Founder 1" = 0, "Founder 2" = 1, "Founder 3" = 0, "Founder 4" = 1))
 @
 In this case every combination of marker alleles occurs with probability $\frac{1}{4}$, regardless of the parameter $r$. For four-parent designs this combination of marker allele distributions is the only one that may be non-informative for $r$. Note that for four-parent designs with finite generations of selfing this combination may in fact be informative. 
 
 The situation appears to be more complicated the larger the number of founders. For the eight-way design there are combinations of marker allele distributions that are completely uninformative, similar to the four parent design. However there are also marker allele distributions which are \emph{approximately uninformative} for the parameter $r$. For example, consider the following marker allele distributions with a single funnel and infinite generations of selfing.
-<<echo=FALSE,cache=TRUE>>=
+<<approxFlat1, echo=FALSE,cache=TRUE>>=
 cbind(M1 = c("Founder 1" = 1, "Founder 2" = 0, "Founder 3" = 0, "Founder 4" = 1, "Founder 5" = 1, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1), M2 = c("Founder 1" = 0, "Founder 2" = 0, "Founder 3" = 1, "Founder 4" = 0, "Founder 5" = 0, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1))
 @
 In this case the likelihood is approximately (but not exactly) flat. The marker probabilities as a function of $r$ are shown in Figure \ref{fig:approximately_flat_no_intercross}. For comparison, we consider the following marker allele distribution to be informative. 
-<<echo=FALSE,cache=TRUE>>=
+<<notFlat1, echo=FALSE,cache=TRUE>>=
 cbind(M1 = c("Founder 1" = 1, "Founder 2" = 1, "Founder 3" = 0, "Founder 4" = 1, "Founder 5" = 1, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1), M2 = c("Founder 1" = 0, "Founder 2" = 1, "Founder 3" = 0, "Founder 4" = 0, "Founder 5" = 0, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1))
 @
 The marker probabilities for this informative case are shown in Figure \ref{fig:eight_way_informative}. There are also cases where the likelihood is approximately symmetric. For example, consider the following marker allele distribution. 
-<<echo=FALSE,cache=TRUE>>=
+<<symmetricExample, echo=FALSE,cache=TRUE>>=
 cbind(M1 = c("Founder 1" = 1, "Founder 2" = 1, "Founder 3" = 0, "Founder 4" = 1, "Founder 5" = 1, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1), M2 = c("Founder 1" = 0, "Founder 2" = 1, "Founder 3" = 1, "Founder 4" = 0, "Founder 5" = 0, "Founder 6" = 0, "Founder 7" = 1, "Founder 8" = 1))
 @
 The marker probabilities for this case are shown in Figure \ref{fig:eight_way_symmetric}. In this case $r = 0$ is indistinguishable from $r = 0.5$. 
@@ -380,48 +382,48 @@ The marker probabilities for this case are shown in Figure \ref{fig:eight_way_sy
 \begin{figure}
 \centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{approximatelyFlatSingleFunnel00.pdf}
+		\includegraphics[scale = 0.45]{approximatelyFlatSingleFunnel00.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{approximatelyFlatSingleFunnel01.pdf}
+		\includegraphics[scale = 0.45]{approximatelyFlatSingleFunnel01.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{approximatelyFlatSingleFunnel10.pdf}
+		\includegraphics[scale = 0.45]{approximatelyFlatSingleFunnel10.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{approximatelyFlatSingleFunnel11.pdf}
+		\includegraphics[scale = 0.45]{approximatelyFlatSingleFunnel11.pdf}
 	\end{subfigure}
 	\caption{Joint marker probabilities for an approximately uninformative pair of markers. The design used is an eight-parent cross with a single funnel, zero generations of intercrossing and infinite generations of selfing. \label{fig:approximately_flat_no_intercross}}
 \end{figure}
 \begin{figure}
 \centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{informativeSingleFunnel00.pdf}
+		\includegraphics[scale = 0.45]{informativeSingleFunnel00.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{informativeSingleFunnel01.pdf}
+		\includegraphics[scale = 0.45]{informativeSingleFunnel01.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{informativeSingleFunnel10.pdf}
+		\includegraphics[scale = 0.45]{informativeSingleFunnel10.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{informativeSingleFunnel11.pdf}
+		\includegraphics[scale = 0.45]{informativeSingleFunnel11.pdf}
 	\end{subfigure}
 	\caption{Joint marker probabilities for an informative pair of markers. The design used is an eight-parent cross with a single funnel, zero generations of intercrossing and infinite generations of selfing. \label{fig:eight_way_informative}}
 \end{figure}
 \begin{figure}
 \centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{uninformativeSingleFunnel00.pdf}
+		\includegraphics[scale = 0.45]{uninformativeSingleFunnel00.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{uninformativeSingleFunnel01.pdf}
+		\includegraphics[scale = 0.45]{uninformativeSingleFunnel01.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{uninformativeSingleFunnel10.pdf}
+		\includegraphics[scale = 0.45]{uninformativeSingleFunnel10.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[scale = 0.2]{uninformativeSingleFunnel11.pdf}
+		\includegraphics[scale = 0.45]{uninformativeSingleFunnel11.pdf}
 	\end{subfigure}
 	\caption{Joint marker probabilities for an uninformative pair of markers. The design used is an eight-parent cross with a single funnel, zero generations of intercrossing and infinite generations of selfing. \label{fig:eight_way_symmetric}}
 \end{figure}
@@ -453,7 +455,7 @@ The intermediate stages of the computation require significantly more memory tha
 Our package makes more extensive use of lookup tables and pre-computation than \pkg{mpMap}. As a result we can analyse large data sets using only OpenMP multi-threading. Package \pkg{mpMap} required the use of much more complicated MPI or CUDA multi-threading to achieve acceptable performance, and this code was much harder to maintain and use. 
 
 To demonstrate this function, we apply it to the object \code{combined} which we created previously. In general option \code{verbose} would be set to \code{TRUE} or \code{FALSE}. In this case we need output suitable for a document, so we use \code{list(progressStyle=1)}. This specifies that that argument \code{style} of \code{txtProgressBar} should be $1$, giving output suitable for a document instead of a console. 
-<<cache=TRUE>>=
+<<rfExample, cache=TRUE>>=
 rf <- estimateRF(object = combinedSNP, verbose = list(progressStyle = 1))
 @
 
@@ -579,17 +581,17 @@ imputeFounders(mpcrossMapped, homozygoteMissingProb = 1,
 Input \code{extraPositions} is a list gives extra (non-marker) positions for which to perform imputation. These positions can be given explicitly, in the format shown below, or using the convenience function \code{generateGridPositions(s)}. Specifying this convenience function for \code{extraPositions} generates a grid of points for each chromosome, equally spaced with distance \code{s}. 
 
 We apply this function to the object \code{combinedSNP}, which contains two data sets. 
-<<cache=TRUE>>=
+<<imputeExample1, cache=TRUE>>=
 mappedSNP <- new("mpcrossMapped", combinedSNP, map = map)
 imputed <- imputeFounders(mappedSNP, extraPositions = 
     list("2" = c("a" = 3.14, "b" = 66)))
 @
 The extra positions are specified to be positions $3.14$ named \code{a} and $66$ named \code{b}. There are no extra positions on chromosome \code{1}. Alternatively, we could specify a grid of points, separated by 10 cM. 
-<<cache=TRUE>>=
+<<imputeExample2, cache=TRUE>>=
 imputed <- imputeFounders(mappedSNP, extraPositions = generateGridPositions(10))
 @
 As we originally specified the \code{selfing} slot to have value \code{"finite"}, the imputed values will contain heterozygotes. The encoding of heterozygotes is given in an entry named \code{key}, which can be extracted using the \code{imputationKey} function. Comparing the imputed data to the original data (before the markers were converted to SNP markers) shows good agreement for the first data set, even for the heterozygotes. 
-<<cache=TRUE>>=
+<<cimputeExample3, ache=TRUE>>=
 imputed <- imputeFounders(mappedSNP)
 imputationKey(imputed, experiment = 1)
 table(imputationData(imputed, experiment = 1), finals(combined)[[1]])
@@ -597,7 +599,7 @@ table(imputationData(imputed, experiment = 1), finals(combined)[[1]])
 The pattern of imputation errors for the heterozygotes makes sense; value $5$ is a heterozygote of founders $1$ and $2$, and the most frequent imputation error is to classify it as a homozygote of founder $1$ or $2$. 
 
 For the second data set no heterozygotes are imputed. This is because no heterozygote markers were called, so heterozygotes are either missing or consistent with being homozygotes, in which case the homozygote is always more likely. The only clue in the data is that missing values are always heterozygotes in this case. Setting \code{heterozygoteMissingProb} to $1$ and \code{homozygoteMissingProb} to $0.05$ gives acceptable results. 
-<<cache=TRUE>>=
+<<imputedExample4, cache=TRUE>>=
 table(imputationData(imputed, experiment = 2), finals(combined)[[2]])
 imputed <- imputeFounders(mappedSNP, heterozygoteMissingProb = 1, 
     homozygoteMissingProb = 0.05)
@@ -609,9 +611,9 @@ The miss-classifications still demonstrate the same problem to a lesser extent. 
 
 \subsection{No intecrossing or selfing}
 
-We begin with an example showing that \pkg{mpMap2} can construct correct maps from unusual experimental designs. In this case we use an eight-parent cross with randomly chosen funnels and no intercrossing and no selfing. The underlying genotypes for this design are all heterozygotes. 
-<<cache=TRUE>>=
-pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 1000, 
+We begin with an example showing that \pkg{mpMap2} can construct correct maps from unusual experimental designs. In this case we use a four-parent cross with randomly chosen funnels and no intercrossing and no selfing. The underlying genotypes for this design are all heterozygotes. 
+<<fourParentExample1, cache=TRUE>>=
+pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 800, 
     intercrossingGenerations = 0, selfingGenerations = 0, nSeeds = 1)
 selfing(pedigree) <- "finite"
 map <- qtl::sim.map(len = rep(300, 3), n.mar = 101, anchor.tel = TRUE, 
@@ -622,19 +624,19 @@ crossSNP <- cross + multiparentSNP(keepHets=TRUE)
 table(finals(cross))
 @
 The estimation of recombination fractions is somewhat slow due to the amount of precalculation, as every distinct funnel is treated separately. This precalculation cost does not grow with the total number of markers.
-<<cache=TRUE>>=
+<<fourParentExample2, cache=TRUE>>=
 #Randomly rearrange markers
 crossSNP <- subset(crossSNP, markers = sample(markers(cross)))
 rf <- estimateRF(crossSNP, verbose = list(progressStyle = 1))
 @
 The next steps are forming linkage groups, ordering chromosomes and imputing missing recombination fraction values.
-<<cache=TRUE>>=
+<<fourParentExample3, cache=TRUE>>=
 grouped <- formGroups(rf, groups = 3, method = "average", clusterBy="theta")
 ordered <- orderCross(grouped, effortMultiplier = 2)
 imputedTheta <- impute(ordered, verbose = list(progressStyle = 1)) 
 @
 The next step is to estimate the map. Our estimated map is significantly longer than the true map. Note the use of the function \code{jitterMap}. This function spaces out markers that have been assigned to the same location. This is necessary for the purposes of imputation, as \code{estimateMap} is capable of estimating a map where markers which are observed to have at least one recombination event between them are assigned the same location. This makes the map incompatible with the data, and would cause problems during the imputation step, unless a non-zero \code{errorProb} is specified. 
-<<cache=TRUE>>=
+<<fourParentExample4, cache=TRUE>>=
 estimatedMap <- estimateMap(imputedTheta, maxOffset = 10)
 estimatedMap <- jitterMap(estimatedMap)
 #match up estimated chromosomes with original chromosomes
@@ -644,15 +646,14 @@ estimatedChromosomes <- sapply(1:3, estChrFunc)
 tail(estimatedMap[[estimatedChromosomes[[1]]]])
 tail(map[[1]])
 @
-The reason for constructing a genetic map is often to search for quantitative trait loci (QTL). Therefore it is not the overall length that is important, but the accurate imputation of the underlying founder genotypes. In this case the imputation is highly accurate, with a correct imputation rate of just over 80\%.
-<<cache=TRUE>>=
+The reason for constructing a genetic map is often to search for quantitative trait loci (QTL). Therefore it is not the overall length that is important, but the accurate imputation of the underlying founder genotypes. In this case the imputation is highly accurate.
+<<fourParentExample5, cache=TRUE>>=
 mappedObject <- new("mpcrossMapped", imputedTheta, map = estimatedMap)
 imputedFounders <- imputeFounders(mappedObject)
 summary <- table(imputedFounders@geneticData[[1]]@imputed@data[,markers(cross)], 
     finals(cross))
 sum(diag(summary))/sum(summary)
 @
-We emphasize that this imputation rate is remarkably high given that there are $28$ possible genotypes. 
 
 \appendix
 

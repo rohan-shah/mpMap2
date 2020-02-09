@@ -26,6 +26,6 @@ test_that("Test that plotProbabilities actually works",
 		plotProbabilities(probabilities, chromosomes = "2")
 	dev.off()
 	pdf(NULL)
-		plotProbabilities(probabilities, positions = colnames(probabilities@geneticData[[1]]@probabilities@data)[8:9])
+		expect_error(plotProbabilities(probabilities, positions = colnames(probabilities@geneticData[[1]]@probabilities@data)[8:9]), NA)
 	dev.off()
 })

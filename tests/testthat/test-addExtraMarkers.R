@@ -1,5 +1,3 @@
-context("Test addExtraMarkers")
-
 test_that("Test validation",
 {
 	map <- qtl::sim.map(len = 20, n.mar = 21, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
