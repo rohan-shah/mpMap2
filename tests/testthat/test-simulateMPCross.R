@@ -3,7 +3,7 @@ test_that("Can simulate a cross object with a single markers",
 	{
 		pedigree <- f2Pedigree(100)
 		map <- qtl::sim.map(len = 100, n.mar = 1, anchor.tel=FALSE, include.x=FALSE, eq.spacing=TRUE)
-		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
+		expect_error(cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane), NA)
 	})
 test_that("Map is reordered",
 	{

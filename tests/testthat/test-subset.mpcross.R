@@ -110,5 +110,5 @@ test_that("Checking subset by lines when imputation data is present",
 		mapped <- new("mpcrossMapped", cross, map = map)
 		suppressWarnings(result <- imputeFounders(mapped, errorProb = 0))
 		subsetted <- subset(result, lines = sample(lineNames(result)))
-		validObject(subsetted, complete = TRUE)
+		expect_error(validObject(subsetted, complete = TRUE), NA)
 	})

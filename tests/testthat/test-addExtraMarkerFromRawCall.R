@@ -1,11 +1,10 @@
-context("Test that addExtraMarkerFromRawCall works")
 test_that("Checking that addExtraMarkerFromRawCall works for an eight-parent pedigree", 
 {
 	set.seed(1)
 	populationSize <- 1000
 
 	pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = populationSize, selfingGenerations = 5, nSeeds = 1L, intercrossingGenerations = 1L)
-	originalMap <- sim.map(len = 100, n.mar = 201, anchor.tel = TRUE, include.x = FALSE, sex.sp = FALSE, eq.spacing = TRUE)
+	originalMap <- qtl::sim.map(len = 100, n.mar = 201, anchor.tel = TRUE, include.x = FALSE, sex.sp = FALSE, eq.spacing = TRUE)
 	cross <- simulateMPCross(map = originalMap, pedigree = pedigree, mapFunction = haldane, seed = 1)
         crossSNP <- cross + multiparentSNP(keepHets = FALSE)
 	crossSNPMapped <- mpcrossMapped(crossSNP, map = originalMap)

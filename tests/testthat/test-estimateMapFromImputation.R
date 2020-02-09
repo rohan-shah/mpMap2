@@ -20,9 +20,9 @@ test_that("Check that estimation of gap sizes is approximately correct, for four
 test_that("Check that estimation of gap sizes is approximately correct, for eight parent designs", 
 	{
 		pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 3000, selfingGenerations = 5, intercrossingGenerations = 0)
-		pedigree@selfing <- "finite"
+		pedigree@selfing <- "infinite"
 		map <- qtl::sim.map(len = rep(100, 1), n.mar = rep(101, 1), anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
-		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = TRUE)
+		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane) + multiparentSNP(keepHets = FALSE)
 		cross <- subset(cross, markers = c(1:30, 70:100))
 		capture.output(rf <- estimateRF(cross))
 		grouped <- formGroups(rf, groups = 1, method = "average", clusterBy = "theta")

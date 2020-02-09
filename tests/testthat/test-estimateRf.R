@@ -45,5 +45,5 @@ test_that("Check that we can compute recombination fractions if there are no lin
 		map <- qtl::sim.map(len = 100, n.mar = 11, include.x = FALSE)
 		cross <- simulateMPCross(map = map, pedigree = pedigree, seed = 1, mapFunction = haldane)
 		cross <- subset(cross, lines = as.character(c()))
-		rf <- estimateRF(cross)
+		expect_error(rf <- estimateRF(cross), NA)
 	})

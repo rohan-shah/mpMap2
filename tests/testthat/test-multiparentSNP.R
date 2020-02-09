@@ -36,7 +36,7 @@ test_that("Check that multiparentSNP works for a 4-way intercross",
 		map <- qtl::sim.map(len = 100, n.mar = 10, anchor.tel=TRUE, include.x=FALSE, eq.spacing=TRUE)
 		cross <- simulateMPCross(map=map, pedigree=pedigree, mapFunction = haldane)
 		cross2 <- cross + multiparentSNP(TRUE)
-		cross3 <- cross + multiparentSNP(FALSE)
+		expect_error(cross3 <- cross + multiparentSNP(FALSE), NA)
 	})
 test_that("Check that multiparentSNP doesn't work for an F2 or RIL",
 	{
