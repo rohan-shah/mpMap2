@@ -10,19 +10,19 @@ test_that("Test validation",
 	subset1 <- subset(cross, markers = c(1:10, 16:21), keepMap = TRUE)
 	subset2 <- subset(cross, markers = 11:15)
 	#No imputation data
-	expect_error(addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE))
+	expect_error(addExtraMarkers(subset1, newMarkers = subset2))
 
 	#No RF data
 	subset1 <- imputeFounders(subset1, extraPositions = generateGridPositions(1))
-	expect_error(addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE))
+	expect_error(addExtraMarkers(subset1, newMarkers = subset2))
 	subset1 <- estimateRF(subset1)
 	
 	#Now it works
-	statistics <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, onlyStatistics = TRUE, verbose = FALSE)
+	statistics <- addExtraMarkers(subset1, newMarkers = subset2, onlyStatistics = TRUE, verbose = FALSE)
 	expect_true(is.numeric(statistics@data))
 
 	#Check that the resulting objcet is correct. 
-	capture.output(results <- addExtraMarkers(subset1, newMarkers = subset2, attemptMpMap2Interactive = FALSE, verbose = FALSE))
+	capture.output(results <- addExtraMarkers(subset1, newMarkers = subset2, verbose = FALSE))
 	permutation <- match(markers(results$object), markers(cross))
 	expect_gt(abs(cor(permutation, 1:nMarkers(cross))), 0.91)
 })
@@ -43,7 +43,7 @@ test_that("Test that markers go to the right place",
 		mapped <- new("mpcrossMapped", grouped, map = estimatedMap, rf = grouped@rf)
 
 		imputed <- imputeFounders(mapped, errorProb = 0.1, extraPositions = generateGridPositions(1))
-		capture.output(added <- addExtraMarkers(imputed, newMarkers = subset2, reorder = FALSE, maxOffset = 15, reorderRadius = 40, attemptMpMap2Interactive = FALSE))
+		capture.output(added <- addExtraMarkers(imputed, newMarkers = subset2, reorder = FALSE, maxOffset = 15, reorderRadius = 40))
 		permutation <- sapply(markers(added$object), function(x) match(x, markers(cross)))
 		expect_gt(cor(1:101, permutation), 0.99)
 		reestimatedMap <- estimateMap(added$object, maxOffset = 15)

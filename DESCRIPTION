@@ -16,7 +16,6 @@ Depends:
 LinkingTo: Rcpp
 Suggests:
     testthat,
-    mpMapInteractive2,
     knitr,
     rmarkdown,
     gridExtra
@@ -92,6 +91,7 @@ Collate:
     'getIntercrossingAndSelfingGenerations.R'
     'getPositions.R'
     'hetData.R'
+    'identC.R'
     'imputationGenerics.R'
     'impute.R'
     'imputeFounders.R'

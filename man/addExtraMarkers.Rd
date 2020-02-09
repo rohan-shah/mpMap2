@@ -14,7 +14,6 @@ addExtraMarkers(
   imputationArgs = NULL,
   onlyStatistics = FALSE,
   orderCrossArgs = list(),
-  attemptMpMap2Interactive = TRUE,
   verbose = TRUE,
   reorder = TRUE
 )
@@ -38,8 +37,6 @@ addExtraMarkers(
 
 \item{orderCrossArgs}{A list containing additional arguments to \code{\link{orderCross}}.}
 
-\item{attemptMpMap2Interactive}{If local reordering is to be performed after the extra markers are added, should this be done interactively, using package mpMapInteractive2?}
-
 \item{verbose}{Should extra logging output be generated?}
 
 \item{reorder}{Should local reordering be performed after the extra markers are added?}
@@ -55,7 +52,7 @@ This function uses a QTL-mapping style approach to add extra markers to an exist
 
 Currently the set of points at which the new markers are considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduced the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. In future it may be possible to use the set of all marker positions as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}. 
 
-Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. If \code{attemptMpMap2Interactive} is \code{TRUE}, then package mpMapInteractive2 will be used to reorder the markers; this requires the user to perform reordering interactively. Otherwise, function \code{orderCross} will be used to automatically perform reordering. 
+Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. 
 
 Once the optional reordering step has been performed, the map is recomputed locally, to account for the addition of the extra markers. The argument \code{maxOffset} is passed through to \code{estimateMap}. Finally, the imputation data will be recomputed if \code{imputationArgs} is not \code{NULL}; in that case, \code{imputationArgs} should contain a list of arguments to \code{imputeFounders}. It is recommended that the imputation data be recomputed if further markers are to be added. 
 

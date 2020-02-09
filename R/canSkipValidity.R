@@ -25,7 +25,7 @@ canSkipValidityInitialize <- function (.Object, ...)
                 Classi <- class(obj)
                 if (length(Classi) > 1L)
                   Classi <- Classi[[1L]]
-                if (methods:::.identC(Classi, Class))
+                if (.identC(Classi, Class))
                   .Object <- obj
                 else if (extends(Classi, Class))
                   .Object <- as(obj, Class, strict = FALSE)
@@ -63,7 +63,7 @@ canSkipValidityInitialize <- function (.Object, ...)
                 slotClass <- slotDefs[[slotName]]
                 slotClassDef <- getClassDef(slotClass, package = ClassDef@package)
                 slotVal <- elements[[i]]
-                if (!methods:::.identC(class(slotVal), slotClass) && !is.null(slotClassDef)) {
+                if (!.identC(class(slotVal), slotClass) && !is.null(slotClassDef)) {
                   valClass <- class(slotVal)
                   valClassDef <- getClassDef(valClass, package = ClassDef@package)
                   if (!identical(possibleExtends(valClass, slotClass,

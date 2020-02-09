@@ -16,7 +16,6 @@ Depends:
     progress
 Suggests:
     testthat,
-    mpMapInteractive2,
     knitr,
     rmarkdown,
     gridExtra

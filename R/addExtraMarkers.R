@@ -32,7 +32,6 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' @param imputationArgs A list containing additional arguments to \code{\link{imputeFounders}}. 
 #' @param onlyStatistics If this argument is \code{TRUE}, then only the chi-squared test statistic values are computed, and the markers are not added.
 #' @param orderCrossArgs A list containing additional arguments to \code{\link{orderCross}}. 
-#' @param attemptMpMap2Interactive If local reordering is to be performed after the extra markers are added, should this be done interactively, using package mpMapInteractive2?
 #' @param verbose Should extra logging output be generated?
 #' @param reorder Should local reordering be performed after the extra markers are added?
 #' @return A list with an entry named \code{statistics}, containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, then the list also contains an entry named \code{object}, which is a new object containing the input object with the new markers added. 
@@ -41,7 +40,7 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #'
 #' Currently the set of points at which the new markers are considered for addition is the set of points at which imputation data is available, \emph{which are not markers}. The intention is that this set of points should be an equally spaced grid of points; this reduced the number of tests that are performed, as generally there are far fewer points in the grid, than there are markers. After the new marker is added, local reordering will need to be performed anyway, making any loss in accuracy by using the grid of points largely irrelevant. In future it may be possible to use the set of all marker positions as the set of points at which tests are performed, by setting \code{useOnlyExtraImputationPoints} to \code{FALSE}. 
 #' 
-#' Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. If \code{attemptMpMap2Interactive} is \code{TRUE}, then package mpMapInteractive2 will be used to reorder the markers; this requires the user to perform reordering interactively. Otherwise, function \code{orderCross} will be used to automatically perform reordering. 
+#' Once the extra markers have added, local reordering is optionally performed, depending on argument \code{reordering}. The radius of the region on which reordering is performed, in terms of the number of markers, is \code{reorderRadius}. 
 #' 
 #' Once the optional reordering step has been performed, the map is recomputed locally, to account for the addition of the extra markers. The argument \code{maxOffset} is passed through to \code{estimateMap}. Finally, the imputation data will be recomputed if \code{imputationArgs} is not \code{NULL}; in that case, \code{imputationArgs} should contain a list of arguments to \code{imputeFounders}. It is recommended that the imputation data be recomputed if further markers are to be added. 
 #' 
@@ -66,9 +65,11 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' 	reorder = FALSE, imputationArgs = list(errorProb = 0.02, 
 #' 	extraPositions = generateGridPositions(1)))$object
 #' @export
-addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoints = TRUE, reorderRadius = 103, maxOffset = 50, knownChromosome, imputationArgs = NULL, onlyStatistics = FALSE, orderCrossArgs = list(), attemptMpMap2Interactive = TRUE, verbose = TRUE, reorder = TRUE)
+addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoints = TRUE, reorderRadius = 103, maxOffset = 50, knownChromosome, imputationArgs = NULL, onlyStatistics = FALSE, orderCrossArgs = list(), 
+#attemptMpMap2Interactive = TRUE, 
+			    verbose = TRUE, reorder = TRUE)
 {
-	hasMpMapInteractive2 <- attemptMpMap2Interactive && requireNamespace("mpMapInteractive2", quietly = TRUE)
+#	hasMpMapInteractive2 <- attemptMpMap2Interactive && requireNamespace("mpMapInteractive2", quietly = TRUE)
 	if(!inherits(newMarkers, "mpcross"))
 	{
 		stop("Input newMarkers must be an object of class mpcross")
@@ -176,14 +177,14 @@ addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoi
 		if(reorder)
 		{
 			if(verbose) cat("Reordering markers [", min(markerRange), ":", max(markerRange), "] of the chromosome, total number of markers for this chromosome was ", length(relevantChromosomeMap), "\n", sep = "")
-			if(hasMpMapInteractive2)
-			{
-				reorderedGrouped <- mpMapInteractive2::mpMapInteractive2(grouped)$object
-			}
-			else
-			{
+#			if(hasMpMapInteractive2)
+#			{
+#				reorderedGrouped <- mpMapInteractive2::mpMapInteractive2(grouped)$object
+#			}
+#			else
+#			{
 				reorderedGrouped <- do.call(orderCross, c(list(grouped), orderCrossArgs))
-			}
+#			}
 		}
 		else reorderedGrouped <- grouped
 		#Get out the reordered markers

@@ -48,6 +48,7 @@
 #include "expandedProbabilities_RInterface.h"
 #include "singleLocusProbabilities_RInterface.h"
 #include "arsaRaw.h"
+#include "identC.h"
 extern "C"
 {
 	const char* package_name = "mpMap2";
@@ -111,6 +112,7 @@ extern "C"
 		{"expandedProbabilitiesFinite", (DL_FUNC)&expandedProbabilitiesFinite_RInterface, 6},
 		{"singleLocusProbabilitiesFinite", (DL_FUNC)&singleLocusProbabilitiesFinite_RInterface, 4},
 		{"singleLocusProbabilitiesInfinite", (DL_FUNC)&singleLocusProbabilitiesInfinite_RInterface, 4},
+		{"identC", (DL_FUNC)&identC, 2},
 		{NULL, NULL, 0}
 	};
 	RcppExport void R_init_mpMap2(DllInfo *info)
