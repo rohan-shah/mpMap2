@@ -591,7 +591,7 @@ The extra positions are specified to be positions $3.14$ named \code{a} and $66$
 imputed <- imputeFounders(mappedSNP, extraPositions = generateGridPositions(10))
 @
 As we originally specified the \code{selfing} slot to have value \code{"finite"}, the imputed values will contain heterozygotes. The encoding of heterozygotes is given in an entry named \code{key}, which can be extracted using the \code{imputationKey} function. Comparing the imputed data to the original data (before the markers were converted to SNP markers) shows good agreement for the first data set, even for the heterozygotes. 
-<<cimputeExample3, ache=TRUE>>=
+<<imputeExample3, ache=TRUE>>=
 imputed <- imputeFounders(mappedSNP)
 imputationKey(imputed, experiment = 1)
 table(imputationData(imputed, experiment = 1), finals(combined)[[1]])
@@ -599,7 +599,7 @@ table(imputationData(imputed, experiment = 1), finals(combined)[[1]])
 The pattern of imputation errors for the heterozygotes makes sense; value $5$ is a heterozygote of founders $1$ and $2$, and the most frequent imputation error is to classify it as a homozygote of founder $1$ or $2$. 
 
 For the second data set no heterozygotes are imputed. This is because no heterozygote markers were called, so heterozygotes are either missing or consistent with being homozygotes, in which case the homozygote is always more likely. The only clue in the data is that missing values are always heterozygotes in this case. Setting \code{heterozygoteMissingProb} to $1$ and \code{homozygoteMissingProb} to $0.05$ gives acceptable results. 
-<<imputedExample4, cache=TRUE>>=
+<<imputeExample4, cache=TRUE>>=
 table(imputationData(imputed, experiment = 2), finals(combined)[[2]])
 imputed <- imputeFounders(mappedSNP, heterozygoteMissingProb = 1, 
     homozygoteMissingProb = 0.05)
@@ -629,9 +629,12 @@ The estimation of recombination fractions is somewhat slow due to the amount of 
 crossSNP <- subset(crossSNP, markers = sample(markers(cross)))
 rf <- estimateRF(crossSNP, verbose = list(progressStyle = 1))
 @
-The next steps are forming linkage groups, ordering chromosomes and imputing missing recombination fraction values.
+The next steps are forming linkage groups, ordering chromosomes and imputing missing recombination fraction values. 
+
+In this case we disable parallelisation in the marker ordering step. As this is a small example, on a computer with a large number of threads parallelisation can significantly slow down the runtime. On the other hand, when doing local reordering on large datasets, parallelisation can help significantly. 
 <<fourParentExample3, cache=TRUE>>=
 grouped <- formGroups(rf, groups = 3, method = "average", clusterBy="theta")
+try(omp_set_num_threads(1), silent = TRUE)
 ordered <- orderCross(grouped, effortMultiplier = 2)
 imputedTheta <- impute(ordered, verbose = list(progressStyle = 1)) 
 @

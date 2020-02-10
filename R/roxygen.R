@@ -75,9 +75,10 @@ NULL
 #' @examples
 #' data(eightParentSubsetMap)
 #' data(wsnp_Ku_rep_c103074_89904851)
+#' data(callFromMapExampleLocalisationStatistics)
 #' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = 
 #'     eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, 
-#'     thresholdChromosomes = 80)
+#'     thresholdChromosomes = 80, existingLocalisationStatistics = existingLocalisationStatistics)
 #' library(ggplot2)
 #' library(gridExtra)
 #' plotData <- wsnp_Ku_rep_c103074_89904851
@@ -105,4 +106,12 @@ NULL
 #'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 #' 
 #' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
+NULL
+
+#' @name callFromMapExampleLocalisationStatistics
+#' @rdname callFromMapExampleLocalisationStatistics
+#' @title Localisation statistics for example of callFromMap
+#' @docType data
+#' @description
+#' This dataset contains the localisation statistics for the example for running \code{callFromMap}. This makes the example fast enough to pass the CRAN check. 
 NULL

@@ -8,6 +8,7 @@
 #' @param existingImputations An object of class mpcrossMapped from the mpMap2 package, containing data about imputed underlying genotypes. 
 #' @param tDistributionPValue Paramater controlling the size of each detected cluster, ranging from 0 to 1. Small values result in small clusters, and large values result in large clusters.
 #' @param useOnlyExtraImputationPoints Should we only use the non-marker positions to identify the correct locations?
+#' @param ... Extra arguments. Only \code{existingLocalisationStatistics} is supported, mostly so the example can run quickly. 
 #' 
 #' @details
 #' This function uses an existing genetic map to call a genetic marker. There are a number of advantages to this approach
@@ -36,11 +37,13 @@
 #' @examples
 #' data(eightParentSubsetMap)
 #' data(wsnp_Ku_rep_c103074_89904851)
+#' data(callFromMapExampleLocalisationStatistics)
 #' library(ggplot2)
 #' library(gridExtra)
+#' #We use an existing set of localisation statistics, to make the example faster
 #' called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = 
 #'     eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, 
-#'     thresholdChromosomes = 80)
+#'     thresholdChromosomes = 80, existingLocalisationStatistics = existingLocalisationStatistics)
 #' plotData <- wsnp_Ku_rep_c103074_89904851
 #' plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
 #' plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])
@@ -66,9 +69,17 @@
 #'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 #' 
 #' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
-callFromMap <- function(rawData, thresholdChromosomes = 100, thresholdAlleleClusters = c(1e-10, 1e-20, 1e-30, 1e-40), maxChromosomes = 2, existingImputations, tDistributionPValue = 0.6, useOnlyExtraImputationPoints = TRUE)
+callFromMap <- function(rawData, thresholdChromosomes = 100, thresholdAlleleClusters = c(1e-10, 1e-20, 1e-30, 1e-40), maxChromosomes = 2, existingImputations, tDistributionPValue = 0.6, useOnlyExtraImputationPoints = TRUE, ...)
 {
-	rawResult <- mpMap2::addExtraMarkerFromRawCall(mpcrossMapped = existingImputations, newMarker = rawData, useOnlyExtraImputationPoints = useOnlyExtraImputationPoints)
+	args <- list(...)
+	if("existingLocalisationStatistics" %in% names(args))
+	{
+		rawResult <- args$existingLocalisationStatistics
+	}
+	else
+	{
+		rawResult <- mpMap2::addExtraMarkerFromRawCall(mpcrossMapped = existingImputations, newMarker = rawData, useOnlyExtraImputationPoints = useOnlyExtraImputationPoints)
+	}
 	chromosomes <- names(existingImputations@map)
 	chromosomeScores <- sapply(chromosomes, function(x) max(rawResult@data[names(rawResult@map[[x]])]))
 	chromosomeScores <- sort(chromosomeScores, decreasing=TRUE)

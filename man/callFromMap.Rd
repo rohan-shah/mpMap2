@@ -11,7 +11,8 @@ callFromMap(
   maxChromosomes = 2,
   existingImputations,
   tDistributionPValue = 0.6,
-  useOnlyExtraImputationPoints = TRUE
+  useOnlyExtraImputationPoints = TRUE,
+  ...
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ callFromMap(
 \item{tDistributionPValue}{Paramater controlling the size of each detected cluster, ranging from 0 to 1. Small values result in small clusters, and large values result in large clusters.}
 
 \item{useOnlyExtraImputationPoints}{Should we only use the non-marker positions to identify the correct locations?}
+
+\item{...}{Extra arguments. Only \code{existingLocalisationStatistics} is supported, mostly so the example can run quickly.}
 }
 \description{
 This function uses an existing genetic map to call genetic markers, including markers polymorphic on multiple chromosomes.
@@ -60,11 +63,13 @@ The steps in the algorithm are as follows:
 \examples{
 data(eightParentSubsetMap)
 data(wsnp_Ku_rep_c103074_89904851)
+data(callFromMapExampleLocalisationStatistics)
 library(ggplot2)
 library(gridExtra)
+#We use an existing set of localisation statistics, to make the example faster
 called <- callFromMap(rawData = as.matrix(wsnp_Ku_rep_c103074_89904851), existingImputations = 
     eightParentSubsetMap, useOnlyExtraImputationPoints = TRUE, tDistributionPValue = 0.8, 
-    thresholdChromosomes = 80)
+    thresholdChromosomes = 80, existingLocalisationStatistics = existingLocalisationStatistics)
 plotData <- wsnp_Ku_rep_c103074_89904851
 plotData$genotype1B <- factor(called$classificationsPerPosition$Chr1BLoc31$finals)
 plotData$imputed1B <- factor(imputationData(eightParentSubsetMap)[, "Chr1BLoc31"])

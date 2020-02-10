@@ -106,6 +106,7 @@ Collate:
     'nFounders.R'
     'nLines.R'
     'nMarkers.R'
+    'num_threads.R'
     'orderCross.R'
     'pedigree.R'
     'pedigreeGraph-class.R'
