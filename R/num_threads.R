@@ -7,6 +7,7 @@
 #' In particular, for small examples on a computer with a large number of threads, parallelisation may result in a huge decrease in performance. 
 #'
 #' This function returns an error if the package was not compiled with OpenMP. 
+#' @param num New number of threads for OpenMP
 omp_set_num_threads <- function(num)
 {
 	.Call("omp_set_num_threads", num, PACKAGE = "mpMap2")

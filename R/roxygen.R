@@ -108,8 +108,8 @@ NULL
 #' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
 NULL
 
-#' @name callFromMapExampleLocalisationStatistics
-#' @rdname callFromMapExampleLocalisationStatistics
+#' @name existingLocalisationStatistics
+#' @rdname existingLocalisationStatistics
 #' @title Localisation statistics for example of callFromMap
 #' @docType data
 #' @description
