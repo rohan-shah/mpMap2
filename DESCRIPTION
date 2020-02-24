@@ -9,7 +9,7 @@ Author: Rohan Shah [aut, cre],
   Alex Whan [ctb],
   Colin Cavanagh [ctb]
 Authors@R: c(person("Rohan", "Shah", role = c("aut", "cre"), email = "cran@bookshah.com"),
-              person("B.", "Emma", "Huang", role = c("aut")),
+              person("Emma", "Huang", role = c("aut")),
 	      person("Matthew", "Morell", role = "ctb"),
 	      person("Alex", "Whan", role = "ctb"),
 	      person("Colin", "Cavanagh", role = "ctb"))
