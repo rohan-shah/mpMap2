@@ -11,6 +11,9 @@ getChromosomes(mpcrossMapped, markers)
 
 \item{markers}{The markers for which we want the chromosomes}
 }
+\value{
+A character vector, with names corresponding to markers, and values corresponding to the chromosome on which the named marker is located.
+}
 \description{
 Get chromosome assignment per marker from an \code{mpcross} object.
 }

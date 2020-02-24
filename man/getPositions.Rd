@@ -11,6 +11,9 @@ getPositions(mpcrossMapped, markers)
 
 \item{markers}{The markers for which to get the positions}
 }
+\value{
+A named vector of numbers, with names corresponding to the selected genetic markers, and values corresponding to genetic positions.
+}
 \description{
 Get positions of genetic markers, on their respective chromosomes
 }

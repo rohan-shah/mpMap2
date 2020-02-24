@@ -17,6 +17,9 @@ pedigree(lineNames, mother, father, selfing, warnImproperFunnels = TRUE)
 
 \item{warnImproperFunnels}{Should a warning be generated in subsequent computations using this pedigree, if there are lines which do not contain all founding lines as ancestors?}
 }
+\value{
+An object of class \code{pedigree} representing the inputs.
+}
 \description{
 Create a pedigree object
 }

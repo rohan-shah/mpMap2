@@ -5,6 +5,7 @@
 #' @param positions The genetic positions at which to plot the composition
 #' @param alleles The founder alleles which we are interested in. 
 #' @param chromosomes The chromosomes of to plot the composition. 
+#' @return A ggplot object, suitable for display. 
 #' @examples
 #' data(simulatedFourParentData)
 #' part1 <- subset(simulatedFourParentData, lines = 

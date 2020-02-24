@@ -12,6 +12,7 @@
 #' Note that funnels for all pedigrees simulated by mpMap2 are already standardised. This will not generally be the case for realy experiments. 
 #' @param cross The object of class \code{mpcross} containing the pedigree of interest
 #' @param standardised Should the output funnels be standardised?
+#' @return An integer matrix with rows representing genetic lines, and columns representing positions within the funnel. 
 #' @examples
 #' data(simulatedFourParentData)
 #' #Funnels used to generate the first ten lines

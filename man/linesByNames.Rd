@@ -11,6 +11,9 @@ linesByNames(pedigree, names)
 
 \item{names}{The names of the lines for which to extract the pedigree}
 }
+\value{
+A matrix giving the genetic lines and their parents, by line name.
+}
 \description{
 Extract part of pedigree in human-readable format
 }

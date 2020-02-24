@@ -20,6 +20,9 @@ imputationMap(object, ...)
 
 \item{...}{Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation map for a specific experiment.}
 }
+\value{
+The map of positions used for IBD genotype imputation.
+}
 \description{
 Get map used for IBD genotype imputation
 }

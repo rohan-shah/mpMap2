@@ -7,6 +7,7 @@
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each F1 if no intercrossing is specified. These lines are then selfed according to selfingGenerations
 #' @param intercrossingGenerations The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @examples
 #' plotWOptions <- function(graph) 
 #' 	plot(graph, vertex.size = 8, vertex.label.cex=0.6, edge.arrow.size=0.01, edge.width=0.2)

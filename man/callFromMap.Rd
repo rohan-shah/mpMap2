@@ -32,6 +32,16 @@ callFromMap(
 
 \item{...}{Extra arguments. Only \code{existingLocalisationStatistics} is supported, mostly so the example can run quickly.}
 }
+\value{
+At the minimum, a list containing an entry \code{called} indicating whether the marker could be successfully called. If it could, other entries are returned. 
+\describe{
+	\item{overallAssignment}{Defines clusters within the data. }
+	\item{classificationsPerPosition}{Defines genotype calls per genetic location to which the marker was mapped. }
+	\item{clusterBoundaries}{Contours giving the boundaries of each cluster in \code{overallAssignment}.}
+	\item{preliminaryGroups}{The preliminary groups based on IBD imputations, which the final genotype calls are built from.}
+\item{pValuesMatrices}{The matrices of p-values used to form a graph, and therefore identify founder alleles.}
+}
+}
 \description{
 This function uses an existing genetic map to call genetic markers, including markers polymorphic on multiple chromosomes.
 }

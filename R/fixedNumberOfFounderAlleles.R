@@ -7,6 +7,7 @@ setClass("fixedNumberOfFounderAlleles", slots = list(alleles = "integer"))
 #' 
 #' This function takes in a fully informative experiment, and changes every marker so that it has a fixed number of founder alleles. Heterozygotes are also changed, so every combination of different alleles is still distinguishable. 
 #' @param alleles Number of alleles for each marker
+#' @return An object of internal class \code{fixedNumberOfFounderAlleles} suitable for application to an object of class \code{mpcross} using the addition operation. 
 #' @examples 
 #' data(simulatedFourParentData)
 #' founders(simulatedFourParentData)[, 1:10]

@@ -6,6 +6,9 @@
 \usage{
 biparentalDominant()
 }
+\value{
+An object of internal type \code{biparentalDominant}, which can be combined with an object of class \code{mpcross} using the addition operator.
+}
 \description{
 Change the markers in a biparental cross from fully informative to dominant. The dominant founder is chosen randomly for every marker. The transformation is applied to an object using the addition operator, see the example below for details.
 }

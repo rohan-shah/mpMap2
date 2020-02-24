@@ -81,6 +81,7 @@ NULL
 #' @param initial The founder lines, given by name or by index within lineNames.
 #' @param observed The lines which are observed in the final population, given by name or by index within lineNames.
 #' @param selfing Value determining whether or not subsequent analysis of populations generated from this pedigree should assume infinite generations of selfing. Possible values are \code{"finite"} and \code{"infinite"}.
+#' @return An object of class \code{detailedPedigree}, suitable for simulation.
 #' @seealso \code{\link[mpMap2]{detailedPedigree-class}}
 detailedPedigree <- function(lineNames, mother, father, initial, observed, selfing)
 {

@@ -19,6 +19,9 @@ founders(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the genetic data matrix of the founding lines}
 }
+\value{
+An integer matrix, with rows corresponding to founding lines and columns corresponding to markers, or a list of such matrices in the case of multiple experiments.
+}
 \description{
 Genetic data for founding lines
 

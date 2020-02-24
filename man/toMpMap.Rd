@@ -9,6 +9,9 @@ toMpMap(mpcross)
 \arguments{
 \item{mpcross}{The object of class \code{mpcross} to convert.}
 }
+\value{
+An object with structure compatible with the older mpMap package.
+}
 \description{
 Convert to the format used by the original mpMap package.
 }

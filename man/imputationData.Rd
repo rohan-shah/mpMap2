@@ -20,6 +20,9 @@ imputationData(object, ...)
 
 \item{...}{Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation data for a specific experiment.}
 }
+\value{
+The IBD genotype imputation data.
+}
 \description{
 Get out the IBD genotype imputation data
 }

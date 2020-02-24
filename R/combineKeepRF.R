@@ -9,6 +9,7 @@
 #' @param gbLimit Passed straight through to estimateRF
 #' @param callEstimateRF Should \code{estimateRF} be called, to compute any missing estimates?
 #' @param skipValidity Should we skip the validity check for object construction, in this function? Running the validity checks can be expensive, and in theory internal package code is trusted to generate valid objects. 
+#' @return A new object of class \code{mpcrossRF} containing the combined information of the two input objects.
 #' @export 
 combineKeepRF <- function(object1, object2, verbose = TRUE, gbLimit = -1, callEstimateRF = TRUE, skipValidity = FALSE)
 {

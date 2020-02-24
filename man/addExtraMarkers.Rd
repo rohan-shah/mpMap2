@@ -41,9 +41,6 @@ addExtraMarkers(
 
 \item{reorder}{Should local reordering be performed after the extra markers are added?}
 }
-\value{
-A list with an entry named \code{statistics}, containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, then the list also contains an entry named \code{object}, which is a new object containing the input object with the new markers added.
-}
 \description{
 Add extra markers to a map, using a QTL-mapping style approach.
 }
@@ -73,7 +70,7 @@ removedMiddle <- estimateRF(removedMiddle)
 extraMarker <- subset(simulatedFourParentData, markers = 50)
 #Add the extra marker, without doing any local reordering. After the marker is added, 
 #	recompute the imputation data, using the same arguments as previously. 
-withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 
+\dontrun{withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 
 	reorder = FALSE, imputationArgs = list(errorProb = 0.02, 
-	extraPositions = generateGridPositions(1)))$object
+	extraPositions = generateGridPositions(1)))$object}
 }

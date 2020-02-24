@@ -55,6 +55,7 @@ setMethod(f = "+", signature = c("mpcross", "normalPhenotype"), definition = fun
 #' @param standardDeviations The standard deviations of the phenotype for all the different founder alleles
 #' @param phenotypeName The name of the new phenotype
 #' @param marker The name of the marker which controls this phenotype
+#' @return An object of class \code{normalPhenotype} representing the phenotype. 
 #' @export
 normalPhenotype <- function(means, standardDeviations, phenotypeName, marker)
 {

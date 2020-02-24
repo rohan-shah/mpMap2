@@ -6,6 +6,9 @@
 \usage{
 removeHets()
 }
+\value{
+An object of internal class \code{removeHets}, which can be combined with an object of class \code{mpcross} using the addition operator.
+}
 \description{
 Remove all heterozygotes from dataset
 }

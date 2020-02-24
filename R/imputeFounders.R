@@ -10,6 +10,7 @@
 #' @param errorProb The probability of a genotyping error. 
 #' @param extraPositions Extra genetic positions at which to perform imputation. 
 #' @param showProgress If this paramater is \code{TRUE}, a progress bar is produced. 
+#' @return An object of class \code{mpcrossMapped}, containing all the information in the input object, and also including imputed IBD genotypes. 
 #' This function uses the Viterbi algorithm to calculate the most likely sequence of underlying genotypes, given observed genetic data. The parameters for the algorithm are a homozygous mising rate, a heterozygous missing rate, and an error probability. 
 #' 
 #' The two missing rates are intended to allow long strings of missing values to be imputed as heterozygotes, in the case that heterozygous genotypes are observed as missing much more often than homozygotes. Only the ratio of these two parameters is relevant, which is why the default values of 1 are acceptable. These default values really mean that the missing rates are equal. 

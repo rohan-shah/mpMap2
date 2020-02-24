@@ -4,6 +4,7 @@
 #' @param mpcrossMapped An object of class \code{mpcrossMapped}
 #' @param gapSize The size of the gap to reestimate. 
 #' @param recombinationFractions The recombination fractions to use for numerical maximum likelihood estimation
+#' @return An object of class \code{mpcrossMapped} with a re-estimated map. 
 #' @export
 estimateMapFromImputation <- function(mpcrossMapped, gapSize = 5, recombinationFractions = c(0:60/600, 11:49/100))
 {

@@ -8,6 +8,7 @@
 #' @rdname probabilityData
 #' @param object The \code{mpcross} object from which to extract the probability data.
 #' @param ... Additional options. Only \code{design} is supported, and gets the probability data for only a single experiment. 
+#' @return A numeric matrix containing the IBD probabliity data, or a list of such matrices in the case of multiple experiments within a single object. 
 #' @examples
 #' data(simulatedFourParentData)
 #' crossSNP <- simulatedFourParentData + multiparentSNP(keepHets = FALSE)

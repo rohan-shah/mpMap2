@@ -8,12 +8,14 @@
 #'
 #' This function returns an error if the package was not compiled with OpenMP. 
 #' @param num New number of threads for OpenMP
+#' @return None
 omp_set_num_threads <- function(num)
 {
 	.Call("omp_set_num_threads", num, PACKAGE = "mpMap2")
 }
 #' @export
 #' @rdname openmp
+#' @return The number of threads for OpenMP
 omp_get_num_threads <- function()
 {
 	.Call("omp_get_num_threads", PACKAGE = "mpMap2")

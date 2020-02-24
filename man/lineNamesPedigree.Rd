@@ -20,6 +20,9 @@ lineNames(object) <- value
 
 \item{value}{The vector of new genetic line names}
 }
+\value{
+None
+}
 \description{
 Get or set the genetic line names of a pedigree
 }

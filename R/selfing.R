@@ -8,6 +8,7 @@
 #' This extra information about whether to assume infinite generations of selfing, or the finite number of generations given in the pedigree, is stored in an extra slot, which must have value \code{"finite"} or \code{"infinite"}. If \code{"finite"} is specified, then in subsequent analysis (e.g. computation of IBD genotypes or probabilities) the number of generations of selfing for each line is taken from the pedigree. 
 #' @param object The pedigree object for which to get or set the generations of selfing, as finite or infinite. 
 #' @param value The new value
+#' @return Dimensions of selfing, either \code{"finite"} or \code{"infinite"}.
 #' @examples
 #' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10,
 #'      selfingGenerations = 0, nSeeds = 1)

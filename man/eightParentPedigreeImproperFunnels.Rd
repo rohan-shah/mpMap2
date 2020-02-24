@@ -17,6 +17,9 @@ eightParentPedigreeImproperFunnels(
 
 \item{nSeeds}{The number of progeny taken from each intercrossing line, or from each initially generated line (if no intercrossing is specified). These lines are then selfed according to selfingGenerations.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Generate a eight-parent pedigree starting from inbred founders, where the founders in the funnels are not necessarily distinct.
 }

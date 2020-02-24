@@ -9,6 +9,9 @@ backcrossPedigree(populationSize)
 \arguments{
 \item{populationSize}{The size of the generated population.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Generate a backcross pedigree which starts from inbred founders
 }

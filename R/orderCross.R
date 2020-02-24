@@ -19,6 +19,7 @@
 #' @param effortMultiplier Multiplier for the amount of computational effort
 #' @param randomStart If TRUE, start from the current ordering
 #' @param verbose If TRUE, generate more detailed output
+#' @return An object of class \code{mpcrossLG}, identical to the input except with the markers rearranged.
 #' @export
 orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0, effortMultiplier = 1, randomStart = TRUE, verbose = FALSE)
 {
@@ -51,6 +52,7 @@ orderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0
 #' @param effortMultiplier Multiplier for the amount of computational effort
 #' @param randomStart If TRUE, start from the current ordering
 #' @param nGroups The number of groups to form using hierarchical clustering
+#' @return An object of class \code{mpcrossLG}, identical to the input except with the markers rearranged.
 #' @export
 clusterOrderCross <- function(mpcrossLG, cool = 0.5, tmin = 0.1, nReps = 1, maxMove = 0, effortMultiplier = 1, randomStart = TRUE, nGroups)
 {

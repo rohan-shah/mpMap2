@@ -13,6 +13,15 @@ listCodingErrors(founders, finals, hetData)
 
 \item{hetData}{Data about the encoding of marker heterozygotes}
 }
+\value{
+List with the following entries:
+	\describe{
+		\item{finals}{Markers with an invalid observed value.}
+	\item{null}{Markers with a missing value for a founding line, for which the are observations for at least one genetic line.}
+		\item{missingHetData}{Markers for which a homozygote did not have an encoding.}
+	\item{invalidHetData}{Markers for which the heterozygote encoding data was invalid.}
+}
+}
 \description{
 Generate a list of encoding errors from genetic data
 }

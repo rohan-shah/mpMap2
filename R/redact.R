@@ -7,6 +7,7 @@
 #'
 #' @description Sensitive information includes names of genetic lines (both founding lines and final population lines) and marker names. All actual data (marker genotypes, imputed IBD genotypes, IBD probabilities, etc) are preserved. 
 #' @param object The object of class \code{mpcross} to redact.
+#' @return An object of class \code{mpcross}, with identifying information removed. 
 #' @export
 setGeneric(name = "redact", def = function(object){standardGeneric("redact")})
 #' @rdname redact

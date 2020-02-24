@@ -20,6 +20,9 @@ impute(
 
 \item{extractErrorsFunction}{Error handling function. If there are errors and allErrors is \code{TRUE}, this function will be called with a matrix indicating which estimates could not be imputed.}
 }
+\value{
+An object of class \code{mpcrossLG}, containing all the information in the input object, but also an imputed copy of the estimated recombination fraction data.
+}
 \description{
 Impute missing recombination fraction estimates
 }

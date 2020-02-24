@@ -12,6 +12,11 @@ omp_get_num_threads()
 \arguments{
 \item{num}{New number of threads for OpenMP}
 }
+\value{
+None
+
+The number of threads for OpenMP
+}
 \description{
 Get or set the number of threads for OpenMP
 }

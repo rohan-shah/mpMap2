@@ -3,6 +3,7 @@
 #' @details Pedigrees in mpMap2 are stored using indices for maternal and paternal lines, which is not a human-readable format. This function takes in a pedigree, and returns a human-readable subset.
 #' @param pedigree An object of class \code{pedigree}
 #' @param names The names of the lines for which to extract the pedigree
+#' @return A matrix giving the genetic lines and their parents, by line name. 
 #' @export
 linesByNames <- function(pedigree, names)
 {
@@ -35,6 +36,7 @@ setMethod(f = "print", signature = "detailedPedigree", definition = function(x)
 #' @param father The index of the paternal line
 #' @param selfing Should the number of generations of selfing be taken from the pedigree (\code{"finite"}), or should selfing be assumed to be infinite (\code{"infinite"})? 
 #' @param warnImproperFunnels Should a warning be generated in subsequent computations using this pedigree, if there are lines which do not contain all founding lines as ancestors?
+#' @return An object of class \code{pedigree} representing the inputs.
 #' @export
 pedigree <- function(lineNames, mother, father, selfing, warnImproperFunnels = TRUE)
 {

@@ -26,6 +26,9 @@ redact(object)
 \arguments{
 \item{object}{The object of class \code{mpcross} to redact.}
 }
+\value{
+An object of class \code{mpcross}, with identifying information removed.
+}
 \description{
 Sensitive information includes names of genetic lines (both founding lines and final population lines) and marker names. All actual data (marker genotypes, imputed IBD genotypes, IBD probabilities, etc) are preserved.
 }

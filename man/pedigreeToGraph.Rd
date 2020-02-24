@@ -9,6 +9,9 @@ pedigreeToGraph(pedigree)
 \arguments{
 \item{pedigree}{The pedigree to convert into a graph}
 }
+\value{
+An object of class \code{pedigreeGraph}, containing the graph and a planar layout for the graph.
+}
 \description{
 Convert pedigree to a graph
 }

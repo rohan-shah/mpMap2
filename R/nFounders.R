@@ -9,6 +9,7 @@
 #' If an \code{mpcross} object contains multiple experiments, one number is returned per experiment. 
 #' @rdname nFounders
 #' @param object The \code{mpcross} object from which to extract the number of founders
+#' @return The number of founding lines in the population, or a list of numbers in the case of multiple experiments contained in a single object.  
 #' @export
 setGeneric(name = "nFounders", def = function(object){standardGeneric("nFounders")})
 #' @rdname nFounders

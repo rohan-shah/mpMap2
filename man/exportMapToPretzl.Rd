@@ -13,6 +13,9 @@ exportMapToPretzl(inputObject, name, separateChromosomes = FALSE)
 
 \item{separateChromosomes}{If \code{TRUE}, separate exports will be generated for each chromosome. The name associated with each chromosome map will contain the chromosome name as a suffix.}
 }
+\value{
+A list containing JSON, suitable for import into Pretzl.
+}
 \description{
 Export genetic map to Pretzl
 }

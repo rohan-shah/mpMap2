@@ -2,6 +2,7 @@
 #' @description Add noise to marker positions, so that no markers are co-located
 #' @details Add noise to marker positions, so that no markers are located at the same position on a single chromosome. This was necessary before there was an error model implemented in the IBD genotype imputation and IBD genotype probabliity code. There is little reason to use this function now. 
 #' @param map The map to add noise to. 
+#' @return A copy of the input map, with noise added to genetic positions. 
 #' @export
 jitterMap <- function(map)
 {

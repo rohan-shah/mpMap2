@@ -10,12 +10,13 @@
 #'
 #' Objects of classes \code{mpcrossLG} or \code{mpcrossRF} can be subset by genetic lines, markers or linkage groups. 
 #' 
-#' An object of class \code{mprcossMapped} can be subset by genetic lines, markers or chromosomes. 
+#' An object of class \code{mpcrossMapped} can be subset by genetic lines, markers or chromosomes. 
 #' 
 #' The remainder of the subsetting methods are not expected to be called directly by the user. They subset internal components, and are used internally by the top-level methods. 
 #' 
 #' @param x The object to be subset
 #' @param ... A method to use to subset (markers, lines, positions or chromosomes), and values for that method. 
+#' @return A subsetted object, of the same type as the input. 
 #' @include mpcross-class.R
 #' @include geneticData-class.R
 setMethod(f = "subset", signature = "imputed", definition = function(x, ...)

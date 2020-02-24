@@ -9,6 +9,9 @@ lineNames(object)
 \arguments{
 \item{object}{The object from which to extract the line names}
 }
+\value{
+Vector of genetic line names
+}
 \description{
 Get or set the genetic line names associated with a pedigree or \code{mpcross} object.
 }

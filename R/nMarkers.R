@@ -7,6 +7,7 @@
 #' If an \code{mpcross} object contains multiple experiments, all experiments are required to have the same markers. So only one number is returned, in all cases. 
 #' @rdname nMarkers
 #' @param object The \code{mpcross} object from which to extract the marker names
+#' @return The number of markers in an object of class \code{mpcross}. 
 #' @export
 setGeneric(name = "nMarkers", def = function(object){standardGeneric("nMarkers")})
 #' @rdname nMarkers

@@ -23,6 +23,9 @@ computeGenotypeProbabilities(
 
 \item{extraPositions}{The extra positions at which to compute the IBD genotype probabilities. May be either a list with named components corresponding to chromosomes (simialr to a map) or a function which will be applied to the input object to generate the extra positions.}
 }
+\value{
+An object of class \code{mpcrossMapped} containing all information in the input object, and also estimated IDB probabilities.
+}
 \description{
 Compute IBD genotype probabilities
 }

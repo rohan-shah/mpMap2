@@ -3,6 +3,7 @@ setClass("removeHets", contains="NULL")
 #' @title Remove heterozygotes
 #' @description Remove all heterozygotes from dataset
 #' @details This function can be used to remove all heterozygotes from an \code{mpcross} object. Information about how pairs of different marker alleles are encoded as genotypes is discarded, and all observations of heterozygotes will be marked as \code{NA}. Any information calculated based on the genetic data (imputed IBD genotypes, IBD probabilities) will be discarded.
+#' @return An object of internal class \code{removeHets}, which can be combined with an object of class \code{mpcross} using the addition operator. 
 #' @examples
 #' pedigree <- eightParentPedigreeImproperFunnels(initialPopulationSize = 10,
 #'      selfingGenerations = 1, nSeeds = 1)

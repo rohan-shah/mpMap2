@@ -23,6 +23,9 @@ selfing(object)
 
 \item{value}{The new value}
 }
+\value{
+Dimensions of selfing, either \code{"finite"} or \code{"infinite"}.
+}
 \description{
 Get or set a pedigree to have finite or infinite generations of selfing
 }

@@ -20,6 +20,9 @@ flatImputationMapNames(object, ...)
 
 \item{...}{Extra parameters, currently only \code{"experiment"} is supported.}
 }
+\value{
+The names of all positions at which IBD genotype imputation has already been performed.
+}
 \description{
 Get the names of all positions at which IBD genotype imputation has already been performed
 }

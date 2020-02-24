@@ -11,6 +11,9 @@ stripPedigree(pedigree, finalLines)
 
 \item{finalLines}{The list of lines of interest. Lines in the pedigree which do not make a genetic contribution to the lines in \code{finalLines} will be removed.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Strip pedigree of lines that make no genetic contribution to the specified set of lines.
 }

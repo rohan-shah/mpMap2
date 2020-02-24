@@ -6,6 +6,7 @@
 #' @details Get the encoding of markers heterozygotes, either for all markers, or a specific marker. 
 #' @param object The object from which to extract the encoding data
 #' @param marker The marker of interest. If this is missing, heterozygote encoding data is returned for all markers. 
+#' @return Heterozygote encoding data, for either a specific marker or all markers. 
 #' @export
 setGeneric(name = "hetData", def = function(object, marker){standardGeneric("hetData")})
 #' @rdname hetData

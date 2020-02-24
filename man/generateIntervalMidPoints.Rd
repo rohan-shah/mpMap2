@@ -9,6 +9,9 @@ generateIntervalMidPoints(object)
 \arguments{
 \item{object}{The object of class \code{mpcrossMapped} from which to take the interval midpoints.}
 }
+\value{
+A function which can be applied to an object of class \code{mpcrossMapped} by \code{imputeFounders} or \code{computeGenotypeProbabilities}.
+}
 \description{
 Specify interval midpoints
 }

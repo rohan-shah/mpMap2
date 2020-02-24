@@ -20,6 +20,9 @@ eightParentPedigreeSingleFunnel(
 
 \item{intercrossingGenerations}{The number of generations of random mating performed from the F1 generation. Population size is maintained at that specified by initialPopulationSize.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Generate a eight-parent pedigree starting from inbred founders, using a single funnel.
 }

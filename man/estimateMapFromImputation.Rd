@@ -17,6 +17,9 @@ estimateMapFromImputation(
 
 \item{recombinationFractions}{The recombination fractions to use for numerical maximum likelihood estimation}
 }
+\value{
+An object of class \code{mpcrossMapped} with a re-estimated map.
+}
 \description{
 Re-estimate large gaps in a genetic map from IBD genotype imputations
 }

@@ -8,6 +8,7 @@
 #' @param initialPopulationSize The number of initially generated lines, whose genetic material is a mosaic of the eight founding lines. These lines are generated using three generations of structured mating. 
 #' @param selfingGenerations The number of selfing generations at the end of the pedigree.
 #' @param nSeeds The number of progeny taken from each intercrossing line, or from each initially generated line (if no intercrossing is specified). These lines are then selfed according to selfingGenerations.
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @export
 #' @details
 #' Generate a eight-parent pedigree starting from inbred founders. The founders in the funnel for every line are chosen \emph{with replacement}. So for any line from the final population, it is likely that some founding lines are absent from the corresponding funnel, and some appear multiple times. 
@@ -27,7 +28,6 @@
 #' \dontrun{plot(pedigreeAsGraph)}
 #' #Write it to a file in DOT format
 # \dontrun{write.graph(graph = pedigreeAsGraph@@graph, format = "dot", file = "./pedigree.dot")}
-
 # This is written in C because otherwise it's just too damn slow (especially for generating the huge populations that we want to use to get numerically accurate results for unit testing)
 eightParentPedigreeImproperFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds)
 {

@@ -26,6 +26,9 @@ as.mpInterval(
 
 \item{errorProb}{Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.}
 }
+\value{
+An object of class \code{mpMarker} or \code{mpInterval}, which are formats specified by package mpwgaim.
+}
 \description{
 Convert an object of class \code{mpcrossMapped} to the format used by MPWGAIM.
 }

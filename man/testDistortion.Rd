@@ -9,6 +9,9 @@ testDistortion(object)
 \arguments{
 \item{object}{An object of class \code{mpcrossMapped} which contains imputed IBD genotype data}
 }
+\value{
+A data.frame containing p-values and test-statistic values for each position at which there is IBD genotype probability data.
+}
 \description{
 Test for distortion using IBD genotype probabilities
 }

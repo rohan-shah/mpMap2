@@ -23,6 +23,9 @@ mpcross(
 
 \item{fixCodingErrors}{Should we automatically fix data errors, by changing invalid values to missing?}
 }
+\value{
+An object of class \code{mpcross}, constructed from the arguments.
+}
 \description{
 Create object of class mpcross
 }

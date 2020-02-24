@@ -22,6 +22,9 @@
 
 \item{...}{Unused}
 }
+\value{
+None
+}
 \description{
 There are multiple meaningful ways to plot some mpMap2 objects. Please use \code{\link{plotProbabilities}} or \code{\link{plotMosaic}} instead.
 }

@@ -19,6 +19,9 @@ nMarkers(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the marker names}
 }
+\value{
+The number of markers in an object of class \code{mpcross}.
+}
 \description{
 Number of genotyped markers
 

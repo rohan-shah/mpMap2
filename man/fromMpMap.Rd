@@ -12,6 +12,8 @@ fromMpMap(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 \item{selfing}{Number of generations of selfing to put in the pedigree, for the converted object. Must be \code{"finite"} or \code{"infinite"}.}
 
 \item{fixCodingErrors}{Should we attempt to fix coding errors, by replacing invalid values by NA? Defaults to FALSE.}
+
+\item{An}{object of class \code{mpcross} or \code{mpcrossMapped}, depending on the data contained in the input object.}
 }
 \description{
 Convert an object from mpMap format into mpMap2 format

@@ -9,6 +9,9 @@ extraImputationPoints(mpcrossMapped)
 \arguments{
 \item{mpcrossMapped}{The object from which to get the non-marker positions}
 }
+\value{
+A vector of genetic position names.
+}
 \description{
 Get out non-marker positions used for IBD genotype imputation
 }

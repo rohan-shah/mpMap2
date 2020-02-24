@@ -4,6 +4,7 @@
 #' @param inputObject The object of class \code{mpcrossMapped} containing the genetic map
 #' @param name If a single JSON object is being exported, the name of the exported map. 
 #' @param separateChromosomes If \code{TRUE}, separate exports will be generated for each chromosome. The name associated with each chromosome map will contain the chromosome name as a suffix. 
+#' @return A list containing JSON, suitable for import into Pretzl. 
 #' @export
 exportMapToPretzl <- function(inputObject, name, separateChromosomes = FALSE)
 {

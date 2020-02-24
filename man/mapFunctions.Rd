@@ -27,6 +27,17 @@ kosambi(x)
 
 \item{r}{recombination fraction}
 }
+\value{
+Recombination fraction.
+
+Genetic distance in cM.
+
+Genetic distance in cM.
+
+Recombination fraction.
+
+Recombination fraction.
+}
 \description{
 Functions used to convert between recombination fractions and centiMorgan distances.
 }

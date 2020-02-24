@@ -7,6 +7,7 @@
 #' @param positions Genetic positions to plot
 #' @param lines Genetic lines to plot
 #' @param ... Extra inputs to \code{heatmap_2}
+#' @return None
 plotMosaic <- function(inputObject, chromosomes, positions, lines, ...)
 {
 	if(inherits(inputObject, "mpcrossMapped"))

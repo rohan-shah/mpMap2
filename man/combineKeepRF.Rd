@@ -26,6 +26,9 @@ combineKeepRF(
 
 \item{skipValidity}{Should we skip the validity check for object construction, in this function? Running the validity checks can be expensive, and in theory internal package code is trusted to generate valid objects.}
 }
+\value{
+A new object of class \code{mpcrossRF} containing the combined information of the two input objects.
+}
 \description{
 Combine mpcross objects, keeping recombination fraction data
 }

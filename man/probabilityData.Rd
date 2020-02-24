@@ -17,6 +17,9 @@ probabilityData(object, ...)
 
 \item{...}{Additional options. Only \code{design} is supported, and gets the probability data for only a single experiment.}
 }
+\value{
+A numeric matrix containing the IBD probabliity data, or a list of such matrices in the case of multiple experiments within a single object.
+}
 \description{
 Get the identity-by-descent probability data from an mpcross object.
 }

@@ -4,6 +4,7 @@
 #'
 #' This can be an inconvenient layout for some operations. This function returns a matrix where the alleles appear as part of the columns, rather than the rows. For example, after applying this function to the given example, the first four values in the first row will be the probabilities that genetic line 1 carries alleles from specific founders, at a specific position. 
 #' @param inputObject The \code{mpcross} object containing the probability data. 
+#' @return A numeric matrix containing IBD probability data. 
 #' @examples
 #' data(simulatedFourParentData)
 #' crossSNP <- simulatedFourParentData + multiparentSNP(keepHets = FALSE)

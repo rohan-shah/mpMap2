@@ -20,6 +20,9 @@ imputationKey(object, ...)
 
 \item{...}{Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation map for a specific experiment.}
 }
+\value{
+Key giving the encoding of heterozygotes, in the imputed IBD genotype data.
+}
 \description{
 Get out key for IBD genotype imputations
 }

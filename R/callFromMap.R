@@ -9,7 +9,14 @@
 #' @param tDistributionPValue Paramater controlling the size of each detected cluster, ranging from 0 to 1. Small values result in small clusters, and large values result in large clusters.
 #' @param useOnlyExtraImputationPoints Should we only use the non-marker positions to identify the correct locations?
 #' @param ... Extra arguments. Only \code{existingLocalisationStatistics} is supported, mostly so the example can run quickly. 
-#' 
+#' @return At the minimum, a list containing an entry \code{called} indicating whether the marker could be successfully called. If it could, other entries are returned. 
+#' \describe{
+#' 	\item{overallAssignment}{Defines clusters within the data. }
+#' 	\item{classificationsPerPosition}{Defines genotype calls per genetic location to which the marker was mapped. }
+#' 	\item{clusterBoundaries}{Contours giving the boundaries of each cluster in \code{overallAssignment}.}
+#' 	\item{preliminaryGroups}{The preliminary groups based on IBD imputations, which the final genotype calls are built from.}
+#'	\item{pValuesMatrices}{The matrices of p-values used to form a graph, and therefore identify founder alleles.}
+#' }
 #' @details
 #' This function uses an existing genetic map to call a genetic marker. There are a number of advantages to this approach
 #' \describe{

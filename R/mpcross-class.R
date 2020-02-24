@@ -188,6 +188,7 @@ setAs("mpcrossLG", "mpcrossRF", def = function(from, to)
 #' @param founders The genetic data for the founding lines, which are assumed to be inbred
 #' @param finals The genetic data for the lines genotyped at the end of the experiment. 
 #' @param pedigree The pedigree for the experiment
+#' @return An object of class \code{hetData}, which encodes only the marker homozygotes.
 #' @examples
 #' map <- qtl::sim.map()
 #' pedigree <- f2Pedigree(1000)
@@ -229,6 +230,7 @@ infiniteSelfing <- function(founders, finals, pedigree)
 #' @param founders Genetic data for the founding lines of the population
 #' @param finals Genetic data for the final genotyped lines of the population
 #' @param pedigree Pedigree for the population. Unused by this particular function.
+#' @return An object of class \code{hetData}, which contains encodings for the marker heterozygotes and the (unique) marker heterozygote 
 #' @export
 hetsForSNPMarkers <- function(founders, finals, pedigree)
 {

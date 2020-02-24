@@ -5,6 +5,7 @@ setClass("assignFounderPattern", slots = list(data = "matrix"))
 #' @description Set founder genotypes
 #' @details Set the founder genotypes to a specified matrix, for an object with fully informative markers. This can allow the same set of founder genotypes to be used for multiple simulation runs.
 #' @param founderMatrix The new matrix of founder genotypes
+#' @return An object of internal class \code{assignFounderPattern}, suitable for application to an object of class \code{mpcross} using the addition operation.
 #' @export
 assignFounderPattern <- function(founderMatrix)
 {
@@ -17,6 +18,7 @@ assignFounderPattern <- function(founderMatrix)
 #' @details These operators are used to combine objects in order to apply a function. For example, \code{e1 + biparentalDominant()} returns the biparental design \code{e1}, with all markers converted to dominant markers. Consult the documentation on the individual functions, rather than this list of operators. 
 #' @param e1 Object one
 #' @param e2 Object two
+#' @return Modified version of the input object. The class of the output depends on the class of the input. 
 #' @rdname internalOperators
 setMethod(f = "+", signature = c("geneticData", "assignFounderPattern"), definition = function(e1, e2)
 {

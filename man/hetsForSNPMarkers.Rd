@@ -13,6 +13,9 @@ hetsForSNPMarkers(founders, finals, pedigree)
 
 \item{pedigree}{Pedigree for the population. Unused by this particular function.}
 }
+\value{
+An object of class \code{hetData}, which contains encodings for the marker heterozygotes and the (unique) marker heterozygote
+}
 \description{
 Create encoding which assumes that the single non-homozygote value for a SNP marker is the heterozygote
 }

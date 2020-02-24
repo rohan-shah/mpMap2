@@ -41,6 +41,9 @@
 
 \item{...}{A method to use to subset (markers, lines, positions or chromosomes), and values for that method.}
 }
+\value{
+A subsetted object, of the same type as the input.
+}
 \description{
 Subset data objects by line names, chromosomes, linkage groups, markers or positions
 }
@@ -53,7 +56,7 @@ An object of class \code{mpcross} can be subset by genetic lines or markers.
 
 Objects of classes \code{mpcrossLG} or \code{mpcrossRF} can be subset by genetic lines, markers or linkage groups. 
 
-An object of class \code{mprcossMapped} can be subset by genetic lines, markers or chromosomes. 
+An object of class \code{mpcrossMapped} can be subset by genetic lines, markers or chromosomes. 
 
 The remainder of the subsetting methods are not expected to be called directly by the user. They subset internal components, and are used internally by the top-level methods.
 }

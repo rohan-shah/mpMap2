@@ -9,6 +9,9 @@ fixedNumberOfFounderAlleles(alleles)
 \arguments{
 \item{alleles}{Number of alleles for each marker}
 }
+\value{
+An object of internal class \code{fixedNumberOfFounderAlleles} suitable for application to an object of class \code{mpcross} using the addition operation.
+}
 \description{
 Convert a fully informative experiment to one with a fixed number of alleles per marker
 }

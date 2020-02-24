@@ -5,6 +5,7 @@
 #' This function relies on the use of the Boost C++ libraries, and may not be available in every distributed version of mpMap2. If this function is unavailable, the function will return \code{NULL}. 
 #' @param pedigree The initial pedigree, which may contain some unneccessary extra genetic lines
 #' @param finalLines The list of lines of interest. Lines in the pedigree which do not make a genetic contribution to the lines in \code{finalLines} will be removed. 
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @export
 stripPedigree <- function(pedigree, finalLines)
 {

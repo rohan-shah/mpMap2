@@ -17,6 +17,9 @@ plotMosaic(inputObject, chromosomes, positions, lines, ...)
 
 \item{...}{Extra inputs to \code{heatmap_2}}
 }
+\value{
+None
+}
 \description{
 Plot estimated genetic composition of lines
 }

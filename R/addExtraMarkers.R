@@ -12,6 +12,7 @@ splitVector <- function(vector, splitValue)
 #' @param x Object of class \code{addExtraMarkersStatistics} containing test-statistic values.
 #' @param y Unused
 #' @param ... Unused
+#' @value A ggplot object suitable for display. 
 setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = function(x, ...)
 {
 	offsetVector <- c(0, head(unlist(lapply(x@map, max)), -1))
@@ -34,7 +35,7 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' @param orderCrossArgs A list containing additional arguments to \code{\link{orderCross}}. 
 #' @param verbose Should extra logging output be generated?
 #' @param reorder Should local reordering be performed after the extra markers are added?
-#' @return A list with an entry named \code{statistics}, containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, then the list also contains an entry named \code{object}, which is a new object containing the input object with the new markers added. 
+#' @value If \code{onlyStatistics} was set to \code{TRUE}, an object of class \code{addExtraMarkersStatistics} containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, a list containing the test statistic values in entry \code{statistics} and in entry \code{object}, a new object containing the input object with the new markers added.
 #' 
 #' @details This function uses a QTL-mapping style approach to add extra markers to an existing map. The code uses the imputation data at a collection of points, and the marker alleles for the \emph{first} marker of the extra markers. If the imputed genotype at a point is \emph{independent} from the genotype at the new marker, then the new marker probably should \emph{not} be mapped to that point. If the imputed genotype at a point and the marker allele are \emph{strongly dependent}, then the new marker \emph{should} probably be mapped to that point. Dependence and independence are measured using a chi-squared test stastistic for independence. \emph{All the extra markers} are then mapped to the position where the test statistic is largest. It is recommended that only single markers be added at a time, unless you are extremely confident that all the extra markers should be located at the same position.
 #'
@@ -61,9 +62,9 @@ setMethod(f = "plot", signature = "addExtraMarkersStatistics", definition = func
 #' extraMarker <- subset(simulatedFourParentData, markers = 50)
 #' #Add the extra marker, without doing any local reordering. After the marker is added, 
 #' #	recompute the imputation data, using the same arguments as previously. 
-#' withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 
+#' \dontrun{withExtra <- addExtraMarkers(mpcrossMapped = removedMiddle, newMarkers = extraMarker, 
 #' 	reorder = FALSE, imputationArgs = list(errorProb = 0.02, 
-#' 	extraPositions = generateGridPositions(1)))$object
+#' 	extraPositions = generateGridPositions(1)))$object}
 #' @export
 addExtraMarkers <- function(mpcrossMapped, newMarkers, useOnlyExtraImputationPoints = TRUE, reorderRadius = 103, maxOffset = 50, knownChromosome, imputationArgs = NULL, onlyStatistics = FALSE, orderCrossArgs = list(), 
 #attemptMpMap2Interactive = TRUE, 

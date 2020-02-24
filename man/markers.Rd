@@ -28,6 +28,9 @@ markers(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the marker names}
 }
+\value{
+The names of the genetic markers.
+}
 \description{
 Genotyped markers
 

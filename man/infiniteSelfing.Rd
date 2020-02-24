@@ -13,6 +13,9 @@ infiniteSelfing(founders, finals, pedigree)
 
 \item{pedigree}{The pedigree for the experiment}
 }
+\value{
+An object of class \code{hetData}, which encodes only the marker homozygotes.
+}
 \description{
 Create allele encoding corresponding to infinite generations of selfing
 }

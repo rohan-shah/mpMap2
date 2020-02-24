@@ -25,6 +25,9 @@ nFounders(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the number of founders}
 }
+\value{
+The number of founding lines in the population, or a list of numbers in the case of multiple experiments contained in a single object.
+}
 \description{
 Number of genotyped markers
 

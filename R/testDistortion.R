@@ -7,6 +7,7 @@
 #' 
 #' The result is a matrix containing p-values, test-statistic values, and the L1 and L2 distances between the observed genetic proportions, and the expected genetic proportions. 
 #' @param object An object of class \code{mpcrossMapped} which contains imputed IBD genotype data
+#' @return A data.frame containing p-values and test-statistic values for each position at which there is IBD genotype probability data. 
 testDistortion <- function(object)
 {
 	if(inherits(object, "mpcross") && length(object@geneticData) == 1)

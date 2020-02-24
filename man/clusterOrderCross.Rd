@@ -32,6 +32,9 @@ clusterOrderCross(
 
 \item{nGroups}{The number of groups to form using hierarchical clustering}
 }
+\value{
+An object of class \code{mpcrossLG}, identical to the input except with the markers rearranged.
+}
 \description{
 Group markers into blocks and arrange those blocks
 }

@@ -9,6 +9,9 @@ generateGridPositions(spacing)
 \arguments{
 \item{spacing}{The spacing of the genetic positions, in cM.}
 }
+\value{
+A function which can be applied to an object of class \code{mpcrossMapped} by \code{imputeFounders} or \code{computeGenotypeProbabilities}.
+}
 \description{
 Specify an equally spaced grid of genetic positions
 }

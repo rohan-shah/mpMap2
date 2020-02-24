@@ -5,6 +5,7 @@
 #'
 #' @param populationSize The size of the generated population
 #' @param selfingGenerations Number of generations of selfing. Specifying one generation leads to an F2 design. 
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @export
 rilPedigree <- function(populationSize, selfingGenerations)
 {

@@ -31,6 +31,7 @@ checkRawSymmetricMatrix <- function(object)
 #' @param x object from which to extract element(s)
 #' @param drop If TRUE the result is coerced to the lowest possible dimension
 #' @param ... Currently unused
+#' @return Various. Not for external use.
 setMethod("[", signature(x = "rawSymmetricMatrix", i = "index", j = "index", drop = "logical"),
 	function(x, i, j, ..., drop)
 	{

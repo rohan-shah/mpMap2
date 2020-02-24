@@ -11,6 +11,9 @@ rilPedigree(populationSize, selfingGenerations)
 
 \item{selfingGenerations}{Number of generations of selfing. Specifying one generation leads to an F2 design.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Generate a two-parent RIL pedigree which starts from inbred founders
 }

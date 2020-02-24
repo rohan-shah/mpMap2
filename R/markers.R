@@ -9,6 +9,7 @@
 #' If an \code{mpcross} object contains multiple experiments, all experiments are required to have the same markers. So a single vector of marker names is returned, in all cases. 
 #' @rdname markers
 #' @param object The \code{mpcross} object from which to extract the marker names
+#' @return The names of the genetic markers.
 #' @export
 setGeneric(name = "markers", def = function(object){standardGeneric("markers")})
 #' @rdname markers

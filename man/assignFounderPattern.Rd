@@ -9,6 +9,9 @@ assignFounderPattern(founderMatrix)
 \arguments{
 \item{founderMatrix}{The new matrix of founder genotypes}
 }
+\value{
+An object of internal class \code{assignFounderPattern}, suitable for application to an object of class \code{mpcross} using the addition operation.
+}
 \description{
 Set founder genotypes
 }

@@ -15,6 +15,9 @@ plotProbabilities(inputObject, positions, alleles, chromosomes)
 
 \item{chromosomes}{The chromosomes of to plot the composition.}
 }
+\value{
+A ggplot object, suitable for display.
+}
 \description{
 Plot genetic composition across the genome
 }

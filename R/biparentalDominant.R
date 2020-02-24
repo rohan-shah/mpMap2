@@ -4,6 +4,7 @@ setClass("biparentalDominant", contains="NULL")
 #' Make markers in a biparental cross dominant
 #'
 #' Change the markers in a biparental cross from fully informative to dominant. The dominant founder is chosen randomly for every marker. The transformation is applied to an object using the addition operator, see the example below for details.
+#' @return An object of internal type \code{biparentalDominant}, which can be combined with an object of class \code{mpcross} using the addition operator. 
 #' @examples
 #' #Simulate an F2 design
 #' f2Pedigree <- f2Pedigree(1000)

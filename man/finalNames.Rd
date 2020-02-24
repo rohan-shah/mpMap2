@@ -19,6 +19,9 @@ finalNames(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the names of the genetic lines}
 }
+\value{
+The names of the genetic lines in the final population.
+}
 \description{
 Names of genetic lines
 

@@ -19,6 +19,9 @@ nLines(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the number of genotyped lines.}
 }
+\value{
+The number of genetic lines in the population, or a list of numbers in the case of multiple experiments contained in a single object.
+}
 \description{
 Number of genotyped lines
 

@@ -13,6 +13,9 @@
 
 \item{...}{Other options to plot.igraph}
 }
+\value{
+None
+}
 \description{
 Plot the graph of a pedigree
 }

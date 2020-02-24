@@ -8,6 +8,7 @@
 #' @param homozygoteMissingProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
 #' @param heterozygoteMissingProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
 #' @param errorProb Used as an input to \code{computeGenotypeProbabilitiesInternal}, if the IBD probabilities need to be calculated.
+#' @return An object of class \code{mpMarker} or \code{mpInterval}, which are formats specified by package mpwgaim. 
 as.mpInterval <- function(object, type = "mpMarker", positions, homozygoteMissingProb, heterozygoteMissingProb, errorProb)
 {
 	if(!isS4(object) || !is(object, "mpcrossMapped"))

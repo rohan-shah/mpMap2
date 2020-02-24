@@ -23,6 +23,9 @@ formGroups(
 
 \item{preCluster}{Before clustering is performed, should we form groups of markers which are completely linked?}
 }
+\value{
+An object of class \code{mpcrossLG}, containing all the information in the input object and also information about linkage groups.
+}
 \description{
 Group markers into linkage groups using hierarchical clustering.
 }

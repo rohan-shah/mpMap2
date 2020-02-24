@@ -4,6 +4,7 @@
 #' Generate an F2 pedigree which starts from inbred founders
 #' 
 #' @param populationSize The size of the generated population. 
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @export
 #' @examples 
 #' pedigree <- f2Pedigree(1000)

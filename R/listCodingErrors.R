@@ -8,6 +8,13 @@
 #' @param founders Genetic data for the founding lines of the population
 #' @param finals Genetic data for the final lines of the population
 #' @param hetData Data about the encoding of marker heterozygotes
+#' @return List with the following entries:
+#' 	\describe{
+#' 		\item{finals}{Markers with an invalid observed value.}
+#'		\item{null}{Markers with a missing value for a founding line, for which the are observations for at least one genetic line.}
+#' 		\item{missingHetData}{Markers for which a homozygote did not have an encoding.}
+#'		\item{invalidHetData}{Markers for which the heterozygote encoding data was invalid.}
+#'	}
 listCodingErrors <- function(founders, finals, hetData)
 {
 	errors <- .Call("listCodingErrors", founders, finals, hetData, PACKAGE="mpMap2")
@@ -22,6 +29,13 @@ listCodingErrors <- function(founders, finals, hetData)
 #' @details Generate a list of encoding errors assuming infinite selfing. Given the infinite selfing assumption, no information about heterozygote encoding is required. 
 #' @param founders Genetic data for the founding lines of the population
 #' @param finals Genetic data for the final lines of the population
+#' @return List with the following entries:
+#' 	\describe{
+#' 		\item{finals}{Markers with an invalid observed value.}
+#'		\item{null}{Markers with a missing value for a founding line, for which the are observations for at least one genetic line.}
+#' 		\item{missingHetData}{Markers for which a homozygote did not have an encoding.}
+#'		\item{invalidHetData}{Markers for which the heterozygote encoding data was invalid.}
+#'	}
 #' @export
 listCodingErrorsInfiniteSelfing <- function(founders, finals)
 {

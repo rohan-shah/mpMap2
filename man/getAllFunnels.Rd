@@ -11,6 +11,9 @@ getAllFunnels(cross, standardised = FALSE)
 
 \item{standardised}{Should the output funnels be standardised?}
 }
+\value{
+An integer matrix with rows representing genetic lines, and columns representing positions within the funnel.
+}
 \description{
 Get the order of the founding lines, as they contribute to each line in the final population
 }

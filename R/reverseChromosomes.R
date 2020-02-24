@@ -3,6 +3,7 @@
 #' @details Create a new object, with the specified chromosomes reversed
 #' @param mpcrossMapped The initial object, for which we want to reverse some of the chromosomes
 #' @param chromosomes The names of the chromosomes to reverse
+#' @return An object of class \code{mpcrossMapped}, with certain chromosomes reversed.
 #' @examples
 #' map <- qtl::sim.map()
 #' pedigree <- f2Pedigree(1000)

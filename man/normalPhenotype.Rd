@@ -15,6 +15,9 @@ normalPhenotype(means, standardDeviations, phenotypeName, marker)
 
 \item{marker}{The name of the marker which controls this phenotype}
 }
+\value{
+An object of class \code{normalPhenotype} representing the phenotype.
+}
 \description{
 Add a normally distributed phenotype
 }

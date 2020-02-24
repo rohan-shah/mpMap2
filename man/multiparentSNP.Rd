@@ -9,6 +9,9 @@ multiparentSNP(keepHets)
 \arguments{
 \item{keepHets}{Should heterozygotes for the SNP marker be kept?}
 }
+\value{
+An object of internal type \code{multiparentSNP}, which can be combined with an object of class \code{mpcross} using the addition operator.
+}
 \description{
 Convert all markers in an object with fully informative markers to SNP markers
 }

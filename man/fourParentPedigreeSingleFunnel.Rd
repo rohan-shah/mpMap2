@@ -20,6 +20,9 @@ fourParentPedigreeSingleFunnel(
 
 \item{intercrossingGenerations}{The number of generations of intercrossing, after each F2 line is generated.}
 }
+\value{
+An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross.
+}
 \description{
 Generate a four-parent pedigree starting from inbred founders, using a single funnel
 }

@@ -7,6 +7,7 @@
 #' @param x Unused
 #' @param y Unused
 #' @param ... Unused
+#' @return None
 setMethod(f = "plot", signature = "mpcross", definition = function(x, ...)
 {
 	stop("Function plot is not defined for an object of class \"mpcross\". Use functions plotProbabilities or plotMosaic instead")

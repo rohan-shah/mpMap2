@@ -9,6 +9,9 @@ jitterMap(map)
 \arguments{
 \item{map}{The map to add noise to.}
 }
+\value{
+A copy of the input map, with noise added to genetic positions.
+}
 \description{
 Add noise to marker positions, so that no markers are co-located
 }

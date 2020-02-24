@@ -4,6 +4,7 @@
 #' 
 #' Note that the return value is itself a function, which is applied internally by \code{imputeFounders} or \code{computeGenotypeProbabilities} to an object of class \code{mpcrossMapped}. 
 #' @param spacing The spacing of the genetic positions, in cM.
+#' @return A function which can be applied to an object of class \code{mpcrossMapped} by \code{imputeFounders} or \code{computeGenotypeProbabilities}. 
 #' @examples
 #' data(simulatedFourParentData)
 #' #Create object that includes the correct map

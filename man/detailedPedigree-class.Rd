@@ -20,6 +20,9 @@ detailedPedigree(lineNames, mother, father, initial, observed, selfing)
 
 \item{selfing}{Value determining whether or not subsequent analysis of populations generated from this pedigree should assume infinite generations of selfing. Possible values are \code{"finite"} and \code{"infinite"}.}
 }
+\value{
+An object of class \code{detailedPedigree}, suitable for simulation.
+}
 \description{
 Class detailedPedigree is similar to the S4 class pedigree, except it also contains information about which lines are going to observed. This allows simulation of a data set with the given pedigree.
 }

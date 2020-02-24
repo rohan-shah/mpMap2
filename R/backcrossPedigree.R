@@ -4,6 +4,7 @@
 #' @details Generate a backcross pedigree which starts from inbred founders
 #' 
 #' @param populationSize The size of the generated population. 
+#' @return An object of class \code{detailedPedigree} representing the experimental design, suitable for simulation using simulateMPCross. 
 #' @examples 
 #' pedigree <- backcrossPedigree(1000)
 #' #This pedigree is automatically marked as involving finite generations of selfing. 

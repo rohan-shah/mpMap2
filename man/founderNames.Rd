@@ -19,6 +19,9 @@ founderNames(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the names of the founding genetic lines}
 }
+\value{
+A vector of names of genetic lines, or a list of such vectors, in the case of multiple experiments.
+}
 \description{
 Names of founding genetic lines
 

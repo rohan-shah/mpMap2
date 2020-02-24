@@ -7,6 +7,7 @@
 #' @param clusterBy The matrix to use for clustering. The three choices are theta (recombination fractions), lod (log-odds ratio) or combined (a combination of both). 
 #' @param method The method to use for hierarchical cluster. Choices are average, complete and single.
 #' @param preCluster Before clustering is performed, should we form groups of markers which are completely linked?
+#' @return An object of class \code{mpcrossLG}, containing all the information in the input object and also information about linkage groups. 
 #' 
 #' @details
 #' This function groups markers into the specified number of linkage groups, using hierarchical clustering. This can be done using three different dissimilarity matrices, specified by the \code{clusterBy} argument. If \code{"theta"} is specified, then the matrix of recombination fractions is used. If \code{"lod"} is specified, then a matrix of likelihood ratio test statistics is used. The hypothesis being tested is whether the recombination fraction is 0.5 (no linkage). If \code{"combined"} is specified, then a combination of both previous approaches is used. We recommend the default value of \code{"theta"}. 

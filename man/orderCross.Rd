@@ -34,6 +34,9 @@ orderCross(
 
 \item{verbose}{If TRUE, generate more detailed output}
 }
+\value{
+An object of class \code{mpcrossLG}, identical to the input except with the markers rearranged.
+}
 \description{
 This function orders markers within linkage groups using a simulated annealing heuristic. The underlying implementation is a C++ reimplementation of the fortran code \code{arsa.f} from the \code{seriation} package. The reimplementation allows for multithreading, and is therefore much faster. It also fixes a couple of bugs in the original code. 
 

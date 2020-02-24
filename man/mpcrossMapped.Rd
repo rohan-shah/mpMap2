@@ -13,6 +13,9 @@ mpcrossMapped(cross, map, rf = NULL)
 
 \item{rf}{Optional recombination fraction data. Leave as NULL if there is no such data.}
 }
+\value{
+
+}
 \description{
 Create object of class mpcrossMapped
 }

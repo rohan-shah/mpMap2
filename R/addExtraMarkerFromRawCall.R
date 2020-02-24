@@ -11,6 +11,7 @@ splitVector <- function(vector, splitValue)
 #' @param newMarker A matrix containing the raw data for the marker to add. 
 #' @param useOnlyExtraImputationPoints Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers? 
 #' @return A vector containing the test statistic values. 
+#' @value An object of class \code{addExtraMarkersStatistics} containing the test statistic values and the genetic map used to generate them. 
 #' 
 #' @details This function uses a QTL-mapping style approach to test for where an extra marker should be added to an existing map. The code uses the imputation data at a collection of points, and the \emph{raw calling data} for the extra marker. The raw calling data must be bivariate.
 #'

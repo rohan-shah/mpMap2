@@ -19,6 +19,9 @@ finals(object)
 \arguments{
 \item{object}{The \code{mpcross} object from which to extract the genetic data matrix}
 }
+\value{
+An integer matrix with rows corresponding to genotyped lines and columns corresponding to markers.
+}
 \description{
 Genetic data for final lines
 

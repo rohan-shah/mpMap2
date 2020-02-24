@@ -5,6 +5,7 @@
 #' @param x pedigree graph to plot
 #' @param y unused
 #' @param ... Other options to plot.igraph
+#' @return None
 #' @seealso \code{\link{pedigreeToGraph}}
 setMethod(f = "plot", signature = "pedigreeGraph", definition = function(x, y, ...)
 {

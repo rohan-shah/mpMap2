@@ -53,7 +53,6 @@ NULL
 #' #Simulate data
 #' simulatedFourParentData <- simulateMPCross(map = simulatedFourParentMap, pedigree = pedigree, 
 #' 	mapFunction = haldane, seed = 1L)
-#' #save(simulatedFourParentData, simulatedFourParentMap, file = "data/simulatedFourParentData.RData")
 NULL
 #' @name simulatedFourParentMap
 #' @rdname simulatedFourParentData

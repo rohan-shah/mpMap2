@@ -3,6 +3,7 @@
 #' @details Extract a character vector, with names corresponding to markers, and values corresponding to the chromosome on which the named marker is located.
 #' @param markers The markers for which we want the chromosomes
 #' @param mpcrossMapped The object containing the map of interest
+#' @return A character vector, with names corresponding to markers, and values corresponding to the chromosome on which the named marker is located.
 #' @examples
 #' map <- qtl::sim.map()
 #' pedigree <- f2Pedigree(1000)

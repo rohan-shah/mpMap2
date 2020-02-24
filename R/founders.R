@@ -7,6 +7,7 @@
 #' If the \code{mpcross} object contains a single experiment a matrix is returned, with rows corresponding to founding lines and columns corresponding to markers. If an \code{mpcross} object contains multiple experiments a list of such matrices is returned, one for each experiment.
 #' @rdname founders
 #' @param object The \code{mpcross} object from which to extract the genetic data matrix of the founding lines
+#' @return An integer matrix, with rows corresponding to founding lines and columns corresponding to markers, or a list of such matrices in the case of multiple experiments. 
 #' @export
 setGeneric(name = "founders", def = function(object){standardGeneric("founders")})
 #' @rdname founders
@@ -29,6 +30,7 @@ setMethod(f = "founders", signature = "geneticData", definition = function(objec
 #'
 #' If the \code{mpcross} object contains a single experiment a vector of names of genetic lines is returned. If an \code{mpcross} object contains multiple experiments a list of vectors of names is returned. 
 #' @param object The \code{mpcross} object from which to extract the names of the founding genetic lines
+#' @return A vector of names of genetic lines, or a list of such vectors, in the case of multiple experiments. 
 #' @rdname founderNames
 #' @export
 setGeneric(name = "founderNames", def = function(object){standardGeneric("founderNames")})

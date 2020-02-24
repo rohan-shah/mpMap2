@@ -6,6 +6,7 @@
 #' @details Get the names of all positions at which IBD genotype imputation has already been performed
 #' @param object The object from which to get the names of positions
 #' @param ... Extra parameters, currently only \code{"experiment"} is supported. 
+#' @return The names of all positions at which IBD genotype imputation has already been performed.
 #' @export
 setGeneric(name = "flatImputationMapNames", def = function(object, ...){standardGeneric("flatImputationMapNames")})
 #' @rdname flatImputationMapNames
@@ -49,6 +50,7 @@ setMethod(f = "flatImputationMapNames", signature = "mpcrossMapped", definition 
 #' @details Get the map of positions used for IBD genotype imputation. This is necessary because the points at which IBD genotype imputation has been performed may include non-marker points. See \code{\link{imputeFounders}} for further details. 
 #' @param object The object from which to extract the IBD genotype imputation positions. 
 #' @param ... Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation map for a specific experiment. 
+#' @return The map of positions used for IBD genotype imputation.
 #' @export
 setGeneric(name = "imputationMap", def = function(object, ...){standardGeneric("imputationMap")})
 #' @rdname imputationMap
@@ -94,6 +96,7 @@ setMethod(f = "imputationMap", signature = "mpcrossMapped", definition = functio
 #' Each value in the matrix represents the predicted genotype for that genetic line, at that position. In the case of completely inbred experiments, each value in the matrix represents the founders from which that allele is believed to be derived. In the case of experiments with residual heterozygosity, the possible genotypes include heterozygotes, and the interpretation of the values in the matrix is more complicated. Function \code{\link{imputationKey}} gives information about how the values in the matrix correspond to actual genotypes. 
 #' @param object The object from which to extract the IBD genotype imputation data
 #' @param ... Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation data for a specific experiment. 
+#' @return The IBD genotype imputation data.
 #' @export
 setGeneric(name = "imputationData", def = function(object, ...){standardGeneric("imputationData")})
 #' @rdname imputationData
@@ -139,6 +142,7 @@ setMethod(f = "imputationData", signature = "mpcrossMapped", definition = functi
 #' The key is a matrix with three columns. The first two columns represent founder alleles, and the third column gives the encoding for that particular pair of founder alleles.
 #' @param object The object from which to get the imputation key. 
 #' @param ... Extra parameters. Currently only \code{"experiment"} is supported, letting the user extract the imputation map for a specific experiment. 
+#' @return Key giving the encoding of heterozygotes, in the imputed IBD genotype data. 
 #' @examples
 #' pedigree <- eightParentPedigreeRandomFunnels(initialPopulationSize = 100, 
 #' 	selfingGenerations = 2, nSeeds = 1, intercrossingGenerations = 0)

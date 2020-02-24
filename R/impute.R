@@ -13,6 +13,7 @@ condition <- function(subclass, message, call = sys.call(-1), ...) {
 #' @param verbose Should more verbose output be generated? 
 #' @param allErrors If there is an error, should we immediately return, or should we continue, and report all errors?
 #' @param extractErrorsFunction Error handling function. If there are errors and allErrors is \code{TRUE}, this function will be called with a matrix indicating which estimates could not be imputed. 
+#' @return An object of class \code{mpcrossLG}, containing all the information in the input object, but also an imputed copy of the estimated recombination fraction data. 
 #' @export
 impute <- function(mpcrossLG, verbose = FALSE, allErrors = FALSE, extractErrorsFunction = function(e) e)
 {

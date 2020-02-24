@@ -11,6 +11,9 @@ reverseChromosomes(mpcrossMapped, chromosomes)
 
 \item{chromosomes}{The names of the chromosomes to reverse}
 }
+\value{
+An object of class \code{mpcrossMapped}, with certain chromosomes reversed.
+}
 \description{
 Create a new object, with the specified chromosomes reversed
 }

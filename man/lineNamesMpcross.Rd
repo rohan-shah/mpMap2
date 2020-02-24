@@ -12,6 +12,9 @@
 \arguments{
 \item{object}{The object from which to extract the line names}
 }
+\value{
+Vector of genetic line names
+}
 \description{
 Get the genetic line names of a population
 }

@@ -17,6 +17,9 @@ hetData(object, marker)
 
 \item{marker}{The marker of interest. If this is missing, heterozygote encoding data is returned for all markers.}
 }
+\value{
+Heterozygote encoding data, for either a specific marker or all markers.
+}
 \description{
 Get the encoding of marker heterozygotes
 }

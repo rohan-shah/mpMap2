@@ -82,6 +82,11 @@
 
 \item{e2}{Object two}
 }
+\value{
+Various. Not for external use.
+
+Modified version of the input object. The class of the output depends on the class of the input.
+}
 \description{
 Internal operators, used to modify mpcross objects.
 }
