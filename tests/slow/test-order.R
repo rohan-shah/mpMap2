@@ -1,4 +1,5 @@
 context("Test ordering function")
+mpMap2::omp_set_num_threads(1)
 test_that("Test that not having rf data generates an error",
 	{
 		f2Pedigree <- f2Pedigree(100)

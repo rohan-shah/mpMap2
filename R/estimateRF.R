@@ -24,7 +24,7 @@
 #' @export
 #' @examples map <- qtl::sim.map(len = 100, n.mar = 11, include.x=FALSE)
 #' f2Pedigree <- f2Pedigree(1000)
-#' cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
+#' \dontrun{cross <- simulateMPCross(map = map, pedigree = f2Pedigree, mapFunction = haldane, seed = 1)
 #' rf <- estimateRF(cross)
 #' #Print the estimated recombination fraction values
 #' rf@@rf@@theta[1:11, 1:11]
@@ -44,7 +44,7 @@
 #' #    lies in the upper-triangular part - The value on the diagonal. 
 #' rf <- estimateRF(cross, markerRows = 3, markerColumns = 1:3)
 #' #Print the estimated recombination fraction values
-#' rf@@rf@@theta[1:11, 1:11]
+#' rf@@rf@@theta[1:11, 1:11]}
 estimateRF <- function(object, recombValues, lineWeights, gbLimit = -1, keepLod = FALSE, keepLkhd = FALSE, verbose = FALSE, markerRows = 1:nMarkers(object), markerColumns = 1:nMarkers(object))
 {
 	inheritsNewMpcrossArgument(object)
