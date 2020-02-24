@@ -52,6 +52,7 @@ getAllFunnels <- function(cross, standardised = FALSE)
 #' @details This function is similar to \code{\link{getAllFunnels}}, but more useful for populations with maintenance (or AIC) generations. It returns a list of all the mixing orders in the initial generations, which make a genetic contribution to the final population. Unlike for \code{\link{getAllFunnels}}, rows of the returned matrix DO NOT refer to specific genetic lines. 
 #' @param cross The object of class \code{mpcross} containing the pedigree of interest
 #' @param standardised Should the output funnels be standardised?
+#' @return Matrix of mixing orders that contribute to the final popluation. Rows DO NOT refer to specific genetic lines. 
 #' @examples
 #' set.seed(1)
 #' pedigree <- fourParentPedigreeRandomFunnels(initialPopulationSize = 1000,

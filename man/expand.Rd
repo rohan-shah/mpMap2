@@ -10,8 +10,9 @@ expand(mpcross, newMarkers)
 \item{mpcross}{The input \code{mpcross} object}
 
 \item{newMarkers}{The names of the new markers to add}
-
-\item{An}{object of class \code{mpcross} with a larger set of markers.}
+}
+\value{
+An object of class \code{mpcross} with a larger set of markers.
 }
 \description{
 Expand set of markers within object, adding extra markers with missing observations as necessary.

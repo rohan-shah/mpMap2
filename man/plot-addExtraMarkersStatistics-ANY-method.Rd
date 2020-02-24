@@ -13,6 +13,9 @@
 
 \item{...}{Unused}
 }
+\value{
+A ggplot object suitable for display.
+}
 \description{
 Plot the chi-squared statistics for independence, used to map a new marker to an existing genetic map
 }

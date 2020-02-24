@@ -11,6 +11,9 @@ getAllFunnelsIncAIC(cross, standardised = FALSE)
 
 \item{standardised}{Should the output funnels be standardised?}
 }
+\value{
+Matrix of mixing orders that contribute to the final popluation. Rows DO NOT refer to specific genetic lines.
+}
 \description{
 Get every order of the founding lines, which makes a contribution to the final population
 }

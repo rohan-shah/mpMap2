@@ -41,6 +41,9 @@ addExtraMarkers(
 
 \item{reorder}{Should local reordering be performed after the extra markers are added?}
 }
+\value{
+If \code{onlyStatistics} was set to \code{TRUE}, an object of class \code{addExtraMarkersStatistics} containing the test statistic values. If \code{onlyStatistics} was set to \code{FALSE}, a list containing the test statistic values in entry \code{statistics} and in entry \code{object}, a new object containing the input object with the new markers added.
+}
 \description{
 Add extra markers to a map, using a QTL-mapping style approach.
 }

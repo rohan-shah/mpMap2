@@ -6,7 +6,7 @@
 #' @param mpcross Object to convert
 #' @param selfing Number of generations of selfing to put in the pedigree, for the converted object. Must be \code{"finite"} or \code{"infinite"}. 
 #' @param fixCodingErrors Should we attempt to fix coding errors, by replacing invalid values by NA? Defaults to FALSE. 
-#' @param An object of class \code{mpcross} or \code{mpcrossMapped}, depending on the data contained in the input object.
+#' @return An object of class \code{mpcross} or \code{mpcrossMapped}, depending on the data contained in the input object.
 #' @export
 fromMpMap <- function(mpcross, selfing = "infinite", fixCodingErrors = FALSE)
 {
@@ -175,7 +175,7 @@ mpcross <- function(founders, finals, pedigree, hetData = infiniteSelfing, fixCo
 #' @param cross An object of class \code{mpcross}
 #' @param map A genetic map, formatted as in the \code{qtl} package.
 #' @param rf Optional recombination fraction data. Leave as NULL if there is no such data.
-#' @return An object of class \code{mpcrossMappe, constructed from the arguments. 
+#' @return An object of class \code{mpcrossMapped}, constructed from the arguments. 
 #' @export
 mpcrossMapped <- function(cross, map, rf=NULL)
 {

@@ -18,7 +18,7 @@ addExtraMarkerFromRawCall(
 \item{useOnlyExtraImputationPoints}{Should we only attempt to add the new marker at points at which imputation data has been generated, which are \emph{not} markers?}
 }
 \value{
-A vector containing the test statistic values.
+An object of class \code{addExtraMarkersStatistics} containing the test statistic values and the genetic map used to generate them.
 }
 \description{
 Add an extra marker to a map, based on raw calling data, using a QTL-mapping style approach.
