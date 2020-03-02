@@ -1,8 +1,8 @@
 Package: mpMap2
 Type: Package
 Title: Genetic Analysis of Multi-Parent Recombinant Inbred Lines
-Version: 1.0.0
-Date: 2020-01-30
+Version: 1.0.1
+Date: 2020-03-02
 Author: Rohan Shah [aut, cre],
   Emma Huang [aut],
   Matthew Morell [ctb],
@@ -27,7 +27,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    gridExtra
+    gridExtra,
+    Heatplus
 Imports: 
     ggplot2,
     Matrix,
@@ -37,7 +38,6 @@ Imports:
     fastcluster,
     pryr,
     nnls,
-    Heatplus,
     RColorBrewer,
     jsonlite,
     progress,

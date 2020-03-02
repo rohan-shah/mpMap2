@@ -14,7 +14,6 @@
 #' @importFrom fastcluster hclust
 #' @importFrom nnls nnls
 #' @importFrom ggplot2 ggplot
-#' @importFrom Heatplus heatmap_2
 #' @importFrom RColorBrewer brewer.pal
 #' @exportClass pedigreeGraph
 #' @exportClass probabilities

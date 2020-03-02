@@ -1,5 +1,6 @@
 #include "intercrossingAndSelfingGenerations.h"
 #include "sortPedigreeLineNames.h"
+#include <cmath>
 SEXP getIntercrossingAndSelfingGenerationsExport(SEXP pedigree_sexp, SEXP finals_sexp)
 {
 BEGIN_RCPP
@@ -39,7 +40,7 @@ bool getIntercrossingAndSelfingGenerations(Rcpp::S4 pedigree, Rcpp::IntegerMatri
 	intercrossing.resize(nFinals);
 	selfing.resize(nFinals);
 
-	int log2Founders = (int)((log(nFounders) / log(2)) + 0.5);
+	int log2Founders = (int)((std::log(static_cast<float>(nFounders)) / std::log(2.0f)) + 0.5);
 	for(int finalCounter = 0; finalCounter < nFinals; finalCounter++)
 	{
 		std::string currentLineName = Rcpp::as<std::string>(finalNames(finalCounter));

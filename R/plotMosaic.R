@@ -51,12 +51,15 @@ plotMosaic <- function(inputObject, chromosomes, positions, lines, ...)
 	dataMatrix <- imputed@data
 	founders <- nFounders(geneticData)
 	dataMatrix[dataMatrix > founders+1] <- founders+1
-	if(nrow(dataMatrix) == 1)
+	if(requireNamespace("Heatplus"))
 	{
-		heatmap_2(rbind(dataMatrix, dataMatrix), scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
-	}
-	else
-	{
-		heatmap_2(dataMatrix, scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+		if(nrow(dataMatrix) == 1)
+		{
+			Heatplus::heatmap_2(rbind(dataMatrix, dataMatrix), scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+		}
+		else
+		{
+			Heatplus::heatmap_2(dataMatrix, scale = "none", col=brewer.pal(founders+1, "Spectral"), Colv = NA, Rowv = NA, do.dendro=c(FALSE,FALSE), ...)
+		}
 	}
 }
