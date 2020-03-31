@@ -164,13 +164,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> void constructLook
 			}
 		}
 	}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel 
 #endif
 	{
 		std::vector<array2<maxAlleles> > markerProbabilities(nFinerPoints);
 		//This next loop is a big chunk of code, but does NOT grow with problem size (number of markers, number of lines). Well, it grows but to some fixed limit, because there are only so many marker patterns. 
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #pragma omp for schedule(dynamic)
 #endif
 		for(std::vector<int>::const_iterator rowPatternIterator = args.rowPatterns.begin(); rowPatternIterator < args.rowPatterns.end(); rowPatternIterator++)

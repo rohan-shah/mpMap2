@@ -24,7 +24,7 @@ namespace arsaRaw
 	};
 	void arsaRaw(arsaRawArgs& args);
 	void arsaRawExported(arsaRawArgs& args);
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	void arsaRawParallel(arsaRawArgs& args);
 #endif
 }

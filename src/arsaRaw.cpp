@@ -1,13 +1,13 @@
 #include "arsaRaw.h"
 #include <Rcpp.h>
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 namespace arsaRaw
 {
 	void arsaRawExported(arsaRawArgs& args)
 	{
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		if(omp_get_max_threads() > 1)
 		{
 			arsaRawParallel(args);
@@ -353,7 +353,7 @@ namespace arsaRaw
 		}
 		PutRNGstate();
 	}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	//Related to parallel version
 	struct change
 	{

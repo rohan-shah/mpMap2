@@ -1,7 +1,7 @@
 #include "arsaRawREntryPoint.h"
 #include "arsaRaw.h"
 #include <Rcpp.h>
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 SEXP arsaRawREntryPoint(SEXP n_, SEXP rawDist_, SEXP levels_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp)
@@ -134,7 +134,7 @@ BEGIN_RCPP
 	args.randomStart = randomStart;
 	args.maxMove = maxMove;
 	args.effortMultiplier = effortMultiplier;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	if(omp_get_max_threads() > 1)
 	{
 		arsaRaw::arsaRawParallel(args);

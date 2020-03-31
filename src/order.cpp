@@ -1,7 +1,7 @@
 #include "order.h"
 #include "impute.h"
 #include "arsaRaw.h"
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 SEXP order(SEXP mpcrossLG_sexp, SEXP groupsToOrder_sexp, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp, SEXP verbose_)
@@ -362,7 +362,7 @@ BEGIN_RCPP
 		args.randomStart = randomStart;
 		args.maxMove = maxMove;
 		args.effortMultiplier = effortMultiplier;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		if(omp_get_max_threads() > 1)
 		{
 			arsaRaw::arsaRawParallel(args);

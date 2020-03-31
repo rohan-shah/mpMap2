@@ -15,7 +15,7 @@
 #include "recodeHetsAsNA.h"
 #include "estimateRF.h"
 #include "matrixChunks.h"
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include "mpMap2_openmp.h"
 #include <omp.h>
 #endif
@@ -48,13 +48,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work. 
 	//Use this to only call setTxtProgressBar every 10 calls to updateProgress. Probably no point in updating status more frequently than that.
 	unsigned long long updateProgressCounter = 0;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel 
 #endif
 	{
 		triangularIterator indexIterator = args.startPosition;
 		unsigned long long previousCounter = 0;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
 		for(unsigned long long counter = 0; counter < args.valuesToEstimateInChunk; counter++)
@@ -116,13 +116,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 					}
 				}
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			#pragma omp critical
 #endif
 			{
 				progressCounter++;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			if(omp_get_thread_num() == 0)
 #endif
 			{
@@ -166,7 +166,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 	//We parallelise this array, even though it's over an iterator not an integer. So we use an integer and use that to work out how many steps forwards we need to move the iterator. We assume that the values are strictly increasing, otherwise this will never work.
 	//Use this to only call setTxtProgressBar every 10 calls to updateProgress. Probably no point in updating status more frequently than that.
 	unsigned long long updateProgressCounter = 0;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel 
 #endif
 	{
@@ -175,7 +175,7 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 		std::vector<int> table(maxAlleles*product1);
 
 		int previousCounter = 0;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
 		for(int counter = 0; counter < (int)args.valuesToEstimateInChunk; counter++)
@@ -265,13 +265,13 @@ template<int nFounders, int maxAlleles, bool infiniteSelfing> bool estimateRFSpe
 				if(contribution != contribution || contribution == -std::numeric_limits<double>::infinity()) args.result[(long)counter *(long)nRecombLevels + (long)recombCounter] = -std::numeric_limits<double>::infinity();
 				else args.result[(long)counter * (long)nRecombLevels + (long)recombCounter] += contribution;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			#pragma omp critical
 #endif
 			{
 				progressCounter++;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			if(omp_get_thread_num() == 0)
 #endif
 			{

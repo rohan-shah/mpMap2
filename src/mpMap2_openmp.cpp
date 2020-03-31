@@ -1,11 +1,11 @@
 #include "mpMap2_openmp.h"
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 SEXP mpMap2_omp_set_num_threads(SEXP num)
 {
 BEGIN_RCPP
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	int nThreads = Rcpp::as<int>(num);
 	omp_set_num_threads(nThreads);
 	return R_NilValue;
@@ -17,7 +17,7 @@ END_RCPP
 SEXP mpMap2_omp_get_num_threads()
 {
 BEGIN_RCPP
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	int nThreads = omp_get_num_threads();
 	return Rcpp::wrap(nThreads);
 #else

@@ -14,7 +14,7 @@
 #include "probabilities4.h"
 #include "probabilities8.h"
 #include "probabilities16.h"
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include "mpMap2_openmp.h"
 #include <omp.h>
 #endif
@@ -246,7 +246,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 	const R_xlen_t product1 = maxAlleles*(maxSelfing-minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations+1);
 	const R_xlen_t product2 = (maxSelfing - minSelfing + 1) *(nDifferentFunnels + maxAIGenerations - minAIGenerations + 1);
 	const R_xlen_t product3 = nDifferentFunnels + maxAIGenerations - minAIGenerations + 1;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
@@ -254,7 +254,7 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 		std::vector<int> table(maxAlleles*product1);
 		std::vector<double> results(nRecombLevels);
 		singleMarkerPairData<maxAlleles> thisMarkerPairData(nRecombLevels, nDifferentFunnels, std::max(maxAIGenerations - minAIGenerations+1, 0), maxSelfing - minSelfing + 1);
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for
 #endif
 		for(std::vector<std::pair<int, int> >::iterator patternPairIterator = args.uniquePatternPairs.begin(); patternPairIterator < args.uniquePatternPairs.end(); patternPairIterator++)
@@ -407,12 +407,12 @@ template<int nFounders, bool infiniteSelfing> bool estimateRFSingleDesignInterna
 				currentPosition.next();
 				destinationCounter++;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			#pragma omp critical
 #endif
 			{
 				done += doneThisThread;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 				if(omp_get_thread_num() == 0)
 #endif
 				{

@@ -4,7 +4,7 @@
 #include <math.h>
 #include <limits>
 #include <sstream>
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 struct rowColumnDifference
@@ -42,12 +42,12 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 	std::sort(copiedMarkersThisGroup.begin(), copiedMarkersThisGroup.end());
 	std::vector<double> similarityMatrix(nMarkersThisGroup * nMarkersThisGroup, 0);
 	std::vector<int> usablePoints(nMarkersThisGroup * nMarkersThisGroup, 0);
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
 		std::vector<int> table(0x100 * 0x100, 0);
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp parallel for schedule(dynamic)
 #endif
 		//First marker
@@ -87,12 +87,12 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		}
 	}
 	typedef std::set<rowColumnDifference, differenceSetComp> differenceSetType;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
 		differenceSetType differenceSet;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
 		//row
@@ -151,13 +151,13 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					if(!replacementFound)
 					{
 						//critical section, due to assignment to the shared error variable. 
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 						#pragma omp critical
 #endif
 						{
 							reportedErrors.push_back(std::make_pair(marker1+1, marker2+1));
 							hasError = true;
-#ifndef USE_OPENMP
+#ifndef _OPENMP
 							//We can't return early if we're using openmp
 							if(!allErrors) return false;
 #endif
@@ -165,13 +165,13 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					}
 				}
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			#pragma omp critical
 #endif
 			{
 				done++;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			if(omp_get_thread_num() == 0)
 #endif
 			{

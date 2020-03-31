@@ -1,5 +1,5 @@
 #include "computeAllEpistaticChiSquared.h"
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 #include <functional>
@@ -112,12 +112,12 @@ BEGIN_RCPP
 			};
 	}
 	unsigned long long done = 0;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
 		std::vector<float> obs(nAlleles*nAlleles), sums1(nAlleles), sums2(nAlleles);
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
 		for(int marker1 = 0; marker1 < nMarkers; marker1++)
@@ -167,13 +167,13 @@ BEGIN_RCPP
 #endif
 				returnValue(marker1, marker2) = returnValue(marker2, marker1) = accumulated;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			#pragma omp critical
 #endif
 			{
 				done++;
 			}
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 			if(omp_get_thread_num() == 0)
 #endif
 			{

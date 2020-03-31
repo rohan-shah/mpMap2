@@ -162,7 +162,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 	integerMatrix key_pointer = key;
 	numericMatrix results_pointer = results;
 	//Now actually run the Viterbi algorithm
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
@@ -187,7 +187,7 @@ template<int nFounders, bool infiniteSelfing> void computeFounderGenotypesIntern
 		forwardsBackwards.funnelSingleLociHaplotypeProbabilities = &funnelSingleLociHaplotypeProbabilities;
 		forwardsBackwards.minAIGenerations = minAIGenerations;
 		forwardsBackwards.maxAIGenerations = maxAIGenerations;
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 		#pragma omp for schedule(dynamic)
 #endif
 		for(int chromosomeCounter = 0; chromosomeCounter < (int)allPositions.chromosomes.size(); chromosomeCounter++)
