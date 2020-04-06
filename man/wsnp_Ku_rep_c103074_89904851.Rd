@@ -40,7 +40,7 @@ called1D <- ggplot(plotData, mapping = aes(x = theta, y = r, color = genotype1D)
     guides(color=guide_legend(title="Called cluster")) + 
     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 
-\dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
+\donttest{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
 }
 \author{
 Alex Whan, Matthew Morell, Rohan Shah, Colin Cavanagh

@@ -75,7 +75,7 @@
 #'     guides(color=guide_legend(title="Called cluster")) + 
 #'     scale_color_manual(values = c("black",RColorBrewer::brewer.pal(n=3,name = "Set1")[1:2]))
 #' 
-#' \dontrun{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
+#' \donttest{grid.arrange(plotImputations1B, plotImputations1D, called1B, called1D)}
 callFromMap <- function(rawData, thresholdChromosomes = 100, thresholdAlleleClusters = c(1e-10, 1e-20, 1e-30, 1e-40), maxChromosomes = 2, existingImputations, tDistributionPValue = 0.6, useOnlyExtraImputationPoints = TRUE, ...)
 {
 	args <- list(...)

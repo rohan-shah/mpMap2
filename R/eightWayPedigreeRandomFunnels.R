@@ -24,9 +24,9 @@
 #' #convert the pedigree to a graph
 #' pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #' #Plot it
-#' \dontrun{plot(pedigreeAsGraph)}
+#' \donttest{plot(pedigreeAsGraph)}
 #' #Write it to a file in DOT format
-# \dontrun{write.graph(graph = pedigreeAsGraph@@graph, format = "dot", file = "./pedigree.dot")}
+# \donttest{write.graph(graph = pedigreeAsGraph@@graph, format = "dot", file = "./pedigree.dot")}
 
 # This is written in C because otherwise it's just too damn slow (especially for generating the huge populations that we want to use to get numerically accurate results for unit testing)
 eightParentPedigreeRandomFunnels <- function(initialPopulationSize, selfingGenerations, nSeeds = 1L, intercrossingGenerations)

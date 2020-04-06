@@ -52,7 +52,7 @@ rf <- estimateRF(simulatedFourParentData)
 #Assign all markers to one linkage group / chromosome
 grouped <- formGroups(rf, groups = 1)
 #Estimate map
-\dontrun{estimatedMap <- estimateMap(grouped, maxOffset = 10)}
+\donttest{estimatedMap <- estimateMap(grouped, maxOffset = 10)}
 #Create object that includes the map
-\dontrun{mapped <- new("mpcrossMapped", grouped, map = estimatedMap)}
+\donttest{mapped <- new("mpcrossMapped", grouped, map = estimatedMap)}
 }

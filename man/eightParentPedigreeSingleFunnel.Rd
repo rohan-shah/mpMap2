@@ -36,9 +36,9 @@ getAllFunnels(cross)
 #convert the pedigree to a graph
 pedigreeAsGraph <- pedigreeToGraph(pedigree)
 #Plot it
-\dontrun{plot(pedigreeAsGraph)}
+\donttest{plot(pedigreeAsGraph)}
 #Write it to a file in DOT format
-\dontrun{write.graph(graph = pedigreeAsGraph@graph, format = "dot", file = "./pedigree.dot")}
+\donttest{write.graph(graph = pedigreeAsGraph@graph, format = "dot", file = "./pedigree.dot")}
 }
 \seealso{
 \code{\link{eightParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeSingleFunnel}}, \code{\link{fourParentPedigreeRandomFunnels}}, \code{\link{twoParentPedigree}}
