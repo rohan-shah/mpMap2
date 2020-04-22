@@ -49,11 +49,11 @@ inline double computeDelta(std::vector<int>& randomPermutation, R_xlen_t swap1, 
 		R_xlen_t permutationI_2 = permutationI_1;
 		if(copiedPermutationSwap1 < permutationI_1) std::swap(copiedPermutationSwap1, permutationI_1);
 		if(copiedPermutationSwap2 < permutationI_2) std::swap(copiedPermutationSwap2, permutationI_2);
-		delta += (abs(i - swap1) - abs(i - swap2)) * (dist[(copiedPermutationSwap2 * (copiedPermutationSwap2+1))/2 + permutationI_2] - dist[(copiedPermutationSwap1 *(copiedPermutationSwap1 + 1))/2 + permutationI_1]);
+		delta += (std::abs(i - swap1) - std::abs(i - swap2)) * (dist[(copiedPermutationSwap2 * (copiedPermutationSwap2+1))/2 + permutationI_2] - dist[(copiedPermutationSwap1 *(copiedPermutationSwap1 + 1))/2 + permutationI_1]);
 	}
 	//subtract off the case i == swap1.
 	//if(permutationSwap2 < permutationSwap1) std::swap(permutationSwap1, permutationSwap2);
-	//delta += abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
+	//delta += std::abs(swap1 - swap2) * dist[(permutationSwap2 * (permutationSwap2+1))/2 + permutationSwap1];
 	return delta;
 }
 SEXP arsaExportedR(SEXP n_, SEXP dist_, SEXP cool_, SEXP temperatureMin_, SEXP nReps_, SEXP maxMove_sexp, SEXP effortMultiplier_sexp, SEXP randomStart_sexp)
@@ -318,7 +318,7 @@ void arsa(arsaArgs& args)
 					getPairForMove(n, swap1, swap2, maxMove);
 					//three different patrs of delta
 					double delta1 = 0, delta2 = 0, delta3 = 0;
-					R_xlen_t span = abs(swap1 - swap2);
+					R_xlen_t span = std::abs(swap1 - swap2);
 					R_xlen_t span2 = span + 1;
 					R_xlen_t permutedSwap1 = currentPermutation[swap1];
 					if(swap2 > swap1)

@@ -29,7 +29,8 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 	unsigned long done = 0;
 	unsigned long total = (unsigned long)markersThisGroup.size();
 	bool hasError = false;
-	int nLevels = (int)levels.size(), nMarkersThisGroup = (int)markersThisGroup.size();
+	int nLevels = (int)levels.size();
+	std::size_t nMarkersThisGroup = markersThisGroup.size();
 	std::vector<double> absoluteDifferences(0x100*0x100, 0);
 	for(int i = 0; i < nLevels; i++)
 	{
@@ -51,7 +52,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		#pragma omp parallel for schedule(dynamic)
 #endif
 		//First marker
-		for(unsigned long long i = 0; i < (unsigned long long)nMarkersThisGroup; i++)
+		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
 		{
 			//Second marker
 			for(unsigned long long j = 0; j < i; j++)
@@ -68,7 +69,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					table[originalTheta[i * (i + 1ULL) / 2ULL + k] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
 					usableSum += (originalTheta[i * (i + 1ULL) / 2ULL + k] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
 				}
-				for(unsigned long long k = i+1; k < (unsigned long long)nMarkersThisGroup; k++)
+				for(unsigned long long k = i+1; k < nMarkersThisGroup; k++)
 				{
 					table[originalTheta[k * (k + 1ULL) / 2ULL + i] * 0x100 + originalTheta[k * (k + 1ULL) / 2ULL + j]]++;
 					usableSum += (originalTheta[k * (k + 1ULL) / 2ULL + i] != 0xff && originalTheta[k * (k + 1ULL) / 2ULL + j] != 0xff);
@@ -96,7 +97,7 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 		#pragma omp for schedule(dynamic)
 #endif
 		//row
-		for(unsigned long long i = 0; i < (unsigned long long)nMarkersThisGroup; i++)
+		for(unsigned long long i = 0; i < nMarkersThisGroup; i++)
 		{
 			int marker1 = copiedMarkersThisGroup[i];
 			//column
@@ -117,7 +118,6 @@ template<bool hasLOD, bool hasLKHD> bool imputeInternal(const unsigned char* ori
 					for(unsigned long long k = 0; k < nMarkersThisGroup; k++)
 					{
 						if(k == i || k == j) continue;
-						int marker3 = copiedMarkersThisGroup[k];
 						if(usablePoints[i * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(true, k, similarityMatrix[i * nMarkersThisGroup + k]));
 						if(usablePoints[j * nMarkersThisGroup + k]) differenceSet.insert(rowColumnDifference(false, k, similarityMatrix[j * nMarkersThisGroup + k]));
 					}
