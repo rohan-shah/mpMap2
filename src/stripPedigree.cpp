@@ -1,9 +1,9 @@
 #ifdef USE_BOOST
 #include "stripPedigree.h"
-#include <boost/graph/adjacency_list.h>
-#include <boost/graph/depth_first_search.h>
-#include <boost/graph/topological_sort.h>
-#include <boost/graph/reverse_graph.h>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/depth_first_search.hpp>
+#include <boost/graph/topological_sort.hpp>
+#include <boost/graph/reverse_graph.hpp>
 enum pedigreeEdgeType
 {
 	MOTHER, FATHER

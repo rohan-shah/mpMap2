@@ -1,7 +1,7 @@
 #include "reorderPedigree.h"
 #ifdef USE_BOOST
-#include <boost/graph/adjacency_list.h>
-#include <boost/graph/topological_sort.h>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/topological_sort.hpp>
 SEXP reorderPedigree(SEXP mother_sexp, SEXP father_sexp, SEXP lineNames_sexp)
 {
 BEGIN_RCPP
