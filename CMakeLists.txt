@@ -36,34 +36,37 @@ if(WIN32)
 	if("${CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")
 		#Copy DESCRIPTION
 		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/DESCRIPTION")
+		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE")
 		#Copy R files
 		foreach(RFILE IN LISTS RFILES)
 			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE}")
 		endforeach()
 		#Run roxygen2
-		add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2);roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+		add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e \"library(roxygen2);roxygen2::roxygenise(clean=TRUE)\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 	else()
 		message(STATUS "R_COMMAND = ${R_COMMAND}")
 		foreach(BUILD_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES)
 			#Copy DESCRIPTION
 			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/DESCRIPTION")
+			add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/NAMESPACE")
 			#Copy R files
 			foreach(RFILE IN LISTS RFILES)
 				add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}/R/${RFILE}")
 			endforeach()
 			#Run roxygen2
-			add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e" "\"library(roxygen2);roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}")
+			add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e" "\"library(roxygen2);roxygen2::roxygenise(clean=TRUE)\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_TYPE}")
 		endforeach()
 	endif()
 else()
 	#Copy DESCRIPTION
 	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION.in" "${CMAKE_CURRENT_BINARY_DIR}/DESCRIPTION")
+	add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/NAMESPACE" "${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE")
 	#Copy R files
 	foreach(RFILE IN LISTS RFILES)
 		add_custom_command(TARGET copyPackage COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/R/${RFILE}" "${CMAKE_CURRENT_BINARY_DIR}/R/${RFILE}")
 	endforeach()
 	#Run roxygen2
-	add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e" "\"library(roxygen2);roxygen2::roxygenise()\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+	add_custom_command(TARGET copyPackage COMMAND "${R_COMMAND}" ARGS "-e" "\"library(roxygen2);roxygen2::roxygenise(clean=TRUE)\"" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 if(WIN32)
 	install(CODE "execute_process(COMMAND \"${R_COMMAND}\" CMD INSTALL --no-multiarch \$\{CMAKE_INSTALL_CONFIG_NAME\} WORKING_DIRECTORY \"${PROJECT_BINARY_DIR}\")")
